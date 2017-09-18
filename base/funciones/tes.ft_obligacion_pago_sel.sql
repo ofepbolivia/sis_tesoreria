@@ -37,6 +37,9 @@ DECLARE
     v_strg_sol			varchar;
     v_id_clase_comprobante	integer;
 
+    v_filtro_resp 		varchar;
+    v_id_funcionario_resp integer;
+
     --variables reporte certificacion presupuestaria
     v_record_op					record;
     v_index						integer;
@@ -159,7 +162,14 @@ BEGIN
                             inner join adq.tproceso_compra pc on pc.id_proceso_compra = cot.id_proceso_compra  ';
         END IF;
 
-
+		IF(p_administrador != 1)THEN
+        	SELECT tf.id_funcionario
+            INTO v_id_funcionario_resp
+            FROM segu.tusuario tu
+            INNER JOIN orga.tfuncionario tf on tf.id_persona = tu.id_persona
+            WHERE tu.id_usuario = p_id_usuario;
+         	v_filtro_resp = 'obpg.id_funcionario_responsable = '||v_id_funcionario_resp||' and ';
+        END IF;
 
                   --Sentencia de la consulta
                   v_consulta:='select
@@ -219,7 +229,6 @@ BEGIN
                               obpg.uo_ex,
                               obpg.id_funcionario_responsable,
 							                fresp.desc_funcionario1 AS desc_fun_responsable
-
                               from tes.tobligacion_pago obpg
                               inner join segu.tusuario usu1 on usu1.id_usuario = obpg.id_usuario_reg
                               left join segu.tusuario usu2 on usu2.id_usuario = obpg.id_usuario_mod
@@ -362,7 +371,7 @@ BEGIN
                         left join param.tplantilla pla on pla.id_plantilla = obpg.id_plantilla
                         '|| v_inner ||'
                         left join orga.vfuncionario fun on fun.id_funcionario=obpg.id_funcionario
-                        left join orga.vfuncionario fresp ON fresp.id_funcionario = obpg.funcionario_responsable
+                        left join orga.vfuncionario fresp ON fresp.id_funcionario = obpg.id_funcionario_responsable
                         where  '||v_filadd;
 
 			--Definicion de la respuesta

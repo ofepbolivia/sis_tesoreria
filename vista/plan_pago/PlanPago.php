@@ -10,67 +10,97 @@ header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
 Phx.vista.PlanPago=Ext.extend(Phx.gridInterfaz,{
-    fheight: '80%',
-    fwidth: '95%',
+    fheight: '85%',
+    fwidth: '90%',
     accionFormulario:undefined, //define la accion que se ejcuta en formulario new o edit
     porc_ret_gar:0,//valor por defecto de retencion de garantia
+    sigConformidad: false,// Nos permite diferencias si presionamos el boton Sig. de Plan de Pagos(Reg. Adq.) o el boton Conformidad de la Interfaz Conformidad de Pagos.
 	constructor:function(config){
 		//definicion de grupos para fomrulario
 		var me = this;
 		this.Grupos = [
 		            {
-		                layout: 'hbox',
-		                border: false,
-		                defaults: {
-		                   border: true
-		                },            
+                        layout: 'column',
+                        border: false,
+                        defaults: {
+                            border: false
+                        },
 		                items: [
+                            {
+                                bodyStyle: 'padding-right:10px;',
+                                items: [
+                            
 		                              {
 		                                xtype: 'fieldset',
 		                                title: 'Tipo de Pago',
 		                                autoHeight: true,
 		                                //layout:'hbox',
 		                                items: [],
-		                                id_grupo:0,
-		                                margins:'2 2 2 2'
+		                                id_grupo:0
 		                             },
-		                              
-		                            {
-		                                xtype: 'fieldset',
-		                                title: 'Detalle de Pago',
-		                                autoHeight: true,
-		                                //layout:'hbox',
-		                                items: [],
-		                                margins:'2 10 2 2',
-		                                id_grupo:1,
-		                                flex:1
-		                             },
-		                              
-		                            {
-		                                xtype: 'fieldset',
-		                                title: 'Ajustes',
-		                                autoHeight: true,
-		                                hiden: true,
-		                                //layout:'hbox',
-		                                items: [],
-		                                margins:'2 10 2 2',
-		                                id_grupo: 2,
-		                                flex: 1
-		                             },
-		                              
-		                            {
-		                                xtype: 'fieldset',
-		                                title: 'Periodo al que corresponde el gasto',
-		                                autoHeight: true,
-		                                hiden: true,
-		                                //layout:'hbox',
-		                                items: [],
-		                                margins:'2 10 2 2',
-		                                buttons: [{ text: 'Dividir gasto', handler: me.calcularAnticipo, scope: me, tooltip: 'Según las fechas,  ayuda con el calculo  del importe anticipado'}],
-		                                id_grupo: 3,
-		                                flex: 1
-		                             }
-		                       ]
+                                    {
+                                        xtype: 'fieldset',
+                                        title: 'Periodo al que corresponde el gasto',
+                                        autoHeight: true,
+                                        hiden: true,
+                                        //layout:'hbox',
+                                        items: [],
+
+                                        buttons: [{
+                                            text: 'Dividir gasto',
+                                            handler: me.calcularAnticipo,
+                                            scope: me,
+                                            tooltip: 'Según las fechas,  ayuda con el calculo  del importe anticipado'
+                                        }],
+                                        id_grupo: 3
+                                    }
+
+                                ]
+                            }, {
+
+                                bodyStyle: 'padding-right:10px;',
+                                items: [
+
+                                    {
+                                        xtype: 'fieldset',
+                                        title: 'Detalle de Pago',
+                                        autoHeight: true,
+                                        //layout:'hbox',
+                                        items: [],
+
+                                        id_grupo:1
+
+                                    },
+
+                                    {
+                                        xtype: 'fieldset',
+                                        title: 'Ajustes',
+                                        autoHeight: true,
+                                        hiden: true,
+                                        //layout:'hbox',
+                                        items: [],
+
+                                        id_grupo: 2
+                                    }
+                                ]
+                            },
+                            {
+                                bodyStyle: 'padding-right:10px;',
+                                items: [
+                                    {
+                                        xtype: 'fieldset',
+                                        title: 'Observaciones',
+                                        autoHeight: true,
+                                        hiden: true,
+                                        //layout:'hbox',
+                                        items: [],
+
+                                        id_grupo: 4
+                                    }
+
+                                ]
+                            }
+                        ]
 		                  
 		     }];
 		
@@ -318,7 +348,7 @@ Phx.vista.PlanPago=Ext.extend(Phx.gridInterfaz,{
                 name: 'nro_cuota',
                 fieldLabel: 'Cuo. N#',
                 allowBlank: true,
-                gwidth: 50,
+                gwidth: 70,
                 renderer:function(value,p,record){
                        if(record.data.total_pagado==record.data.monto_ejecutar_total_mo ){
                              return String.format('<b><font color="green">{0}</font></b>', value);
@@ -354,6 +384,29 @@ Phx.vista.PlanPago=Ext.extend(Phx.gridInterfaz,{
             grid:true,
             form:false
         },
+
+        {
+            config:{
+                name:'es_ultima_cuota',
+                fieldLabel:'Es Ultima Cuota',
+                allowBlank: true,
+                anchor: '70%',
+                gwidth: 100,
+
+                renderer: function (value, p, record, rowIndex, colIndex) {
+
+                    if (value == true) {
+                        var checked = 'checked';
+                    }
+                    return String.format('<div style="vertical-align:middle;text-align:center;"><input style="height:20px;width:20px;" type="checkbox"  {0}></div>', checked);
+                }
+            },
+            type:'Checkbox',//ComboRec
+            id_grupo: 0,
+            grid: true,
+            form:true
+        },
+
         {
             config:{
                 name: 'estado',
@@ -435,7 +488,7 @@ Phx.vista.PlanPago=Ext.extend(Phx.gridInterfaz,{
                 name: 'nombre_pago',
                 fieldLabel: 'Nombre Pago',
                 allowBlank: true,
-                anchor: '80%',
+                anchor: '100%',
                 gwidth: 250,
                 maxLength:255
             },
@@ -474,8 +527,8 @@ Phx.vista.PlanPago=Ext.extend(Phx.gridInterfaz,{
                 fieldLabel: 'Fecha Tent.',
                 allowBlank: false,
                 gwidth: 80,
-                        format: 'd/m/Y', 
-                        renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+                format: 'd/m/Y',
+                renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
             },
             type:'DateField',
             filters:{pfiltro:'plapa.fecha_dev',type:'date'},
@@ -483,12 +536,14 @@ Phx.vista.PlanPago=Ext.extend(Phx.gridInterfaz,{
             grid:true,
             form:true
         },
+
         {
             config:{
                 name: 'id_plantilla',
                 fieldLabel: 'Tipo Documento',
                 allowBlank: false,
                 emptyText:'Elija una plantilla...',
+                resizable: true,
                 store:new Ext.data.JsonStore(
                 {
                     url: '../../sis_parametros/control/Plantilla/listarPlantilla',
@@ -942,13 +997,13 @@ Phx.vista.PlanPago=Ext.extend(Phx.gridInterfaz,{
                 name: 'obs_descuentos_anticipo',
                 fieldLabel: 'Obs. Desc. Antic.',
                 allowBlank: true,
-                anchor: '80%',
+                anchor: '100%',
                 gwidth: 100,
                 maxLength:300
             },
             type:'TextArea',
             filters:{pfiltro:'plapa.obs_descuentos_anticipo',type:'string'},
-            id_grupo:1,
+            id_grupo:4,
             grid:true,
             form:true
         },
@@ -958,13 +1013,13 @@ Phx.vista.PlanPago=Ext.extend(Phx.gridInterfaz,{
                 fieldLabel: 'Obs. Pago',
                 qtip:'Estas observaciones van a la glosa del comprobante que se genere',
                 allowBlank: true,
-                anchor: '80%',
+                anchor: '100%',
                 gwidth: 100,
                 maxLength:300
             },
             type:'TextArea',
             filters:{pfiltro:'plapa.obs_monto_no_pagado',type:'string'},
-            id_grupo:1,
+            id_grupo:4,
             grid:true,
             form:true
         },
@@ -973,13 +1028,14 @@ Phx.vista.PlanPago=Ext.extend(Phx.gridInterfaz,{
                 name: 'obs_otros_descuentos',
                 fieldLabel: 'Obs. otros desc.',
                 allowBlank: true,
-                anchor: '80%',
+                anchor: '100%',
                 gwidth: 100,
-                maxLength:300
+                maxLength:300,
+                width:300
             },
             type:'TextArea',
             filters:{pfiltro:'plapa.obs_otros_descuentos',type:'string'},
-            id_grupo:1,
+            id_grupo:4,
             grid:true,
             form:true
         },
@@ -988,14 +1044,14 @@ Phx.vista.PlanPago=Ext.extend(Phx.gridInterfaz,{
                 name: 'obs_descuentos_ley',
                 fieldLabel: 'Obs. desc. ley',
                 allowBlank: true,
-                anchor: '80%',
+                anchor: '100%',
                 readOnly:true,
                 gwidth: 100,
                 maxLength:300
             },
             type:'TextArea',
             filters:{pfiltro:'plapa.obs_descuentos_ley',type:'string'},
-            id_grupo:1,
+            id_grupo:4,
             grid:true,
             form:true
         },
@@ -1004,13 +1060,13 @@ Phx.vista.PlanPago=Ext.extend(Phx.gridInterfaz,{
                 name: 'obs_descuento_inter_serv',
                 fieldLabel: 'Obs. desc. inter. serv.',
                 allowBlank: true,
-                anchor: '80%',
+                anchor: '100%',
                 gwidth: 100,
                 maxLength:300
             },
             type:'TextArea',
             filters:{pfiltro:'plapa.obs_descuento_inter_serv',type:'string'},
-            id_grupo:1,
+            id_grupo:4,
             grid:true,
             form:true
         },
@@ -1271,7 +1327,8 @@ Phx.vista.PlanPago=Ext.extend(Phx.gridInterfaz,{
 		{name:'fecha_costo_ini', type: 'date',dateFormat:'Y-m-d'},
 		{name:'fecha_costo_fin', type: 'date',dateFormat:'Y-m-d'},
 		'id_depto_conta_pp','desc_depto_conta_pp','funcionario_wf','tiene_form500',
-		'id_depto_lb','desc_depto_lb','prioridad_lp',{name:'ultima_cuota_dev',type:'numeric'}
+		'id_depto_lb','desc_depto_lb','prioridad_lp',{name:'ultima_cuota_dev',type:'numeric'},
+        {name: 'es_ultima_cuota', type: 'boolean'}
 		
 	],
 	
@@ -1366,50 +1423,65 @@ Phx.vista.PlanPago=Ext.extend(Phx.gridInterfaz,{
         this.reload();
      },  
     
-   sigEstado:function(){                   
-      	var rec=this.sm.getSelected();
-      	
-      	if ((rec.data.estado == 'vbsolicitante' && rec.data.tipo_obligacion == 'adquisiciones') && 
-      				(rec.data['fecha_conformidad'] == '' || rec.data['fecha_conformidad'] == undefined || rec.data['fecha_conformidad'] == null)
-      				&& (rec.data.tipo=='devengado'  || rec.data.tipo=='devengado_pagado' || rec.data.tipo=='devengado_pagado_1c')) {
-      		Ext.Msg.show({
-			   title:'Confirmación',
-			   scope: this,
-			   msg: 'Esta segur@ de solicitar el pago sin generar la conformidad? Para generarla presione el botón "Conformidad"',
-			   buttons: Ext.Msg.YESNO,
-			   fn: function(id, value, opt) {			   		
-			   		if (id == 'yes') {
-			   			this.mostrarWizard(rec);
-			   		} else {
-			   			opt.hide;
-			   		}
-			   },	
-			   animEl: 'elId',
-			   icon: Ext.MessageBox.WARNING
-			}, this);
-      	} else if ((rec.data.estado == 'borrador' && rec.data.tipo_obligacion != 'adquisiciones') && 
-      				(rec.data['fecha_conformidad'] == '' || rec.data['fecha_conformidad'] == undefined || rec.data['fecha_conformidad'] == null)
-      				&& (rec.data.tipo=='devengado'  || rec.data.tipo=='devengado_pagado' || rec.data.tipo=='devengado_pagado_1c')
-      				&& this.maestro.uo_ex == 'no') {
-      		Ext.Msg.show({
-			   title:'Confirmación',
-			   scope: this,
-			   msg: 'Al solicitar el pago se generará una conformidad implícita bajo responsabilidad del funcionario solicitante. Desea Continuar?',
-			   buttons: Ext.Msg.YESNO,
-			   fn: function(id, value, opt) {			   		
-			   		if (id == 'yes') {
-			   			this.mostrarWizard(rec);
-			   		} else {
-			   			opt.hide;
-			   		}
-			   },	
-			   animEl: 'elId',
-			   icon: Ext.MessageBox.WARNING
-			}, this);
-      	
-      	} else {
-      		this.mostrarWizard(rec);
-      	}
+   sigEstado:function(){
+       var rec=this.sm.getSelected();
+       if(rec.data.fecha_tentativa == '' || rec.data.fecha_tentativa == null ){
+           Ext.Msg.show({
+               title: '<b>Información</b>',
+               msg: 'Es necesario completar alguno campos antes de continuar; presione el botón Editar, llene los campos marcados con rojo y los que considere necesarios.',
+               buttons: Ext.Msg.OK,
+               width: 512,
+               icon: Ext.Msg.INFO
+           });
+       }
+       else{
+
+           if ((rec.data.estado == 'vbsolicitante' && rec.data.tipo_obligacion == 'adquisiciones') &&
+               (rec.data['fecha_conformidad'] == '' || rec.data['fecha_conformidad'] == undefined || rec.data['fecha_conformidad'] == null)
+               && (rec.data.tipo == 'devengado' || rec.data.tipo == 'devengado_pagado' || rec.data.tipo == 'devengado_pagado_1c')) {
+               Ext.Msg.show({
+                   title: 'Confirmación',
+                   scope: this,
+                   msg: 'Esta segur@ de solicitar el pago sin generar la conformidad? Para generarla presione el botón "Conformidad"',
+                   buttons: Ext.Msg.YESNO,
+                   fn: function (id, value, opt) {
+                       if (id == 'yes') {
+                           this.mostrarWizard(rec);
+                       } else {
+                           opt.hide;
+                       }
+                   },
+                   animEl: 'elId',
+                   icon: Ext.MessageBox.WARNING
+               }, this);
+           } else if ((rec.data.estado == 'borrador' && rec.data.tipo_obligacion != 'adquisiciones') &&
+               (rec.data['fecha_conformidad'] == '' || rec.data['fecha_conformidad'] == undefined || rec.data['fecha_conformidad'] == null)
+               && (rec.data.tipo == 'devengado' || rec.data.tipo == 'devengado_pagado' || rec.data.tipo == 'devengado_pagado_1c')
+               && this.maestro.uo_ex == 'no') {
+               Ext.Msg.show({
+                   title: 'Confirmación',
+                   scope: this,
+                   msg: 'Al solicitar el pago se generará una conformidad implícita bajo responsabilidad del funcionario solicitante. Desea Continuar?',
+                   buttons: Ext.Msg.YESNO,
+                   fn: function (id, value, opt) {
+                       if (id == 'yes') {
+                           this.mostrarWizard(rec);
+                       } else {
+                           opt.hide;
+                       }
+                   },
+                   animEl: 'elId',
+                   icon: Ext.MessageBox.WARNING
+               }, this);
+           } else if(rec.data.estado == 'borrador' && ((rec.data.conformidad == '' || rec.data.conformidad == null) && (rec.data.fecha_conformidad == '' || rec.data.fecha_conformidad == null))) {
+
+                   this.onButtonConformidad();
+
+               //this.mostrarWizard(rec);
+           }else{
+               this.mostrarWizard(rec);
+           }
+       }
                
      },
      
@@ -1817,6 +1889,7 @@ Phx.vista.PlanPago=Ext.extend(Phx.gridInterfaz,{
      		this.formConformidad.getForm().findField('conformidad').setValue(data.conformidad);
 	     	this.formConformidad.getForm().findField('fecha_conformidad').setValue(data.fecha_conformidad);
 	     	this.windowConformidad.show();
+            this.sigConformidad = true;
      	} else {
      		Ext.Msg.show({
 			   title:'Alerta',
@@ -1828,6 +1901,7 @@ Phx.vista.PlanPago=Ext.extend(Phx.gridInterfaz,{
 			   			this.formConformidad.getForm().findField('conformidad').setValue(data.conformidad);
 	     				this.formConformidad.getForm().findField('fecha_conformidad').setValue(data.fecha_conformidad);
 	     				this.windowConformidad.show();
+                        this.sigConformidad = true;
 			   		}			   },	
 			   animEl: 'elId',
 			   icon: Ext.MessageBox.WARNING
@@ -1837,6 +1911,7 @@ Phx.vista.PlanPago=Ext.extend(Phx.gridInterfaz,{
      },
      
      onSubmitConformidad : function () {
+         this.reload();
      	var d= this.sm.getSelected().data;
      	Phx.CP.loadingShow();	
 		Ext.Ajax.request({
@@ -1854,6 +1929,11 @@ Phx.vista.PlanPago=Ext.extend(Phx.gridInterfaz,{
      },
      
      successConformidad : function (resp) {
+        console.log('conforme',this.sigConformidad);
+        var rec=this.sm.getSelected();
+        if(this.sigConformidad){
+             this.mostrarWizard(rec);
+         }
      	this.windowConformidad.hide();
      	Phx.vista.PlanPago.superclass.successDel.call(this,resp); 
      	

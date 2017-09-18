@@ -1727,3 +1727,10 @@ CREATE TABLE tes.tcaja_funcionario (
 WITH (oids = false);
 
 /*****************************F-SCP-GSS-TES-0-15/03/2017*************/
+
+/*****************************I-SCP-FEA-TES-0-27/07/2017*************/
+
+ALTER TABLE tes.tplan_pago
+  ADD COLUMN es_ultima_cuota BOOLEAN;
+
+/*****************************F-SCP-FEA-TES-0-27/07/2017*************/

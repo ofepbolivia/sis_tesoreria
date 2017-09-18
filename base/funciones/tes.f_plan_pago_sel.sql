@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION tes.f_plan_pago_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -17,7 +15,6 @@ $body$
  COMENTARIOS:
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
-
  DESCRIPCION:
  AUTOR:
  FECHA:
@@ -252,8 +249,8 @@ BEGIN
                         (select count(*)
                              from unnest(pwf.id_tipo_estado_wfs) elemento
                              where elemento = ew.id_tipo_estado) as contador_estados,
-                        depto.prioridad as prioridad_lp
-
+                        depto.prioridad as prioridad_lp,
+						plapa.es_ultima_cuota
                         from tes.tplan_pago plapa
                         inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = plapa.id_proceso_wf
                         inner join tes.tobligacion_pago op on op.id_obligacion_pago = plapa.id_obligacion_pago
@@ -576,16 +573,16 @@ BEGIN
 		begin
 
 			--Sentencia de la consulta de conteo de registros
-			v_consulta:='select fun.desc_funcionario1, prov.desc_proveedor,
+			v_consulta:='select
+            			fun.desc_funcionario1, prov.desc_proveedor,
             			to_char( pp.fecha_conformidad,''DD/MM/YYYY''),pp.conformidad,
                         cot.numero_oc,op.numero, pp.nro_cuota,op.num_tramite::varchar,
-                         pxp.html_rows(''<td>'' || ci.desc_ingas || ''</td><td>'' || od.descripcion|| ''</td>'')::text,
+                         tes.f_get_detalle_html(op.id_obligacion_pago)::text,
                          (case when (pxp.list_unique(ci.tipo)) is null THEN
                             ''Servicio''
                          ELSE
                             pxp.list_unique(ci.tipo)
                          END)::varchar as tipo,
-
                          pp.fecha_costo_ini,
                          pp.fecha_costo_fin,
                          pp.observaciones_pago,
@@ -608,7 +605,8 @@ BEGIN
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
-            v_consulta:=v_consulta||' group by fun.desc_funcionario1, prov.desc_proveedor, pp.fecha_conformidad,pp.conformidad, cot.numero_oc,op.numero, pp.nro_cuota,op.num_tramite';
+            v_consulta:=v_consulta||' group by fun.desc_funcionario1, prov.desc_proveedor, pp.fecha_conformidad,pp.conformidad, cot.numero_oc,op.numero, pp.nro_cuota,op.num_tramite,
+                        pp.fecha_costo_ini, pp.fecha_costo_fin, pp.obs_monto_no_pagado, pp.observaciones_pago, op.total_nro_cuota, op.obs,op.id_obligacion_pago';
             raise notice '%',v_consulta;
 
 			--Devuelve la respuesta
@@ -638,7 +636,6 @@ BEGIN
 						    where od.id_concepto_ingas = ' || v_parametros.id_concepto || ' and od.estado_reg = ''activo''
 						    group by od.id_obligacion_pago
 						)
-
 						SELECT pp.id_plan_pago,
                         		(case when ot.id_orden_trabajo is not null then
 								ot.desc_orden
@@ -651,7 +648,6 @@ BEGIN
 						        end) as fecha
 						        ,mon.moneda,pp.monto,pro.monto_ejecutar_mo,
                                 od.id_centro_costo, pp.fecha_costo_ini, pp.fecha_costo_fin
-
 						FROM tes.tobligacion_pago op
 						inner join obligacion_pago_concepto opc on op.id_obligacion_pago = opc.id_obligacion_pago
 						inner join tes.tplan_pago pp on op.id_obligacion_pago = pp.id_obligacion_pago and pp.estado_reg = ''activo''
@@ -692,9 +688,7 @@ BEGIN
 						    where od.id_concepto_ingas = ' || v_parametros.id_concepto || ' and od.estado_reg = ''activo''
 						    group by od.id_obligacion_pago
 						)
-
 						SELECT count(pp.id_plan_pago)
-
 						FROM tes.tobligacion_pago op
 						inner join obligacion_pago_concepto opc on op.id_obligacion_pago = opc.id_obligacion_pago
 						inner join tes.tplan_pago pp on op.id_obligacion_pago = pp.id_obligacion_pago and pp.estado_reg = ''activo''
@@ -787,7 +781,6 @@ BEGIN
 
         v_filtro='';
             /*
-
 			--Sentencia de la consulta de conteo de registros
 			v_consulta:='SELECT count(id_plan_pago),
                                 sum(monto_cuota) as monto_cuota,
@@ -814,7 +807,6 @@ BEGIN
 			return v_consulta;
 
 		end;
-
     /*********************************
  	#TRANSACCION:  'TES_REPPAGOS_SEL'
  	#DESCRIPCION:	Reporte de pagos relacionados
@@ -933,9 +925,6 @@ BEGIN
 			return v_consulta;
 
 		end;
-
-
-
 
    /*********************************
  	#TRANSACCION:  'TES_PAGOSB_SEL'

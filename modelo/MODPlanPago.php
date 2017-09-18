@@ -113,7 +113,7 @@ class MODPlanPago extends MODbase{
 		$this->captura('desc_depto_conta_pp','varchar');
 		$this->captura('contador_estados','bigint');
 		$this->captura('prioridad_lp','integer');
-		//$this->captura('es_ultima_cuota','boolean');
+		$this->captura('es_ultima_cuota','boolean');
 
 		
 		//Ejecuta la instruccion
@@ -790,6 +790,8 @@ class MODPlanPago extends MODbase{
 		  $this->setParametro('estado','estado','VARCHAR');
 		  $this->setParametro('fuera_estado','fuera_estado','VARCHAR');
 		  
+		  $this->capturaCount('monto_mb','numeric');
+		  
 		
 		  $this->captura('id_plan_pago', 'INTEGER');
 		  $this->captura('desc_proveedor', 'VARCHAR');
@@ -798,6 +800,7 @@ class MODPlanPago extends MODbase{
 		  $this->captura('fecha_tentativa', 'DATE');
 		  $this->captura('nro_cuota', 'NUMERIC');
 		  $this->captura('monto ','NUMERIC');
+		  $this->captura('monto_mb ','NUMERIC');		  
 		  $this->captura('codigo', 'VARCHAR');
 		  $this->captura('conceptos', 'TEXT');
 		  $this->captura('ordenes', 'TEXT');
@@ -939,12 +942,14 @@ function listarPagos(){
 	function setUltimaCuota(){
 		//Definicion de variables para ejecucion del procedimiento
 		$this->procedimiento='tes.f_plan_pago_ime';
-		$this->transaccion='TES_SETULTCUO_IME';
+		$this->transaccion='TES_ULTIMA_CUOTA_SET';
 		$this->tipo_procedimiento='IME';
 
 		//Define los parametros para la funcion
+		$this->setParametro('id_obligacion_pago','id_obligacion_pago','int4');
 		$this->setParametro('id_plan_pago','id_plan_pago','int4');
 		$this->setParametro('es_ultima_cuota','es_ultima_cuota','boolean');
+		$this->setParametro('accion','accion','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -954,6 +959,20 @@ function listarPagos(){
 		return $this->respuesta;
 	}
 
+	function tieneUltimaCuota(){
+		//Definicion de variables para ejecucion del procedimiento
+		$this->procedimiento='tes.f_plan_pago_ime';
+		$this->transaccion='TES_ULTIMA_CUOTA_GET';
+		$this->tipo_procedimiento='IME';
+		$this->setParametro('id_obligacion_pago','id_obligacion_pago','int4');
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
 
 
 }

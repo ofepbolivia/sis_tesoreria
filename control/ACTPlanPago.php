@@ -232,7 +232,7 @@ class ACTPlanPago extends ACTbase{
 		if ($this->objParam->getParametro('id_proceso_wf') != '') {
 			$this->objParam->addFiltro("pp.id_proceso_wf = ". $this->objParam->getParametro('id_proceso_wf'));
 		}
-		
+
 		if ($this->objParam->getParametro('firmar') == 'si') {
 	    	$firmar = 'si';
 			$fecha_firma = $this->objParam->getParametro('fecha_firma');
@@ -376,6 +376,21 @@ class ACTPlanPago extends ACTbase{
 			$this->objFunc=$this->create('MODPlanPago');
 			$this->res=$this->objFunc->listadosPagosRelacionados($this->objParam);
 		}
+		
+		if($this->objParam->getParametro('resumen')!='no'){
+			//adicionar una fila al resultado con el summario
+			$temp = Array();
+			$temp['monto_mb'] = $this->res->extraData['monto_mb'];
+			$temp['tipo_reg'] = 'summary';
+			$temp['id_plan_pago'] = 0;
+			
+			$this->res->total++;
+			
+			$this->res->addLastRecDatos($temp);
+		}
+		
+		
+		
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
    
@@ -413,9 +428,19 @@ class ACTPlanPago extends ACTbase{
             'Se generó con éxito el reporte: ' . $nombreArchivo, 'control');
         $this->mensajeExito->setArchivoGenerado($nombreArchivo);
         $this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
-
-
     }
+
+	function setUltimaCuota(){
+		$this->objFunc=$this->create('MODPlanPago');
+		$this->res=$this->objFunc->setUltimaCuota($this->objParam);
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
+
+	function tieneUltimaCuota(){
+		$this->objFunc=$this->create('MODPlanPago');
+		$this->res=$this->objFunc->tieneUltimaCuota($this->objParam);
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
 			
 }
 

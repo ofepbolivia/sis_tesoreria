@@ -23,15 +23,14 @@ Phx.vista.PlanPagoRegIni = {
 	nombreVista: 'PlanPagoRegIni',
 	
 	constructor: function(config) {
-		
-		
 	    this.maestro=config.maestro;
 	    Phx.vista.PlanPagoRegIni.superclass.constructor.call(this,config);
+
 	    //this.creaFormularioConformidad();
         ////formulario de departamentos
         //this.crearFormularioEstados();
         //si la interface es pestanha este código es para iniciar 
-          var dataPadre = Phx.CP.getPagina(this.idContenedorPadre).getSelectedData()
+          var dataPadre = Phx.CP.getPagina(this.idContenedorPadre).getSelectedData();
           if(dataPadre){
              this.onEnablePanel(this, dataPadre);
           }
@@ -49,18 +48,41 @@ Phx.vista.PlanPagoRegIni = {
                 handler : this.onBtnVerifPresup,
                 tooltip : '<b>Verificación de la disponibilidad presupuestaria</b>'
             });*/
-            
+        this.addButton(
+                'btnConformidad',{
+                text:'Conformidad',iconCls: 'bok',disabled:false ,handler:this.onButtonConformidad,
+                tooltip: 'Generar conformidad para el pago (Firma acta de conformidad)'
+            });//argument: {'sigConformidad': false},
                     
          this.creaFormularioConformidad();
          this.iniciarEventos();
          //esconde boton para mandar a borrador 
          this.getBoton('ini_estado').hide(); 
           
-         this.getConfigPago(); 
+         this.getConfigPago();
+        //Evento cuando se haga click en el checkBox
+        this.grid.addListener('cellclick', this.oncellclick,this);
         
-        
-    }, 
-    
+    },
+    oncellclick : function(grid, rowIndex, columnIndex, e) {
+        var record = this.store.getAt(rowIndex).data,
+        fieldName = grid.getColumnModel().getDataIndex(columnIndex);
+
+        console.log('oncellclick',record);
+        if(fieldName == 'es_ultima_cuota') {
+            Ext.Ajax.request({
+                url:'../../sis_tesoreria/control/PlanPago/setUltimaCuota',
+                params:{ id_obligacion_pago: record.id_obligacion_pago, id_plan_pago: record.id_plan_pago, es_ultima_cuota: record.es_ultima_cuota, accion: 'grid'},
+                success: function (resp) {
+                    this.reload();
+                },
+                failure: this.conexionFailure,
+                timeout: this.timeout,
+                scope: this
+            });
+        }
+    },
+
      getConfigPago: function(id_plantilla){
         var data = this.getSelectedData();
            Phx.CP.loadingShow();
@@ -185,12 +207,12 @@ Phx.vista.PlanPagoRegIni = {
         	this.Cmp.fecha_costo_fin.setMinValue(newValue);
         	this.Cmp.fecha_costo_fin.reset();
         		
-        }, this)
+        }, this);
         
         //eventos de fechas de costo
-        this.Cmp.fecha_costo_fin.on('change',function(o, newValue, oldValue){
+        /*this.Cmp.fecha_costo_fin.on('change',function(o, newValue, oldValue){
         	this.Cmp.fecha_costo_ini.setMaxValue(newValue);
-        }, this)
+        }, this);*/
         
         
        
@@ -436,14 +458,62 @@ Phx.vista.PlanPagoRegIni = {
     },
     
        
-     onReloadPage:function(m){
-        this.maestro=m;
-        this.store.baseParams={id_obligacion_pago:this.maestro.id_obligacion_pago,tipo_interfaz:this.nombreVista};
-        this.load({params:{start:0, limit:this.tam_pag}})
+    onReloadPage:function(m){
+       this.maestro=m;
+       this.store.baseParams={id_obligacion_pago:this.maestro.id_obligacion_pago,tipo_interfaz:this.nombreVista};
+       this.load({params:{start:0, limit:this.tam_pag}})
          
-     },
-    
+    },
+
+    onSubmit: function (o,x, force) {
+
+
+        if(this.Cmp.es_ultima_cuota.getValue()){
+            Phx.vista.PlanPagoRegIni.superclass.onSubmit.call(this, o);
+        }else{
+
+            var rec =  Phx.CP.getPagina(this.idContenedorPadre).getSelectedData();
+            Ext.Ajax.request({
+                url:'../../sis_tesoreria/control/PlanPago/tieneUltimaCuota',
+                params:{ id_obligacion_pago: rec.id_obligacion_pago},
+                success: function (resp) {
+                    var objRes = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+
+                    if(!JSON.parse(objRes.ROOT.datos.v_bandera)) {
+                        Ext.Msg.show({
+                            title: 'Información',
+                            msg: '<b>Estimado usuario, el nuevo registro no fue definido como ultima cuota, debe definirlo como ultima cuota.</b>',
+                            buttons: Ext.Msg.OK,
+                            width: 512,
+                            icon: Ext.Msg.INFO
+                        });
+                    }else{
+                        Phx.vista.PlanPagoRegIni.superclass.onSubmit.call(this, o);
+                    }
+                },
+                failure: this.conexionFailure,
+                timeout: this.timeout,
+                scope: this
+            });
+
+        }
+
+    },
+
     successSave: function(resp) {
+        var rec =  Phx.CP.getPagina(this.idContenedorPadre).getSelectedData();
+        var objRes = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+        //Una vez insertada el nuevo plan de pago lo fijamos como ultima cuota.
+        Ext.Ajax.request({
+            url:'../../sis_tesoreria/control/PlanPago/setUltimaCuota',
+            params:{ id_obligacion_pago: rec.id_obligacion_pago, id_plan_pago: objRes.ROOT.datos.id_plan_pago, es_ultima_cuota: true, accion: 'form'},
+            success: function (resp) {
+                //this.reload();
+            },
+            failure: this.conexionFailure,
+            timeout: this.timeout,
+            scope: this
+        });
        Phx.CP.getPagina(this.idContenedorPadre).reload();  
        Phx.vista.PlanPagoRegIni.superclass.successSave.call(this,resp);
         
@@ -560,11 +630,7 @@ Phx.vista.PlanPagoRegIni = {
             height : '50%',
         }, rec.data, this.idContenedor, 'VerificacionPresup');
     },
-    
-    
-    
-    
-   
+
     east:{
           url:'../../../sis_tesoreria/vista/prorrateo/Prorrateo.php',
           title:'Prorrateo', 
@@ -572,6 +638,6 @@ Phx.vista.PlanPagoRegIni = {
           cls:'Prorrateo'
      },    
 	tabla_id: 'id_plan_pago',
-	tabla: 'tes.tplan_pago' 
+	tabla: 'tes.tplan_pago'
 };
 </script>

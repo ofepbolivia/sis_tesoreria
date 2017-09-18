@@ -448,7 +448,7 @@ Phx.vista.PlanPagoVb = {
            this.getBoton('SincPresu').disable();          
            this.getBoton('ModAprop').disable(); 
            this.getBoton('btnObs').disable();
-           this.getBoton('btnConformidad').disable();
+           //this.getBoton('btnConformidad').disable();
            this.menuAdq.disable();
            
            

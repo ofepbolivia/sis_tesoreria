@@ -35,9 +35,16 @@ class RConformidad extends  ReportePDFFormulario {
 		$conformidad = $maestro[0]['conformidad'];
 		$numero_oc = $maestro[0]['numero_oc'];	
 		$numero_op = $maestro[0]['numero_op'];	
-		$numero_cuota = $maestro[0]['numero_cuota'];
+		$numero_cuota = number_format ( $maestro[0]['numero_cuota'] ,0);
 		$numero_tramite = $maestro[0]['numero_tramite'];
 		$detalle = $maestro[0]['detalle'];
+
+		$fecha_ini = date_format(date_create($maestro[0]['fecha_costo_ini']), 'd/m/Y');
+		$fecha_fin = date_format(date_create($maestro[0]['fecha_costo_fin']), 'd/m/Y');
+		$observaciones_pago = $maestro[0]['obs_monto_no_pagado'];
+		$total_nro_cuota = $maestro[0]['total_nro_cuota'];
+		$obs = $maestro[0]['obs'];
+
 		$tipo = str_replace(',', '/', $maestro[0]['tipo']);
 		$nombre_usuario_firma = $this->nombre_usuario_firma;
 		$this->firma['datos_documento']['numero_tramite'] = $numero_tramite;
@@ -69,18 +76,26 @@ class RConformidad extends  ReportePDFFormulario {
         	</tr>
         	
         	<tr>
-            	<td> <b>Nro OC/Contrato</b> : $numero_oc<br> <b>Nro Obligación Pago : </b>$numero_op</td> 
-                <td><b> Fecha de Conformidad : </b>$fecha_conformidad</td> 
+        		<td colspan = "2"><b>Justificación :</b>$obs</td>
         	</tr>
         	<tr>
-            	<td> <b>Nro de Cuota :</b> $numero_cuota</td> 
-                <td><b> Proveedor: </b>$proveedor</td> 
+            	<td><b>Nro OC/Contrato</b> : $numero_oc <br><b>Nro Obligación Pago : </b>$numero_op</td> 
+                <td><b>Proveedor: </b>$proveedor</td> 
         	</tr>
+        	<tr>
+            	<td><b>Nro de Cuota :</b> $numero_cuota de $total_nro_cuota</td> 
+            	<td><b>Fecha de Conformidad : </b>$fecha_conformidad</td>    
+        	</tr>
+        	<tr>
+            	<td><b>Fecha Inicio :</b> $fecha_ini </td> 
+                <td><b>Fecha Fin: </b> $fecha_fin </td> 
+        	</tr>
+        	
         	<tr>
             	<td align="justify"  colspan="2">En cumplimiento al Reglamento Específico de las Normas Básicas del Sistema de Administración de Bienes y Servicios de la Empresa,  doy conformidad del $tipo, solicitado. 
             	<br><br>
             	<table border="0">$detalle</table><br><br>
-            	El mismo cumple con las características y condiciones requeridas, en calidad y cantidad. La cuál fue adquirida considerando criterios de economía para la obtención de los mejores precios del mercado.<br><br><b>**Nota : $conformidad </b><br><br>En conformidad de lo anteriormente mencionado firmo a continuación:</td>
+            	El mismo cumple con las características y condiciones requeridas, en calidad y cantidad. La cuál fue adquirida considerando criterios de economía para la obtención de los mejores precios del mercado.<br><br><b>**Obs. del Pago:</b> $observaciones_pago<br><br><b>**Nota :</b> $conformidad <br><br>En conformidad de lo anteriormente mencionado firmo a continuación:</td>
         	</tr>
         	<tr>
             	<td align="center"  colspan="2">   <br><br>
@@ -92,7 +107,8 @@ class RConformidad extends  ReportePDFFormulario {
 EOF;
 		//$this->writeHTMLCell (175,30,20,70,$html);
 		$this->setY($this->customy);
-		$this->writeHTML ($html);		
+		$this->writeHTML ($html);
+
 		return $this->firma;
 			
 	}
