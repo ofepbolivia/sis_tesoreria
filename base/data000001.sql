@@ -1749,5 +1749,24 @@ VALUES
 /***********************************F-DAT-RAC-TES-0-17/08/2017*****************************************/
   
 
+/***********************************I-DAT-RAC-TES-0-30/05/2017*****************************************/
+select pxp.f_insert_tgui ('<i class="fa fa-money fa-2x"></i> OBLIGACIONES DE PAGO', '', 'TES', 'si', 9, '', 1, '', '', 'TES');
+
+
+----------------------------------
+--COPY LINES TO SUBSYSTEM data.sql FILE  
+---------------------------------
+
+select param.f_import_tcatalogo_tipo ('insert','tplan_pago','TES','tplan_pago');
+select param.f_import_tcatalogo ('insert','TES','Devengado','devengado','tplan_pago');
+select param.f_import_tcatalogo ('insert','TES','Borrador','borrador','tplan_pago');
+select param.f_import_tcatalogo ('insert','TES','Anulado','anulado','tplan_pago');
+select param.f_import_tcatalogo ('insert','TES','Pago Exterior','pago_exterior','tplan_pago');
+select param.f_import_tcatalogo ('insert','TES','Contabilizado','pagado','tplan_pago');
+
+/***********************************F-DAT-RAC-TES-0-30/05/2017*****************************************/
+
+
+
 
 

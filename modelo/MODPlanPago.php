@@ -809,6 +809,7 @@ class MODPlanPago extends MODbase{
 		  $this->captura('id_proveedor', 'INTEGER');
 		  $this->captura('obs', 'VARCHAR');
 		  $this->captura('tipo', 'VARCHAR');
+		  $this->captura('cbte_relacionado', 'VARCHAR');
 		  
 	
 		  

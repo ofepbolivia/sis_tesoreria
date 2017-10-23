@@ -111,25 +111,27 @@ BEGIN
            
          
             --Sentencia de la consulta
-			v_consulta:='SELECT
-                          id_plan_pago,
-                          desc_proveedor,
-                          num_tramite,
-                          estado,
-                          fecha_tentativa,
-                          nro_cuota,
-                          monto,
-                          monto_mb,
-                          codigo,
-                          conceptos,
-                          ordenes,
-                          id_proceso_wf,
-                          id_estado_wf,
-                          id_proveedor,
-                          obs,
-                          tipo
-                        FROM
-                          tes.vpagos_relacionados
+			v_consulta:='
+SELECT
+                          pr.id_plan_pago,
+                          pr.desc_proveedor,
+                          pr.num_tramite,
+                          pr.estado,
+                          pr.fecha_tentativa,
+                          pr.nro_cuota,
+                          pr.monto,
+                          pr.monto_mb,
+                          pr.codigo,
+                          pr.conceptos,
+                          pr.ordenes,
+                          pr.id_proceso_wf,
+                          pr.id_estado_wf,
+                          pr.id_proveedor,
+                          pr.obs,
+                          pr.tipo,
+                          cbte.c31::varchar as cbte_relacionado
+                        FROM tes.vpagos_relacionados pr
+                        left join conta.tint_comprobante cbte on pr.id_int_comprobante = cbte.id_int_comprobante
                         WHERE '||v_filtro;
 
 			--Definicion de la respuesta
@@ -214,8 +216,8 @@ BEGIN
             v_consulta:='SELECT 
                                    count(id_plan_pago),
                                    sum(monto_mb) as monto_mb
-						 FROM
-                          tes.vpagos_relacionados
+						 FROM tes.vpagos_relacionados pr
+                             left join conta.tint_comprobante cbte on pr.id_int_comprobante = cbte.id_int_comprobante
                         WHERE '||v_filtro;
 
 			--Definicion de la respuesta

@@ -292,7 +292,22 @@ Phx.vista.RepPlanPago=Ext.extend(Phx.gridInterfaz,{
             bottom_filter: true,
             grid:true,
             form:false
+        },
+        {
+            config:{
+                name:'cbte_relacionado',
+                fieldLabel:'Cbte Rel',
+                gwidth: 150,
+            },
+            type:'Field',
+            id_grupo:1,
+            filters:{pfiltro:'cbte.c31',type:'string'},
+            bottom_filter: true,
+            grid:true,
+            form:false
         }
+        
+        
         
       
 	],
@@ -314,7 +329,7 @@ Phx.vista.RepPlanPago=Ext.extend(Phx.gridInterfaz,{
 	          'id_estado_wf',
 	          'id_proveedor',
 	          'obs',
-	          'tipo','monto_mb','tipo_reg'],
+	          'tipo','monto_mb','tipo_reg','cbte_relacionado'],
 
    arrayDefaultColumHidden:['obs','conceptos','ordenes'],
     
