@@ -102,7 +102,7 @@ Phx.vista.PlanPagoRegIni = {
     iniciarEventos:function(){
 	//(f.e.a)
         this.Cmp.fecha_tentativa.on('select', function(value, date){
-		var anio = date.getFullYear();
+		var anio = this.maestro.num_tramite.substring(13,18);//date.getFullYear();
 
 		var fecha_inicio = new Date(anio+'/01/1');
 		var fecha_fin = new Date(anio+'/12/31');
