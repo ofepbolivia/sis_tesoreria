@@ -270,7 +270,7 @@ Phx.vista.ObligacionPago = Ext.extend(Phx.gridInterfaz,{
                 //minValue:(Phx.CP.config_ini.sis_integracion=='ENDESIS')?new Date('1/1/2014'):undefined,
                 fieldLabel: 'Fecha',
                 allowBlank: false,
-                readOnly : true,
+                readOnly : false,
                 gwidth: 100,
                         format: 'd/m/Y', 
                         renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
