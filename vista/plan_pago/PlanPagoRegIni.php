@@ -101,7 +101,7 @@ Phx.vista.PlanPagoRegIni = {
        
     iniciarEventos:function(){
 	//(f.e.a)
-        this.Cmp.fecha_tentativa.on('select', function(value, date){
+        /*this.Cmp.fecha_tentativa.on('select', function(value, date){
 		var anio = this.maestro.num_tramite.substring(13,18);//date.getFullYear();
 
 		var fecha_inicio = new Date(anio+'/01/1');
@@ -109,7 +109,7 @@ Phx.vista.PlanPagoRegIni = {
 		//control de fechas de inicio y fin de costos
 		this.Cmp.fecha_costo_ini.setMinValue(fecha_inicio);
 		this.Cmp.fecha_costo_fin.setMaxValue(fecha_fin);
-	}, this);    
+	}, this);*/    
         this.Cmp.monto.on('change',this.calculaMontoPago,this); 
         this.Cmp.descuento_anticipo.on('change',this.calculaMontoPago,this);
         this.Cmp.monto_no_pagado.on('change',this.calculaMontoPago,this);
@@ -148,11 +148,11 @@ Phx.vista.PlanPagoRegIni = {
 	    //(f.e.a)control de fechas de inicio y fin de costos
             //var fecha = this.Cmp.fecha_tentativa.getValue();
             //var anio = fecha.getFullYear();
-	    var anio = this.maestro.num_tramite.substring(13,18);
+	    /*var anio = this.maestro.num_tramite.substring(13,18);
             var fecha_inicio = new Date(anio+'/01/1');
             var fecha_fin = new Date(anio+'/12/31');
             this.Cmp.fecha_costo_ini.setMinValue(fecha_inicio);
-            this.Cmp.fecha_costo_fin.setMaxValue(fecha_fin);
+            this.Cmp.fecha_costo_fin.setMaxValue(fecha_fin);*/
              
              if(this.accionFormulario == 'NEW'){
                
@@ -314,7 +314,12 @@ Phx.vista.PlanPagoRegIni = {
     },
     
     onButtonNew:function(){
-        
+             console.log('tramite', this.maestro.num_tramite.substring(13,18));
+	 var anio = this.maestro.num_tramite.substring(13,18);//fecha.getFullYear();
+	 var fecha_inicio = new Date(anio+'/01/1');
+	 var fecha_fin = new Date(anio+'/12/31');
+	 this.Cmp.fecha_costo_ini.setMinValue(fecha_inicio);
+	 this.Cmp.fecha_costo_fin.setMaxValue(fecha_fin);
              this.porc_ret_gar = 0; //resetea valor por defecto de retencion de garantia
              var data = this.getSelectedData();
              this.ocultarGrupo(2); //ocultar el grupo de ajustes
