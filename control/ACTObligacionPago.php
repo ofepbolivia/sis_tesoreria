@@ -30,6 +30,8 @@ class ACTObligacionPago extends ACTbase{
 		if($this->objParam->getParametro('pes_estado')=='otros'){
              $this->objParam->addFiltro("obpg.tipo_obligacion not  in (''pago_unico'',''pago_directo'')");
         }
+
+
 		if($this->objParam->getParametro('pes_estado')=='pago_directo'){
              $this->objParam->addFiltro("obpg.tipo_obligacion  in (''pago_directo'')");
         }
@@ -143,6 +145,7 @@ class ACTObligacionPago extends ACTbase{
 		$this->res=$this->objFunc->extenderOp($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
+    
 	
 	function modificarObsPoa(){
 		$this->objFunc=$this->create('MODObligacionPago');	

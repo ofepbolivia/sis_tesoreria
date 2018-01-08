@@ -100,7 +100,7 @@ CREATE OR REPLACE FUNCTION tes.f_fun_inicio_plan_pago_wf (
 
 
     --JRR  Se comenta la conformidad implicita
-    if (v_registros.estado = 'borrador' and v_registros.tipo_obligacion in ('pago_unico','pago_directo') and v_registros.uo_ex = 'no' ) then
+    if (v_registros.estado = 'borrador' and v_registros.tipo_obligacion in ('pga','pago_unico','pago_directo') and v_registros.uo_ex = 'no' ) then
 
 
       update tes.tplan_pago

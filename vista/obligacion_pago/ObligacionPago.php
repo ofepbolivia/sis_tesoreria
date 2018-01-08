@@ -95,9 +95,43 @@ Phx.vista.ObligacionPago = Ext.extend(Phx.gridInterfaz,{
 
         this.addButton('ajustes',{grupo:[0,1,2],text:'Ajus.', iconCls: 'blist', disabled: true, handler: this.showAjustes,tooltip: '<b>Ajustes a los anticipos totales para pagos variables</b>'});
         this.addButton('est_anticipo',{grupo:[0,1,2],text:'Ampli.', iconCls: 'blist', disabled: true, handler: this.showAnticipo,tooltip: '<b>Define el monto de ampliación util cuando necesitamos hacer pagos anticipados para la siguiente gestión</b>'});
-        this.addButton('extenderop',{grupo:[0,1,2],text:'Ext.', iconCls: 'blist', disabled: true, handler: this.extenederOp,tooltip: '<b>Extender la obligación de pago para la siguiente gestión</b>'});
-  
-  
+        //this.addButton('extenderop',{grupo:[0,1,2],text:'Ext.', iconCls: 'blist', disabled: true, handler: this.extenederOp,tooltip: '<b>Extender la obligación de pago para la siguiente gestión</b>'});
+        this.addButton('btnExtender',
+            {
+                iconCls: 'brenew',
+                xtype: 'splitbutton',
+                grupo: [0,4],
+                tooltip: '<b>Ext. Pagos</b><br>Nos permite elegir extender un pago recurrente, unico <br> o pago de una gestion anterior.',
+                text: 'Ext. Pagos',
+                /*argument: {
+                    'news': true,
+                    def: 'reset'
+                },*/
+                scope: this,
+                menu: [{
+                    text: 'Pago Recurrente (TES)',
+                    //iconCls: 'btag_accept',
+                    tooltip: '<b>Permite Extender un Pago Unico, o Recurrente</b>',
+                    /*argument: {
+                        'news': true,
+                        def: 'csv'
+                    },*/
+                    handler: this.extenederOp,
+                    scope: this
+                }, {
+                    text: 'Pago Gestiones Anteriores (PGA)',
+                    //iconCls: 'btemplate',
+                    /*argument: {
+                        'news': true,
+                        def: 'pdf'
+                    },*/
+                    tooltip: '<b>Permite Extender un Pago Gestion Anterior</b>',
+                    handler: this.extenderPGA,
+                    scope: this
+                }]
+            }
+        );
+
         this.addButton('btnObs',{
         	 		grupo:[0,1], 
                     text :'Obs Wf',
@@ -590,7 +624,7 @@ Phx.vista.ObligacionPago = Ext.extend(Phx.gridInterfaz,{
         {
             config:{
                 name: 'fecha_pp_ini',
-                fieldLabel: 'Fecha Ini.',
+                fieldLabel: 'Fecha Pago',
                 allowBlank: false,
                 gwidth: 100,
                 format: 'd/m/Y', 
@@ -1085,7 +1119,8 @@ Phx.vista.ObligacionPago = Ext.extend(Phx.gridInterfaz,{
           var tb =this.tbar;
           
           
-          Phx.vista.ObligacionPago.superclass.preparaMenu.call(this,n); 
+          Phx.vista.ObligacionPago.superclass.preparaMenu.call(this,n);
+
           if (data['estado']== 'borrador'){
               this.getBoton('edit').enable();
               if(this.getBoton('new'))
@@ -1109,10 +1144,9 @@ Phx.vista.ObligacionPago = Ext.extend(Phx.gridInterfaz,{
                if (data['estado'] == 'registrado'){   
                   this.getBoton('ant_estado').enable();
                   this.getBoton('fin_registro').disable();
-                 
                   this.enableTabPagos();
-      
                   this.getBoton('est_anticipo').enable();
+                  this.getBoton('btnExtender').enable();
                 }
                 
                 if (data['estado'] == 'en_pago'){
@@ -1120,6 +1154,7 @@ Phx.vista.ObligacionPago = Ext.extend(Phx.gridInterfaz,{
                     this.getBoton('ant_estado').enable();
                     this.getBoton('fin_registro').enable();
                     this.getBoton('est_anticipo').enable();
+                    this.getBoton('btnExtender').enable();
                 }
                 
                if (data['estado'] == 'anulado'){
@@ -1133,16 +1168,16 @@ Phx.vista.ObligacionPago = Ext.extend(Phx.gridInterfaz,{
                     this.getBoton('fin_registro').disable();
                     this.getBoton('est_anticipo').disable();
                     if(data['id_obligacion_pago_extendida']=='' || !data['id_obligacion_pago_extendida'] ){
-                    	this.getBoton('extenderop').enable();
+                    	this.getBoton('btnExtender').enable();
                     }
                     else{
-                    	this.getBoton('extenderop').disable();
+                    	this.getBoton('btnExtender').disable();
                     }
                     
-               }
+               }/*
                else{
                	 this.getBoton('extenderop').disable();
-               }
+               }*/
                
                if (data['estado'] == 'vbpresupuestos' || data['estado'] == 'vbpoa'){
                     
@@ -1237,7 +1272,7 @@ Phx.vista.ObligacionPago = Ext.extend(Phx.gridInterfaz,{
 			this.getBoton('btnChequeoDocumentosWf').disable();
 			this.getBoton('ajustes').disable();
 			this.getBoton('est_anticipo').disable();
-			this.getBoton('extenderop').disable();
+			this.getBoton('btnExtender').disable();
 			this.getBoton('btnCheckPresupeusto').disable();
 			this.getBoton('btnObs').disable();
 			
@@ -1435,7 +1470,38 @@ Phx.vista.ObligacionPago = Ext.extend(Phx.gridInterfaz,{
 		this.windowAjustes.hide();
 		
 	},
-	
+    extenderPGA: function () {
+        var me = this,
+        d = me.sm.getSelected().data;
+
+        if(!d.id_obligacion_pago_extendida && d.id_obligacion_pago_extendida != '' ){
+            if(confirm('¿Está seguro de extender la obligación para pago de Gestion Anterior?. \n Si  no existen   registros de presupuestos y partidas para la siguiente gestión , no se copiara nada, tendrá que hacer los registros faltantes manualmente. No podrá volver a ejecutar este comando')){
+                if(confirm('¿Está realmente seguro?')){
+                    Phx.CP.loadingShow();
+                    Ext.Ajax.request({
+                        url:'../../sis_tesoreria/control/ObligacionPago/extenderOp',
+                        success: function(){
+                            Phx.CP.loadingHide();
+                            me.reload();
+                        },
+                        failure: me.conexionFailure,
+                        params:{
+                            'id_obligacion_pago' : d.id_obligacion_pago,
+                            'id_administrador' : 2
+                        },
+                        timeout: me.timeout,
+                        scope: me
+                    });
+
+                }
+            }
+        }
+        else{
+
+            alert('La obligación ya fue extendida')
+        }
+    },
+
 	extenederOp:function(){
 		var me = this,
 		    d = me.sm.getSelected().data;
@@ -1452,7 +1518,8 @@ Phx.vista.ObligacionPago = Ext.extend(Phx.gridInterfaz,{
 									        },
 									failure: me.conexionFailure,
 									params:{
-											'id_obligacion_pago' : d.id_obligacion_pago
+											'id_obligacion_pago' : d.id_obligacion_pago,
+                                            'id_administrador' : 1
 											
 											},
 									timeout: me.timeout,
@@ -1498,7 +1565,7 @@ Phx.vista.ObligacionPago = Ext.extend(Phx.gridInterfaz,{
             }
         ]}
         });
-        
+
         //Adiciona el menú a la barra de herramientas
         this.tbar.add(this.menuAdq);
     },
@@ -1744,45 +1811,96 @@ Phx.vista.ObligacionPago = Ext.extend(Phx.gridInterfaz,{
     mostrarWizard : function(rec) {
      	var configExtra = [],
      		obsValorInicial;
+
      	 if(this.nombreVista == 'solicitudvbpresupuestos') {
      	 	obsValorInicial = rec.data.obs_presupuestos;
      	 }
-     	
-     	this.objWizard = Phx.CP.loadWindows('../../../sis_workflow/vista/estado_wf/FormEstadoWf.php',
-                                'Estado de Wf',
-                                {
-                                    modal: true,
-                                    width: 700,
-                                    height: 450
-                                }, {
-                                	configExtra: configExtra,
-                                	data:{
-                                       id_estado_wf: rec.data.id_estado_wf,
-                                       id_proceso_wf: rec.data.id_proceso_wf, 
-                                       id_obligacion_pago: rec.data.id_obligacion_pago,
-                                       fecha_ini: rec.data.fecha_tentativa
-                                      
-                                   },
-                                   obsValorInicial : obsValorInicial,
-                                }, this.idContenedor, 'FormEstadoWf',
-                                {
-                                    config:[{
-                                              event:'beforesave',
-                                              delegate: this.onSaveWizard,
-                                              
-                                            },
-					                        {
-					                          event:'requirefields',
-					                          delegate: function () {
-						                          	this.onButtonEdit();
-										        	this.window.setTitle('Registre los campos antes de pasar al siguiente estado');
-										        	this.formulario_wizard = 'si';
-					                          }
-					                          
-					                        }],
-                                    
-                                    scope:this
-                                 });        
+        if(this.nombreVista == 'PGA'){
+            if(this.Cmp.id_plantilla.getValue()=='' || this.Cmp.fecha_pp_ini.getValue()==''){
+                Ext.Msg.show({
+                    title: 'Información',
+                    msg: '<b>Estimado usuario:</b><br>No puede pasar al siguiente estado porque tiene campos pendientes, para completar con información necesaria, <br> Pulse el boton Editar.',
+                    buttons: Ext.Msg.OK,
+                    width: 512,
+                    icon: Ext.Msg.INFO
+                });
+
+
+            }else{
+                this.objWizard = Phx.CP.loadWindows('../../../sis_workflow/vista/estado_wf/FormEstadoWf.php',
+                    'Estado de Wf',
+                    {
+                        modal: true,
+                        width: 700,
+                        height: 450
+                    }, {
+                        configExtra: configExtra,
+                        data: {
+                            id_estado_wf: rec.data.id_estado_wf,
+                            id_proceso_wf: rec.data.id_proceso_wf,
+                            id_obligacion_pago: rec.data.id_obligacion_pago,
+                            fecha_ini: rec.data.fecha_tentativa
+
+                        },
+                        obsValorInicial: obsValorInicial,
+                    }, this.idContenedor, 'FormEstadoWf',
+                    {
+                        config: [{
+                            event: 'beforesave',
+                            delegate: this.onSaveWizard,
+
+                        },
+                            {
+                                event: 'requirefields',
+                                delegate: function () {
+                                    this.onButtonEdit();
+                                    this.window.setTitle('Registre los campos antes de pasar al siguiente estado');
+                                    this.formulario_wizard = 'si';
+                                }
+
+                            }],
+
+                        scope: this
+                    });
+            }
+        }else {
+
+            this.objWizard = Phx.CP.loadWindows('../../../sis_workflow/vista/estado_wf/FormEstadoWf.php',
+                'Estado de Wf',
+                {
+                    modal: true,
+                    width: 700,
+                    height: 450
+                }, {
+                    configExtra: configExtra,
+                    data: {
+                        id_estado_wf: rec.data.id_estado_wf,
+                        id_proceso_wf: rec.data.id_proceso_wf,
+                        id_obligacion_pago: rec.data.id_obligacion_pago,
+                        fecha_ini: rec.data.fecha_tentativa
+
+                    },
+                    obsValorInicial: obsValorInicial,
+                }, this.idContenedor, 'FormEstadoWf',
+                {
+                    config: [{
+                        event: 'beforesave',
+                        delegate: this.onSaveWizard,
+
+                    },
+                        {
+                            event: 'requirefields',
+                            delegate: function () {
+                                this.onButtonEdit();
+                                this.window.setTitle('Registre los campos antes de pasar al siguiente estado');
+                                this.formulario_wizard = 'si';
+                            }
+
+                        }],
+
+                    scope: this
+                });
+        }
      },
     onSaveWizard:function(wizard,resp){
         Phx.CP.loadingShow();

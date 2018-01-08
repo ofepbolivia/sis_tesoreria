@@ -159,6 +159,7 @@ DECLARE
      va_num_tramite							VARCHAR[];
      v_adq_comprometer_presupuesto			varchar;
 
+     v_id_administrador			integer;
      
 			    
 BEGIN
@@ -1056,7 +1057,7 @@ BEGIN
                             
                             
                             -- si es un proceso de pago unico,  la primera cuota pasa de borrador al siguiente estado de manera automatica 
-                            IF  v_tipo_obligacion = 'pago_unico' and   v_i = 1   THEN
+                            IF  ((v_tipo_obligacion = 'pga' or v_tipo_obligacion = 'pago_unico') and   v_i = 1)   THEN
                                v_sw_saltar = TRUE;
                             else
                                v_sw_saltar = FALSE;
@@ -1623,7 +1624,7 @@ BEGIN
             where op.id_obligacion_pago = v_parametros.id_obligacion_pago;
             
             --validar que el estado de la obligacion sea finaliza
-            IF v_registros.estado not in ('finalizado') THEN
+            IF v_registros.estado not in ('registrado','en_pago','finalizado','finalizado') THEN
                raise exception 'No se permiten obligaciones de pago que no esten finalizadas';
             END IF;
             
@@ -1666,7 +1667,14 @@ BEGIN
                                             ]);
             
             
-             v_resp = tes.f_inserta_obligacion_pago(p_administrador, p_id_usuario, hstore(v_hstore_registros));
+            --bandera para ver si es un pago recurrente o unico=1, pga=2.
+            if(v_parametros.id_administrador = 2)then
+               v_id_administrador = 2;
+            else
+               v_id_administrador = p_administrador;
+            end if;
+
+             v_resp = tes.f_inserta_obligacion_pago(v_id_administrador, p_id_usuario, hstore(v_hstore_registros));
              v_id_obligacion_pago_sg =  pxp.f_recupera_clave(v_resp, 'id_obligacion_pago');
              v_id_gestion_sg =  pxp.f_recupera_clave(v_resp, 'id_gestion');
 
