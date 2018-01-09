@@ -81,7 +81,7 @@ BEGIN
           END IF;
 
 
-         IF   v_parametros.tipo_interfaz in ('obligacionPagoTes','obligacionPagoUnico') THEN
+         IF   v_parametros.tipo_interfaz in ('obligacionPagoTes','obligacionPagoUnico', 'PGA') THEN
 
                  IF   p_administrador != 1 THEN
 
@@ -99,6 +99,8 @@ BEGIN
 
                 IF   v_parametros.tipo_interfaz  = 'obligacionPagoUnico' THEN
                    v_filadd=v_filadd ||' obpg.tipo_obligacion = ''pago_unico'' and';
+                ELSIF v_parametros.tipo_interfaz  = 'PGA' THEN
+                   v_filadd=v_filadd ||' obpg.tipo_obligacion = ''pga'' and';
                 ELSE
                    v_filadd=v_filadd ||' obpg.tipo_obligacion in (''pago_directo'',''rrhh'') and';
                 END IF;
@@ -271,7 +273,7 @@ BEGIN
               END IF;
 
 
-             IF   v_parametros.tipo_interfaz in ('obligacionPagoTes','obligacionPagoUnico') THEN
+             IF   v_parametros.tipo_interfaz in ('obligacionPagoTes','obligacionPagoUnico', 'PGA') THEN
 
                      IF   p_administrador != 1 THEN
 
@@ -289,6 +291,8 @@ BEGIN
 
                     IF   v_parametros.tipo_interfaz  = 'obligacionPagoUnico' THEN
                        v_filadd=v_filadd ||' obpg.tipo_obligacion = ''pago_unico'' and';
+                    ELSIF v_parametros.tipo_interfaz  = 'PGA' THEN
+                   	   v_filadd=v_filadd ||' obpg.tipo_obligacion = ''pga'' and';
                     ELSE
                        v_filadd=v_filadd ||' obpg.tipo_obligacion in (''pago_directo'',''rrhh'') and';
                     END IF;

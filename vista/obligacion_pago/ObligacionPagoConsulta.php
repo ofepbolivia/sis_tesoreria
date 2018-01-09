@@ -43,7 +43,7 @@ Phx.vista.ObligacionPagoConsulta = {
 			this.getBoton('btnChequeoDocumentosWf').enable();
 			this.getBoton('ajustes').disable();
 			this.getBoton('est_anticipo').disable();
-			this.getBoton('extenderop').disable();
+			//this.getBoton('extenderop').disable();
 			this.TabPanelSouth.get(1).enable();
 		    if(data.tipo_obligacion == 'adquisiciones'){
               this.getBoton('btnVerifPresup').disable();
@@ -75,7 +75,7 @@ Phx.vista.ObligacionPagoConsulta = {
 			this.getBoton('btnChequeoDocumentosWf').disable();
 			this.getBoton('ajustes').disable();
 			this.getBoton('est_anticipo').disable();
-			this.getBoton('extenderop').disable();
+			//this.getBoton('extenderop').disable();
 			
 			//Inhabilita el reporte de disponibilidad
             this.getBoton('btnVerifPresup').disable();
