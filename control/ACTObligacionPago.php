@@ -38,6 +38,14 @@ class ACTObligacionPago extends ACTbase{
 		if($this->objParam->getParametro('pes_estado')=='pago_unico'){
              $this->objParam->addFiltro("obpg.tipo_obligacion  in (''pago_unico'')");
         }
+
+        //(f.e.a) Pagos de gestiones anteriores
+        if($this->objParam->getParametro('pes_estado')=='borrador_pga'){
+            $this->objParam->addFiltro("obpg.estado in (''borrador'')");
+        }
+        if($this->objParam->getParametro('pes_estado')=='proceso_pga'){
+            $this->objParam->addFiltro("obpg.estado in(''vbpoa'', ''vb_jefe_aeropuerto'', ''suppresu'', ''vbpresupuestos'', ''registrado'', ''en_pago'', ''finalizado'')");
+        }
 		
 		
 		if($this->objParam->getParametro('filtro_campo')!=''){

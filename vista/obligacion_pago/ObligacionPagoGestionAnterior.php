@@ -19,18 +19,26 @@ header("content-type: text/javascript; charset=UTF-8");
         requireclase: 'Phx.vista.ObligacionPago',
         title: 'Pago Gestión Anterior',
         nombreVista: 'PGA',
-        //ActList:'../../sis_tesoreria/control/ObligacionPago/listarObligacionPagoSol',
-        /*
-         *  Interface heredada para el sistema de adquisiciones para que el reposnable
-         *  de adqusiciones registro los planes de pago , y ase por los pasos configurados en el WF
-         *  de validacion, aprobacion y registro contable
-         * */
+
+        gruposBarraTareas:[
+            {name:'borrador_pga',title:'<H1 align="center"><i class="fa fa-paper-plane"></i>Borrador</h1>',grupo:0,height:0},
+            {name:'proceso_pga',title:'<H1 align="center"><i class="fa fa-plus-circle"></i>Proceso</h1>',grupo:1,height:0}],
+
+        actualizarSegunTab: function(name, indice){
+            console.log('ESTADO', name);
+                this.store.baseParams.pes_estado = name;
+                this.load({params:{start:0, limit:this.tam_pag}});
+
+        },
+
+        bactGroups:  [0,1],
+        bexcelGroups: [0,1],
 
         constructor: function(config) {
             Phx.vista.ObligacionPagoGestionAnterior.superclass.constructor.call(this,config);
             this.store.baseParams = {tipo_interfaz:this.nombreVista};
-            this.store.baseParams.pes_estado = 'pga';
-            //this.load({params: {start: 0, limit: this.tam_pag}});
+            this.store.baseParams.pes_estado = 'borrador_pga';
+            this.load({params: {start: 0, limit: this.tam_pag}});
         },
 
 
