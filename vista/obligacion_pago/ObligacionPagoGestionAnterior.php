@@ -25,8 +25,8 @@ header("content-type: text/javascript; charset=UTF-8");
             {name:'proceso_pga',title:'<H1 align="center"><i class="fa fa-plus-circle"></i>Proceso</h1>',grupo:1,height:0}],
 
         actualizarSegunTab: function(name, indice){
-            console.log('ESTADO', name);
-                this.store.baseParams.pes_estado = name;
+
+                this.store.baseParams.pga_estado = name;
                 this.load({params:{start:0, limit:this.tam_pag}});
 
         },
@@ -37,7 +37,7 @@ header("content-type: text/javascript; charset=UTF-8");
         constructor: function(config) {
             Phx.vista.ObligacionPagoGestionAnterior.superclass.constructor.call(this,config);
             this.store.baseParams = {tipo_interfaz:this.nombreVista};
-            this.store.baseParams.pes_estado = 'borrador_pga';
+            this.store.baseParams.pga_estado = 'borrador_pga';
             this.load({params: {start: 0, limit: this.tam_pag}});
         },
 

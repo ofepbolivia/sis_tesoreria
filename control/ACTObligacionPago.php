@@ -40,11 +40,11 @@ class ACTObligacionPago extends ACTbase{
         }
 
         //(f.e.a) Pagos de gestiones anteriores
-        if($this->objParam->getParametro('pes_estado')=='borrador_pga'){
+        if($this->objParam->getParametro('pga_estado')=='borrador_pga'){
             $this->objParam->addFiltro("obpg.estado in (''borrador'')");
         }
-        if($this->objParam->getParametro('pes_estado')=='proceso_pga'){
-            $this->objParam->addFiltro("obpg.estado in(''vbpoa'', ''vb_jefe_aeropuerto'', ''suppresu'', ''vbpresupuestos'', ''registrado'', ''en_pago'', ''finalizado'')");
+        if($this->objParam->getParametro('pga_estado')=='proceso_pga'){
+            $this->objParam->addFiltro("obpg.estado in (''vbpoa'', ''vb_jefe_aeropuerto'', ''suppresu'', ''vbpresupuestos'', ''registrado'', ''en_pago'', ''finalizado'')");
         }
 		
 		
