@@ -59,9 +59,37 @@ header("content-type: text/javascript; charset=UTF-8");
             }
 
         ],
+
+        preparaMenu: function(n){
+
+            var data = this.getSelectedData();
+            var tb =this.tbar;
+            Phx.vista.ObligacionPagoGestionAnterior.superclass.preparaMenu.call(this,n);
+            console.log('datos: ', data);
+            if (data.tipo_obligacion == 'pga' && (data.estado == 'vbpoa' || data.estado == 'vb_jefe_aeropuerto' || data.estado == 'vbpresupuestos' ||
+                data.estado == 'suppresu' || data.estado == 'registrado' || data.estado == 'en_pago')) {
+                this.getBoton('edit').setVisible(true);
+            }
+
+            return tb;
+        },
+
+        liberaMenu: function(){
+            var tb = Phx.vista.ObligacionPagoGestionAnterior.superclass.liberaMenu.call(this);
+            if(tb){
+
+            }
+            return tb;
+        },
         onButtonEdit:function(){
 
             var data= this.sm.getSelected().data;
+
+            //(f.e.a)habilitar campo contrato
+            if(data.tipo_obligacion == 'pga'){
+                this.Cmp.id_contrato.enable();
+            }
+
             this.cmpTipoObligacion.disable();
             this.cmpDepto.disable();
             this.cmpFecha.disable();
@@ -86,7 +114,13 @@ header("content-type: text/javascript; charset=UTF-8");
             if(data.estado != 'borrador'){
                 this.Cmp.tipo_anticipo.disable();
 
-                this.Cmp.id_proveedor.disable();
+                if(data.tipo_obligacion == 'pga'){
+                    this.mostrarComponente(this.Cmp.id_proveedor);
+                    this.Cmp.id_proveedor.enable();
+                }else{
+                    this.Cmp.id_proveedor.disable();
+                }
+
 
             }
             else{
