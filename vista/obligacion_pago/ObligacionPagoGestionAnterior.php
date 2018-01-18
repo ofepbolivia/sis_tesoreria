@@ -35,7 +35,9 @@ header("content-type: text/javascript; charset=UTF-8");
         bexcelGroups: [0,1],
 
         constructor: function(config) {
+            this.Atributos[this.getIndAtributo('id_contrato')].config.allowBlank = true;
             Phx.vista.ObligacionPagoGestionAnterior.superclass.constructor.call(this,config);
+
             this.store.baseParams = {tipo_interfaz:this.nombreVista};
             this.store.baseParams.pga_estado = 'borrador_pga';
             this.load({params: {start: 0, limit: this.tam_pag}});
