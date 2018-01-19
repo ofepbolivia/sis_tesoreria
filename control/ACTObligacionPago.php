@@ -31,7 +31,6 @@ class ACTObligacionPago extends ACTbase{
              $this->objParam->addFiltro("obpg.tipo_obligacion not  in (''pago_unico'',''pago_directo'')");
         }
 
-
 		if($this->objParam->getParametro('pes_estado')=='pago_directo'){
              $this->objParam->addFiltro("obpg.tipo_obligacion  in (''pago_directo'')");
         }
@@ -47,7 +46,13 @@ class ACTObligacionPago extends ACTbase{
             $this->objParam->addFiltro("obpg.estado in (''vbpoa'', ''vb_jefe_aeropuerto'', ''suppresu'', ''vbpresupuestos'', ''registrado'', ''en_pago'', ''finalizado'')");
         }
 		
-		
+        //(fea) Pagos Moneda base y moneda extranjera
+        if($this->objParam->getParametro('moneda_base')=='base'){
+            $this->objParam->addFiltro("mn.tipo_moneda = ''base''");
+        }else{
+            $this->objParam->addFiltro("mn.tipo_moneda != ''base''");
+        }
+
 		if($this->objParam->getParametro('filtro_campo')!=''){
             $this->objParam->addFiltro($this->objParam->getParametro('filtro_campo')." = ".$this->objParam->getParametro('filtro_valor'));  
         }

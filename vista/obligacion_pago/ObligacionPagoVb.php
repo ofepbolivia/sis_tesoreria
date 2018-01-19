@@ -29,6 +29,7 @@ Phx.vista.ObligacionPagoVb = {
 	actualizarSegunTab: function(name, indice){
     	if(this.finCons){
     		 this.store.baseParams.pes_estado = name;
+             this.store.baseParams.moneda_base = 'base';
     	     this.load({params:{start:0, limit:this.tam_pag}});
     	   }
     },
@@ -144,6 +145,7 @@ Phx.vista.ObligacionPagoVb = {
         
         this.cmpObs=this.formEstado.getForm().findField('obs');
         this.store.baseParams.pes_estado = 'pago_unico';
+        this.store.baseParams.moneda_base = 'base';
         this.load({params:{start:0, limit:this.tam_pag}});
         this.finCons = true;
 		 
