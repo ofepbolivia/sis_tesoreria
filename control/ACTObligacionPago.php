@@ -47,9 +47,9 @@ class ACTObligacionPago extends ACTbase{
         }
 		
         //(fea) Pagos Moneda base y moneda extranjera
-        if($this->objParam->getParametro('moneda_base')=='base'){
+        if($this->objParam->getParametro('moneda_base')=='base' && $this->objParam->getParametro('tipo_interfaz') == 'ObligacionPagoVb'){
             $this->objParam->addFiltro("mn.tipo_moneda = ''base''");
-        }else{
+        }else if($this->objParam->getParametro('moneda_base')=='extranjero' && $this->objParam->getParametro('tipo_interfaz') == 'ObligacionPagoVb'){
             $this->objParam->addFiltro("mn.tipo_moneda != ''base''");
         }
 
