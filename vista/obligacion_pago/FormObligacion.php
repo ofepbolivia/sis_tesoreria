@@ -89,7 +89,49 @@ Phx.vista.FormObligacion=Ext.extend(Phx.frmInterfaz,{
 							       		    origen:'OT',
 						                    allowBlank:true
 						            }),
-						            
+
+			       /*'id_orden_trabajo': new Ext.form.ComboBox({
+
+
+										   //tasignacion:true,
+					   					   name: 'id_orden_trabajo',
+					   					   tinit:true,
+										   resizable:true,
+
+										   fieldLabel: 'Orden Trabajo',
+										   allowBlank: true,
+										   emptyText : 'Ordenes...',
+										   store : new Ext.data.JsonStore({
+											   url:'../../sis_contabilidad/control/OrdenTrabajo/listarOrdenTrabajo',
+											   id : 'id_orden_trabajo',
+											   root: 'datos',
+											   sortInfo:{
+												   field: 'motivo_orden',
+												   direction: 'ASC'
+											   },
+											   totalProperty: 'total',
+											   fields: ['id_orden_trabajo','motivo_orden','desc_orden','motivo_orden','codigo'],
+											   remoteSort: true,
+											   baseParams: {par_filtro:'codigo#desc_orden#motivo_orden'}
+										   }),
+										   valueField: 'id_orden_trabajo',
+										   tpl:'<tpl for="."><div class="x-combo-list-item"><p><b>{codigo}</b></p><p>{desc_orden}</p> </div></tpl>',
+										   displayField: 'desc_orden',
+										   gdisplayField: 'desc_orden',
+										   hiddenName: 'id_orden_trabajo',
+										   forceSelection:true,
+										   typeAhead: false,
+										   triggerAction: 'all',
+										   listWidth:350,
+										   lazyRender:true,
+										   mode:'remote',
+										   pageSize:10,
+										   queryDelay:1000,
+										   width:350,
+										   gwidth:350,
+										   minChars:2
+				   				}),*/
+
 					'descripcion': new Ext.form.TextField({
 										name: 'descripcion',
 										msgTarget: 'title',
@@ -123,25 +165,56 @@ Phx.vista.FormObligacion=Ext.extend(Phx.frmInterfaz,{
 	           },this);
 	        
 	    this.detCmp.id_concepto_ingas.on('select',function( cmb, rec, ind){
-	        	
-	        	    this.detCmp.id_orden_trabajo.store.baseParams = {
-			        		                                           filtro_ot:rec.data.filtro_ot,
-			        		 										   requiere_ot:rec.data.requiere_ot,
-			        		 										   id_grupo_ots:rec.data.id_grupo_ots
-			        		 										 };
-			        this.detCmp.id_orden_trabajo.modificado = true;
-			        if(rec.data.requiere_ot =='obligatorio'){
-			        	this.detCmp.id_orden_trabajo.allowBlank = false;
-			        	this.detCmp.id_orden_trabajo.setReadOnly(false);
-			        }
-			        else{
-			        	this.detCmp.id_orden_trabajo.allowBlank = true;
-			        	this.detCmp.id_orden_trabajo.setReadOnly(true);
-			        }
-			        this.detCmp.id_orden_trabajo.reset();
+
+			if(this.detCmp.id_centro_costo.getValue()=='') {
+				this.detCmp.id_orden_trabajo.store.baseParams = {
+																   filtro_ot:rec.data.filtro_ot,
+																   requiere_ot:rec.data.requiere_ot,
+																   id_grupo_ots:rec.data.id_grupo_ots
+																 };
+				//(fea)this.detCmp.id_orden_trabajo.modificado = true;
+				if(rec.data.requiere_ot =='obligatorio'){
+					this.detCmp.id_orden_trabajo.allowBlank = false;
+					this.detCmp.id_orden_trabajo.setReadOnly(false);
+				}
+				else{
+					this.detCmp.id_orden_trabajo.allowBlank = true;
+					this.detCmp.id_orden_trabajo.setReadOnly(true);
+				}
+				//(fea)this.detCmp.id_orden_trabajo.reset();
+			}else{
+				this.detCmp.id_orden_trabajo.store.baseParams = {
+					filtro_ot:rec.data.filtro_ot,
+					requiere_ot:rec.data.requiere_ot,
+					id_grupo_ots:rec.data.id_grupo_ots,
+					id_centro_costo : this.detCmp.id_centro_costo.getValue()
+				};
+				//(fea)this.detCmp.id_orden_trabajo.modificado = true;
+				if(rec.data.requiere_ot =='obligatorio'){
+					this.detCmp.id_orden_trabajo.allowBlank = false;
+					this.detCmp.id_orden_trabajo.setReadOnly(false);
+				}
+				else{
+					this.detCmp.id_orden_trabajo.allowBlank = true;
+					this.detCmp.id_orden_trabajo.setReadOnly(true);
+				}
+				//(fea)this.detCmp.id_orden_trabajo.reset();
+			}
 			        
         	
              },this);
+		//(f.e.a)
+		this.detCmp.id_centro_costo.on('select',function(cmp,rec,ind){
+			this.detCmp.id_orden_trabajo.reset();
+			this.detCmp.id_orden_trabajo.store.baseParams.id_centro_costo = rec.data.id_centro_costo;
+			this.detCmp.id_orden_trabajo.modificado = true;
+
+			console.log('cmp', cmp);
+			console.log('rec', rec);
+
+		}, this);
+
+
     },
     
     onInitAdd: function(){
@@ -207,9 +280,10 @@ Phx.vista.FormObligacion=Ext.extend(Phx.frmInterfaz,{
     },
     
     cargarDatosMaestro: function(){
-    	
-        
-        this.detCmp.id_orden_trabajo.store.baseParams.fecha_solicitud = this.Cmp.fecha.getValue().dateFormat('d/m/Y');
+		console.log('cargarDatosMaestro');
+
+
+		this.detCmp.id_orden_trabajo.store.baseParams.fecha_solicitud = this.Cmp.fecha.getValue().dateFormat('d/m/Y');
         this.detCmp.id_orden_trabajo.modificado = true;
         
         this.detCmp.id_centro_costo.store.baseParams.id_gestion = this.Cmp.id_gestion.getValue();
@@ -219,7 +293,7 @@ Phx.vista.FormObligacion=Ext.extend(Phx.frmInterfaz,{
         //cuando esta el la inteface de presupeustos no filtra por bienes o servicios
         this.detCmp.id_concepto_ingas.store.baseParams.id_gestion=this.Cmp.id_gestion.getValue();
         this.detCmp.id_concepto_ingas.modificado = true;
-    	
+
     },
     
     evaluaGrilla: function(){

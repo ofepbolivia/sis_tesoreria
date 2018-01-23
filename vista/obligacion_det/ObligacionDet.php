@@ -550,6 +550,13 @@ Phx.vista.ObligacionDet=Ext.extend(Phx.gridInterfaz,{
 			        this.Cmp.id_orden_trabajo.enable();
         	
              },this);
+
+			//(f.e.a)
+			this.Cmp.id_centro_costo.on('select',function(cmp,rec,ind){
+				this.Cmp.id_orden_trabajo.reset();
+				this.Cmp.id_orden_trabajo.store.baseParams.id_centro_costo = rec.data.id_centro_costo;
+				this.Cmp.id_orden_trabajo.modificado = true;
+			}, this);
 	    
 	},
 	onReloadPage:function(m){
