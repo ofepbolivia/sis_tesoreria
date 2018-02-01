@@ -81,7 +81,8 @@ BEGIN
           END IF;
 
 
-         IF   v_parametros.tipo_interfaz in ('obligacionPagoTes','obligacionPagoUnico', 'PGA') THEN
+
+         IF   v_parametros.tipo_interfaz in ('obligacionPagoTes','obligacionPagoUnico', 'PGA', 'PPM') THEN
 
                  IF   p_administrador != 1 THEN
 
@@ -92,15 +93,37 @@ BEGIN
                    from param.tdepto_usuario depu
                    where depu.id_usuario =  p_id_usuario;
 
-                 v_filadd='(obpg.id_depto  in ('|| COALESCE(array_to_string(va_id_depto,','),'0')||')) and';
+					if(v_parametros.tipo_interfaz  = 'PGA')then
 
-                END IF;
+                    	SELECT tf.id_funcionario
+                        into v_id_funcionario
+                        FROM segu.tusuario tu
+                        INNER JOIN orga.tfuncionario tf on tf.id_persona = tu.id_persona
+                        WHERE tu.id_usuario = p_id_usuario ;
+                        --v_inner =  'inner join wf.testado_wf ew on ew.id_estado_wf = obpg.id_estado_wf';
+                        v_filadd = v_filadd ||'obpg.id_funcionario = '||v_id_funcionario||' and';
+                    elsif(v_parametros.tipo_interfaz  = 'PPM')then
+
+                    	SELECT tf.id_funcionario
+                        into v_id_funcionario
+                        FROM segu.tusuario tu
+                        INNER JOIN orga.tfuncionario tf on tf.id_persona = tu.id_persona
+                        WHERE tu.id_usuario = p_id_usuario ;
+                        v_filadd = v_filadd ||'obpg.id_funcionario = '||v_id_funcionario||' and';
+
+                    else
+                 		v_filadd='(obpg.id_depto  in ('|| COALESCE(array_to_string(va_id_depto,','),'0')||')) and';
+                    end if;
+
+                 END IF;
 
 
                 IF   v_parametros.tipo_interfaz  = 'obligacionPagoUnico' THEN
                    v_filadd=v_filadd ||' obpg.tipo_obligacion = ''pago_unico'' and';
                 ELSIF v_parametros.tipo_interfaz  = 'PGA' THEN
-                   v_filadd=v_filadd ||' obpg.tipo_obligacion = ''pga'' and';
+                    v_filadd=v_filadd ||' obpg.tipo_obligacion = ''pga'' and';
+                ELSIF v_parametros.tipo_interfaz  = 'PPM' THEN
+                	v_filadd=v_filadd ||' obpg.tipo_obligacion = ''ppm'' and';
                 ELSE
                    v_filadd=v_filadd ||' obpg.tipo_obligacion in (''pago_directo'',''rrhh'') and';
                 END IF;
@@ -230,6 +253,7 @@ BEGIN
                               inner join param.tmoneda mn on mn.id_moneda=obpg.id_moneda
                               inner join segu.tsubsistema ss on ss.id_subsistema=obpg.id_subsistema
                               inner join param.tdepto dep on dep.id_depto=obpg.id_depto
+
                               left join param.vproveedor pv on pv.id_proveedor=obpg.id_proveedor
                               left join leg.tcontrato con on con.id_contrato = obpg.id_contrato
                               left join param.tplantilla pla on pla.id_plantilla = obpg.id_plantilla
@@ -244,7 +268,7 @@ BEGIN
 
 
 
-            -- raise notice '%',v_consulta;
+            --raise exception '%',v_consulta;
 			--Devuelve la respuesta
 			return v_consulta;
 
@@ -273,7 +297,7 @@ BEGIN
               END IF;
 
 
-             IF   v_parametros.tipo_interfaz in ('obligacionPagoTes','obligacionPagoUnico', 'PGA') THEN
+             IF   v_parametros.tipo_interfaz in ('obligacionPagoTes','obligacionPagoUnico', 'PGA', 'PPM') THEN
 
                      IF   p_administrador != 1 THEN
 
@@ -284,7 +308,25 @@ BEGIN
                        from param.tdepto_usuario depu
                        where depu.id_usuario =  p_id_usuario;
 
-                     v_filadd='(obpg.id_depto  in ('|| COALESCE(array_to_string(va_id_depto,','),'0')||')) and';
+                        if(v_parametros.tipo_interfaz  = 'PGA')then
+                          SELECT tf.id_funcionario
+                          into v_id_funcionario
+                          FROM segu.tusuario tu
+                          INNER JOIN orga.tfuncionario tf on tf.id_persona = tu.id_persona
+                          WHERE tu.id_usuario = p_id_usuario ;
+                          --v_inner =  'inner join wf.testado_wf ew on ew.id_estado_wf = obpg.id_estado_wf';
+                          v_filadd = v_filadd ||' obpg.id_funcionario = '||v_id_funcionario||' and';
+                        elsif(v_parametros.tipo_interfaz  = 'PPM')then
+                          SELECT tf.id_funcionario
+                          into v_id_funcionario
+                          FROM segu.tusuario tu
+                          INNER JOIN orga.tfuncionario tf on tf.id_persona = tu.id_persona
+                          WHERE tu.id_usuario = p_id_usuario ;
+                          v_filadd = v_filadd ||' obpg.id_funcionario = '||v_id_funcionario||' and';
+                        else
+                            v_filadd='(obpg.id_depto  in ('|| COALESCE(array_to_string(va_id_depto,','),'0')||')) and';
+                        end if;
+
 
                     END IF;
 
@@ -293,6 +335,8 @@ BEGIN
                        v_filadd=v_filadd ||' obpg.tipo_obligacion = ''pago_unico'' and';
                     ELSIF v_parametros.tipo_interfaz  = 'PGA' THEN
                    	   v_filadd=v_filadd ||' obpg.tipo_obligacion = ''pga'' and';
+                    ELSIF v_parametros.tipo_interfaz  = 'PPM' THEN
+                   	   v_filadd=v_filadd ||' obpg.tipo_obligacion = ''ppm'' and';
                     ELSE
                        v_filadd=v_filadd ||' obpg.tipo_obligacion in (''pago_directo'',''rrhh'') and';
                     END IF;
@@ -363,6 +407,7 @@ BEGIN
                         inner join param.tmoneda mn on mn.id_moneda=obpg.id_moneda
                         inner join segu.tsubsistema ss on ss.id_subsistema=obpg.id_subsistema
                         inner join param.tdepto dep on dep.id_depto=obpg.id_depto
+
                         left join param.vproveedor pv on pv.id_proveedor=obpg.id_proveedor
                         left join leg.tcontrato con on con.id_contrato = obpg.id_contrato
                         left join param.tplantilla pla on pla.id_plantilla = obpg.id_plantilla
@@ -918,7 +963,7 @@ BEGIN
             ELSE
             	v_firma_fun = '';
         	END IF;
-        		------
+        	------
             SELECT (''||te.codigo||' '||te.nombre)::varchar
             INTO v_nombre_entidad
             FROM param.tempresa te;
@@ -966,15 +1011,15 @@ BEGIN
 
             inner join param.tgestion tg on tg.id_gestion = ts.id_gestion
 
-            INNER JOIN pre.tpresup_partida tpp ON tpp.id_partida = tpar.id_partida AND tpp.id_centro_costo = tsd.id_centro_costo
+            --INNER JOIN pre.tpresup_partida tpp ON tpp.id_partida = tpar.id_partida AND tpp.id_centro_costo = tsd.id_centro_costo
 
             INNER JOIN param.tcentro_costo tcc ON tcc.id_centro_costo = tsd.id_centro_costo
             INNER JOIN param.ttipo_cc ttc ON ttc.id_tipo_cc = tcc.id_tipo_cc
 
-            INNER JOIN pre.tpresupuesto	tp ON tp.id_presupuesto = tpp.id_presupuesto
+            INNER JOIN pre.tpresupuesto	tp ON tp.id_presupuesto = tsd.id_centro_costo --tpp.id_presupuesto
             INNER JOIN pre.vcategoria_programatica vcp ON vcp.id_categoria_programatica = tp.id_categoria_prog
 
-            INNER JOIN pre.tclase_gasto_partida tcgp ON tcgp.id_partida = tpp.id_partida
+            INNER JOIN pre.tclase_gasto_partida tcgp ON tcgp.id_partida = tpar.id_partida --tpp.id_partida
             INNER JOIN pre.tclase_gasto tcg ON tcg.id_clase_gasto = tcgp.id_clase_gasto
 
             INNER JOIN param.tmoneda tmo ON tmo.id_moneda = ts.id_moneda
@@ -998,6 +1043,54 @@ BEGIN
 			return v_consulta;
 
         end;
+   /*********************************
+ 	#TRANSACCION:  'TES_PAGSINDOC_SEL'
+ 	#DESCRIPCION:	Reporte Solicitud de Costos
+ 	#AUTOR:		Franklin Espinoza Alvarez
+ 	#FECHA:		31-01-2018 16:01:32
+	***********************************/
+
+    elsif(p_transaccion='TES_REPSC_SEL')then
+
+    	begin
+
+
+    		v_consulta:='select
+						obpg.id_obligacion_pago,
+						obpg.id_proveedor,
+                        pv.desc_proveedor,
+						obpg.estado,
+						obpg.tipo_obligacion,
+						obpg.id_moneda,
+                        mn.moneda,
+						obpg.obs,
+						obpg.porc_retgar,
+						obpg.id_subsistema,
+                        ss.nombre as nombre_subsistema,
+						obpg.porc_anticipo,
+						obpg.id_depto,
+                        dep.nombre as nombre_depto,
+						obpg.num_tramite,
+                        obpg.fecha,
+                        obpg.numero,
+                        obpg.tipo_cambio_conv,
+                        obpg.comprometido,
+                        obpg.nro_cuota_vigente,
+                        mn.tipo_moneda,
+                        obpg.pago_variable
+						from tes.tobligacion_pago obpg
+                        inner join param.vproveedor pv on pv.id_proveedor=obpg.id_proveedor
+                        inner join param.tmoneda mn on mn.id_moneda=obpg.id_moneda
+                        inner join segu.tsubsistema ss on ss.id_subsistema=obpg.id_subsistema
+						inner join param.tdepto dep on dep.id_depto=obpg.id_depto
+                        where obpg.id_proceso_wf = '||v_parametros.id_proceso_wf;
+
+            --Definicion de la respuesta
+			--v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+			--Devuelve la respuesta
+			return v_consulta;
+
+		end;
    else
 
 		raise exception 'Transaccion inexistente';

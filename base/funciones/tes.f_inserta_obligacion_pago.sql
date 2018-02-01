@@ -96,38 +96,39 @@ BEGIN
                          and per.fecha_fin >= (p_hstore->'fecha')::date
                          limit 1 offset 0;
 
-
+		--RAISE EXCEPTION 'FECHAS: %,%', (p_hstore->'fecha')::date, v_id_periodo;
         IF   (p_hstore->'tipo_obligacion')::varchar = 'adquisiciones'    THEN
              raise exception 'Los pagos de adquisiciones tienen que ser habilitados desde el sistema de adquisiciones';
 
-        ELSIF   (p_hstore->'tipo_obligacion')::varchar  in ('pago_directo','pago_unico','pago_especial', 'pga')    THEN
+        ELSIF   (p_hstore->'tipo_obligacion')::varchar  in ('pago_directo','pago_unico','pago_especial', 'pga', 'ppm')    THEN
 
 
-                 IF (p_hstore->'tipo_obligacion')::varchar  = 'pago_directo' and p_administrador = 1   THEN
+                 IF (p_hstore->'tipo_obligacion')::varchar  = 'pago_directo' and p_administrador != 2 THEN
                       v_tipo_documento = pxp.f_get_variable_global('tes_tipo_documento_pago_directo'); --'PGD';
                       v_codigo_proceso_macro = pxp.f_get_variable_global('tes_codigo_macro_pago_directo');--'TES-PD';
-
-
-                 ELSEIF(p_hstore->'tipo_obligacion')::varchar  = 'pago_unico' and p_administrador = 1  THEN
+                 ELSIF(p_hstore->'tipo_obligacion')::varchar  = 'pago_unico' and p_administrador != 2 THEN
                       v_tipo_documento = pxp.f_get_variable_global('tes_tipo_documento_pago_unico');--'PU';
                       v_codigo_proceso_macro = pxp.f_get_variable_global('tes_codigo_macro_pago_unico');--'PU';
-                 ELSEIF((p_hstore->'tipo_obligacion')::varchar  = 'pga' or p_administrador = 2) THEN
+                 ELSIF(p_administrador = 2 OR (p_hstore->'tipo_obligacion')::varchar  = 'pga') THEN
                  	  v_tipo_documento = 'PGA';
                       v_codigo_proceso_macro = 'PGA';
+                 ELSIF(p_administrador = 2 OR (p_hstore->'tipo_obligacion')::varchar  = 'ppm') THEN
+                 	  v_tipo_documento = 'PPM';
+                      v_codigo_proceso_macro = 'PPM';
                  ELSE
                       v_tipo_documento =  pxp.f_get_variable_global('tes_tipo_documento_especial'); --'PE';
                       v_codigo_proceso_macro = pxp.f_get_variable_global('tes_codigo_macro_especial');--'TES-PD';
                  END IF;
 
                 --obtener el correlativo segun el tipo de documento
-                      v_num =   param.f_obtener_correlativo(
-                                 v_tipo_documento,
-                                 v_id_periodo,-- par_id,
-                                 NULL, --id_uo
-                                 (p_hstore->'id_depto')::integer,    -- id_depto
-                                 p_id_usuario,
-                                 'TES',
-                                 NULL);
+                v_num =   param.f_obtener_correlativo(
+                           v_tipo_documento,
+                           v_id_periodo,-- par_id,
+                           NULL, --id_uo
+                           (p_hstore->'id_depto')::integer,    -- id_depto
+                           p_id_usuario,
+                           'TES',
+                           NULL);
 
                 --si el funcionario que solicita es un gerente .... es el mimso encargado de aprobar
 
@@ -187,7 +188,7 @@ BEGIN
 
 
 
-        --   obtener el codigo del tipo_proceso
+        --obtener el codigo del tipo_proceso
 
         select   tp.codigo
             into v_codigo_tipo_proceso

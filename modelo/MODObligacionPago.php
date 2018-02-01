@@ -872,5 +872,47 @@ class MODObligacionPago extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+	//(FEA) Reporte Solicitud Centros Pagos Manuales
+	function reporteSolicitudCentros(){
+
+		$this->procedimiento='tes.ft_obligacion_pago_sel';
+		$this->transaccion = 'TES_REPSC_SEL';
+		$this->tipo_procedimiento = 'SEL';
+
+		$this->setCount(false);
+		$this->setParametro('id_proceso_wf', 'id_proceso_wf', 'int4');
+
+		//Definicion de la lista del resultado del query
+		$this->captura('id_obligacion_pago','int4');
+		$this->captura('id_proveedor','int4');
+		$this->captura('desc_proveedor','varchar');
+		$this->captura('estado','varchar');
+		$this->captura('tipo_obligacion','varchar');
+		$this->captura('id_moneda','int4');
+		$this->captura('moneda','varchar');
+		$this->captura('obs','varchar');
+		$this->captura('porc_retgar','numeric');
+		$this->captura('id_subsistema','int4');
+		$this->captura('nombre_subsistema','varchar');
+		$this->captura('porc_anticipo','numeric');
+		$this->captura('id_depto','int4');
+		$this->captura('nombre_depto','varchar');
+		$this->captura('num_tramite','varchar');
+		$this->captura('fecha','date');
+		$this->captura('numero','varchar');
+		$this->captura('tipo_cambio_conv','numeric');
+		$this->captura('comprometido','varchar');
+		$this->captura('nro_cuota_vigente','numeric');
+		$this->captura('tipo_moneda','varchar');
+		$this->captura('pago_variable','varchar');
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+
+	}
 }
 ?>
