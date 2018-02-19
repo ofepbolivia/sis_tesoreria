@@ -318,7 +318,7 @@ Phx.vista.PlanPago=Ext.extend(Phx.gridInterfaz,{
                 name: 'nro_cuota',
                 fieldLabel: 'Cuo. N#',
                 allowBlank: true,
-                gwidth: 50,
+                gwidth: 70,
                 renderer:function(value,p,record){
                        if(record.data.total_pagado==record.data.monto_ejecutar_total_mo ){
                              return String.format('<b><font color="green">{0}</font></b>', value);
@@ -445,7 +445,6 @@ Phx.vista.PlanPago=Ext.extend(Phx.gridInterfaz,{
             grid:true,
             form:true
         },
-        
         {
 			config:{
 				name: 'nro_sol_pago',
@@ -1271,7 +1270,9 @@ Phx.vista.PlanPago=Ext.extend(Phx.gridInterfaz,{
 		{name:'fecha_costo_ini', type: 'date',dateFormat:'Y-m-d'},
 		{name:'fecha_costo_fin', type: 'date',dateFormat:'Y-m-d'},
 		'id_depto_conta_pp','desc_depto_conta_pp','funcionario_wf','tiene_form500',
-		'id_depto_lb','desc_depto_lb','prioridad_lp',{name:'ultima_cuota_dev',type:'numeric'}
+		'id_depto_lb','desc_depto_lb','prioridad_lp',{name:'ultima_cuota_dev',type:'numeric'},
+        'nro_cbte',
+        'c31'
 		
 	],
 	

@@ -270,6 +270,7 @@ BEGIN
                         left join param.tdepto depto on depto.id_depto = plapa.id_depto_lb
                         left join tes.tts_libro_bancos lb on plapa.id_int_comprobante = lb.id_int_comprobante
                         left join param.tdepto depc on depc.id_depto = plapa.id_depto_conta
+                        left join conta.tint_comprobante tcon on tcon.id_int_comprobante = plapa.id_int_comprobante
                        where  plapa.estado_reg=''activo''  and '||v_filtro;
 
 			--Definicion de la respuesta
@@ -369,6 +370,7 @@ BEGIN
                         left join orga.vfuncionario funwf on funwf.id_funcionario = ew.id_funcionario
                         left join param.tdepto depto on depto.id_depto = plapa.id_depto_lb
                         left join tes.tts_libro_bancos lb on plapa.id_int_comprobante = lb.id_int_comprobante
+                        left join conta.tint_comprobante tcon on tcon.id_int_comprobante = plapa.id_int_comprobante
                       where  plapa.estado_reg=''activo''   and '||v_filtro;
 
 			--Definicion de la respuesta

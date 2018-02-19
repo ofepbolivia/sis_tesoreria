@@ -26,6 +26,57 @@ Phx.vista.PlanPagoRegIni = {
 		
 		
 	    this.maestro=config.maestro;
+        this.Atributos.splice(14,0,
+            {
+                config:{
+                    name: 'nro_cbte',
+                    fieldLabel: 'Nro. Comprobante',
+                    allowBlank: true,
+                    anchor: '80%',
+                    gwidth:120,
+                    maxLength:255,
+
+                    renderer: function (vale,p, record) {
+                        if(record.data.nro_cbte == null)
+                            return String.format('{0}', "<div style='color: brown'><b>"+'Aun no se genero'+"</b></div>");
+                        else
+                            return String.format('{0}', "<div style='color: green'><b>"+record.data.nro_cbte+"</b></div>");
+                    }
+
+                },
+                type:'TextField',
+                filters:{pfiltro:'tcon.nro_cbte',type:'string'},
+                id_grupo:1,
+                grid:true,
+                form:false,
+                bottom_filter: true
+            }
+        );
+        this.Atributos.splice(15,0,
+            {
+                config:{
+                    name: 'c31',
+                    fieldLabel: 'C31',
+                    allowBlank: true,
+                    anchor: '80%',
+                    gwidth:90,
+                    maxLength:255,
+
+                    renderer: function (vale,p, record) {
+                        if(record.data.c31==null)
+                            return String.format('{0}', "<div style='color: brown'><b>"+'Aun no se genero'+"</b></div>");
+                        else
+                            return String.format('{0}', "<div style='color: green'><b>"+record.data.c31+"</b></div>");
+                    }
+                },
+                type:'TextField',
+                filters:{pfiltro:'tcon.c31',type:'string'},
+                id_grupo:1,
+                grid:true,
+                form:false,
+                bottom_filter: true
+            }
+        );
 	    Phx.vista.PlanPagoRegIni.superclass.constructor.call(this,config);
 	    //this.creaFormularioConformidad();
         ////formulario de departamentos
@@ -39,7 +90,9 @@ Phx.vista.PlanPagoRegIni = {
           {
              this.bloquearMenus();
           }
-          
+        
+
+
           //this.addButton('btnConformidad',{text:'Conformidad',iconCls: 'bok',disabled:true,handler:this.onButtonConformidad,tooltip: 'Generar conformidad para el pago (Firma acta de conformidad)'});
           /*this.addButton('btnVerifPresup', {
                 text : 'Disponibilidad',
