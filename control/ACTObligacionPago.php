@@ -38,6 +38,10 @@ class ACTObligacionPago extends ACTbase{
              $this->objParam->addFiltro("obpg.tipo_obligacion  in (''pago_unico'')");
         }
 
+        if ($this->objParam->getParametro('id_gestion') != '') {
+            $this->objParam->addFiltro("obpg.id_gestion = ". $this->objParam->getParametro('id_gestion'));
+        }
+
         //(f.e.a) Pagos de gestiones anteriores
         if($this->objParam->getParametro('pga_estado')=='borrador_pga'){
             $this->objParam->addFiltro("obpg.estado in (''borrador'')");
