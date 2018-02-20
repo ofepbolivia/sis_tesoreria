@@ -38,7 +38,7 @@ Phx.vista.PlanPagoRegIni = {
 
                     renderer: function (vale,p, record) {
                         if(record.data.nro_cbte == null)
-                            return String.format('{0}', "<div style='color: brown'><b>"+'Aun no se genero'+"</b></div>");
+                            return String.format('{0}', '');
                         else
                             return String.format('{0}', "<div style='color: green'><b>"+record.data.nro_cbte+"</b></div>");
                     }
@@ -64,7 +64,7 @@ Phx.vista.PlanPagoRegIni = {
 
                     renderer: function (vale,p, record) {
                         if(record.data.c31==null)
-                            return String.format('{0}', "<div style='color: brown'><b>"+'Aun no se genero'+"</b></div>");
+                            return String.format('{0}', '');
                         else
                             return String.format('{0}', "<div style='color: green'><b>"+record.data.c31+"</b></div>");
                     }
