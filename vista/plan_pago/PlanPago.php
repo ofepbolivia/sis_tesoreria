@@ -1272,7 +1272,8 @@ Phx.vista.PlanPago=Ext.extend(Phx.gridInterfaz,{
 		'id_depto_conta_pp','desc_depto_conta_pp','funcionario_wf','tiene_form500',
 		'id_depto_lb','desc_depto_lb','prioridad_lp',{name:'ultima_cuota_dev',type:'numeric'},
         'nro_cbte',
-        'c31'
+        'c31',
+        {name:'es_ultima_cuota', type: 'boolean'},
 		
 	],
 	

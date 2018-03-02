@@ -26,6 +26,30 @@ Phx.vista.PlanPagoRegIni = {
 		
 		
 	    this.maestro=config.maestro;
+
+
+        this.Atributos.splice(12,0,
+            {
+                config:{
+                    name:'es_ultima_cuota',
+                    fieldLabel:'Es Ultima Cuota',
+                    allowBlank: true,
+                    anchor: '70%',
+                    gwidth: 100,
+
+                    renderer: function (value, p, record, rowIndex, colIndex) {
+                        if (value == true) {
+                            var checked = 'checked';
+                        }
+                        return String.format('<div style="vertical-align:middle;text-align:center;"><input style="height:20px;width:20px;"  disabled type="checkbox"  {0}></div>', checked);
+                    }
+                },
+                type:'Checkbox',
+                id_grupo: 0,
+                grid: true,
+                form:true
+            }
+        );
         this.Atributos.splice(14,0,
             {
                 config:{
@@ -90,10 +114,12 @@ Phx.vista.PlanPagoRegIni = {
           {
              this.bloquearMenus();
           }
-        
 
+        this.addButton('btnConformidad',{
+            text:'Conformidad',iconCls: 'bok',disabled:false,handler:this.onButtonConformidad,
+            tooltip: 'Generar conformidad para el pago (Firma acta de conformidad)'
+        });
 
-          //this.addButton('btnConformidad',{text:'Conformidad',iconCls: 'bok',disabled:true,handler:this.onButtonConformidad,tooltip: 'Generar conformidad para el pago (Firma acta de conformidad)'});
           /*this.addButton('btnVerifPresup', {
                 text : 'Disponibilidad',
                 iconCls : 'bassign',
