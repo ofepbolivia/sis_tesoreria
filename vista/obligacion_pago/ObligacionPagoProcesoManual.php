@@ -25,7 +25,17 @@ header("content-type: text/javascript; charset=UTF-8");
             {name:'proceso_ppm',title:'<H1 align="center"><i class="fa fa-plus-circle"></i>Proceso</h1>',grupo:1,height:0}],
 
         actualizarSegunTab: function(name, indice){
+            if (this.getBoton('ini_estado')!= undefined){
+                this.getBoton('ini_estado').setVisible(false);
+            }
 
+            if(this.getBoton('ant_estado')!=undefined && name=='borrador_ppm'){
+                this.getBoton('ant_estado').setVisible(false);
+            }
+
+            if(name=='proceso_ppm'){
+                this.getBoton('edit').setVisible(true);
+            }
             this.store.baseParams.ppm_estado = name;
             this.load({params:{start:0, limit:this.tam_pag}});
 
@@ -37,7 +47,8 @@ header("content-type: text/javascript; charset=UTF-8");
         constructor: function(config) {
             this.Atributos[this.getIndAtributo('id_contrato')].config.allowBlank = true;
             Phx.vista.ObligacionPagoProcesoManual.superclass.constructor.call(this,config);
-
+            this.getBoton('ini_estado').setVisible(false);
+            this.getBoton('ant_estado').setVisible(false);
             this.store.baseParams = {tipo_interfaz:this.nombreVista};
             this.store.baseParams.ppm_estado = 'borrador_ppm';
             this.load({params: {start: 0, limit: this.tam_pag}});
@@ -68,10 +79,10 @@ header("content-type: text/javascript; charset=UTF-8");
             var tb =this.tbar;
             Phx.vista.ObligacionPagoProcesoManual.superclass.preparaMenu.call(this,n);
             console.log('datos: ', data);
-            if (data.tipo_obligacion == 'ppm' && (data.estado == 'vbpoa' || data.estado == 'vb_jefe_aeropuerto' || data.estado == 'vbpresupuestos' ||
+            /*if (data.tipo_obligacion == 'ppm' && (data.estado == 'vbpoa' || data.estado == 'vb_jefe_aeropuerto' || data.estado == 'vbpresupuestos' ||
                 data.estado == 'suppresu' || data.estado == 'registrado' || data.estado == 'en_pago')) {
                 this.getBoton('edit').setVisible(true);
-            }
+            }*/
 
             return tb;
         },

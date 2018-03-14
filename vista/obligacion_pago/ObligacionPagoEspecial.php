@@ -27,7 +27,7 @@ Phx.vista.ObligacionPagoEspecial = {
 	constructor: function(config) {
 	    
 	   Phx.vista.ObligacionPagoEspecial.superclass.constructor.call(this,config);
-       
+	   this.getBoton('ini_estado').setVisible(false);
         
     },
     

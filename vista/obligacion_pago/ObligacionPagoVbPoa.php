@@ -51,8 +51,9 @@ Phx.vista.ObligacionPagoVbPoa = {
             scope: this
            }];
            
-           
+
 	   Phx.vista.ObligacionPagoVbPoa.superclass.constructor.call(this,config);
+       this.getBoton('ini_estado').setVisible(false);
        this.addButton('obs_poa',{text:'Datos. POA', disabled:true, handler: this.initObs, tooltip: '<b>Registro de datos del área de POA</b>'});
        this.crearFormObs();
         

@@ -33,6 +33,7 @@ Phx.vista.ObligacionPagoSol = {
        
        
        Phx.vista.ObligacionPagoSol.superclass.constructor.call(this, config);
+        this.getBoton('ini_estado').setVisible(false);
     },
     
         
