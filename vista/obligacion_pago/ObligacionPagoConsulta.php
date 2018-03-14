@@ -47,6 +47,9 @@ Phx.vista.ObligacionPagoConsulta = {
         });
 
 	    Phx.vista.ObligacionPagoConsulta.superclass.constructor.call(this,config);
+        this.getBoton('ini_estado').setVisible(false);
+        this.getBoton('ant_estado').setVisible(false);
+        this.getBoton('fin_registro').setVisible(false);
         this.cmbGestion.on('select',this.capturarEventos, this);
     },
 

@@ -71,79 +71,10 @@ header("content-type: text/javascript; charset=UTF-8");
 
 
             Phx.vista.ObligacionPagoVbExtranjero.superclass.constructor.call(this,config);
+
             this.addButton('obs_presu',{grupo:[0,1,2],text:'Obs. Presupuestos', disabled:true, handler: this.initObs, tooltip: '<b>Observacioens del área de presupuesto</b>'});
             this.crearFormObs();
-
-
-            this.formEstado = new Ext.form.FormPanel({
-                baseCls: 'x-plain',
-                autoDestroy: true,
-
-                border: false,
-                layout: 'form',
-                autoHeight: true,
-                items: [
-
-                    {
-                        //configuracion del componente
-                        labelSeparator:'',
-                        inputType:'hidden',
-                        name: 'id_estado_wf',
-                        xtype:'field'
-
-                    },
-
-                    {
-                        name: 'obs',
-                        xtype: 'textarea',
-                        fieldLabel: 'Obs',
-                        allowBlank: false,
-                        grow: true,
-                        growMin : '80%',
-                        qtip: 'Por que esta retrocediendo?',
-                        value:'',
-                        anchor: '80%',
-                        maxLength:500
-                    }]
-            });
-
-
-            this.wEstado = new Ext.Window({
-                title: 'Estados',
-                collapsible: true,
-                maximizable: true,
-                autoDestroy: true,
-                width: 380,
-                height: 290,
-                layout: 'fit',
-                plain: true,
-                bodyStyle: 'padding:5px;',
-                buttonAlign: 'center',
-                items: this.formEstado,
-                modal:true,
-                closeAction: 'hide',
-                buttons: [
-                    {
-                        text: 'Guardar',
-                        handler: this.antEstadoSubmmit,
-                        scope:this,
-                        argument: {estado: 'anterior'}
-
-                    },
-                    {
-                        text: 'Guardar',
-                        handler:this.submitSigEstado,
-                        scope:this
-
-                    },
-                    {
-                        text: 'Cancelar',
-                        handler:function(){this.wEstado.hide()},
-                        scope:this
-                    }]
-            });
-
-            this.cmpObs=this.formEstado.getForm().findField('obs');
+            
             this.store.baseParams.pes_estado = 'pago_unico';
             this.store.baseParams.moneda_base = 'extranjero';
             this.load({params:{start:0, limit:this.tam_pag}});
@@ -151,66 +82,55 @@ header("content-type: text/javascript; charset=UTF-8");
 
         },
 
-        submitSigEstado: function(){
-            var d= this.sm.getSelected().data;
-            Phx.CP.loadingShow();
-            Ext.Ajax.request({
-                // form:this.form.getForm().getEl(),
-                url:'../../sis_tesoreria/control/ObligacionPago/finalizarRegistro',
-                params:{id_obligacion_pago: d.id_obligacion_pago, operacion:'fin_registro', obs:this.cmpObs.getValue()}  ,
-                success: function(r1,r2,r3){
-                    this.wEstado.hide();
-                    this.successSinc(r1,r2,r3)
+        antEstado:function(res){
+            var rec=this.sm.getSelected();
+            Phx.CP.loadWindows('../../../sis_workflow/vista/estado_wf/AntFormEstadoWf.php',
+                'Estado de Wf',
+                {
+                    modal:true,
+                    width:450,
+                    height:250
+
                 },
-                failure: function(r1,r2,r3){
-                    this.conexionFailure(r1,r2,r3);
-                    var d= this.sm.getSelected().data;
-                } ,
-                timeout:this.timeout,
-                scope:this
-            });
-
-        },
-
-        showObsEstado: function(){
-            this.wEstado.buttons[0].hide();
-            this.wEstado.buttons[1].show();
-
-            var d = this.sm.getSelected().data;
-
-            this.cmpObs.setValue(d.obs_presupuestos);
-            this.wEstado.show();
-
-        },
-
-        antEstado:function(res,eve) {
-
-            this.wEstado.buttons[1].hide();
-            this.wEstado.buttons[0].show();
-            this.cmpObs.setValue('');
-            this.wEstado.show();
-
-
-        },
-
-        antEstadoSubmmit:function(res,eve){
-            var d= this.sm.getSelected().data;
-            if(this.formEstado.getForm().isValid()){
-                Phx.CP.loadingShow();
-                var operacion = 'cambiar';
-                operacion = res.argument.estado == 'inicio'?'inicio':operacion;
-
-                Ext.Ajax.request({
-                    url:'../../sis_tesoreria/control/ObligacionPago/anteriorEstadoObligacion',
-                    params:{id_obligacion_pago:d.id_obligacion_pago,
-                        operacion: operacion,
-                        obs:this.cmpObs.getValue()},
-                    success:this.successSinc,
-                    failure: this.conexionFailure,
-                    timeout:this.timeout,
+                {
+                    data:rec.data,
+                    estado_destino: res.argument.estado
+                },
+                this.idContenedor,
+                'AntFormEstadoWf',
+                {
+                    config:[{
+                        event:'beforesave',
+                        delegate: this.onAntEstado,
+                    }
+                    ],
                     scope:this
-                });
-            }
+                }
+            );
+        },
+        onAntEstado: function(wizard,resp){
+            Phx.CP.loadingShow();
+
+
+            Ext.Ajax.request({
+                url:'../../sis_tesoreria/control/ObligacionPago/anteriorEstadoObligacionPago',
+                params:{
+                    id_proceso_wf: resp.id_proceso_wf,
+                    id_estado_wf:  resp.id_estado_wf,
+                    obs: resp.obs,
+                    operacion: resp.estado_destino,
+                    id_obligacion_pago: resp.data.id_obligacion_pago
+                },
+                argument:{wizard:wizard},
+                success: function (resp) {
+                    Phx.CP.loadingHide();
+                    resp.argument.wizard.panel.destroy();
+                    this.reload();
+                },
+                failure: this.conexionFailure,
+                timeout: this.timeout,
+                scope: this
+            });
 
         },
 
@@ -325,7 +245,7 @@ header("content-type: text/javascript; charset=UTF-8");
             var data = this.getSelectedData();
             var tb =this.tbar;
             Phx.vista.ObligacionPagoVbExtranjero.superclass.preparaMenu.call(this,n);
-
+            this.getBoton('ini_estado').enable();
             if(this.historico == 'no'){
                 this.getBoton('obs_presu').enable();
             }
@@ -337,6 +257,7 @@ header("content-type: text/javascript; charset=UTF-8");
         liberaMenu:function(){
 
             var tb = Phx.vista.ObligacionPagoVbExtranjero.superclass.liberaMenu.call(this);
+            this.getBoton('ini_estado').disable();
             if(tb){
                 this.getBoton('obs_presu').disable();
             }

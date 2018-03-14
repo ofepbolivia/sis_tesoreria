@@ -35,7 +35,16 @@ Phx.vista.ObligacionPago = Ext.extend(Phx.gridInterfaz,{
 		//crear venta de ajuste para pagos variable           
 		this.crearFormAjustes();  
 		this.iniciarEventos();
-	    
+        this.addButton('ini_estado', {
+            grupo: [0,1,2],
+            argument: {estado: 'inicio'},
+            text: 'Dev. al Solicitante',
+            iconCls: 'batras',
+            disabled: true,
+            handler: this.antEstado,
+            tooltip: '<b>Retorna la Obligacion al estado Borrador</b>'
+        });
+
          this.addButton('ant_estado',{
          	  grupo:[0,1,2],
               argument: {estado: 'anterior'},
@@ -1082,8 +1091,7 @@ Phx.vista.ObligacionPago = Ext.extend(Phx.gridInterfaz,{
             }
             
      },
-     antEstado:function(res,eve)
-     {                   
+     antEstado:function(res,eve) {
             var d= this.sm.getSelected().data;
             Phx.CP.loadingShow();
             var operacion = 'cambiar';

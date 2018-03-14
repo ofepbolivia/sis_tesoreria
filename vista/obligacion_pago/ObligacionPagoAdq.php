@@ -28,6 +28,7 @@ Phx.vista.ObligacionPagoAdq = {
 	
 	constructor: function(config) {
 	   Phx.vista.ObligacionPagoAdq.superclass.constructor.call(this,config);
+        this.getBoton('ini_estado').setVisible(false);
        this.Cmp.id_contrato.allowBlank = true; 
         
     },

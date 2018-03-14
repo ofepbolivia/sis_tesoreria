@@ -461,6 +461,27 @@ class MODObligacionPago extends MODbase{
         //Devuelve la respuesta
         return $this->respuesta;
     }
+    //fea 12/3/2018
+    function anteriorEstadoObligacionPago(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento='tes.ft_obligacion_pago_ime';
+        $this->transaccion='TES_ANTEOB_IME';
+        $this->tipo_procedimiento='IME';
+
+        //Define los parametros para la funcion
+        $this->setParametro('id_proceso_wf','id_proceso_wf','int4');
+        $this->setParametro('id_estado_wf','id_estado_wf','int4');
+        $this->setParametro('obs','obs','text');
+        $this->setParametro('operacion','operacion','varchar');
+        $this->setParametro('id_obligacion_pago','id_obligacion_pago','int4');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
 
      function obtenerFaltante(){
         //Definicion de variables para ejecucion del procedimiento

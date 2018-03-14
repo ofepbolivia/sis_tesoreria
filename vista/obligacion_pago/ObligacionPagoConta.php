@@ -36,6 +36,7 @@ Phx.vista.ObligacionPagoConta = {
        
        
        Phx.vista.ObligacionPagoConta.superclass.constructor.call(this,config);
+       this.getBoton('ini_estado').setVisible(false);
     },
     
         

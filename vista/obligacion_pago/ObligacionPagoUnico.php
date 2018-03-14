@@ -30,7 +30,7 @@ Phx.vista.ObligacionPagoUnico = {
 	constructor: function(config) {
 	    
 	   Phx.vista.ObligacionPagoUnico.superclass.constructor.call(this,config);
-       
+	   this.getBoton('ini_estado').setVisible(false);
         
     },
     
