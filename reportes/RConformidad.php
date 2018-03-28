@@ -12,29 +12,30 @@ class RConformidad extends  ReportePDFFormulario {
 	var	$customy;
 	function Header() {
 		$this->ln(25);
-		$height = 20; 
+		$height = 20;
 		//cabecera del reporte
 		$this->Cell(40, $height, '', 0, 0, 'C', false, '', 0, false, 'T', 'C');
-        $this->SetFontSize(16);
-        $this->SetFont('','B');        
-        $this->Cell(105, $height, 'ACTA DE CONFORMIDAD', 0, 0, 'C', false, '', 0, false, 'T', 'C');								
+		$this->SetFontSize(16);
+		$this->SetFont('','B');
+		$this->Cell(105, $height, 'ACTA DE CONFORMIDAD', 0, 0, 'C', false, '', 0, false, 'T', 'C');
 		$x=$this->getX();
 		$y=$this->getY();
 		$this->Image(dirname(__FILE__).'/../../pxp/lib'.$_SESSION['_DIR_LOGO'], $x, $y, 36);
+		$this->SetMargins(10, 50, 10);
 		$this->ln(20);
 		$this->customy = $this->getY();
-		
+
 		//$this->firmar();
 	}
-	
+
 	function generarActa($maestro) {
-		
-		$nombre_solicitante = $maestro[0]['nombre_solicitante'];	
+
+		$nombre_solicitante = $maestro[0]['nombre_solicitante'];
 		$proveedor = $maestro[0]['proveedor'];
 		$fecha_conformidad = $maestro[0]['fecha_conformidad'];
 		$conformidad = $maestro[0]['conformidad'];
-		$numero_oc = $maestro[0]['numero_oc'];	
-		$numero_op = $maestro[0]['numero_op'];	
+		$numero_oc = $maestro[0]['numero_oc'];
+		$numero_op = $maestro[0]['numero_op'];
 		$numero_cuota = $maestro[0]['numero_cuota'];
 		$numero_tramite = $maestro[0]['numero_tramite'];
 		$detalle = $maestro[0]['detalle'];
@@ -46,10 +47,12 @@ class RConformidad extends  ReportePDFFormulario {
 		$this->firma['datos_documento']['numero_cuota'] = $numero_cuota;
 		$this->firma['datos_documento']['fecha_conformidad'] = $fecha_conformidad;
 		$this->firma['datos_documento']['conformidad'] = $conformidad;
-		
-		
-				
+
+
+
 		$this->AddPage();
+		$this->SetMargins(10, 50, 10);
+		$this->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
 		$url_firma = $this->crearFirma2();
 		/*Se requiere obtener nombre_solicitante, fecha_conformidad,factura, proveedor,conformidad,numero_oc,numero_op, numero_cuota*/
 		$html = <<<EOF
@@ -92,11 +95,11 @@ class RConformidad extends  ReportePDFFormulario {
 EOF;
 		//$this->writeHTMLCell (175,30,20,70,$html);
 		$this->setY($this->customy);
-		$this->writeHTML ($html);		
+		$this->writeHTML ($html);
 		return $this->firma;
-			
+
 	}
-	
-    
+
+
 }
 ?>
