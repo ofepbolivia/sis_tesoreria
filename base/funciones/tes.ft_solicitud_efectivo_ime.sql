@@ -69,6 +69,10 @@ DECLARE
     v_saldo_caja			numeric;
     v_importe_maximo_solicitud	numeric;
     v_temp					interval;
+    v_temp_1				interval;
+    v_temp2				interval;
+    v_fecha_entrega			date;
+    v_dias_maximo_rendicion  integer;
 
 BEGIN
 
@@ -423,9 +427,7 @@ BEGIN
                   case when v_parametros.saldo > 0 then
                   'Devolucion de dinero del solicitante al cajero'
                   else
-
-                  'Solicitud de reposicion de dinero al solicitante, gasto excedido' 
-
+                  'Solicitud de reposicion de dinero al solicitante, gasto excedido'
                   end as motivo,
                   id_solicitud_efectivo_fk as id_solicitud_efectivo_fk,
                   id_estado_wf
@@ -588,14 +590,12 @@ BEGIN
 
         END;
 
-        
-/*********************************    
+/*********************************
 	#TRANSACCION:  'TES_AMPREN_IME'
  	#DESCRIPCION:	Ampliar dias para rendir solicitud efectivo
  	#AUTOR:		Gonzalo Sarmiento
  	#FECHA:		10-04-2017
 	***********************************/
-
 
 	elsif(p_transaccion='TES_AMPREN_IME')then
 
@@ -603,24 +603,34 @@ BEGIN
              --raise exception '%',v_parametros.dias_ampliado::varchar;
 			v_temp = v_parametros.dias_ampliado::varchar||' days';
 
+            select fecha_entrega, c.dias_maximo_rendicion
+            into v_fecha_entrega, v_dias_maximo_rendicion
+            from tes.tsolicitud_efectivo sol
+            inner join tes.tcaja c
+            on c.id_caja = sol.id_caja
+            where id_solicitud_efectivo = v_parametros.id_solicitud_efectivo;
+
+
+             v_temp2 = v_dias_maximo_rendicion::varchar||' days';
+			v_temp_1 = pxp.f_get_weekend_days(v_fecha_entrega::Date, (v_fecha_entrega::Date +  v_temp + v_temp2)::Date)::varchar||' days';
+
+
 			--Sentencia de la modificacion
 			update tes.tsolicitud_efectivo set
 
-                fecha_entrega = (fecha_entrega::Date +  v_temp)::date,
+                fecha_entrega = (fecha_entrega::Date +  v_temp + v_temp_1 + v_temp2)::date,
                 id_usuario_mod = p_id_usuario,
                 fecha_mod = now()
             where id_solicitud_efectivo = v_parametros.id_solicitud_efectivo;
 
-               
 			--Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Dias de rendicion ampliados)'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Dias de rendicion ampliados)');
             v_resp = pxp.f_agrega_clave(v_resp,'id_solicitud_efectivo',v_parametros.id_solicitud_efectivo::varchar);
-               
+
             --Devuelve la respuesta
             return v_resp;
-            
-		end;     
-         
+
+		end;
 
 	else
 
