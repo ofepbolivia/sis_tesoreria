@@ -780,7 +780,8 @@ header("content-type: text/javascript; charset=UTF-8");
 				  }else{
 					this.getBoton('del').disable();
 					this.getBoton('btnVistaPrevia').enable();
-					if(data['estado']=='cobrado'||data['estado']=='reingresado'||data['estado']=='anulado'||data['estado']=='vbpagosindocumento'){
+					//if(data['estado']=='cobrado'||data['estado']=='reingresado'||data['estado']=='anulado'||data['estado']=='vbpagosindocumento') para que se les avilite los botones
+					if(data['estado']=='reingresado'||data['estado']=='anulado'||data['estado']=='vbpagosindocumento'){
 						this.getBoton('edit').disable();							
 						this.getBoton('btnCheque').disable();
 						this.getBoton('btnCheque2').disable();						
