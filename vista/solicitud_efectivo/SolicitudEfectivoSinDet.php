@@ -377,7 +377,8 @@ Phx.vista.SolicitudEfectivoSinDet=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
-				maxLength:500
+				maxLength:500,
+                style: 'background-color: #EAA8A8;'
 			},
 				type:'TextField',
 				filters:{pfiltro:'solefe.motivo',type:'string'},
@@ -392,7 +393,8 @@ Phx.vista.SolicitudEfectivoSinDet=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 60,
-				maxLength:1179650
+				maxLength:1179650,
+                style: 'background-color: #EAA8A8;'
 			},
 				type:'NumberField',
 				filters:{pfiltro:'solefe.monto',type:'numeric'},
