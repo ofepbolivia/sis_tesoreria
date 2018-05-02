@@ -497,7 +497,7 @@ BEGIN
             END IF;
 
             --eliminamos solo los que estan en estado borrador
-    		if(g_estado_actual = 'borrador')then
+    		if(g_estado_actual = 'borrador' OR g_estado_actual= 'transferido')then
 	        	delete from tes.tts_libro_bancos
             	where id_libro_bancos=v_parametros.id_libro_bancos;
 			else
