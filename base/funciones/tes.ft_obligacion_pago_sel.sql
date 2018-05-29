@@ -816,7 +816,7 @@ BEGIN
                     ejecutado			numeric DEFAULT 0.00,
                     pagado				numeric DEFAULT 0.00,
                     revertible			numeric DEFAULT 0.00,
-                    revertir			numeric DEFAULT 0.00
+                    revertir			numeric
             ) on commit drop;
 
             insert into obligaciones (id_obligacion_det,
