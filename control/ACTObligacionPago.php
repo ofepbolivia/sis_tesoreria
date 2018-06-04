@@ -57,6 +57,14 @@ class ACTObligacionPago extends ACTbase{
         if($this->objParam->getParametro('ppm_estado')=='proceso_ppm'){
             $this->objParam->addFiltro("obpg.estado in (''vbpoa'', ''vb_jefe_aeropuerto'', ''suppresu'', ''vbpresupuestos'', ''registrado'', ''en_pago'', ''finalizado'')");
         }
+
+        //(f.e.a) Pagos de Compras del Exterior
+        if($this->objParam->getParametro('pce_estado')=='borrador_pce'){
+            $this->objParam->addFiltro("obpg.estado in (''borrador'')");
+        }
+        if($this->objParam->getParametro('pce_estado')=='proceso_pce'){
+            $this->objParam->addFiltro("obpg.estado in (''vobogerencia'',''vbgaf'',''vbpoa'', ''vb_jefe_aeropuerto'', ''suppresu'', ''vbpresupuestos'', ''registrado'', ''en_pago'', ''finalizado'')");
+        }
 		
         //(fea) Pagos Moneda base y moneda extranjera
         if($this->objParam->getParametro('moneda_base')=='base' && $this->objParam->getParametro('tipo_interfaz') == 'ObligacionPagoVb'){
