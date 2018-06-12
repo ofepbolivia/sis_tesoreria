@@ -75,7 +75,7 @@ BEGIN
                v_historico = 'no';
             END IF;
 
-            IF  lower(v_parametros.tipo_interfaz) in ('condetalle','sindetalle','efectivocaja') THEN
+            IF  lower(v_parametros.tipo_interfaz) in ('condetalle','sindetalle','efectivocaja','sindetallea') THEN
 
             	select id_tipo_solicitud into v_id_tipo_solicitud
                 from tes.ttipo_solicitud
@@ -99,7 +99,7 @@ BEGIN
                                         and estado=''repuesto''), 0.00)
                  			else 0.00 end as saldo';
 
-                IF p_administrador !=1 and p_administrador !=0 THEN
+                IF p_administrador !=1 /*and p_administrador !=0*/ THEN
                     v_i = 1;
                 	FOR v_cajas in (select id_caja
                     				from tes.tcajero
@@ -111,9 +111,15 @@ BEGIN
 
                     IF v_i > 1 THEN
                     	v_filtro = '(solefe.id_caja in ('||v_cajas.id_caja||') OR (solefe.id_funcionario = '||v_parametros.id_funcionario_usu::varchar||' or
-      								solefe.id_usuario_reg = '||p_id_usuario||')) and solefe.id_tipo_solicitud in ('||v_id_tipo_solicitud||','||v_id_tipo_reposicion||') and ';
+      								solefe.id_usuario_reg = '||p_id_usuario||')) and
+                                    solefe.id_tipo_solicitud in ('||v_id_tipo_solicitud||','||v_id_tipo_reposicion||') and ';
                     ELSE
-                   		v_filtro = '(solefe.id_funcionario='||v_parametros.id_funcionario_usu::varchar||'  or solefe.id_usuario_reg='||p_id_usuario||' or solefe.id_usuario_mod='||p_id_usuario||') and solefe.id_tipo_solicitud in ('||v_id_tipo_solicitud||','||v_id_tipo_reposicion||') and ';
+                    	if lower(v_parametros.tipo_interfaz) = 'sindetallea' then
+                        	v_filtro = 'solefe.id_tipo_solicitud in ('||v_id_tipo_solicitud||','||v_id_tipo_reposicion||') and ';
+                        else
+                            v_filtro = '(solefe.id_funcionario='||v_parametros.id_funcionario_usu::varchar||'  or solefe.id_usuario_reg='||p_id_usuario||' or
+                            solefe.id_usuario_mod='||p_id_usuario||') and solefe.id_tipo_solicitud in ('||v_id_tipo_solicitud||','||v_id_tipo_reposicion||') and ';
+                        end if;
                     END IF;
 
                 ELSE
@@ -526,12 +532,12 @@ BEGIN
             from tes.tts_libro_bancos lb
             inner join tes.tproceso_caja pc on pc.id_int_comprobante = lb.id_int_comprobante
 			inner join tes.tcaja cj on cj.id_caja=pc.id_caja
-            where lb.id_proceso_wf = v_parametros.id_proceso_wf;
-            /*
+            where pc.id_proceso_wf = v_parametros.id_proceso_wf;
+
             IF v_num IS NULL THEN
 
                 v_num = param.f_obtener_correlativo(
-                              'MEMO',
+                              'MEMOCCH',
                                v_id_gestion,-- par_id,
                                NULL, --id_uo
                                v_id_depto,    -- id_depto
@@ -544,7 +550,7 @@ BEGIN
                 WHERE id_proceso_caja = v_id_proceso_caja;
 
             END IF;
-            */
+
     		--Sentencia de la consulta
 v_consulta:='select lb.fecha,
                                lb.nro_cheque,
