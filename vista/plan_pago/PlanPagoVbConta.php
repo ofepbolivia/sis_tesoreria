@@ -100,13 +100,27 @@ Phx.vista.PlanPagoVbConta = {
            this.store.baseParams.filtro_valor = config.filtro_directo.valor;
            this.store.baseParams.filtro_campo = config.filtro_directo.campo;
        }
-       
-       this.load({params:{
-           start: 0, 
+        var fecha = new Date();
+        Ext.Ajax.request({
+            url:'../../sis_parametros/control/Gestion/obtenerGestionByFecha',
+            params:{fecha:fecha.getDate()+'/'+(fecha.getMonth()+1)+'/'+fecha.getFullYear()},
+            success:function(resp){
+                var reg =  Ext.decode(Ext.util.Format.trim(resp.responseText));
+                this.cmbGestion.setValue(reg.ROOT.datos.id_gestion);
+                this.cmbGestion.setRawValue(reg.ROOT.datos.anho);
+                this.store.baseParams.id_gestion=reg.ROOT.datos.id_gestion;
+                this.load({params:{start:0, limit:this.tam_pag}});
+            },
+            failure: this.conexionFailure,
+            timeout:this.timeout,
+            scope:this
+        });
+       /*this.load({params:{
+           start: 0,
            limit: this.tam_pag
-        }});
+        }});*/
         
-        this.cmbGestion.on('change',function(){
+        this.cmbGestion.on('select',function(){
         	this.store.baseParams.id_gestion = this.cmbGestion.getValue();
         	if(!this.store.baseParams.id_gestion){
         		delete this.store.baseParams.id_gestion;

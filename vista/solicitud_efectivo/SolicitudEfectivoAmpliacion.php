@@ -12,7 +12,7 @@ header("content-type: text/javascript; charset=UTF-8");
 <script>
     Phx.vista.SolicitudEfectivoAmpliacion=Ext.extend(Phx.gridInterfaz,{
 
-            vista:'SinDetalle',
+            vista:'SinDetalleA',
 
             gruposBarraTareas:[{name:'entregado',title:'<H1 align="center"><i class="fa fa-file-o"></i> Entregados</h1>',grupo:0,height:0}],
 

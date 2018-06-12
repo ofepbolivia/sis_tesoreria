@@ -1,5 +1,4 @@
 --------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION tes.ft_obligacion_pago_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -82,7 +81,7 @@ BEGIN
 
 
 
-         IF   v_parametros.tipo_interfaz in ('obligacionPagoTes','obligacionPagoUnico', 'PGA', 'PPM') THEN
+         IF   v_parametros.tipo_interfaz in ('obligacionPagoTes','obligacionPagoUnico', 'PGA', 'PPM', 'PCE') THEN
 
                  IF   p_administrador != 1 THEN
 
@@ -100,8 +99,7 @@ BEGIN
                         FROM segu.tusuario tu
                         INNER JOIN orga.tfuncionario tf on tf.id_persona = tu.id_persona
                         WHERE tu.id_usuario = p_id_usuario ;
-                        --v_inner =  'inner join wf.testado_wf ew on ew.id_estado_wf = obpg.id_estado_wf';
-                        v_filadd = v_filadd ||'obpg.id_funcionario = '||v_id_funcionario||' and';
+                        v_filadd = v_filadd ||'(obpg.id_funcionario = '||v_id_funcionario||' or obpg.id_usuario_reg = '||p_id_usuario||') and ';
                     elsif(v_parametros.tipo_interfaz  = 'PPM')then
 
                     	SELECT tf.id_funcionario
@@ -109,8 +107,15 @@ BEGIN
                         FROM segu.tusuario tu
                         INNER JOIN orga.tfuncionario tf on tf.id_persona = tu.id_persona
                         WHERE tu.id_usuario = p_id_usuario ;
-                        v_filadd = v_filadd ||'obpg.id_funcionario = '||v_id_funcionario||' and';
+                        v_filadd = v_filadd ||'(obpg.id_funcionario = '||v_id_funcionario||' or obpg.id_usuario_reg = '||p_id_usuario||') and ';
+                    elsif(v_parametros.tipo_interfaz  = 'PCE')then
 
+                    	SELECT tf.id_funcionario
+                        into v_id_funcionario
+                        FROM segu.tusuario tu
+                        INNER JOIN orga.tfuncionario tf on tf.id_persona = tu.id_persona
+                        WHERE tu.id_usuario = p_id_usuario ;
+                        v_filadd = v_filadd ||'(obpg.id_funcionario = '||v_id_funcionario||' or obpg.id_usuario_reg = '||p_id_usuario||') and ';
                     else
                  		v_filadd='(obpg.id_depto  in ('|| COALESCE(array_to_string(va_id_depto,','),'0')||')) and';
                     end if;
@@ -124,6 +129,8 @@ BEGIN
                     v_filadd=v_filadd ||' obpg.tipo_obligacion = ''pga'' and';
                 ELSIF v_parametros.tipo_interfaz  = 'PPM' THEN
                 	v_filadd=v_filadd ||' obpg.tipo_obligacion = ''ppm'' and';
+                    ELSIF v_parametros.tipo_interfaz  = 'PCE' THEN
+                	v_filadd=v_filadd ||' obpg.tipo_obligacion = ''pce'' and';
                 ELSE
                    v_filadd=v_filadd ||' obpg.tipo_obligacion in (''pago_directo'',''rrhh'') and';
                 END IF;
@@ -297,7 +304,7 @@ BEGIN
               END IF;
 
 
-             IF   v_parametros.tipo_interfaz in ('obligacionPagoTes','obligacionPagoUnico', 'PGA', 'PPM') THEN
+             IF   v_parametros.tipo_interfaz in ('obligacionPagoTes','obligacionPagoUnico', 'PGA', 'PPM', 'PCE') THEN
 
                      IF   p_administrador != 1 THEN
 
@@ -314,15 +321,23 @@ BEGIN
                           FROM segu.tusuario tu
                           INNER JOIN orga.tfuncionario tf on tf.id_persona = tu.id_persona
                           WHERE tu.id_usuario = p_id_usuario ;
-                          --v_inner =  'inner join wf.testado_wf ew on ew.id_estado_wf = obpg.id_estado_wf';
-                          v_filadd = v_filadd ||' obpg.id_funcionario = '||v_id_funcionario||' and';
+
+                         v_filadd = v_filadd ||'(obpg.id_funcionario = '||v_id_funcionario||' or obpg.id_usuario_reg = '||p_id_usuario||') and ';
                         elsif(v_parametros.tipo_interfaz  = 'PPM')then
                           SELECT tf.id_funcionario
                           into v_id_funcionario
                           FROM segu.tusuario tu
                           INNER JOIN orga.tfuncionario tf on tf.id_persona = tu.id_persona
                           WHERE tu.id_usuario = p_id_usuario ;
-                          v_filadd = v_filadd ||' obpg.id_funcionario = '||v_id_funcionario||' and';
+                          v_filadd = v_filadd ||'(obpg.id_funcionario = '||v_id_funcionario||' or obpg.id_usuario_reg = '||p_id_usuario||') and ';
+                        elsif(v_parametros.tipo_interfaz  = 'PCE')then
+
+                          SELECT tf.id_funcionario
+                          into v_id_funcionario
+                          FROM segu.tusuario tu
+                          INNER JOIN orga.tfuncionario tf on tf.id_persona = tu.id_persona
+                          WHERE tu.id_usuario = p_id_usuario ;
+                          v_filadd = v_filadd ||'(obpg.id_funcionario = '||v_id_funcionario||' or obpg.id_usuario_reg = '||p_id_usuario||') and ';
                         else
                             v_filadd='(obpg.id_depto  in ('|| COALESCE(array_to_string(va_id_depto,','),'0')||')) and';
                         end if;
@@ -337,6 +352,8 @@ BEGIN
                    	   v_filadd=v_filadd ||' obpg.tipo_obligacion = ''pga'' and';
                     ELSIF v_parametros.tipo_interfaz  = 'PPM' THEN
                    	   v_filadd=v_filadd ||' obpg.tipo_obligacion = ''ppm'' and';
+                    ELSIF v_parametros.tipo_interfaz  = 'PCE' THEN
+                	   v_filadd=v_filadd ||' obpg.tipo_obligacion = ''pce'' and';
                     ELSE
                        v_filadd=v_filadd ||' obpg.tipo_obligacion in (''pago_directo'',''rrhh'') and';
                     END IF;
@@ -899,7 +916,7 @@ BEGIN
             WHERE top.id_proceso_wf =  v_parametros.id_proceso_wf;
 
         	--Gerencia del funcionario solicitante
-        	WITH RECURSIVE gerencia(id_uo, id_nivel_organizacional, nombre_unidad, nombre_cargo, codigo) AS (
+        	/*WITH RECURSIVE gerencia(id_uo, id_nivel_organizacional, nombre_unidad, nombre_cargo, codigo) AS (
               SELECT tu.id_uo, tu.id_nivel_organizacional, tu.nombre_unidad, tu.nombre_cargo, tu.codigo
               FROM orga.tuo  tu
               INNER JOIN orga.tuo_funcionario tf ON tf.id_uo = tu.id_uo
@@ -917,7 +934,7 @@ BEGIN
             SELECT (codigo||'-'||nombre_unidad)::varchar
             INTO v_gerencia
             FROM gerencia
-            ORDER BY id_nivel_organizacional asc limit 1;
+            ORDER BY id_nivel_organizacional asc limit 1;*/
             --end gerencia
 
             SELECT top.estado, top.id_estado_wf, top.obs
@@ -992,8 +1009,7 @@ BEGIN
             COALESCE('''||v_firma_fun||'''::varchar, '''') AS firmas,
             COALESCE('''||v_record_op.obs||'''::varchar,'''') AS justificacion,
             COALESCE(tet.codigo::varchar,''00''::varchar) AS codigo_transf,
-            --(uo.codigo||''-''||uo.nombre_unidad)::varchar as unidad_solicitante,
-            '''||v_gerencia||'''::varchar AS unidad_solicitante,
+            (''(''||tuo.codigo||'')''||tuo.nombre_unidad)::varchar as unidad_solicitante,
             fun.desc_funcionario1::varchar as funcionario_solicitante,
             '''||v_cod_proceso||'''::varchar AS codigo_proceso,
 
@@ -1025,7 +1041,9 @@ BEGIN
             INNER JOIN param.tmoneda tmo ON tmo.id_moneda = ts.id_moneda
 
             inner join orga.vfuncionario fun on fun.id_funcionario = ts.id_funcionario
-            --inner join orga.tuo uo on uo.id_uo = ts.id_uo
+
+            inner JOIN orga.tuo_funcionario uof ON uof.id_funcionario = ts.id_funcionario and uof.tipo = ''oficial'' and uof.estado_reg = ''activo'' and (current_date <= uof.fecha_finalizacion or  uof.fecha_finalizacion is null)
+			inner JOIN orga.tuo tuo on tuo.id_uo = orga.f_get_uo_gerencia(uof.id_uo,uof.id_funcionario,current_date)
 
             left JOIN pre.tpresupuesto_partida_entidad tppe ON tppe.id_partida = tpar.id_partida AND tppe.id_presupuesto = tp.id_presupuesto
             left JOIN pre.tentidad_transferencia tet ON tet.id_entidad_transferencia = tppe.id_entidad_transferencia
@@ -1036,7 +1054,7 @@ BEGIN
             ' GROUP BY vcp.id_categoria_programatica, tpar.codigo, ttc.codigo, vcp.codigo_programa,
             vcp.codigo_proyecto, vcp.codigo_actividad, vcp.codigo_fuente_fin, vcp.codigo_origen_fin,
     		tpar.nombre_partida, tcg.codigo, tcg.nombre, tmo.codigo, ts.num_tramite, tet.codigo,
-    		funcionario_solicitante, ts.fecha, tg.gestion, ts.codigo_poa ';
+    		funcionario_solicitante, ts.fecha, tg.gestion, ts.codigo_poa, tuo.codigo, tuo.nombre_unidad ';
 			v_consulta =  v_consulta || 'ORDER BY tpar.codigo, tcg.nombre, vcp.id_categoria_programatica, ttc.codigo asc  ';
 			--Devuelve la respuesta
             RAISE NOTICE 'v_consulta %',v_consulta;
