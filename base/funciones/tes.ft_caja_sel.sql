@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION tes.ft_caja_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -34,7 +32,14 @@ DECLARE
     v_cajas				record;
     v_i					integer;
     v_id_caja			integer[];
-
+    
+    --update filtrado para 'cajaabierto'
+    v_inner_aux			varchar='';
+	v_ids_func			integer[];
+    v_ids_cajero		integer[];
+    v_fill_func			varchar='';
+    v_cont_cajero		integer=0;
+    v_cont_func			integer=0;
 BEGIN
 
 	v_nombre_funcion = 'tes.ft_caja_sel';
@@ -53,7 +58,7 @@ BEGIN
 
         	v_filtro='';
             v_inner='';
-
+            v_inner_aux = 'left join tes.tcajero caje on caje.id_caja=caja.id_caja and caje.tipo=''responsable''';
             IF (v_parametros.id_funcionario_usu is null) then
 
                 v_parametros.id_funcionario_usu = -1;
@@ -87,29 +92,42 @@ BEGIN
             END IF;
 
             IF  lower(v_parametros.tipo_interfaz) = 'cajaabierto' THEN
+            
+				IF p_administrador !=1 THEN
+                	
+                    select pxp.aggarray(tc.id_caja)
+                    into v_ids_cajero
+                    from tes.tcajero tc
+                    where id_funcionario=v_parametros.id_funcionario_usu and tipo='responsable';
+                    
+                    select pxp.aggarray(tcf.id_caja)
+                    into v_ids_func
+                    from tes.tcaja_funcionario tcf 
+                    inner join tes.tcaja tc on tc.id_caja = tcf.id_caja
+                    where tcf.id_funcionario = v_parametros.id_funcionario_usu and date_part('year',tc.fecha_apertura) = date_part('year',current_date);
+                    
+                    if(v_ids_cajero is not null and v_ids_func is not null) then
 
-                IF p_administrador !=1 THEN
-                	v_i = 1;
-                	FOR v_cajas in (select id_caja
-                    				from tes.tcajero
-                    				where id_funcionario=v_parametros.id_funcionario_usu
-				                    and tipo='responsable')LOOP
-                    	v_id_caja[v_i] = v_cajas.id_caja;
-                        v_i = v_i + 1;
-                    END LOOP;
+                        v_inner_aux = v_inner_aux||' left join tes.tcaja_funcionario cajer on cajer.id_caja = caja.id_caja ';
+                    	
+                        v_filtro = 'caja.estado = ''abierto'' and pc.tipo=''apertura'' and 
+                        (caja.id_caja in ('||array_to_string(v_ids_cajero,',')||') or 
+                        caja.id_caja in  ('||array_to_string(v_ids_func,',')||')) and ';
+                    
+                    elsif(v_ids_cajero is not null) then
 
-                    IF v_i > 1 THEN
-                    	v_filtro = '(caja.estado = ''abierto'') and (pc.tipo=''apertura'') and caja.id_caja in('||array_to_string(v_id_caja,',')||') and ';
-                    ELSE
-                    	v_inner = ' left join tes.tcaja_funcionario cjusu on cjusu.id_caja=caja.id_caja ';
-                    	v_filtro = '(caja.estado = ''abierto'') and (pc.tipo=''apertura'') and cjusu.id_funcionario='||v_parametros.id_funcionario_usu::integer||' and ';
-                    END IF;
+                        v_filtro = 'caja.estado = ''abierto'' and pc.tipo=''apertura'' and 
+                        caja.id_caja in ('||array_to_string(v_ids_cajero,',')||') and '; 
 
+                    elsif(v_ids_func is not null) then
 
+                        v_inner_aux = ' left join tes.tcaja_funcionario caje on caje.id_caja = caja.id_caja ';
+                        v_filtro = 'caja.estado = ''abierto'' and pc.tipo=''apertura'' and 
+                        caja.id_caja in ('||array_to_string(v_ids_func,',')||') and '; 
+                    end if;
                 ELSE
 	                 v_filtro = '(caja.estado = ''abierto'') and (pc.tipo=''apertura'') and ';
-               END IF;
-                
+               	END IF; 
             END IF;
             
             IF  lower(v_parametros.tipo_interfaz) = 'cajacajero' THEN
@@ -161,6 +179,7 @@ BEGIN
                         left join param.tdepto deplb on deplb.id_depto=caja.id_depto_lb
                         left join tes.tcuenta_bancaria ctab on ctab.id_cuenta_bancaria=caja.id_cuenta_bancaria
                         left join tes.tcajero caje on caje.id_caja=caja.id_caja and caje.tipo=''responsable''
+                        --'||v_inner_aux||'
 						left join orga.vfuncionario fun on fun.id_funcionario=caje.id_funcionario
                         '||v_inner||'   
                         where  '||v_filtro;
