@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION tes.f_integracion_libro_bancos (
   p_id_usuario integer,
   p_id_int_comprobante integer
@@ -67,7 +65,16 @@ BEGIN
 
               v_respuesta_libro_bancos = tes.f_generar_cheque(p_id_usuario,p_id_int_comprobante, v_id_finalidad,NULL,COALESCE(v_registros.c31,''),'nacional');
            ELSE
-              v_respuesta_libro_bancos = tes.f_generar_deposito_cheque(p_id_usuario,p_id_int_comprobante, v_id_finalidad,NULL,COALESCE(v_registros.c31,''),'nacional');
+              select fin.id_finalidad into v_id_finalidad
+              from tes.tfinalidad fin
+              where fin.nombre_finalidad ilike 'proveedores';
+
+              IF(v_registros.centro!='si')THEN
+              	v_respuesta_libro_bancos = tes.f_generar_deposito_cheque(p_id_usuario,p_id_int_comprobante, v_id_finalidad,NULL,COALESCE(v_registros.c31,''),'nacional');
+              ELSE
+              	v_respuesta_libro_bancos = tes.f_generar_cheque(p_id_usuario,p_id_int_comprobante, v_id_finalidad,NULL,COALESCE(v_registros.c31,''),'nacional');
+              END IF;
+              
           	v_resp= 'true';
           END IF;
       elseif(v_registros.prioridad_conta = 2 and v_registros.prioridad_libro =2 )then
