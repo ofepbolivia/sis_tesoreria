@@ -58,7 +58,7 @@ header("content-type: text/javascript; charset=UTF-8");
 			
 			this.addButton('trans_deposito',
 				{	text:'Transfer. Depósito',
-					iconCls: 'btransferMoney',
+					iconCls: 'btransfer',
 					disabled:false,
 					handler:this.transDeposito,
 					tooltip: '<b>Transferencia Depósito</b><p>Transferencia de Depósito Total o Saldo</p>'
@@ -792,14 +792,16 @@ header("content-type: text/javascript; charset=UTF-8");
 		},
 		
 		transferir:function(wizard,resp){
+			console.log('tranfer',resp)
             Phx.CP.loadingShow();
             Ext.Ajax.request({
                 // form:this.form.getForm().getEl(),
                 url:'../../sis_tesoreria/control/TsLibroBancos/transferirDeposito',
                 params:{
                         id_libro_bancos:resp.id_libro_bancos,
-                        tipo:resp.tipo,  
-                        id_libro_bancos_fk:resp.id_libro_bancos_fk
+                        tipo:resp.tipo, 
+                        id_libro_bancos_fk:resp.id_libro_bancos_fk,
+                        importe_transferencia:resp.importe_transferencia
                  },
                 argument:{wizard:wizard},  
                 success:this.successWizard,
