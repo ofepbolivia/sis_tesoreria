@@ -11,14 +11,18 @@ header("content-type: text/javascript; charset=UTF-8");
 <script>
 	Phx.vista.TsLibroBancosDeposito = Ext.extend(Phx.gridInterfaz, {
 		
-		constructor : function(config) {
+		constructor : function(config) {			
 			this.maestro = config.maestro;
-			Phx.vista.TsLibroBancosDeposito.superclass.constructor.call(this, config);
+			this.tbarItems = ['-',this.cmbGestion,'-'];
+			Phx.vista.TsLibroBancosDeposito.superclass.constructor.call(this, config);	
+		    this.cmbGestion.on('select',this.capturarEventos, this);                                                                  
+            var date = new Date();            
 			this.init();
 			this.iniciarEventos();
 			this.store.baseParams={
 					id_cuenta_bancaria : this.id_cuenta_bancaria,
-					mycls:this.mycls};
+					mycls:this.mycls,
+					gestion:date.getFullYear()};
 			this.load({
 				params : {
 					start : 0,
@@ -85,6 +89,21 @@ header("content-type: text/javascript; charset=UTF-8");
 				}
 			);
 		},
+    cmbGestion : new Ext.form.ComboBox({
+        name:'gestion',
+        store:['2018','2017','2016','2015','2014','2013'],
+        typeAhead: true,
+        value: '2018',
+        mode: 'local',
+        triggerAction: 'all',
+        emptyText:'Géstion...',
+        selectOnFocus:true,
+        width:135,
+    }),
+    capturarEventos: function () {         	
+        this.store.baseParams.gestion=this.cmbGestion.getValue();     
+        this.load({params:{start:0, limit:this.tam_pag}});
+    }, 		
 		Atributos : [{
 			config : {
 				labelSeparator : '',
@@ -825,7 +844,7 @@ header("content-type: text/javascript; charset=UTF-8");
 			      				   
 		},
 		
-		transferir:function(wizard,resp){
+		transferir:function(wizard,resp){			
             Phx.CP.loadingShow();
             Ext.Ajax.request({
                 // form:this.form.getForm().getEl(),
