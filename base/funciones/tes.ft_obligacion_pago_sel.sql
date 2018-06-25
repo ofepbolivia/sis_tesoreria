@@ -1,4 +1,3 @@
---------------- SQL ---------------
 CREATE OR REPLACE FUNCTION tes.ft_obligacion_pago_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -272,7 +271,6 @@ BEGIN
                   --Definicion de la respuesta
                   v_consulta:=v_consulta||v_parametros.filtro;
                   v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
-
 
 
             --raise exception '%',v_consulta;
@@ -833,7 +831,7 @@ BEGIN
                     ejecutado			numeric DEFAULT 0.00,
                     pagado				numeric DEFAULT 0.00,
                     revertible			numeric DEFAULT 0.00,
-                    revertir			numeric DEFAULT 0.00
+                    revertir			numeric
             ) on commit drop;
 
             insert into obligaciones (id_obligacion_det,
@@ -1071,8 +1069,6 @@ BEGIN
     elsif(p_transaccion='TES_REPSC_SEL')then
 
     	begin
-
-
     		v_consulta:='select
 						obpg.id_obligacion_pago,
 						obpg.id_proveedor,

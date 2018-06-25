@@ -254,7 +254,8 @@ BEGIN
 						--coalesce(plapa.es_ultima_cuota,true) as es_ultima_cuota,
                         plapa.es_ultima_cuota as es_ultima_cuota,
                         tcon.nro_cbte,
-                        tcon.c31
+                        tcon.c31,
+                        op.id_gestion
                         from tes.tplan_pago plapa
                         inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = plapa.id_proceso_wf
                         inner join tes.tobligacion_pago op on op.id_obligacion_pago = plapa.id_obligacion_pago
@@ -579,7 +580,7 @@ BEGIN
 		begin
 
 			--Sentencia de la consulta de conteo de registros
-			v_consulta:='select 
+			v_consulta:='select
             			fun.desc_funcionario1, prov.desc_proveedor,
             			to_char( pp.fecha_conformidad,''DD/MM/YYYY''),pp.conformidad,
                         cot.numero_oc,op.numero, pp.nro_cuota,op.num_tramite::varchar,
@@ -819,8 +820,6 @@ BEGIN
 			return v_consulta;
 
 		end;
-
-    
 
 
 

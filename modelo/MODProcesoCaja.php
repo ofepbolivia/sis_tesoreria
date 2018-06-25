@@ -48,6 +48,7 @@ class MODProcesoCaja extends MODbase{
 		$this->captura('usr_mod','varchar');
 		$this->captura('nombre','varchar');
 		$this->captura('id_moneda','int4');
+		$this->captura('id_gestion','int4');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

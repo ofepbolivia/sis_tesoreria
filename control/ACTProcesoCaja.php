@@ -34,7 +34,10 @@ class ACTProcesoCaja extends ACTbase{
 				 $this->objParam->addFiltro("ren.estado in (''contabilizado'',''rendido'',''entregado'')");
 			}			
 		}
+        if($this->objParam->getParametro('id_gestion') != ''){
+            $this->objParam->addFiltro("ren.id_gestion = ".$this->objParam->getParametro('id_gestion')." ");
 
+        }
 		$this->objParam->defecto('dir_ordenacion','asc');
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);

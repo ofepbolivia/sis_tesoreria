@@ -514,7 +514,8 @@ Phx.vista.ProcesoCaja=Ext.extend(Phx.gridInterfaz,{
 		{name:'id_usuario_mod', type: 'numeric'},
 		{name:'usr_reg', type: 'string'},
 		{name:'usr_mod', type: 'string'},
-		{name:'nombre', type: 'string'}
+		{name:'nombre', type: 'string'},
+        {name:'id_gestion', type: 'numeric'},
 
 	],
 	sortInfo:{

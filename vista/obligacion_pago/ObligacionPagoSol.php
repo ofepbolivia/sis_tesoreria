@@ -24,19 +24,79 @@ Phx.vista.ObligacionPagoSol = {
 	 * */
 	
 	constructor: function(config) {
-	   
-	  
+
+        this.tbarItems = ['-',
+            'Gestión:',this.cmbGestion,'-'
+        ];
+        var fecha = new Date();
+        Ext.Ajax.request({
+            url:'../../sis_parametros/control/Gestion/obtenerGestionByFecha',
+            params:{fecha:fecha.getDate()+'/'+(fecha.getMonth()+1)+'/'+fecha.getFullYear()},
+            success:function(resp){
+                var reg =  Ext.decode(Ext.util.Format.trim(resp.responseText));
+                this.cmbGestion.setValue(reg.ROOT.datos.id_gestion);
+                this.cmbGestion.setRawValue(fecha.getFullYear());
+                this.store.baseParams.id_gestion=reg.ROOT.datos.id_gestion;
+                this.load({params:{start:0, limit:this.tam_pag}});
+            },
+            failure: this.conexionFailure,
+            timeout:this.timeout,
+            scope:this
+        });
+
 	   this.Atributos[this.getIndAtributo('id_depto')].config.url = '../../sis_parametros/control/Depto/listarDeptoFiltradoXUsuario';
        this.Atributos[this.getIndAtributo('id_depto')].config.baseParams = {estado:'activo',codigo_subsistema:'TES',modulo:'OP'},
        this.Atributos[this.getIndAtributo('id_funcionario')].grid = true;
        this.Atributos[this.getIndAtributo('id_funcionario')].form = true;
-       
-       
+
        Phx.vista.ObligacionPagoSol.superclass.constructor.call(this, config);
         this.getBoton('ini_estado').setVisible(false);
+
+        this.cmbGestion.on('select', this.capturarEventos, this);
+
+
     },
-    
-        
+
+    cmbGestion: new Ext.form.ComboBox({
+        //name: 'gestion',
+        // id: 'gestion_reg',
+        fieldLabel: 'Gestion',
+        allowBlank: true,
+        emptyText: 'Gestion...',
+        blankText: 'Año',
+        editable: false,
+        store: new Ext.data.JsonStore(
+            {
+                url: '../../sis_parametros/control/Gestion/listarGestion',
+                id: 'id_gestion',
+                root: 'datos',
+                sortInfo: {
+                    field: 'gestion',
+                    direction: 'DESC'
+                },
+                totalProperty: 'total',
+                fields: ['id_gestion', 'gestion'],
+                // turn on remote sorting
+                remoteSort: true,
+                baseParams: {par_filtro: 'gestion'}
+            }),
+        valueField: 'id_gestion',
+        triggerAction: 'all',
+        displayField: 'gestion',
+        hiddenName: 'id_gestion',
+        mode: 'remote',
+        pageSize: 5,
+        queryDelay: 500,
+        listWidth: '280',
+        hidden: false,
+        width: 80
+    }),
+    capturarEventos: function () {
+        this.store.baseParams.id_gestion=this.cmbGestion.getValue();
+
+        this.load({params:{start:0, limit:this.tam_pag}});
+    },
+
      tabsouth:[
             { 
                  url:'../../../sis_tesoreria/vista/obligacion_det/ObligacionDet.php',
@@ -53,7 +113,7 @@ Phx.vista.ObligacionPagoSol = {
             }
     
        ],
-       
+
        iniciarEventos:function(){
             this.cmpProveedor = this.getComponente('id_proveedor');
             this.cmpFuncionario = this.getComponente('id_funcionario');
@@ -217,7 +277,7 @@ Phx.vista.ObligacionPagoSol = {
        this.cmpMoneda.disable();
        this.Cmp.id_funcionario.disable()
        this.mostrarComponente(this.cmpProveedor);
-       
+
        Phx.vista.ObligacionPagoSol.superclass.onButtonEdit.call(this);
        
        if(data.tipo_obligacion == 'adquisiciones'){
@@ -263,6 +323,22 @@ Phx.vista.ObligacionPagoSol = {
     },
     
     onButtonNew:function(){
+
+        Ext.Ajax.request({
+
+            success: function (resp) {
+                var reg = Ext.decode(Ext.util.Format.trim(resp.responseText));
+                this.Cmp.id_gestion.setValue(reg.ROOT.datos.id_gestion);
+                this.Cmp.id_gestion.setRawValue(reg.ROOT.datos.gestion);
+                //this.store.baseParams.id_gestion=this.cmbGestion.getValue();
+                this.Cmp.id_gestion.setValue(this.cmbGestion.getValue());
+                this.Cmp.id_gestion.setRawValue(this.cmbGestion.getRawValue());
+            },
+            failure: this.conexionFailure,
+            timeout: this.timeout,
+            scope: this
+        });
+
         Phx.vista.ObligacionPagoSol.superclass.onButtonNew.call(this);
        
         
@@ -286,11 +362,11 @@ Phx.vista.ObligacionPagoSol = {
         this.cmpFecha.setValue(new Date());
         this.cmpFecha.fireEvent('change')
         this.cmpTipoObligacion.setValue('pago_directo');
-        
-        
-        
+
+
+
     },
-    
-       
+
+
 };
 </script>
