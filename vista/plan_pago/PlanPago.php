@@ -15,6 +15,8 @@ Phx.vista.PlanPago=Ext.extend(Phx.gridInterfaz,{
     accionFormulario:undefined, //define la accion que se ejcuta en formulario new o edit
     porc_ret_gar:0,//valor por defecto de retencion de garantia
 	constructor:function(config){
+
+
 		//definicion de grupos para fomrulario
 		var me = this;
 		this.Grupos = [
@@ -1273,8 +1275,8 @@ Phx.vista.PlanPago=Ext.extend(Phx.gridInterfaz,{
 		'id_depto_lb','desc_depto_lb','prioridad_lp',{name:'ultima_cuota_dev',type:'numeric'},
         'nro_cbte',
         'c31',
+        {name:'id_gestion', type: 'numeric'},
         {name:'es_ultima_cuota', type: 'boolean'},
-		
 	],
 	
    arrayDefaultColumHidden:['id_fecha_reg','id_fecha_mod',

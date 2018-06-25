@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION tes.f_plan_pago_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -252,7 +250,12 @@ BEGIN
                         (select count(*)
                              from unnest(pwf.id_tipo_estado_wfs) elemento
                              where elemento = ew.id_tipo_estado) as contador_estados,
-                        depto.prioridad as prioridad_lp
+                        depto.prioridad as prioridad_lp,
+						--coalesce(plapa.es_ultima_cuota,true) as es_ultima_cuota,
+                        plapa.es_ultima_cuota as es_ultima_cuota,
+                        tcon.nro_cbte,
+                        tcon.c31,
+                        op.id_gestion
 
                         from tes.tplan_pago plapa
                         inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = plapa.id_proceso_wf
@@ -578,7 +581,7 @@ BEGIN
 		begin
 
 			--Sentencia de la consulta de conteo de registros
-			v_consulta:='select 
+			v_consulta:='select
             			fun.desc_funcionario1, prov.desc_proveedor,
             			to_char( pp.fecha_conformidad,''DD/MM/YYYY''),pp.conformidad,
                         cot.numero_oc,op.numero, pp.nro_cuota,op.num_tramite::varchar,
@@ -819,124 +822,6 @@ BEGIN
 
 		end;
 
-    /*********************************
- 	#TRANSACCION:  'TES_REPPAGOS_SEL'
- 	#DESCRIPCION:	Reporte de pagos relacionados
- 	#AUTOR:		rac
- 	#FECHA:		22-12-2014 15:43:23
-	***********************************/
-
-	ELSIF(p_transaccion='TES_REPPAGOS_SEL')then
-
-    	begin
-
-           v_filtro = ' ';
-
-            --filtro de proveedores
-           IF  pxp.f_existe_parametro(p_tabla,'id_proveedors')  THEN
-             IF v_parametros.id_proveedors is not null and v_parametros.id_proveedors != '' THEN
-                v_filtro = ' id_proveedor in ('||v_parametros.id_proveedors||') and ';
-             END IF;
-           END IF;
-
-            --filtro de conceptos
-           IF  pxp.f_existe_parametro(p_tabla,'id_concepto_ingas')  THEN
-             IF v_parametros.id_concepto_ingas is not null and v_parametros.id_concepto_ingas != '' THEN
-                v_filtro = v_filtro||' id_concepto_ingas &&  string_to_array('''||v_parametros.id_concepto_ingas||''','','') and ';
-             END IF;
-           END IF;
-
-            --filtro de ordenes de trabajo
-           IF  pxp.f_existe_parametro(p_tabla,'id_orden_trabajos')  THEN
-             IF v_parametros.id_orden_trabajos is not null and v_parametros.id_orden_trabajos != '' THEN
-                v_filtro = v_filtro||' id_orden_trabajos && string_to_array('''||v_parametros.id_orden_trabajos||''','','') and ';
-             END IF;
-           END IF;
-
-
-
-            --Sentencia de la consulta
-			v_consulta:='SELECT
-                          id_plan_pago,
-                          desc_proveedor,
-                          num_tramite,
-                          estado,
-                          fecha_tentativa,
-                          nro_cuota,
-                          monto,
-                          codigo,
-                          conceptos,
-                          ordenes,
-                          id_proceso_wf,
-                          id_estado_wf,
-                          id_proveedor,
-                          obs,
-                          tipo
-                        FROM
-                          tes.vpagos_relacionados
-                        WHERE '||v_filtro;
-
-			--Definicion de la respuesta
-			v_consulta:=v_consulta||v_parametros.filtro;
-			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
-
-             --raise exception '%',v_consulta;
-
-			--Devuelve la respuesta
-			return v_consulta;
-
-		end;
-
-   /*********************************
- 	#TRANSACCION:  'TES_REPPAGOS_CONT'
- 	#DESCRIPCION:	Conteo de registros para el reporte de  pagos
- 	#AUTOR:		rac
- 	#FECHA:		22-12-2014 15:43:23
-	***********************************/
-
-	elsif(p_transaccion='TES_REPPAGOS_CONT')then
-
-		begin
-
-
-           v_filtro = ' ';
-
-            --filtro de proveedores
-           IF  pxp.f_existe_parametro(p_tabla,'id_proveedors')  THEN
-             IF v_parametros.id_proveedors is not null and v_parametros.id_proveedors != '' THEN
-                v_filtro = ' id_proveedor in ('||v_parametros.id_proveedors||') and ';
-             END IF;
-           END IF;
-
-            --filtro de conceptos
-           IF  pxp.f_existe_parametro(p_tabla,'id_concepto_ingas')  THEN
-             IF v_parametros.id_concepto_ingas is not null and v_parametros.id_concepto_ingas != '' THEN
-                v_filtro = v_filtro||' id_concepto_ingas &&  string_to_array('''||v_parametros.id_concepto_ingas||''','','') and ';
-             END IF;
-           END IF;
-
-            --filtro de ordenes de trabajo
-           IF  pxp.f_existe_parametro(p_tabla,'id_orden_trabajos')  THEN
-             IF v_parametros.id_orden_trabajos is not null and v_parametros.id_orden_trabajos != '' THEN
-                v_filtro = v_filtro||' id_orden_trabajos && string_to_array('''||v_parametros.id_orden_trabajos||''','','') and ';
-             END IF;
-           END IF;
-
-
-
-            v_consulta:='SELECT count(id_plan_pago)
-						 FROM
-                          tes.vpagos_relacionados
-                        WHERE '||v_filtro;
-
-			--Definicion de la respuesta
-			v_consulta:=v_consulta||v_parametros.filtro;
-
-            --raise notice '% .',v_consulta;
-			--Devuelve la respuesta
-			return v_consulta;
-
-		end;
 
 
 

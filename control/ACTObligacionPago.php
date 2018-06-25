@@ -42,6 +42,7 @@ class ACTObligacionPago extends ACTbase{
             $this->objParam->addFiltro("obpg.id_gestion = ". $this->objParam->getParametro('id_gestion'));
         }
 
+
         //(f.e.a) Pagos de gestiones anteriores
         if($this->objParam->getParametro('pga_estado')=='borrador_pga'){
             $this->objParam->addFiltro("obpg.estado in (''borrador'')");
@@ -68,7 +69,11 @@ class ACTObligacionPago extends ACTbase{
 		if($this->objParam->getParametro('filtro_campo')!=''){
             $this->objParam->addFiltro($this->objParam->getParametro('filtro_campo')." = ".$this->objParam->getParametro('filtro_valor'));  
         }
-		
+        if($this->objParam->getParametro('id_gestion') != ''){
+            $this->objParam->addFiltro("obpg.id_gestion = ".$this->objParam->getParametro('id_gestion')." ");
+
+        }
+
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODObligacionPago','listarObligacionPago');
@@ -114,6 +119,11 @@ class ACTObligacionPago extends ACTbase{
 		if($this->objParam->getParametro('filtro_campo')!=''){
             $this->objParam->addFiltro($this->objParam->getParametro('filtro_campo')." = ".$this->objParam->getParametro('filtro_valor'));  
         }
+        if($this->objParam->getParametro('id_gestion') != ''){
+            $this->objParam->addFiltro("obpg.id_gestion = ".$this->objParam->getParametro('id_gestion')." ");
+
+        }
+
         
         if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
             $this->objReporte = new Reporte($this->objParam,$this);

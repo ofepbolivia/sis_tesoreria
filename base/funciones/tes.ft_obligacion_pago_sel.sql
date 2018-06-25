@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION tes.ft_obligacion_pago_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -109,7 +107,7 @@ BEGIN
                         FROM segu.tusuario tu
                         INNER JOIN orga.tfuncionario tf on tf.id_persona = tu.id_persona
                         WHERE tu.id_usuario = p_id_usuario ;
-                        v_filadd = v_filadd ||'obpg.id_funcionario = '||v_id_funcionario||' and';
+                        v_filadd = v_filadd ||'(obpg.id_funcionario = '||v_id_funcionario||' or obpg.id_usuario_reg = '||p_id_usuario||') and ';
 
                     else
                  		v_filadd='(obpg.id_depto  in ('|| COALESCE(array_to_string(va_id_depto,','),'0')||')) and';

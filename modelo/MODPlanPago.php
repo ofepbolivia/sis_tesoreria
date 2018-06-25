@@ -110,15 +110,16 @@ class MODPlanPago extends MODbase{
 		$this->captura('ultima_cuota_dev','numeric');
 		
 		$this->captura('id_depto_conta_pp','integer');
-		$this->captura('desc_depto_conta_pp','varchar');
-		$this->captura('contador_estados','bigint');
-		$this->captura('prioridad_lp','integer');
-		$this->captura('es_ultima_cuota','boolean');
-		$this->captura('nro_cbte','varchar');
-		$this->captura('c31','varchar');
+        $this->captura('desc_depto_conta_pp','varchar');
+        $this->captura('contador_estados','bigint');
+        $this->captura('prioridad_lp','integer');
+        $this->captura('es_ultima_cuota','boolean');
+        $this->captura('nro_cbte','varchar');
+        $this->captura('c31','varchar');
+        $this->captura('id_gestion','integer');
 
-		
-		//Ejecuta la instruccion
+
+        //Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
 		

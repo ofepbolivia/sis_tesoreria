@@ -45,6 +45,26 @@ header("content-type: text/javascript; charset=UTF-8");
         bexcelGroups: [0,1],
 
         constructor: function(config) {
+
+            this.tbarItems = ['-',
+                'Gestión:',this.cmbGestion,'-'
+            ];
+            var fecha = new Date();
+            Ext.Ajax.request({
+                url:'../../sis_parametros/control/Gestion/obtenerGestionByFecha',
+                params:{fecha:fecha.getDate()+'/'+(fecha.getMonth()+1)+'/'+fecha.getFullYear()},
+                success:function(resp){
+                    var reg =  Ext.decode(Ext.util.Format.trim(resp.responseText));
+                    this.cmbGestion.setValue(reg.ROOT.datos.id_gestion);
+                    this.cmbGestion.setRawValue(fecha.getFullYear());
+                    this.store.baseParams.id_gestion=reg.ROOT.datos.id_gestion;
+                    this.load({params:{start:0, limit:this.tam_pag}});
+                },
+                failure: this.conexionFailure,
+                timeout:this.timeout,
+                scope:this
+            });
+
             this.Atributos[this.getIndAtributo('id_contrato')].config.allowBlank = true;
             Phx.vista.ObligacionPagoGestionAnterior.superclass.constructor.call(this,config);
             this.getBoton('ini_estado').setVisible(false);
@@ -52,9 +72,49 @@ header("content-type: text/javascript; charset=UTF-8");
             this.store.baseParams = {tipo_interfaz:this.nombreVista};
             this.store.baseParams.pga_estado = 'borrador_pga';
             this.load({params: {start: 0, limit: this.tam_pag}});
+
+            this.cmbGestion.on('select',this.capturarEventos, this);
         },
 
 
+        cmbGestion: new Ext.form.ComboBox({
+            name: 'gestion',
+            id: 'gestion_rev',
+            fieldLabel: 'Gestion',
+            allowBlank: true,
+            emptyText:'Gestion...',
+            blankText: 'Año',
+            store:new Ext.data.JsonStore(
+                {
+                    url: '../../sis_parametros/control/Gestion/listarGestion',
+                    id: 'id_gestion',
+                    root: 'datos',
+                    sortInfo:{
+                        field: 'gestion',
+                        direction: 'DESC'
+                    },
+                    totalProperty: 'total',
+                    fields: ['id_gestion','gestion'],
+                    // turn on remote sorting
+                    remoteSort: true,
+                    baseParams:{par_filtro:'gestion'}
+                }),
+            valueField: 'id_gestion',
+            triggerAction: 'all',
+            displayField: 'gestion',
+            hiddenName: 'id_gestion',
+            mode:'remote',
+            pageSize:50,
+            queryDelay:500,
+            listWidth:'280',
+            hidden:false,
+            width:80
+        }),
+        capturarEventos: function () {
+            this.store.baseParams.id_gestion=this.cmbGestion.getValue();
+
+            this.load({params:{start:0, limit:this.tam_pag}});
+        },
 
         tabsouth:[
             {

@@ -15,6 +15,8 @@ Phx.vista.ObligacionPago = Ext.extend(Phx.gridInterfaz,{
 
     nombreVista: 'obligacionPago',
 	constructor: function(config){
+
+
 		this.maestro = config;
     	//llama al constructor de la clase padre
 		Phx.vista.ObligacionPago.superclass.constructor.call(this,config);
@@ -149,8 +151,8 @@ Phx.vista.ObligacionPago = Ext.extend(Phx.gridInterfaz,{
                     handler : this.onOpenObs,
                     tooltip : '<b>Observaciones</b><br/><b>Observaciones del WF</b>'
           });
-          
-	
+
+
 	   this.construyeVariablesContratos();
 	
 	},

@@ -67,11 +67,31 @@ header("content-type: text/javascript; charset=UTF-8");
                     this.reload();
                 },
                 scope: this
-            }];
+            },'-',
+                {xtype: 'label',text: 'Gestión:'},
+                this.cmbGestion
+            ];
+
+            var fecha = new Date();
+            Ext.Ajax.request({
+                url:'../../sis_parametros/control/Gestion/obtenerGestionByFecha',
+                params:{fecha:fecha.getDate()+'/'+(fecha.getMonth()+1)+'/'+fecha.getFullYear()},
+                success:function(resp){
+                    var reg =  Ext.decode(Ext.util.Format.trim(resp.responseText));
+                    this.cmbGestion.setValue(reg.ROOT.datos.id_gestion);
+                    this.cmbGestion.setRawValue(fecha.getFullYear());
+                    this.store.baseParams.id_gestion=reg.ROOT.datos.id_gestion;
+                    this.load({params:{start:0, limit:this.tam_pag}});
+                },
+                failure: this.conexionFailure,
+                timeout:this.timeout,
+                scope:this
+            });
 
 
             Phx.vista.ObligacionPagoVbExtranjero.superclass.constructor.call(this,config);
 
+            this.cmbGestion.on('select', this.capturarEventos, this);
             this.addButton('obs_presu',{grupo:[0,1,2],text:'Obs. Presupuestos', disabled:true, handler: this.initObs, tooltip: '<b>Observacioens del área de presupuesto</b>'});
             this.crearFormObs();
             
@@ -81,7 +101,44 @@ header("content-type: text/javascript; charset=UTF-8");
             this.finCons = true;
 
         },
+        cmbGestion: new Ext.form.ComboBox({
+            name: 'gestion',
+            id: 'gestion_rev',
+            fieldLabel: 'Gestion',
+            allowBlank: true,
+            emptyText: 'Gestion...',
+            blankText: 'Año',
+            store: new Ext.data.JsonStore(
+                {
+                    url: '../../sis_parametros/control/Gestion/listarGestion',
+                    id: 'id_gestion',
+                    root: 'datos',
+                    sortInfo: {
+                        field: 'gestion',
+                        direction: 'DESC'
+                    },
+                    totalProperty: 'total',
+                    fields: ['id_gestion', 'gestion'],
+                    // turn on remote sorting
+                    remoteSort: true,
+                    baseParams: {par_filtro: 'gestion'}
+                }),
+            valueField: 'id_gestion',
+            triggerAction: 'all',
+            displayField: 'gestion',
+            hiddenName: 'id_gestion',
+            mode: 'remote',
+            pageSize: 50,
+            queryDelay: 500,
+            listWidth: '280',
+            hidden: false,
+            width: 80
+        }),
+        capturarEventos: function () {
+            this.store.baseParams.id_gestion = this.cmbGestion.getValue();
 
+            this.load({params: {start: 0, limit: this.tam_pag}});
+        },
         antEstado:function(res){
             var rec=this.sm.getSelected();
             Phx.CP.loadWindows('../../../sis_workflow/vista/estado_wf/AntFormEstadoWf.php',
