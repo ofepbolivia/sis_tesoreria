@@ -256,7 +256,6 @@ BEGIN
                         tcon.nro_cbte,
                         tcon.c31,
                         op.id_gestion
-
                         from tes.tplan_pago plapa
                         inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = plapa.id_proceso_wf
                         inner join tes.tobligacion_pago op on op.id_obligacion_pago = plapa.id_obligacion_pago
@@ -821,8 +820,6 @@ BEGIN
 			return v_consulta;
 
 		end;
-
-
 
 
 

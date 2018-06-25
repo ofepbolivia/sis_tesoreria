@@ -497,7 +497,7 @@ BEGIN
             END IF;
 
             --eliminamos solo los que estan en estado borrador
-    		if(g_estado_actual = 'borrador')then
+    		if(g_estado_actual = 'borrador' OR g_estado_actual= 'transferido')then
 	        	delete from tes.tts_libro_bancos
             	where id_libro_bancos=v_parametros.id_libro_bancos;
 			else
@@ -882,7 +882,8 @@ BEGIN
                      from tes.tts_libro_bancos lb
                      inner join cd.tcuenta_doc cd on cd.id_int_comprobante=lb.id_int_comprobante
                      where lb.id_libro_bancos=v_id_libro_bancos) THEN
-          	if(v_codigo_estado_siguiente in ('entregado','cobrado'))then
+          	--if(v_codigo_estado_siguiente in ('entregado','cobrado'))then
+          	if(v_codigo_estado_siguiente in ('entregado'))then
           		UPDATE cd.tcuenta_doc
                 SET fecha_entrega= current_date
                 WHERE id_int_comprobante=(select id_int_comprobante

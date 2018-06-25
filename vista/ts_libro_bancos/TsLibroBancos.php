@@ -748,7 +748,7 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
 					this.getBoton('btnMemoramdum').disable();
 					this.getBoton('btnNotificacion').disable();				  
 					this.getBoton('btnCheque').disable();
-					this.getBoton('btnCheque2').disable();				
+				    this.getBoton('btnCheque2').disable();				
 					this.getBoton('btnVistaPrevia').disable();
 					this.getBoton('edit').enable();
 					this.getBoton('del').enable();
@@ -757,7 +757,14 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
 				  }else{
 					this.getBoton('del').disable();
 					this.getBoton('btnVistaPrevia').enable();
-					if(data['estado']=='cobrado'||data['estado']=='reingresado'||data['estado']=='anulado'){
+					if(data['estado']=='cobrado'){  //agregado
+						this.getBoton('btnCheque').disable();
+						this.getBoton('btnCheque2').disable();						
+						this.getBoton('ant_estado').enable();
+						this.getBoton('fin_registro').disable();
+					}
+					//if(data['estado']=='cobrado'||data['estado']=='reingresado'||data['estado']=='anulado'){
+					else if(data['estado']=='reingresado'||data['estado']=='anulado'){					
 						this.getBoton('edit').disable();							
 						this.getBoton('btnCheque').disable();
 						this.getBoton('btnCheque2').disable();						
@@ -799,6 +806,7 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
 					this.getBoton('fin_registro').disable();
 
 					if(data['estado']=='transferido'){
+						this.getBoton('del').enable(); //agregadp para habilitar botondel
 						this.getBoton('edit').disable();
 						this.getBoton('ant_estado').disable();
 					}else{
@@ -821,7 +829,7 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
 				this.getBoton('btnCheque').disable();
 				this.getBoton('btnCheque2').disable();				
 				this.getBoton('btnVistaPrevia').disable();
-				this.getBoton('edit').disable();
+			  this.getBoton('edit').disable();
 				this.getBoton('del').disable();
 		  }		  
 	 },

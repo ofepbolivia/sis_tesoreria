@@ -23,7 +23,11 @@ class ACTTsLibroBancos extends ACTbase{
 		$this->objParam->defecto('dir_ordenacion','asc');
 		
 		if($this->objParam->getParametro('id_cuenta_bancaria')!=''){
-			$this->objParam->addFiltro("id_cuenta_bancaria = ".$this->objParam->getParametro('id_cuenta_bancaria'));	
+			$this->objParam->addFiltro("id_cuenta_bancaria = ".$this->objParam->getParametro('id_cuenta_bancaria'));					
+		}
+			
+		if($this->objParam->getParametro('gestion')!=''){
+			$this->objParam->addFiltro("extract(year from lban.fecha_reg)=".$this->objParam->getParametro('gestion'));
 		}
 		
 		if($this->objParam->getParametro('mycls')=='TsLibroBancosDeposito'){

@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION tes.f_plan_pago_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -151,7 +149,8 @@ DECLARE
     v_exception_context			varchar;
     v_id_uo						integer;
     v_especial					numeric;
-       
+    v_correo_conformidad_pago   boolean;  
+    v_record					record; 
 			    
 BEGIN
 
@@ -1527,7 +1526,7 @@ BEGIN
 
 	elsif(p_transaccion='TES_GENCONF_IME')then
 
-		begin
+		begin --raise exception 'v_parametros.id_plan_pago: %', v_parametros.id_plan_pago;
         	--verificar si el plan de pagos fue realizado por el empleado solicitante o el usuario de registro
             --de la obligacion de pago
             select usu.id_persona into v_id_persona
@@ -1588,6 +1587,15 @@ BEGIN
            wf.tdocumento_wf .estado_reg = 'activo' and td.estado_reg = 'activo' and
            wf.tdocumento_wf .id_proceso_wf = v_id_proceso_wf;
            
+           select tpp.conformidad, tpp.es_ultima_cuota
+           into v_record
+           from tes.tplan_pago tpp
+           where tpp.id_plan_pago = v_parametros.id_plan_pago;
+           
+           if(v_record.es_ultima_cuota = true and (v_record.conformidad != '' or v_record.conformidad is not null))then
+             --Enviar correo a las auxiliares de adquisicones indicando que se dio conformidad al pago.
+              v_correo_conformidad_pago = tes.f_correo_conformidad_pago(v_parametros.id_plan_pago, p_id_usuario);
+           end if;
            
            v_resp_doc = wf.f_verifica_documento(v_id_usuario_firma, v_id_estado_actual);
             --Definicion de la respuesta

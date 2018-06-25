@@ -23,7 +23,7 @@ class ACTSolicitudEfectivo extends ACTbase{
 			$this->objParam-> addFiltro("caja.tipo_ejecucion = ''con_detalle''");
 		}
 
-		if($this->objParam->getParametro('tipo_interfaz')=='SinDetalle')
+		if($this->objParam->getParametro('tipo_interfaz')=='SinDetalle' || $this->objParam->getParametro('tipo_interfaz')=='SinDetalleA')
 		{
 			$this->objParam-> addFiltro("caja.tipo_ejecucion = ''sin_detalle''");
 			
