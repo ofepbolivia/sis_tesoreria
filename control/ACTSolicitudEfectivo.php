@@ -65,6 +65,11 @@ class ACTSolicitudEfectivo extends ACTbase{
 			$this->objParam->addFiltro($this->objParam->getParametro('filtro_campo')." = ".$this->objParam->getParametro('filtro_valor'));
 		}
 
+        if($this->objParam->getParametro('id_gestion') != ''){
+            $this->objParam->addFiltro("solefe.id_gestion = ".$this->objParam->getParametro('id_gestion')." ");
+
+        }
+
 		$this->objParam->addParametro('id_funcionario_usu',$_SESSION["ss_id_funcionario"]);
 
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){

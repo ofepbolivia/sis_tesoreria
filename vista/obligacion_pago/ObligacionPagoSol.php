@@ -324,20 +324,6 @@ Phx.vista.ObligacionPagoSol = {
     
     onButtonNew:function(){
 
-        Ext.Ajax.request({
-
-            success: function (resp) {
-                var reg = Ext.decode(Ext.util.Format.trim(resp.responseText));
-                this.Cmp.id_gestion.setValue(reg.ROOT.datos.id_gestion);
-                this.Cmp.id_gestion.setRawValue(reg.ROOT.datos.gestion);
-                //this.store.baseParams.id_gestion=this.cmbGestion.getValue();
-                this.Cmp.id_gestion.setValue(this.cmbGestion.getValue());
-                this.Cmp.id_gestion.setRawValue(this.cmbGestion.getRawValue());
-            },
-            failure: this.conexionFailure,
-            timeout: this.timeout,
-            scope: this
-        });
 
         Phx.vista.ObligacionPagoSol.superclass.onButtonNew.call(this);
        
