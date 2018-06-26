@@ -36,6 +36,27 @@ header("content-type: text/javascript; charset=UTF-8");
             constructor:function(config){
                 this.maestro=config.maestro;
 
+                this.tbarItems = ['-',
+                    'Gestión:',this.cmbGestion,'-'
+                ];
+                var fecha = new Date();
+                Ext.Ajax.request({
+                    url:'../../sis_parametros/control/Gestion/obtenerGestionByFecha',
+                    params:{fecha:fecha.getDate()+'/'+(fecha.getMonth()+1)+'/'+fecha.getFullYear()},
+                    success:function(resp){
+                        var reg =  Ext.decode(Ext.util.Format.trim(resp.responseText));
+                        this.cmbGestion.setValue(reg.ROOT.datos.id_gestion);
+                        this.cmbGestion.setRawValue(fecha.getFullYear());
+                        this.store.baseParams.id_gestion=reg.ROOT.datos.id_gestion;
+                        this.load({params:{start:0, limit:this.tam_pag}});
+                    },
+                    failure: this.conexionFailure,
+                    timeout:this.timeout,
+                    scope:this
+                });
+
+
+
                 this.Atributos[this.getIndAtributo('monto_rendido')].config.renderer = function(value, p, record) {
                     var saldo = parseFloat(record.data.monto) + parseFloat(record.data.monto_repuesto) - parseFloat(record.data.monto_rendido) - parseFloat(record.data.monto_devuelto);
                     if (record.data.estado == 'entregado' || record.data.estado == 'finalizado') {
@@ -72,8 +93,9 @@ header("content-type: text/javascript; charset=UTF-8");
 
                 //llama al constructor de la clase padre
                 Phx.vista.SolicitudEfectivoSinDet.superclass.constructor.call(this,config);
-                this.iniciarEventos();
+                this.cmbGestion.on('select', this.capturarEventos, this);
 
+                this.iniciarEventos();
                 this.addButton('fin_registro',
                     {	text:'Siguiente',
                         iconCls: 'badelante',
@@ -177,6 +199,46 @@ header("content-type: text/javascript; charset=UTF-8");
 
                 this.finCons = true;
             },
+
+        cmbGestion: new Ext.form.ComboBox({
+            //name: 'gestion',
+            // id: 'gestion_reg',
+            fieldLabel: 'Gestion',
+            allowBlank: true,
+            emptyText: 'Gestion...',
+            blankText: 'Año',
+            editable: false,
+            store: new Ext.data.JsonStore(
+                {
+                    url: '../../sis_parametros/control/Gestion/listarGestion',
+                    id: 'id_gestion',
+                    root: 'datos',
+                    sortInfo: {
+                        field: 'gestion',
+                        direction: 'DESC'
+                    },
+                    totalProperty: 'total',
+                    fields: ['id_gestion', 'gestion'],
+                    // turn on remote sorting
+                    remoteSort: true,
+                    baseParams: {par_filtro: 'gestion'}
+                }),
+            valueField: 'id_gestion',
+            triggerAction: 'all',
+            displayField: 'gestion',
+            hiddenName: 'id_gestion',
+            mode: 'remote',
+            pageSize: 5,
+            queryDelay: 500,
+            listWidth: '280',
+            hidden: false,
+            width: 80
+        }),
+        capturarEventos: function () {
+
+            this.store.baseParams.id_gestion = this.cmbGestion.getValue();
+            this.load({params: {start: 0, limit: this.tam_pag}});
+        },
 
             Atributos:[
                 {
@@ -339,7 +401,7 @@ header("content-type: text/javascript; charset=UTF-8");
                         fieldLabel: 'Num Tramite',
                         allowBlank: false,
                         anchor: '80%',
-                        gwidth: 150,
+                        gwidth: 250,
                         maxLength:50
                     },
                     type:'TextField',
@@ -639,6 +701,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 {name:'monto', type: 'numeric'},
                 {name:'id_proceso_wf', type: 'numeric'},
                 {name:'nro_tramite', type: 'string'},
+                {name:'id_gestion', type: 'numeric'},
                 {name:'estado', type: 'string'},
                 {name:'estado_reg', type: 'string'},
                 {name:'motivo', type: 'string'},

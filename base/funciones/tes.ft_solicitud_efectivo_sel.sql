@@ -1,4 +1,3 @@
---------------- SQL ---------------
 CREATE OR REPLACE FUNCTION tes.ft_solicitud_efectivo_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -75,7 +74,7 @@ BEGIN
                v_historico = 'no';
             END IF;
 
-            IF  lower(v_parametros.tipo_interfaz) in ('condetalle','sindetalle','efectivocaja','sindetallea') THEN
+            IF  lower(v_parametros.tipo_interfaz) in ('condetalle','sindetalle','efectivocaja') THEN
 
             	select id_tipo_solicitud into v_id_tipo_solicitud
                 from tes.ttipo_solicitud
@@ -99,7 +98,7 @@ BEGIN
                                         and estado=''repuesto''), 0.00)
                  			else 0.00 end as saldo';
 
-                IF p_administrador !=1 /*and p_administrador !=0*/ THEN
+                IF p_administrador !=1 and p_administrador !=0 THEN
                     v_i = 1;
                 	FOR v_cajas in (select id_caja
                     				from tes.tcajero
@@ -114,12 +113,8 @@ BEGIN
       								solefe.id_usuario_reg = '||p_id_usuario||')) and
                                     solefe.id_tipo_solicitud in ('||v_id_tipo_solicitud||','||v_id_tipo_reposicion||') and ';
                     ELSE
-                    	if lower(v_parametros.tipo_interfaz) = 'sindetallea' then
-                        	v_filtro = 'solefe.id_tipo_solicitud in ('||v_id_tipo_solicitud||','||v_id_tipo_reposicion||') and ';
-                        else
-                            v_filtro = '(solefe.id_funcionario='||v_parametros.id_funcionario_usu::varchar||'  or solefe.id_usuario_reg='||p_id_usuario||' or
-                            solefe.id_usuario_mod='||p_id_usuario||') and solefe.id_tipo_solicitud in ('||v_id_tipo_solicitud||','||v_id_tipo_reposicion||') and ';
-                        end if;
+                   		v_filtro = '(solefe.id_funcionario='||v_parametros.id_funcionario_usu::varchar||'  or solefe.id_usuario_reg='||p_id_usuario||' or
+                        solefe.id_usuario_mod='||p_id_usuario||') and solefe.id_tipo_solicitud in ('||v_id_tipo_solicitud||','||v_id_tipo_reposicion||') and ';
                     END IF;
 
                 ELSE
@@ -232,7 +227,8 @@ BEGIN
 	       				COALESCE((select sum(monto) from tes.tsolicitud_efectivo where id_solicitud_efectivo_fk=solefe.id_solicitud_efectivo and estado=''repuesto''),0.00) as monto_repuesto,
 						solefe.id_proceso_wf,
 						solefe.nro_tramite,
-						solefe.estado,
+                        solefe.id_gestion,
+                        solefe.estado,
 						solefe.estado_reg,
 						solefe.motivo,
 						solefe.id_funcionario,
@@ -265,6 +261,7 @@ BEGIN
             v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
 			--Devuelve la respuesta
+
             raise notice '%', v_consulta;
 			return v_consulta;
 
