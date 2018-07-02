@@ -63,10 +63,10 @@ header("content-type: text/javascript; charset=UTF-8");
                     this.reload();
                 },
                 scope: this
-            },'-',
-                {xtype: 'label',text: 'Gestión:'},
+            }, '-',
+                {xtype: 'label', text: 'Gestión:'},
                 this.cmbGestion
-                ];
+            ];
 
 
             var fecha = new Date();
@@ -219,6 +219,18 @@ header("content-type: text/javascript; charset=UTF-8");
                 'ObligacionPagoApropiacion');
         },
         onButtonEdit: function () {
+
+            var anio = new Date();
+            anio = anio.getFullYear();
+            var fecha_inicio = new Date(anio+'/01/1');
+
+            var fecha_fin = new Date(anio+'/12/31');
+            this.Cmp.fecha_costo_ini.setMinValue(fecha_inicio);
+            this.Cmp.fecha_costo_ini.setMaxValue(fecha_fin);
+            this.Cmp.fecha_costo_fin.setMinValue(fecha_inicio);
+            this.Cmp.fecha_costo_fin.setMaxValue(fecha_fin);
+
+
             var data = this.getSelectedData();
             if (data.estado == 'vbfin' || data.estado == 'vbcostos') {
                 this.Cmp.id_cuenta_bancaria.allowBlank = true;
@@ -228,6 +240,15 @@ header("content-type: text/javascript; charset=UTF-8");
 
             Phx.vista.PlanPagoVb.superclass.onButtonEdit.call(this);
 
+           /* var anio = this.fecha;
+            //var anio = this.maestro.fecha;
+            anio = anio.getFullYear();
+            var fecha_inicio = new Date(anio+'/01/1');
+            //fecha_inicio = null;
+            var fecha_fin = new Date(anio+'/12/31');
+            this.Cmp.fecha_costo_ini.setMinValue(fecha_inicio);
+            this.Cmp.fecha_costo_fin.setMaxValue(fecha_fin);
+*/
             if (this.Cmp.id_depto_lb.getValue() > 0) {
                 this.Cmp.id_cuenta_bancaria.store.baseParams = Ext.apply(this.Cmp.id_cuenta_bancaria.store.baseParams, {
                     id_depto_lb: this.Cmp.id_depto_lb.getValue(),
@@ -412,12 +433,13 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.Cmp.fecha_costo_fin.setMinValue(newValue);
                 this.Cmp.fecha_costo_fin.reset();
 
-            }, this)
+            }, this);
 
             //eventos de fechas de costo
             this.Cmp.fecha_costo_fin.on('change', function (o, newValue, oldValue) {
                 this.Cmp.fecha_costo_ini.setMaxValue(newValue);
-            }, this)
+            }, this);
+
 
 
         },
@@ -765,6 +787,8 @@ header("content-type: text/javascript; charset=UTF-8");
 
         },
         onButtonNew: function () {
+
+
             Ext.Ajax.request({
 
                 success: function (resp) {
