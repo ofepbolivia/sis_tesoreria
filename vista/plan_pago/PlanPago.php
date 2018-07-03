@@ -1095,6 +1095,51 @@ Phx.vista.PlanPago=Ext.extend(Phx.gridInterfaz,{
             form: true
         },
         {
+            config : {
+                name : 'fecha_cbte_ini',
+                fieldLabel : 'Fecha Inicial(cbte)',
+                allowBlank : true,
+                width : 100,
+                gwidth : 120,
+                format : 'd/m/Y',
+                renderer : function(value, p, record) {
+                    return value ? value.dateFormat('d/m/Y') : ''
+                }
+            },
+            type : 'DateField',
+            filters : {
+                pfiltro : 'tcon.fecha_costo_ini',
+                type : 'date'
+            },
+            id_grupo : 3,
+            egrid : true,
+            grid : true,
+            form : false
+        }, {
+            config : {
+                name : 'fecha_cbte_fin',
+                fieldLabel : 'Fecha Final(cbte)',
+                allowBlank : true,
+                width : 100,
+                gwidth : 120,
+                format : 'd/m/Y',
+                renderer : function(value, p, record) {
+                    return value ? value.dateFormat('d/m/Y') : ''
+                }
+            },
+            type : 'DateField',
+            filters : {
+                pfiltro : 'tcon.fecha_costo_fin',
+                type : 'date'
+            },
+            id_grupo : 3,
+            egrid : true,
+            grid : true,
+            form : false
+        },
+
+
+        {
             config:{
                 name: 'funcionario_wf',
                 fieldLabel: 'Funcionario Res WF',
@@ -1277,6 +1322,8 @@ Phx.vista.PlanPago=Ext.extend(Phx.gridInterfaz,{
         'c31',
         {name:'id_gestion', type: 'numeric'},
         {name:'es_ultima_cuota', type: 'boolean'},
+        {name:'fecha_cbte_ini', type: 'date',dateFormat:'Y-m-d'},
+        {name:'fecha_cbte_fin', type: 'date',dateFormat:'Y-m-d'},
 	],
 	
    arrayDefaultColumHidden:['id_fecha_reg','id_fecha_mod',
