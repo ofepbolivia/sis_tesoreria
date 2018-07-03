@@ -692,6 +692,7 @@ header("content-type: text/javascript; charset=UTF-8");
 					if(data['estado']=='transferido'){
 						this.getBoton('edit').disable();
 						this.getBoton('ant_estado').disable();
+						this.getBoton('del').enable();
 					}else{
 						this.getBoton('edit').enable();
 						this.getBoton('ant_estado').enable();
@@ -707,11 +708,11 @@ header("content-type: text/javascript; charset=UTF-8");
 		 
 		 antEstado:function(res,eve)
 		{                   
-			var d= this.sm.getSelected().data;
+			var d= this.sm.getSelected().data;			
 			Phx.CP.loadingShow();
+
 			var operacion = 'cambiar';
-			operacion=  res.argument.estado == 'inicio'?'inicio':operacion; 
-			
+			operacion=  res.argument.estado == 'inicio'?'inicio':operacion;
 			Ext.Ajax.request({
 				url:'../../sis_tesoreria/control/TsLibroBancos/anteriorEstadoLibroBancos',
 				params:{id_libro_bancos:d.id_libro_bancos,
