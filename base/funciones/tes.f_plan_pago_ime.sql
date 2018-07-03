@@ -195,6 +195,12 @@ BEGIN
             --Devuelve la respuesta
             return v_resp;
 
+            update tes.tplan_pago set
+                fecha_costo_ini = v_parametros.fecha_costo_ini,
+                fecha_costo_fin = v_parametros.fecha_costo_fin
+
+			where id_int_comprobante = v_parametros.id_int_comprobante;
+
 
 		end;
 
@@ -681,7 +687,6 @@ BEGIN
             fecha_costo_ini = v_parametros.fecha_costo_ini,
             fecha_costo_fin = v_parametros.fecha_costo_fin
             where id_plan_pago = v_parametros.id_plan_pago;
-
 
 
             -- chequea fechas de costos inicio y fin

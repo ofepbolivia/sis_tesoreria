@@ -117,6 +117,9 @@ class MODPlanPago extends MODbase{
         $this->captura('nro_cbte','varchar');
         $this->captura('c31','varchar');
         $this->captura('id_gestion','integer');
+        $this->captura('fecha_cbte_ini','date');
+        $this->captura('fecha_cbte_fin','date');
+
 
 
         //Ejecuta la instruccion
