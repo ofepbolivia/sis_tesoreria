@@ -240,7 +240,14 @@ header("content-type: text/javascript; charset=UTF-8");
 
                 this.reload();
             }else{
-                alert(reg.ROOT.datos.mensaje)
+                Ext.Msg.show({
+                    title: 'Información',
+                    msg: reg.ROOT.datos.mensaje,
+                    buttons: Ext.Msg.OK,
+                    width: 700,
+                    icon: Ext.Msg.INFO
+                });
+                //alert(reg.ROOT.datos.mensaje)
             }
         },
 
@@ -275,11 +282,13 @@ header("content-type: text/javascript; charset=UTF-8");
 
             this.Cmp.id_plantilla.on('select',function(cmb,rec,i){
                 this.getDecuentosPorAplicar(rec.data.id_plantilla);
-                this.Cmp.monto_excento.reset();
+                //this.Cmp.monto_excento.reset();
                 if(rec.data.sw_monto_excento=='si'){
+                    var row_data = this.getSelectedData();
                     this.Cmp.monto_excento.enable();
                     this.Cmp.tipo_excento.setValue(rec.data.tipo_excento);
                     this.Cmp.valor_excento.setValue(rec.data.valor_excento);
+                    this.Cmp.monto_excento.setValue(row_data.monto_excento);
                 }
                 else{
                     this.Cmp.monto_excento.disable();

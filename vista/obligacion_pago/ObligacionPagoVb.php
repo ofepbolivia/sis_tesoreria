@@ -126,7 +126,6 @@ header("content-type: text/javascript; charset=UTF-8");
 
         cmbGestion: new Ext.form.ComboBox({
             name: 'gestion',
-            id: 'gestion_rev',
             fieldLabel: 'Gestion',
             allowBlank: true,
             emptyText: 'Gestion...',

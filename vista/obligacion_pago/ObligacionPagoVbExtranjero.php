@@ -94,7 +94,7 @@ header("content-type: text/javascript; charset=UTF-8");
             this.cmbGestion.on('select', this.capturarEventos, this);
             this.addButton('obs_presu',{grupo:[0,1,2],text:'Obs. Presupuestos', disabled:true, handler: this.initObs, tooltip: '<b>Observacioens del área de presupuesto</b>'});
             this.crearFormObs();
-            
+
             this.store.baseParams.pes_estado = 'pago_unico';
             this.store.baseParams.moneda_base = 'extranjero';
             this.load({params:{start:0, limit:this.tam_pag}});
@@ -103,7 +103,6 @@ header("content-type: text/javascript; charset=UTF-8");
         },
         cmbGestion: new Ext.form.ComboBox({
             name: 'gestion',
-            id: 'gestion_rev',
             fieldLabel: 'Gestion',
             allowBlank: true,
             emptyText: 'Gestion...',

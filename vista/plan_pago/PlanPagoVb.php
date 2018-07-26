@@ -157,7 +157,6 @@ header("content-type: text/javascript; charset=UTF-8");
 
         cmbGestion: new Ext.form.ComboBox({
             name: 'gestion',
-            id: 'gestion_rev',
             fieldLabel: 'Gestion',
             allowBlank: true,
             emptyText: 'Gestion...',
@@ -240,15 +239,15 @@ header("content-type: text/javascript; charset=UTF-8");
 
             Phx.vista.PlanPagoVb.superclass.onButtonEdit.call(this);
 
-           /* var anio = this.fecha;
-            //var anio = this.maestro.fecha;
-            anio = anio.getFullYear();
-            var fecha_inicio = new Date(anio+'/01/1');
-            //fecha_inicio = null;
-            var fecha_fin = new Date(anio+'/12/31');
-            this.Cmp.fecha_costo_ini.setMinValue(fecha_inicio);
-            this.Cmp.fecha_costo_fin.setMaxValue(fecha_fin);
-*/
+            /* var anio = this.fecha;
+             //var anio = this.maestro.fecha;
+             anio = anio.getFullYear();
+             var fecha_inicio = new Date(anio+'/01/1');
+             //fecha_inicio = null;
+             var fecha_fin = new Date(anio+'/12/31');
+             this.Cmp.fecha_costo_ini.setMinValue(fecha_inicio);
+             this.Cmp.fecha_costo_fin.setMaxValue(fecha_fin);
+ */
             if (this.Cmp.id_depto_lb.getValue() > 0) {
                 this.Cmp.id_cuenta_bancaria.store.baseParams = Ext.apply(this.Cmp.id_cuenta_bancaria.store.baseParams, {
                     id_depto_lb: this.Cmp.id_depto_lb.getValue(),
@@ -363,11 +362,13 @@ header("content-type: text/javascript; charset=UTF-8");
 
             this.Cmp.id_plantilla.on('select', function (cmb, rec, i) {
                 this.getDecuentosPorAplicar(rec.data.id_plantilla);
-                this.Cmp.monto_excento.reset();
+                //this.Cmp.monto_excento.reset();
                 if (rec.data.sw_monto_excento == 'si') {
+                    var row_data = this.getSelectedData();
                     this.Cmp.monto_excento.enable();
                     this.Cmp.tipo_excento.setValue(rec.data.tipo_excento);
                     this.Cmp.valor_excento.setValue(rec.data.valor_excento);
+                    this.Cmp.monto_excento.setValue(row_data.monto_excento);
                 }
                 else {
                     this.Cmp.monto_excento.disable();
