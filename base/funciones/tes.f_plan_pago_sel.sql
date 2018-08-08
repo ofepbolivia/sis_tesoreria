@@ -238,8 +238,8 @@ BEGIN
                         plapa.monto_ajuste_siguiente_pago,
                         op.pago_variable,
                         plapa.monto_anticipo,
-                        tcon.fecha_costo_ini,
-                        tcon.fecha_costo_fin,
+                        plapa.fecha_costo_ini,
+                        plapa.fecha_costo_fin,
                         funwf.desc_funcionario1::text as funcionario_wf,
                         plapa.tiene_form500,
                         plapa.id_depto_lb,
@@ -255,7 +255,9 @@ BEGIN
                         plapa.es_ultima_cuota as es_ultima_cuota,
                         tcon.nro_cbte,
                         tcon.c31,
-                        op.id_gestion
+                        op.id_gestion,
+                        tcon.fecha_costo_ini as fecha_cbte_ini,
+                        tcon.fecha_costo_fin as fecha_cbte_fin
                         from tes.tplan_pago plapa
                         inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = plapa.id_proceso_wf
                         inner join tes.tobligacion_pago op on op.id_obligacion_pago = plapa.id_obligacion_pago

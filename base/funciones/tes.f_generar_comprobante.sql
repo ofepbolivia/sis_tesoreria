@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION tes.f_generar_comprobante (
   p_id_usuario integer,
   p_id_usuario_ai integer,
@@ -8,7 +6,7 @@ CREATE OR REPLACE FUNCTION tes.f_generar_comprobante (
   p_id_depto_conta integer,
   p_conexion varchar = NULL::character varying
 )
-RETURNS varchar [] AS
+RETURNS varchar [] [] AS
 $body$
 /* Autor:   RAC
 *  DESC:     Generar comprobantes de devengado o pago segun corresponda al tipo de plan de pago
@@ -25,42 +23,43 @@ DECLARE
     v_registros_pro   	record;
     v_ejecutado 		numeric;
     v_comprometido		numeric;
-   
+
     v_monto_ejecutar_mo	numeric;
-    
+
     va_id_tipo_estado   integer[];
     va_codigo_estado    varchar[];
     va_disparador       varchar[];
     va_regla            varchar[];
     va_prioridad        integer[];
-    
+
     v_id_estado_actual				integer;
     v_id_moneda_base   				integer;
-    
+
     v_sw_verificacion  				boolean;
     v_mensaje_verificacion 			varchar;
     v_desc_ingas 					varchar;
     v_cont 							integer;
     v_respuesta 					varchar[];
     v_id_int_comprobante 			integer;
-    
+
     v_id_tipo_estado 				integer;
     v_pre_integrar_presupuestos 	varchar;
     v_prioridad_depto_conta_inter 	varchar;
     v_sincronizar_internacional   	varchar;
     v_prioridad_depto_conta		  	integer;
     v_codigo_plt_cbte				varchar;
-	
-    
+	--f.e.a
+    v_centro_costo					varchar;
+    v_partida						varchar;
 BEGIN
 
 	v_nombre_funcion = 'tes.f_generar_comprobante';
     v_id_moneda_base =  param.f_get_moneda_base();
     v_pre_integrar_presupuestos = pxp.f_get_variable_global('pre_integrar_presupuestos');
-    
-  
+
+
     --  obtinen datos del plan de pagos
-           
+
            SELECT
              pp.id_plan_pago,
              pp.id_plan_pago_fk,
@@ -87,38 +86,37 @@ BEGIN
            inner join tes.tobligacion_pago op on op.id_obligacion_pago = pp.id_obligacion_pago and op.estado_reg = 'activo'
            inner join tes.ttipo_plan_pago tpp on tpp.codigo = pp.tipo and tpp.estado_reg = 'activo'
            where pp.id_plan_pago = p_id_plan_pago;
-        
-      
-                    
+
+
           -- verifica el depto de conta, si no tiene lo modifica
-          
-          
+
+
           IF v_registros.id_depto_conta is NULL or v_registros.id_depto_conta !=  p_id_depto_conta THEN
              --registra el depto de conta
-             
+
              IF p_id_depto_conta is not null THEN
-          
+
                  update tes.tobligacion_pago set
                    id_depto_conta =  p_id_depto_conta
                  where id_obligacion_pago = v_registros.id_obligacion_pago;
-             ELSE 
-             
+             ELSE
+
                 raise exception 'no eligio un depto de contabilidad';
-             
+
              END IF;
-             
+
              v_registros.id_depto_conta =  p_id_depto_conta;
-          
+
           ELSE
-          
+
               IF v_registros.id_depto_conta != p_id_depto_conta THEN
-              
+
                  --RAC, ya no es necesaria esta validacion pueden mesclar los comprobantes ....
                  --raise exception 'El departamento de contabilidad no coincide con el registrado para  las anteriores cuotas del plan de pago';
-                        
+
               END IF;
-          
-          
+
+
           END IF;
 
 
@@ -130,10 +128,13 @@ BEGIN
                 WHERE pp.id_obligacion_pago = v_registros.id_obligacion_pago
                       and (pp.estado != 'devengado' and pp.estado != 'pagado' and pp.estado != 'anulado' and pp.estado != 'anticipado' and pp.estado != 'aplicado' and pp.estado != 'devuelto' and pp.estado!='pago_exterior' and pp.estado!='contabilizado')
                       and pp.estado_reg = 'activo'
-                      and  pp.nro_cuota < v_registros.nro_cuota ) THEN
+                      and  pp.nro_cuota < v_registros.nro_cuota
+                      and pp.id_obligacion_pago <>  20557) THEN
+
+                      --para el proceso TES-PD-000619-2018 se salta esta validacion a solicitud de hugo tapia 3/8/2018
 
 
-                    raise exception 'Antes de Continuar,  la cuotas anteriores tienes que estar finalizadas';
+                    raise exception 'Antes de continuar, las cuotas anteriores tienen que estar finalizadas';
 
 
                  END IF;
@@ -171,7 +172,7 @@ BEGIN
                                  where  pro.id_plan_pago = p_id_plan_pago
                                    and pro.estado_reg = 'activo') LOOP
 
-
+						--raise exception 'v_registros_pro: %', v_registros_pro;
                         v_comprometido=0;
                         v_ejecutado=0;
 
@@ -188,7 +189,7 @@ BEGIN
                         END IF;
 
                       --verifica si el presupuesto comprometido sobrante alcanza para devengar
-                      IF  ( v_comprometido - v_ejecutado)  <  v_registros_pro.monto_ejecutar_mo  and v_registros_pro.sw_movimiento != 'flujo' THEN
+                      IF  (v_comprometido - v_ejecutado)  <  v_registros_pro.monto_ejecutar_mo  and v_registros_pro.sw_movimiento != 'flujo' THEN
 
                          -- raise EXCEPTION  '% - % = % < %',v_comprometido,v_ejecutado,v_comprometido - v_ejecutado, v_registros_pro.monto_ejecutar_mb;
 
@@ -199,36 +200,48 @@ BEGIN
                          from  param.tconcepto_ingas cig
                          where cig.id_concepto_ingas  = v_registros_pro.id_concepto_ingas;
 
+						  select ttc.codigo AS centro_costo
+                          into v_centro_costo
+                          from param.tcentro_costo tcc
+        				  inner join param.ttipo_cc ttc on ttc.id_tipo_cc = tcc.id_tipo_cc
+                          where  tcc.id_centro_costo = v_registros_pro.id_centro_costo;
+
+                          select (tp.codigo||' - '||tp.nombre_partida)
+                          into v_partida
+                          from pre.tpartida_ejecucion pe
+                          inner join  pre.tpartida tp on tp.id_partida = pe.id_partida
+                          where pe.id_partida_ejecucion = v_registros_pro.id_partida_ejecucion_com;
+
                           --sinc_presupuesto
-                          v_mensaje_verificacion =v_mensaje_verificacion ||v_cont::varchar||') '||v_desc_ingas||'('||  substr(v_registros_pro.descripcion, 0, 15)   ||'...)'||' Presup. '||v_registros_pro.id_centro_costo||' monto faltante ' || (v_registros_pro.monto_ejecutar_mo - (v_comprometido - v_ejecutado))::varchar||' \n';
+                          v_mensaje_verificacion =v_mensaje_verificacion ||v_cont::varchar||') '||v_desc_ingas||'('||  substr(v_registros_pro.descripcion, 0, 15)   ||'...)'||' Presup. '||v_centro_costo||' monto faltante ' || (v_registros_pro.monto_ejecutar_mo - (v_comprometido - v_ejecutado))::varchar||', en la partida: <br>'||coalesce(v_partida,'')||'<br> -------------------------------------------------------- <br>';
                           v_sw_verificacion=false;
                           v_cont = v_cont +1;
-                     
+
                       END IF;
-                      
-                     
-                
+
+
+
                    END LOOP;
-                  
+
                   IF not v_sw_verificacion THEN
-                  
-                     
+
+
                       UPDATE  tes.tplan_pago pp set
                        sinc_presupuesto = 'si'
-                      where  pp.id_plan_pago=p_id_plan_pago;  
-                      
-                      
-                     v_respuesta[1]='FALSE'; 
+                      where  pp.id_plan_pago=p_id_plan_pago;
+
+
+                     v_respuesta[1]='FALSE';
                      v_respuesta[2]='Falta Presupuesto según el siguiente detalle :\n '||v_mensaje_verificacion;
                      RETURN v_respuesta;
                   END IF;
-           
-           
+
+
           END IF;
-          
-          
-          
-          
+
+
+
+
           ------------------------------------
           -- validacion del prorrateo--    no estoy seguro si funciona la misma idea para el pago
           ------------------------------------
@@ -237,134 +250,134 @@ BEGIN
            into
               v_monto_ejecutar_mo
             from tes.tprorrateo pro
-            where pro.estado_reg = 'activo' and  
+            where pro.estado_reg = 'activo' and
               pro.id_plan_pago  = p_id_plan_pago;
-              
-          
+
+
             IF v_registros.monto_ejecutar_total_mo != v_registros.total_prorrateado  or  v_monto_ejecutar_mo != v_registros.monto_ejecutar_total_mo THEN
-                      
+
               raise exception 'El total prorrateado no iguala con el monto total a ejecutar';
-            
+
             END IF;
-            
-                  
+
+
             --------------------------------------------------------
             ---cambio al siguiente estado de borrador a Pendiente----
             ---------------------------------------------------------
-            
-             
+
+
              -- obtiene el siguiente estado del flujo
-              
+
             -- pasar la solicitud a estado pendiente, que quiere decir que el comprobante esta generado a espera de validacion
-           
-             
-            
-            select   
+
+
+
+            select
               te.id_tipo_estado
             into
               v_id_tipo_estado
-            from wf.ttipo_estado te 
-            inner join wf.tproceso_wf  pw on pw.id_tipo_proceso = te.id_tipo_proceso 
+            from wf.ttipo_estado te
+            inner join wf.tproceso_wf  pw on pw.id_tipo_proceso = te.id_tipo_proceso
                   and pw.id_proceso_wf = v_registros.id_proceso_wf
-            where te.codigo = 'pendiente'; 
-              
-            
-            
-            
+            where te.codigo = 'pendiente';
+
+
+
+
             IF v_id_tipo_estado is  null THEN
-            
+
              raise exception 'El proceso de WF esta mal parametrizado, no tiene el estado pendiente';
-            
+
             END IF;
-            
-            
-        
-            
+
+
+
+
             --registrar el siguiente estado detectado
-             v_id_estado_actual =  wf.f_registra_estado_wf(v_id_tipo_estado, 
-                                                           NULL, 
-                                                           v_registros.id_estado_wf, 
+             v_id_estado_actual =  wf.f_registra_estado_wf(v_id_tipo_estado,
+                                                           NULL,
+                                                           v_registros.id_estado_wf,
                                                            v_registros.id_proceso_wf,
                                                            p_id_usuario,
                                                            p_id_usuario_ai,
                                                            p_usuario_ai,
                                                            v_registros.id_depto,
                                                            'La solicitud de '||v_registros.tipo ||'pasa a Contabilidad');
-            
-            
+
+
             ---------------------------------------
             ----  Generacion del Comprobante  -----
             ---------------------------------------
-            
-            
+
+
             --  obtiene prioridad del libro de bancos ...
-            select 
+            select
               d.prioridad
             into
              v_prioridad_depto_conta
             from param.tdepto d
-            where d.id_depto =  v_registros.id_depto_conta; 
-            
-           
-            
+            where d.id_depto =  v_registros.id_depto_conta;
+
+
+
             --si esta habilita la sincronizacion internacional y depto de conta es internacional
             v_sincronizar_internacional = pxp.f_get_variable_global('sincronizar_internacional');
             v_prioridad_depto_conta_inter = pxp.f_get_variable_global('conta_prioridad_depto_internacional');
-            
-          
+
+
             IF v_sincronizar_internacional = 'true' and (v_prioridad_depto_conta::varchar = v_prioridad_depto_conta_inter::varchar) THEN
              -- recupera la estacion destino
-             -- utiliza la plantilla segun estacion destino, para generar el comprobante 
-                
-              
-             
-               select 
+             -- utiliza la plantilla segun estacion destino, para generar el comprobante
+
+
+
+               select
                 etp.codigo_plantilla_comprobante
                into
                 v_codigo_plt_cbte
-               from tes.testacion e 
+               from tes.testacion e
                inner join tes.testacion_tipo_pago etp on e.id_estacion = etp.id_estacion and etp.estado_reg = 'activo'
-               inner join tes.ttipo_plan_pago tpp on tpp.id_tipo_plan_pago = etp.id_tipo_plan_pago 
-               where     e.id_depto_lb = v_registros.id_depto_lb 
+               inner join tes.ttipo_plan_pago tpp on tpp.id_tipo_plan_pago = etp.id_tipo_plan_pago
+               where     e.id_depto_lb = v_registros.id_depto_lb
                     and  e.estado_reg = 'activo'
                     and tpp.codigo =  v_registros.tipo;
-             
-            
-             -- si es  internacional, 
+
+
+             -- si es  internacional,
                 v_id_int_comprobante =   conta.f_gen_comprobante (
-                                         v_registros.id_plan_pago, 
+                                         v_registros.id_plan_pago,
                                          v_codigo_plt_cbte,
-                                         v_id_estado_actual, 
-                                         p_id_usuario, 
+                                         v_id_estado_actual,
+                                         p_id_usuario,
                                          p_id_usuario_ai,
-                                         p_usuario_ai, 
-                                         p_conexion, 
+                                         p_usuario_ai,
+                                         p_conexion,
                                          true);
-           
-            
+
+
             ELSE
-            
+
                --  Si NO  se contabiliza nacionalmente
-               v_id_int_comprobante =   conta.f_gen_comprobante ( 
+               v_id_int_comprobante =   conta.f_gen_comprobante (
                									v_registros.id_plan_pago,
                                                 v_registros.codigo_plantilla_comprobante,
                                                 v_id_estado_actual,
                                                 p_id_usuario,
                                                 p_id_usuario_ai,
-                                                p_usuario_ai, 
+                                                p_usuario_ai,
                                                 p_conexion);
             END IF;
-           
+
              --  actualiza el id_comprobante en el registro del plan de pago
-            
+
               update tes.tplan_pago set
                 id_int_comprobante = v_id_int_comprobante
               where id_plan_pago = v_registros.id_plan_pago;
-             
-             
+
+
              -- actualiza estado en la solicitud
-            
-             update tes.tplan_pago  set 
+
+             update tes.tplan_pago  set
                id_estado_wf =  v_id_estado_actual,
                estado = 'pendiente',
                id_usuario_mod=p_id_usuario,
@@ -372,18 +385,18 @@ BEGIN
                id_usuario_ai = p_id_usuario_ai,
                usuario_ai = p_usuario_ai
              where id_plan_pago  = p_id_plan_pago;
-  
+
 
  v_respuesta[1]= 'TRUE';
- 
-  
+
+
 
 RETURN   v_respuesta;
 
 
 
 EXCEPTION
-					
+
 	WHEN OTHERS THEN
 			v_resp='';
 			v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);

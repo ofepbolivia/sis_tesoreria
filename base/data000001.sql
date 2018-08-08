@@ -1766,6 +1766,12 @@ select param.f_import_tcatalogo ('insert','TES','Contabilizado','pagado','tplan_
 
 /***********************************F-DAT-RAC-TES-0-30/05/2017*****************************************/
 
+/***********************************I-DAT-MAY-TES-0-08/08/2018*****************************************/
+select pxp.f_insert_tgui ('Reporte Trámites en Proceso de Pago ', 'Reporte Trámites en Proceso de Pago ', 'REPROCPAG', 'si', 11, 'sis_tesoreria/vista/reporte_proceso_pago/ReporteProcesoPago.php', 3, '', 'ReporteProcesoPago', 'TES');
+/***********************************F-DAT-MAY-TES-0-08/08/2018*****************************************/
+
+
+
 
 
 

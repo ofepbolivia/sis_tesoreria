@@ -935,7 +935,7 @@ BEGIN
             ORDER BY id_nivel_organizacional asc limit 1;*/
             --end gerencia
 
-            SELECT top.estado, top.id_estado_wf, top.obs
+            SELECT top.estado, top.id_estado_wf, top.obs, top.id_gestion
             INTO v_record_op
             FROM tes.tobligacion_pago top
             WHERE top.id_proceso_wf = v_parametros.id_proceso_wf;
@@ -1016,7 +1016,7 @@ BEGIN
             ts.codigo_poa,
             (select  pxp.list(distinct ob.codigo|| '' ''||ob.descripcion||'' '')
             from pre.tobjetivo ob
-            where ob.codigo = ANY (string_to_array(ts.codigo_poa,'',''))
+            where ob.codigo = ANY (string_to_array(ts.codigo_poa,'','')) and ob.id_gestion = '||v_record_op.id_gestion||'
             )::varchar as codigo_descripcion
 
             FROM tes.tobligacion_pago ts
@@ -1105,6 +1105,56 @@ BEGIN
 			return v_consulta;
 
 		end;
+
+         /*********************************
+ 	#TRANSACCION:  'TES_REPROCPAG_SEL'
+ 	#DESCRIPCION:	Reporte de procesos de pagos
+ 	#AUTOR:		admin
+ 	#FECHA:		07-08-2018 16:01:32
+	***********************************/
+
+    elsif(p_transaccion='TES_REPROCPAG_SEL')then
+
+    	begin
+         	    		--Sentencia de la consulta
+			v_consulta:='with estadoPlanPago as (select op.num_tramite, p.monto, p.nro_cuota,p.liquido_pagable, p.estado, op.id_obligacion_pago, p.fecha_tentativa, p.tipo
+						from tes.tobligacion_pago op
+						left join tes.tplan_pago p on p.id_obligacion_pago = op.id_obligacion_pago and p.estado_reg = ''activo''
+						and p.estado != ''anulado'')
+
+                 	SELECT
+                    obl.num_tramite,
+                    obl.id_obligacion_pago,
+                    pr.desc_proveedor,
+                    obl.obs,
+                    es.monto,
+                    m.moneda,
+                    to_char(obl.fecha,''DD/MM/YYYY''),
+                    obl.estado,
+                    de.nombre as nombre_depto,
+                    to_char(es.fecha_tentativa,''DD/MM/YYYY'')::date as fecha_tentativa,
+                    es.nro_cuota
+
+                    from tes.tobligacion_pago obl
+                    inner join segu.tusuario usu1 on usu1.id_usuario = obl.id_usuario_reg
+                    inner join param.vproveedor pr on pr.id_proveedor = obl.id_proveedor
+                    inner join param.tmoneda m on m.id_moneda = obl.id_moneda
+                    left join estadoPlanPago es on es.id_obligacion_pago = obl.id_obligacion_pago
+                    inner join param.tdepto de on de.id_depto = obl.id_depto
+
+                    where
+                    es.fecha_tentativa between '''||v_parametros.fecha_ini||''' and '''||v_parametros.fecha_fin||'''
+                    and obl.estado IN(''borrador'',''registrado'',''en_pago'',''anulado'')
+                    AND es.monto>= '''||v_parametros.monto||''' ';
+
+                    v_consulta:=v_consulta||'ORDER BY obl.num_tramite, es.nro_cuota ASC';
+
+            raise notice '% .',v_consulta;
+			--Devuelve la respuesta
+			return v_consulta;
+
+		end;
+
    else
 
 		raise exception 'Transaccion inexistente';
