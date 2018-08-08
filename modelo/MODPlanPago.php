@@ -616,7 +616,7 @@ class MODPlanPago extends MODbase{
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
-		//  var_dump($this->consulta);exit;
+		echo($this->consulta);exit;
 		$this->ejecutarConsulta();
 		
 		
