@@ -935,5 +935,39 @@ class MODObligacionPago extends MODbase{
 		return $this->respuesta;
 
 	}
+
+    function  reporteProcesoPago()
+    {
+        $this->procedimiento = 'tes.ft_obligacion_pago_sel';
+        $this->transaccion = 'TES_REPROCPAG_SEL';
+        $this->tipo_procedimiento = 'SEL';
+        $this->setCount(false);
+
+        $this->setParametro('monto','monto','numeric');
+        $this->setParametro('fecha_ini','fecha_ini','date');
+        $this->setParametro('fecha_fin','fecha_fin','date');
+        //$this->setParametro('fecha_tentativa','fecha_tentativa','date');
+
+        $this->captura('num_tramite', 'varchar');
+        $this->captura('id_obligacion_pago', 'integer');
+        $this->captura('desc_proveedor', 'varchar');
+        $this->captura('obs', 'varchar');
+        $this->captura('monto', 'numeric');
+        $this->captura('moneda', 'varchar');
+        $this->captura('fecha', 'text');
+        $this->captura('estado', 'varchar');
+        $this->captura('nombre_depto', 'varchar');
+        $this->captura('fecha_tentativa', 'date');
+        $this->captura('nro_cuota', 'numeric');
+
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+        //var_dump($this->respuesta);exit;
+        //Devuelve la respuesta
+        return $this->respuesta;
+
+    }
 }
 ?>
