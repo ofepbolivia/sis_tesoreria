@@ -21,11 +21,10 @@ class ACTTsLibroBancos extends ACTbase{
 	function listarTsLibroBancos(){
 		$this->objParam->defecto('ordenacion','id_libro_bancos');
 		$this->objParam->defecto('dir_ordenacion','asc');
-		
 		if($this->objParam->getParametro('id_cuenta_bancaria')!=''){
-			$this->objParam->addFiltro("id_cuenta_bancaria = ".$this->objParam->getParametro('id_cuenta_bancaria'));					
+			$this->objParam->addFiltro("lban.id_cuenta_bancaria = ".$this->objParam->getParametro('id_cuenta_bancaria'));					
 		}
-			
+				
 		if($this->objParam->getParametro('gestion')!=''){
 			$this->objParam->addFiltro("extract(year from lban.fecha_reg)=".$this->objParam->getParametro('gestion'));
 		}
@@ -53,7 +52,7 @@ class ACTTsLibroBancos extends ACTbase{
 		}
 		
 		if($this->objParam->getParametro('mycls')=='RelacionarCheque'){
-			$this->objParam->addFiltro("id_int_comprobante is null");	
+			$this->objParam->addFiltro("lban.id_int_comprobante is null");	
 			$this->objParam->addFiltro("tipo=''cheque''");		
 		}
 		
