@@ -627,6 +627,7 @@ header("content-type: text/javascript; charset=UTF-8");
 				grid:true,
 				form:false
 		}
+		
 	],
         title : 'Cheques',
         ActSave:'../../sis_tesoreria/control/TsLibroBancos/insertarTsLibroBancos',
@@ -670,7 +671,9 @@ header("content-type: text/javascript; charset=UTF-8");
 		{name:'saldo_deposito', type: 'numeric'},
 		{name:'nombre_regional', type: 'string'},
 		{name:'sistema_origen', type: 'string'},
-		{name:'notificado', type: 'string'}
+		{name:'notificado', type: 'string'},
+		{name:'tramite', type: 'string'}
+		
 	],
         sortInfo : {
             field : 'fecha DESC , nro_cheque',

@@ -409,9 +409,39 @@ header("content-type: text/javascript; charset=UTF-8");
             type:'TextField',
             filters:{pfiltro:'lban.num_tramite',type:'string'},
             id_grupo:1,
-            grid:true,
+            grid:false,
             form:false
         },
+        {
+			config:{
+				name: 'tramite',
+				fieldLabel: '#Tramite Relacionado',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 130,
+				maxLength:4
+			},
+				type:'TextField',
+				filters:{pfiltro:'tc.nro_tramite',type:'string'},
+				id_grupo:1,
+				grid:true,
+				form:false
+		},
+		{
+			config:{
+				name: 'comprobante_sigep',
+				fieldLabel: 'Comprobante Sigep',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 150,
+				maxLength:25
+			},
+				type:'TextField',
+				filters:{pfiltro:'com.c31',type:'string'},
+				id_grupo:1,
+				grid:true,
+				form:false
+		},
 		{
             config:{
                 name:'id_finalidad',
@@ -594,7 +624,10 @@ header("content-type: text/javascript; charset=UTF-8");
 		{name:'id_finalidad', type: 'numeric'},
 		{name:'nombre_finalidad', type: 'string'},
 		{name:'color', type: 'string'},
-		{name:'sistema_origen', type: 'string'}
+		{name:'sistema_origen', type: 'string'},
+		{name:'tramite', type: 'string'},
+		{name:'comprobante_sigep', type: 'string'}
+		
 	],
         sortInfo : {
             field : 'fecha',

@@ -59,9 +59,11 @@ class MODTsLibroBancos extends MODbase{
 		$this->captura('sistema_origen','varchar');
 		$this->captura('notificado','varchar');
 		$this->captura('fondo_devolucion_retencion','varchar');
-		
+		$this->captura('tramite','varchar');
+		$this->captura('comprobante_sigep','varchar');
 		//Ejecuta la instruccion
 		$this->armarConsulta();
+		//var_dump($this->consulta);exit;
 		$this->ejecutarConsulta();
 		//Devuelve la respuesta
 		return $this->respuesta;
@@ -156,7 +158,6 @@ class MODTsLibroBancos extends MODbase{
 		$this->setParametro('estado_reg','estado_reg','varchar');
 		$this->setParametro('tipo','tipo','varchar');
 		$this->setParametro('id_finalidad','id_finalidad','int4');
-
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();

@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION tes.ft_ts_libro_bancos_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -48,47 +46,53 @@ BEGIN
 
     	begin
     		--Sentencia de la consulta
-			v_consulta:='select id_libro_bancos,
-                        num_tramite,
-                        id_cuenta_bancaria,
-                        fecha as fecha,
-                        a_favor,
-                        nro_cheque,
-                        importe_deposito,
-                        nro_liquidacion,
-                        detalle,
-                        origen,
-                        observaciones,
-                        importe_cheque,
-                        id_libro_bancos_fk,
-                        estado,
-                        nro_comprobante,
-                        comprobante_sigma,
-                        indice,
-                        estado_reg,
-                        tipo,
-                        nro_deposito,
-                        fecha_reg,
-                        id_usuario_reg,
-                        fecha_mod,
-                        id_usuario_mod,
-                        usr_reg,
-                        usr_mod,
-                        id_depto,
-                        nombre_depto,
-                        id_proceso_wf,
-                        id_estado_wf,
-                        fecha_cheque_literal,
-                        id_finalidad,
-                        nombre_finalidad,
-                        color,
-                        saldo_deposito,
-                        nombre_regional,
-                        sistema_origen,
-                        notificado,
-                        fondo_devolucion_retencion
-                        from tes.vlibro_bancos lban
-				        where  ';
+			v_consulta:=' select 
+                             lban.id_libro_bancos,
+                             lban.num_tramite,
+                             lban.id_cuenta_bancaria,
+                             lban.fecha as fecha,
+                             lban.a_favor,
+                             lban.nro_cheque,
+                             lban.importe_deposito,
+                             lban.nro_liquidacion,
+                             lban.detalle,
+                             lban.origen,
+                             lban.observaciones,
+                             lban.importe_cheque,
+                             lban.id_libro_bancos_fk,
+                             lban.estado,
+                             lban.nro_comprobante,
+                             lban.comprobante_sigma,
+                             lban.indice,
+                             lban.estado_reg,
+                             lban.tipo,
+                             lban.nro_deposito,
+                             lban.fecha_reg,
+                             lban.id_usuario_reg,
+                             lban.fecha_mod,
+                             lban.id_usuario_mod,
+                             lban.usr_reg,
+                             lban.usr_mod,
+                             lban.id_depto,
+                             lban.nombre_depto,
+                             lban.id_proceso_wf,
+                             lban.id_estado_wf,
+                             lban.fecha_cheque_literal,
+                             lban.id_finalidad,
+                             lban.nombre_finalidad,
+                             lban.color,
+                             lban.saldo_deposito,
+                             lban.nombre_regional,
+                             lban.sistema_origen,
+                             lban.notificado,
+                             lban.fondo_devolucion_retencion,
+                             tc.nro_tramite as tramite,
+                             com.c31 as comprobante_sigep
+                             from tes.vlibro_bancos lban  
+                             left join cd.tdeposito_cd td on td.id_libro_bancos = lban.id_libro_bancos
+                             left join cd.tcuenta_doc tc on tc.id_cuenta_doc = td.id_cuenta_doc 
+                             left join conta.tint_comprobante com on com.id_int_comprobante=tc.id_int_comprobante
+                             where  ';
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
@@ -133,8 +137,11 @@ BEGIN
 
 		begin
 			--Sentencia de la consulta de conteo de registros
-			v_consulta:='select count(id_libro_bancos)
-					    from tes.vlibro_bancos lban
+			v_consulta:='select count(lban.id_libro_bancos)
+					   from tes.vlibro_bancos lban  
+                             left join cd.tdeposito_cd td on td.id_libro_bancos = lban.id_libro_bancos
+                             left join cd.tcuenta_doc tc on tc.id_cuenta_doc = td.id_cuenta_doc 
+                             left join conta.tint_comprobante com on com.id_int_comprobante=tc.id_int_comprobante
 					    where ';
 
 			--Definicion de la respuesta
