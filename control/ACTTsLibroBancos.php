@@ -57,7 +57,7 @@ class ACTTsLibroBancos extends ACTbase{
 		}
 		
 		if($this->objParam->getParametro('m_nro_cheque')!=''){
-			$this->objParam->addFiltro("nro_cheque= (Select max (lb.nro_cheque)
+			$this->objParam->addFiltro("lban.nro_cheque= (Select max (lb.nro_cheque)
 													From tes.tts_libro_bancos lb 
 													Where lb.id_cuenta_bancaria=".$this->objParam->getParametro('m_id_cuenta_bancaria').") ");	
 		}		
