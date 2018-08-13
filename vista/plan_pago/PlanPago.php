@@ -1068,7 +1068,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 config:{
                     name: 'fecha_costo_ini',
                     fieldLabel: 'Fecha Inicio.',
-                    allowBlank: false,
+                    allowBlank: true,
                     gwidth: 100,
                     format: 'd/m/Y',
                     renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
@@ -1083,7 +1083,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 config:{
                     name: 'fecha_costo_fin',
                     fieldLabel: 'Fecha Fin.',
-                    allowBlank: false,
+                    allowBlank: true,
                     gwidth: 100,
                     format: 'd/m/Y',
                     renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
