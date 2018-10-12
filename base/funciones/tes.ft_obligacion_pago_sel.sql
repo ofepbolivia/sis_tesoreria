@@ -52,6 +52,9 @@ DECLARE
     v_gerencia					varchar;
     v_id_funcionario			integer;
 
+    v_id_gestion				integer;
+    v_add_filtro				varchar;
+
 BEGIN
 
 	v_nombre_funcion = 'tes.ft_obligacion_pago_sel';
@@ -251,7 +254,13 @@ BEGIN
                               obpg.obs_poa,
                               obpg.uo_ex,
                               obpg.id_funcionario_responsable,
-							                fresp.desc_funcionario1 AS desc_fun_responsable
+							  fresp.desc_funcionario1 AS desc_fun_responsable,
+                              conf.id_conformidad,
+                              conf.conformidad_final,
+                              conf.fecha_conformidad_final::date,
+                              conf.fecha_inicio::date,
+                              conf.fecha_fin::date,
+                              conf.observaciones
 
                               from tes.tobligacion_pago obpg
                               inner join segu.tusuario usu1 on usu1.id_usuario = obpg.id_usuario_reg
@@ -266,6 +275,9 @@ BEGIN
                               '||v_inner ||'
                               left join orga.vfuncionario fun on fun.id_funcionario=obpg.id_funcionario
                               left join orga.vfuncionario fresp ON fresp.id_funcionario = obpg.id_funcionario_responsable
+
+                              left join tes.tconformidad conf on conf.id_obligacion_pago = obpg.id_obligacion_pago
+
                               where  '||v_filadd;
 
                   --Definicion de la respuesta
@@ -1154,6 +1166,69 @@ BEGIN
 			return v_consulta;
 
 		end;
+
+           /*********************************
+ 	#TRANSACCION:  'TES_LISOBLPA_SEL'
+ 	#DESCRIPCION:	lista obligaciones de pago
+ 	#AUTOR:	admin
+ 	#FECHA:		06-09-2018 16:01:32
+	***********************************/
+
+	elsif(p_transaccion='TES_LISOBLPA_SEL')then
+
+    	begin
+
+         -- raise exception '(%),... %', v_parametros.tipo_interfaz, v_filadd;
+
+                  --Sentencia de la consulta
+                  v_consulta:='select
+                              obpg.id_obligacion_pago,
+                              obpg.num_tramite,
+                              obpg.id_gestion,
+                              obpg.estado
+
+                              from tes.tobligacion_pago obpg
+
+                              where ' ;
+                  --Definicion de la respuesta
+                  v_consulta:=v_consulta||v_parametros.filtro;
+                  v_consulta:=v_consulta;
+                  --||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+--raise notice 'error1  %',v_consulta;
+--raise exception 'error  %',v_consulta;
+              raise notice '%',v_consulta;
+			--Devuelve la respuesta
+			return v_consulta;
+
+		end;
+          /*********************************
+ 	#TRANSACCION:  'TES_LISOBLPA_CONT'
+ 	#DESCRIPCION:	Conteo de registros
+ 	#AUTOR:	 RAC (KPLIAN)
+ 	#FECHA:		04-05-2014 16:01:32
+	***********************************/
+
+	elsif(p_transaccion='TES_LISOBLPA_CONT')then
+
+		begin
+
+
+			--Sentencia de la consulta de conteo de registros
+			v_consulta:='select count(obpg.id_obligacion_pago)
+					    from tes.tobligacion_pago obpg
+
+                              where';
+
+			--Definicion de la respuesta
+			v_consulta:=v_consulta||v_parametros.filtro;
+
+			--Devuelve la respuesta
+
+            raise notice '%',v_consulta;
+			return v_consulta;
+
+		end;
+
 
    else
 

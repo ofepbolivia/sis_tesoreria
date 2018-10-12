@@ -5268,6 +5268,22 @@ select pxp.f_insert_testructura_gui ('REPROCPAG', 'REPOP');
 
 /***********************************F-DEP-MAY-TES-0-08/08/2018****************************************/
 
+/***********************************I-DEP-MAY-TES-0-08/08/2018****************************************/
+select pxp.f_insert_testructura_gui ('REPROCPAG', 'REPOP');
+
+/***********************************F-DEP-MAY-TES-0-08/08/2018****************************************/
+
+/***********************************I-DEP-MAY-TES-0-31/08/2018****************************************/
+
+ALTER TABLE tes.tconformidad
+  ADD CONSTRAINT tconformidad_fk FOREIGN KEY (id_obligacion_pago)
+    REFERENCES tes.tobligacion_pago(id_obligacion_pago)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+
+/***********************************F-DEP-MAY-TES-0-31/08/2018****************************************/
+
 
 
 
