@@ -1146,7 +1146,8 @@ BEGIN
 
                               left join tes.tconformidad conf on conf.id_obligacion_pago = obpg.id_obligacion_pago
 
-                              where  obpg.estado != ''anulado'' and '||v_filtro;
+                              where  obpg.estado != ''anulado''
+                              and obpg.tipo_obligacion = ''adquisiciones'' and '||v_filtro;
 
                   --Definicion de la respuesta
                   v_consulta:=v_consulta||v_parametros.filtro;
