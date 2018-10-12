@@ -153,6 +153,15 @@ DECLARE
     v_record					record;
     v_anio_gestion			 	    integer;
 
+    --(F.E.A) VARIABLES PARA DEFINIR LA ULTIMA CUOTA Y ENVIAR CORREO CUANDO ES ULTIMA CUOTA PARA INDICAR QUE ADJUNTE FORM. 500.
+	v_reg_plan_pago				record;
+    v_bandera					boolean=false;
+    v_cont_plan_pago		    integer;
+    v_registros_aux				record;
+    v_descripcion 				varchar;
+    v_desc_persona				varchar;
+    v_id_alarma					integer;
+
 BEGIN
 
     v_nombre_funcion = 'tes.f_plan_pago_ime';
@@ -646,7 +655,7 @@ BEGIN
 
 
 
-
+--RAISE EXCEPTION 'v_parametros.es_ultima_cuota : %', v_parametros.es_ultima_cuota;
 
 			--Sentencia de la modificacion
 			update tes.tplan_pago set
@@ -685,7 +694,8 @@ BEGIN
             monto_ajuste_ag = v_parametros.monto_ajuste_ag,
             monto_anticipo = v_monto_anticipo,
             fecha_costo_ini = v_parametros.fecha_costo_ini,
-            fecha_costo_fin = v_parametros.fecha_costo_fin
+            fecha_costo_fin = v_parametros.fecha_costo_fin/*,
+            es_ultima_cuota = v_parametros.es_ultima_cuota*/
             where id_plan_pago = v_parametros.id_plan_pago;
 
 
@@ -1713,6 +1723,68 @@ BEGIN
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Se cambio el estado de tiene formulario 500 ');
             v_resp = pxp.f_agrega_clave(v_resp,'tes_tipo_pago_deshabilitado', pxp.f_get_variable_global('tes_tipo_pago_deshabilitado'));
 
+            --Devuelve la respuesta
+            return v_resp;
+        end;
+    /*********************************
+ 	#TRANSACCION:  'TES_ULTIMA_CUOTA_SET'
+ 	#DESCRIPCION:	Fijamos el el campo es_ultimo_pago a true, si fuese el ultimo cuota de pago
+ 	#AUTOR:		Franklin E.
+ 	#FECHA:		31-05-2016
+	***********************************/
+
+	elsif(p_transaccion='TES_ULTIMA_CUOTA_SET')then
+
+		begin
+        	--raise exception 'id_obligacion_pago: %, es_ultima_cuota: %, id_plan_pago: %', v_parametros.id_obligacion_pago, v_parametros.es_ultima_cuota, v_parametros.id_plan_pago;
+        	IF(v_parametros.accion = 'grid')THEN
+                SELECT count(tpp.id_plan_pago) AS cont, tpp.id_plan_pago
+                INTO v_reg_plan_pago
+                FROM tes.tobligacion_pago top
+                INNER JOIN tes.tplan_pago tpp ON tpp.id_obligacion_pago = top.id_obligacion_pago
+                WHERE  top.id_obligacion_pago = v_parametros.id_obligacion_pago AND tpp.es_ultima_cuota = true
+                GROUP BY tpp.id_plan_pago;
+
+                IF(v_reg_plan_pago.cont IS NULL)THEN
+                    v_bandera = true;
+                END IF;
+
+                IF(v_reg_plan_pago.cont =1 AND v_reg_plan_pago.id_plan_pago = v_parametros.id_plan_pago)THEN
+                    UPDATE tes.tplan_pago SET
+                      es_ultima_cuota =  CASE WHEN (v_parametros.es_ultima_cuota=FALSE OR v_parametros.es_ultima_cuota IS NULL)  THEN TRUE ELSE FALSE END
+                    WHERE id_plan_pago = v_parametros.id_plan_pago;
+                ELSIF v_bandera THEN
+                    UPDATE tes.tplan_pago SET
+                      es_ultima_cuota =  CASE WHEN (v_parametros.es_ultima_cuota=FALSE OR v_parametros.es_ultima_cuota IS NULL)  THEN TRUE ELSE FALSE END
+                    WHERE id_plan_pago = v_parametros.id_plan_pago;
+                END IF;
+            ELSE
+            	SELECT count(tpp.id_plan_pago)
+                INTO v_cont_plan_pago
+				FROM tes.tplan_pago tpp
+				WHERE tpp.id_obligacion_pago = v_parametros.id_obligacion_pago AND tpp.estado_reg = 'activo';
+
+                UPDATE tes.tobligacion_pago SET
+                	total_nro_cuota = v_cont_plan_pago
+                WHERE id_obligacion_pago = v_parametros.id_obligacion_pago;
+
+            	FOR v_reg_plan_pago IN (SELECT tpp.id_plan_pago, tpp.es_ultima_cuota
+                						FROM tes.tplan_pago tpp
+                                        WHERE tpp.id_obligacion_pago = v_parametros.id_obligacion_pago AND tpp.estado_reg = 'activo'
+                                        ORDER BY tpp.fecha_reg ASC)LOOP
+
+                	UPDATE tes.tplan_pago SET
+                		es_ultima_cuota = CASE WHEN v_cont_plan_pago = 1 THEN TRUE ELSE FALSE END
+                	WHERE id_plan_pago = v_reg_plan_pago.id_plan_pago;
+
+                    v_cont_plan_pago = v_cont_plan_pago - 1;
+                END LOOP;
+            END IF;
+
+
+            --Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Se cambio el estado de la ultima cuota con Exito');
+            v_resp = pxp.f_agrega_clave(v_resp,'id_obligacion_pago',v_parametros.id_obligacion_pago::VARCHAR);
             --Devuelve la respuesta
             return v_resp;
         end;

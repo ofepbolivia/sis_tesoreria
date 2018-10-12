@@ -29,11 +29,181 @@ Phx.vista.ObligacionPagoAdq = {
 	constructor: function(config) {
 	   Phx.vista.ObligacionPagoAdq.superclass.constructor.call(this,config);
         this.getBoton('ini_estado').setVisible(false);
-       this.Cmp.id_contrato.allowBlank = true; 
+       this.Cmp.id_contrato.allowBlank = true;
+
+
+
+        this.addButton('btnConformidad', {
+            text: 'Conformidad',
+            grupo: [0, 1],
+            iconCls: 'bok',
+            disabled: true,
+            handler: this.onButtonConformidad,
+            tooltip: 'Generar Conformidad Final'
+        });
         
     },
-    
-   
+
+    creaFormularioConformidad: function () {
+
+        this.formConformidad = new Ext.form.FormPanel({
+            id: this.idContenedor + '_CONFOR',
+            items: [
+                new Ext.form.DateField({
+                    fieldLabel: 'Fecha Conformidad Final',
+                    format: 'd/m/Y',
+                    name: 'fecha_conformidad_final',
+                    allowBlank: false,
+                    width: '95%'
+                }),
+                new Ext.form.TextArea({
+                    fieldLabel: 'Conformidad Final',
+                    name: 'conformidad_final',
+                    height: 60,
+                    allowBlank: false,
+                    width: '95%'
+                }),
+                new Ext.form.DateField({
+                    fieldLabel: 'Fecha Inicio',
+                    format: 'd/m/Y',
+                    name: 'fecha_inicio',
+                    //height: 150,
+                    allowBlank: true,
+                    width: '95%'
+                }),
+                new Ext.form.DateField({
+                    fieldLabel: 'Fecha Fin',
+                    format: 'd/m/Y',
+                    name: 'fecha_fin',
+                    //height: 150,
+                    allowBlank: true,
+                    width: '95%'
+                }),
+                new Ext.form.TextArea({
+                    fieldLabel: 'Observaciones',
+                    name: 'observaciones',
+                    height: 50,
+                    allowBlank: true,
+                    width: '95%'
+                })
+
+            ],
+            autoScroll: false,
+            //height: this.fheight,
+            autoDestroy: true,
+            autoScroll: true
+        });
+
+
+        // Definicion de la ventana que contiene al formulario
+        this.windowConformidad = new Ext.Window({
+            // id:this.idContenedor+'_W',
+            title: 'Datos Acta Conformidad Final',
+            modal: true,
+            width: 400,
+            height: 400,
+            bodyStyle: 'padding:5px;',
+            layout: 'fit',
+            hidden: true,
+            autoScroll: false,
+            maximizable: true,
+            buttons: [{
+                text: 'Guardar',
+                arrowAlign: 'bottom',
+                handler: this.onSubmitConformidad,
+                argument: {
+                    'news': false
+                },
+                scope: this
+
+            },
+                {
+                    text: 'Declinar',
+                    handler: this.onDeclinarConformidad,
+                    scope: this
+                }],
+            items: this.formConformidad,
+            // autoShow:true,
+            autoDestroy: true,
+            closeAction: 'hide'
+        });
+    },
+
+    onButtonConformidad: function () {
+        var data = this.sm.getSelected().data;
+        this.creaFormularioConformidad();
+        console.log('data', data);
+        if (data['fecha_conformidad_final'] == '' || data['fecha_conformidad_final'] == undefined || data['fecha_conformidad_final'] == null) {
+            console.log('a');
+            this.formConformidad.getForm().findField('fecha_inicio').setValue(data.fecha_inicio);
+            this.formConformidad.getForm().findField('fecha_fin').setValue(data.fecha_fin);
+            this.formConformidad.getForm().findField('fecha_conformidad_final').setValue(data.fecha_conformidad_final);
+            this.formConformidad.getForm().findField('conformidad_final').setValue(data.conformidad_final);
+            this.formConformidad.getForm().findField('observaciones').setValue(data.observaciones);
+            this.windowConformidad.show();
+        } else {
+            console.log('b');
+            Ext.Msg.show({
+                title: 'Alerta',
+                scope: this,
+                msg: 'El acta de Conformidad Final ya se encuentra firmada. Esta seguro de volver a firmar?',
+                buttons: Ext.Msg.YESNO,
+                fn: function (id, value, opt) {
+                    if (id == 'yes') {
+                        this.formConformidad.getForm().findField('fecha_inicio').setValue(data.fecha_inicio);
+                        console.log('conformidad 1', this.formConformidad.getForm().findField('fecha_inicio').getValue());
+                        this.formConformidad.getForm().findField('fecha_fin').setValue(data.fecha_fin);
+                        console.log('conformidad 2', this.formConformidad.getForm().findField('fecha_fin').getValue());
+                        this.formConformidad.getForm().findField('fecha_conformidad_final').setValue(data.fecha_conformidad_final);
+                        this.formConformidad.getForm().findField('conformidad_final').setValue(data.conformidad_final);
+                        this.formConformidad.getForm().findField('observaciones').setValue(data.observaciones);
+                        this.windowConformidad.show();
+                    }
+                },
+                animEl: 'elId',
+                icon: Ext.MessageBox.WARNING
+            }, this);
+        }
+
+    },
+    onSubmitConformidad: function () {
+
+        var d = this.sm.getSelected().data;
+        Phx.CP.loadingShow();
+        Ext.Ajax.request({
+            //url:'../../sis_tesoreria/control/PlanPago/generarConformidad',
+            url: '../../sis_tesoreria/control/Conformidad/generarConformidadFinal',
+            success: this.successConformidad,
+            failure: this.failureConformidad,
+            params: {
+                //'id_conformidad': d.id_conformidad,
+                'id_obligacion_pago': d.id_obligacion_pago,
+                'fecha_inicio': this.formConformidad.getForm().findField('fecha_inicio').getValue(),
+                'fecha_fin': this.formConformidad.getForm().findField('fecha_fin').getValue(),
+                'conformidad_final': this.formConformidad.getForm().findField('conformidad_final').getValue(),
+                'fecha_conformidad_final': this.formConformidad.getForm().findField('fecha_conformidad_final').getValue().dateFormat('d/m/Y'),
+                'observaciones': this.formConformidad.getForm().findField('observaciones').getValue()
+            },
+            timeout: this.timeout,
+            scope: this
+
+        });
+
+    },
+
+    successConformidad: function (resp) {
+        this.windowConformidad.hide();
+        Phx.vista.ConformidadFinal.superclass.successDel.call(this, resp);
+    },
+
+    failureConformidad: function (resp) {
+        Phx.CP.loadingHide();
+        Phx.vista.ConformidadFinal.superclass.conexionFailure.call(this, resp);
+    },
+
+    onDeclinarConformidad: function () {
+        this.windowConformidad.hide();
+    },
     
      tabsouth:[
             { 

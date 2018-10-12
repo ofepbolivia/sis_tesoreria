@@ -829,8 +829,14 @@ Phx.vista.ObligacionPago = Ext.extend(Phx.gridInterfaz,{
 		'tipo_anticipo',
 		'ajuste_anticipo','desc_funcionario1',
 		'ajuste_aplicado', 'codigo_poa','obs_poa',
-		'monto_estimado_sg','id_obligacion_pago_extendida', 'obs_presupuestos','id_contrato','desc_contrato'
-		
+		'monto_estimado_sg','id_obligacion_pago_extendida', 'obs_presupuestos','id_contrato','desc_contrato',
+        {name:'id_conformidad', type: 'numeric'},
+        {name:'conformidad_final', type: 'string'},
+        {name:'fecha_conformidad_final', type: 'date',dateFormat:'Y-m-d'},
+        {name:'fecha_inicio', type: 'date',dateFormat:'Y-m-d'},
+        {name:'fecha_fin', type: 'date',dateFormat:'Y-m-d'},
+        {name:'observaciones', type: 'string'}
+
 	],
 	
 	arrayDefaultColumHidden:['id_fecha_reg','id_fecha_mod','fecha_mod','usr_reg','estado_reg','fecha_reg','usr_mod',
@@ -1267,7 +1273,8 @@ Phx.vista.ObligacionPago = Ext.extend(Phx.gridInterfaz,{
           this.getBoton('diagrama_gantt').enable();
           this.getBoton('btnChequeoDocumentosWf').enable();
           this.getBoton('btnObs').enable();
-          
+          this.getBoton('btnConformidad').enable();
+
      },
      
      

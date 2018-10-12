@@ -1782,7 +1782,28 @@ IS 'depto de libro de bancos';
 
 
 /*****************************F-SCP-RAC-TES-0-18/08/2017*************/
-  
-  
-  
 
+ /*****************************I-SCP-MAY-TES-0-31/08/2018*************/
+
+CREATE TABLE tes.tconformidad (
+  id_conformidad SERIAL NOT NULL,
+  fecha_conformidad_final DATE,
+  fecha_inicio DATE,
+  fecha_fin DATE,
+  observaciones VARCHAR(350),
+  id_obligacion_pago INTEGER,
+  PRIMARY KEY(id_conformidad)
+) INHERITS (pxp.tbase)
+
+WITH (oids = false);
+  /*****************************F-SCP-MAY-TES-0-31/08/2018*************/
+  
+ /*****************************I-SCP-MAY-TES-0-05/09/2018*************/
+
+ALTER TABLE tes.tconformidad
+  ADD COLUMN conformidad_final TEXT;
+
+  ALTER TABLE tes.tconformidad
+  ADD COLUMN id_gestion INTEGER;
+
+  /*****************************F-SCP-MAY-TES-0-05/09/2018*************/

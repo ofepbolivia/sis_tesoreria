@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION tes.ft_ts_libro_bancos_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -459,7 +457,7 @@ BEGIN
             observaciones = v_parametros.observaciones
             WHERE id_libro_bancos_fk=v_parametros.id_libro_bancos;
         END IF;
-        
+
         if(pxp.f_existe_parametro(p_tabla,'nro_deposito')=TRUE) then
         	UPDATE tes.tts_libro_bancos SET
             nro_deposito = v_parametros.nro_deposito
@@ -525,7 +523,8 @@ BEGIN
 		begin
         	--cheque nuevo
 
-            Select lb.id_int_comprobante, lb.num_tramite into g_id_int_comprobante, g_nro_tramite
+            Select lb.id_int_comprobante, lb.num_tramite
+            into g_id_int_comprobante, g_nro_tramite
             From tes.tts_libro_bancos lb
             where lb.id_libro_bancos=v_parametros.id_libro_bancos_new;
 
@@ -534,12 +533,13 @@ BEGIN
             END IF;
 
         	--obtenermos del cheque anterior
-            Select lb.id_int_comprobante, lb.num_tramite into g_id_int_comprobante, g_nro_tramite
+            Select lb.id_int_comprobante, lb.num_tramite
+            into g_id_int_comprobante, g_nro_tramite
             From tes.tts_libro_bancos lb
             where lb.id_libro_bancos=v_parametros.id_libro_bancos_old;
 
             IF g_id_int_comprobante is null THEN
-            	raise exception 'No puede relacionar el cheque, el cheque del tramite %, no cuenta con un comprobante', g_nro_tramite;
+            	raise exception 'No puede relacionar el cheque, el cheque anterior del tramite %, no cuenta con un comprobante', g_nro_tramite;
             END IF;
 
             UPDATE tes.tts_libro_bancos
