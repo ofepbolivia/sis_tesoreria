@@ -5284,6 +5284,31 @@ ALTER TABLE tes.tconformidad
 
 /***********************************F-DEP-MAY-TES-0-31/08/2018****************************************/
 
+/***********************************I-DEP-FEA-TES-0-07/11/2018****************************************/
+
+CREATE OR REPLACE VIEW tes.vcomp_costo_alquiler_aeronave (
+    fecha_dev,
+    monto,
+    desc_ingas,
+    estado,
+    id_partida_ejecucion_dev)
+AS
+ SELECT pp.fecha_dev,
+    pp.monto,
+    cg.desc_ingas,
+    pp.estado,
+    t.id_partida_ejecucion_dev
+   FROM tes.tplan_pago pp
+     JOIN tes.tprorrateo p ON pp.id_plan_pago = p.id_plan_pago
+     JOIN tes.tobligacion_det pod ON pod.id_obligacion_det = p.id_obligacion_det
+     JOIN param.tconcepto_ingas cg ON cg.id_concepto_ingas = pod.id_concepto_ingas
+     JOIN conta.tint_transaccion t ON t.id_int_transaccion = p.id_int_transaccion
+  WHERE pp.estado::text = 'devengado'::text AND cg.desc_ingas::text ~~ '%ALQUILER DE AERONAVE%'::text;
+
+
+
+/***********************************F-DEP-FEA-TES-0-07/11/2018****************************************/
+
 
 
 
