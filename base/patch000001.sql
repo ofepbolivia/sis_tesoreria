@@ -1807,3 +1807,39 @@ ALTER TABLE tes.tconformidad
   ADD COLUMN id_gestion INTEGER;
 
   /*****************************F-SCP-MAY-TES-0-05/09/2018*************/
+
+/*****************************I-SCP-FEA-TES-0-07/11/2018*************/
+
+CREATE TABLE tes.tcuenta_bancaria_periodo (
+  id_cuenta_bancaria_periodo SERIAL,
+  id_cuenta_bancaria INTEGER,
+  id_periodo INTEGER,
+  estado VARCHAR,
+  CONSTRAINT tcuenta_bancaria_periodo_pk_tcuenta_bancaria_periodo_id_cuenta_ PRIMARY KEY(id_cuenta_bancaria_periodo),
+  CONSTRAINT tcuenta_bancaria_periodo_fk FOREIGN KEY (id_cuenta_bancaria)
+    REFERENCES tes.tcuenta_bancaria(id_cuenta_bancaria)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE,
+  CONSTRAINT tcuenta_bancaria_periodo_fk1 FOREIGN KEY (id_periodo)
+    REFERENCES param.tperiodo(id_periodo)
+    ON DELETE NO ACTION
+    ON UPDATE CASCADE
+    NOT DEFERRABLE
+) INHERITS (pxp.tbase)
+
+WITH (oids = false);
+
+ALTER TABLE tes.tplan_pago
+  ADD COLUMN observaciones_pago TEXT,
+  ADD COLUMN es_ultima_cuota BOOLEAN;
+
+ALTER TABLE tes.tsolicitud_efectivo
+  ADD COLUMN id_funcionario_finanzas INTEGER;
+
+ALTER TABLE tes.ttipo_plan_pago
+  ADD COLUMN tipo_ejecucion VARCHAR(20);
+
+ALTER TABLE tes.tts_libro_bancos
+  ADD COLUMN tabla VARCHAR(255);
+/*****************************F-SCP-FEA-TES-0-07/11/2018*************/
