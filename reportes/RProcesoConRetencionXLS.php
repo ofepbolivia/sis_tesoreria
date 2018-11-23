@@ -154,34 +154,34 @@ class RProcesoConRetencionXLS
 
         foreach ($datos as $value)
         {
-            if ($value['monto_retgar_mo']!= 0) {
-                $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0, $fila, $this->numero);
-                $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(1, $fila, $value['proveedor']);
-                $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(2, $fila, $value['num_tramite']);
-                $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(3, $fila, $value['nro_cuota']);
-                $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(4, $fila, $value['tipo']);
-                $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(5, $fila, $value['fecha_dev']);
-                $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(6, $fila,$value['moneda']);
-                $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(7, $fila, $value['monto']);
-                $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(8, $fila, $value['monto_retgar_mo']);
-                $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(9, $fila, $value['liquido_pagable']);
-                $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(10, $fila, $value['c31']);
+//            if ($value['monto_retgar_mo']!= 0) {
+            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0, $fila, $this->numero);
+            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(1, $fila, $value['proveedor']);
+            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(2, $fila, $value['num_tramite']);
+            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(3, $fila, $value['nro_cuota']);
+            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(4, $fila, $value['tipo']);
+            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(5, $fila, $value['fecha_dev']);
+            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(6, $fila,$value['moneda']);
+            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(7, $fila, $value['monto']);
+            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(8, $fila, $value['monto_retgar_mo']);
+            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(9, $fila, $value['liquido_pagable']);
+            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(10, $fila, $value['c31']);
 
-                $this->docexcel->getActiveSheet()->getStyle("D$fila:D$fila")->applyFromArray($styleTitulos3);
-                $this->docexcel->getActiveSheet()->getStyle("F$fila:F$fila")->applyFromArray($styleTitulos3);
-                $this->docexcel->getActiveSheet()->getStyle("H$fila:H$fila")->applyFromArray($styleTitulos3);
-                $this->docexcel->getActiveSheet()->getStyle("I$fila:I$fila")->applyFromArray($styleTitulos3);
-                $this->docexcel-> getActiveSheet () -> getStyle ( "H$fila:H$fila") -> getNumberFormat () -> setFormatCode (PHPExcel_Style_NumberFormat :: FORMAT_NUMBER_COMMA_SEPARATED1);
-                $this->docexcel-> getActiveSheet () -> getStyle ( "I$fila:I$fila") -> getNumberFormat () -> setFormatCode (PHPExcel_Style_NumberFormat :: FORMAT_NUMBER_COMMA_SEPARATED1);
-                $this->docexcel-> getActiveSheet () -> getStyle ( "J$fila:J$fila") -> getNumberFormat () -> setFormatCode (PHPExcel_Style_NumberFormat :: FORMAT_NUMBER_COMMA_SEPARATED1);
+            $this->docexcel->getActiveSheet()->getStyle("D$fila:D$fila")->applyFromArray($styleTitulos3);
+            $this->docexcel->getActiveSheet()->getStyle("F$fila:F$fila")->applyFromArray($styleTitulos3);
+            $this->docexcel->getActiveSheet()->getStyle("H$fila:H$fila")->applyFromArray($styleTitulos3);
+            $this->docexcel->getActiveSheet()->getStyle("I$fila:I$fila")->applyFromArray($styleTitulos3);
+            $this->docexcel-> getActiveSheet () -> getStyle ( "H$fila:H$fila") -> getNumberFormat () -> setFormatCode (PHPExcel_Style_NumberFormat :: FORMAT_NUMBER_COMMA_SEPARATED1);
+            $this->docexcel-> getActiveSheet () -> getStyle ( "I$fila:I$fila") -> getNumberFormat () -> setFormatCode (PHPExcel_Style_NumberFormat :: FORMAT_NUMBER_COMMA_SEPARATED1);
+            $this->docexcel-> getActiveSheet () -> getStyle ( "J$fila:J$fila") -> getNumberFormat () -> setFormatCode (PHPExcel_Style_NumberFormat :: FORMAT_NUMBER_COMMA_SEPARATED1);
 
-                $this->docexcel->getActiveSheet()->getStyle("J$fila:J$fila")->applyFromArray($styleTitulos3);
-                $this->docexcel->getActiveSheet()->getStyle("K$fila:K$fila")->applyFromArray($styleTitulos3);
+            $this->docexcel->getActiveSheet()->getStyle("J$fila:J$fila")->applyFromArray($styleTitulos3);
+            $this->docexcel->getActiveSheet()->getStyle("K$fila:K$fila")->applyFromArray($styleTitulos3);
 
-                $fila++;
+            $fila++;
 
-                $this->numero++;
-            }
+            $this->numero++;
+//            }
 
         }
 
