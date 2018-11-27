@@ -954,7 +954,7 @@ BEGIN
                                 inner join param.vproveedor pro on pro.id_proveedor = obli.id_proveedor
                                 inner join param.tmoneda mo on mo.id_moneda = obli.id_moneda
                                 inner join conta.tint_comprobante com on com.id_int_comprobante = pla.id_int_comprobante
-                                 WHERE pla.fecha_dev >= '''||v_parametros.fecha_ini||''' and pla.fecha_dev <= '''||v_parametros.fecha_fin||''' and pla.estado in (''devengado'',''pagado'')';
+                                 WHERE pla.fecha_dev >= '''||v_parametros.fecha_ini||''' and pla.fecha_dev <= '''||v_parametros.fecha_fin||''' and (pla.estado in (''devengado'',''pagado'') and monto_retgar_mo != 0 or pla.estado in (''devuelto'' )) ';
 
 			--Definicion de la respuesta
             --v_consulta:=v_consulta||v_parametros.filtro;
