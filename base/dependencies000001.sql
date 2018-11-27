@@ -5310,5 +5310,83 @@ AS
 /***********************************F-DEP-FEA-TES-0-07/11/2018****************************************/
 
 
+/***********************************I-DEP-FEA-TES-0-27/11/2018****************************************/
+
+select wf.f_import_ttipo_documento_estado ('insert','ACTCONF','PUPLAP','borrador','PUPLAP','firmar','superior','"{$tabla.sw_conformidad}"="si"');
+select wf.f_import_ttipo_documento_estado ('insert','OTRDOC','PUPLAP','borrador','PUPLAP','crear','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','ACTCONF','PUPLAP','vbsolicitante','PUPLAP','firmar','superior','"{$tabla.sw_conformidad}"="si"');
+select wf.f_import_ttipo_documento_estado ('insert','DOCRES','PU_AP_ANT','borrador','PU_AP_ANT','crear','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','ACTCONF','PUPLAP','devengado','PUPLAP','firmar','superior','"{$tabla.sw_conformidad}"="si"');
+select wf.f_import_ttipo_documento_estado ('insert','ACTCONF','PUPLAP','pendiente','PUPLAP','firmar','superior','"{$tabla.sw_conformidad}"="si"');
+select wf.f_import_ttipo_documento_estado ('insert','ACTCONF','PUPLAP','supconta','PUPLAP','firmar','superior','"{$tabla.sw_conformidad}"="si"');
+select wf.f_import_ttipo_documento_estado ('insert','ACTCONF','PUPLAP','vbconta','PUPLAP','firmar','superior','"{$tabla.sw_conformidad}"="si"');
+select wf.f_import_ttipo_documento_estado ('insert','ACTCONF','PUPLAP','vbfin','PUPLAP','firmar','superior','"{$tabla.sw_conformidad}"="si"');
+select wf.f_import_ttipo_documento_estado ('insert','ACTCONF','PUPLAP','vbgerente','PUPLAP','firmar','superior','"{$tabla.sw_conformidad}"="si"');
+select wf.f_import_ttipo_documento_estado ('insert','DOCRES','OPU','borrador','OPU','crear','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','FACTURA','OPU','borrador','OPU','crear','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','FACTURA','OPU','vbconta','PUPLAP','hacer_exigible','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','FACTURA','OPU','pendiente','PUPLAP','verificar','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','INFORME','OPU','borrador','OPU','insertar','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','DOCRES','OPU','borrador','OPU','insertar','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','OTRO','OPU','borrador','OPU','insertar','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','NOTINT','OPU','borrador','OPU','insertar','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','FACTURA','OPU','borrador','OPU','insertar','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','DOCRES','OPU','vbpresupuestos','OPU','exigir','superior','');
+select wf.f_import_ttipo_documento_estado ('delete','FACTURA','OPU','vbpresupuestos','OPU',NULL,NULL,NULL);
+select wf.f_import_ttipo_documento_estado ('delete','DOCRES','OPU','vbpoa','OPU',NULL,NULL,NULL);
+select wf.f_import_ttipo_documento_estado ('delete','FACTURA','OPU','vbpoa','OPU',NULL,NULL,NULL);
+select wf.f_import_ttipo_documento_estado ('delete','FACTURA','OPU','anulado','OPU',NULL,NULL,NULL);
+select wf.f_import_ttipo_documento_estado ('delete','FACTURA','OPU','borrador','OPU',NULL,NULL,NULL);
+select wf.f_import_ttipo_documento_estado ('insert','FACTURA','OPU','vbpoa','OPU','exigir','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','FACTURA','OPU','vbpresupuestos','OPU','exigir','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','FACTURA','OPU','borrador','OPU','eliminar','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','CORELE','OPU','borrador','OPU','insertar','superior','');
+select wf.f_import_ttipo_documento_estado ('delete','ACTCONF','PUPLAP','borrador','PUPLAP',NULL,NULL,NULL);
+select wf.f_import_ttipo_documento_estado ('insert','ACTCONF','PUPLAP','borrador','PUPLAP','crear','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','ACTCONF','PUPLAP','vbdeposito','PUPLAP','firmar','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','DOCRES','OPU','suppresu','OPU','insertar','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','OTRO','OPU','suppresu','OPU','insertar','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','NOTINT','OPU','suppresu','OPU','insertar','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','INFORME','OPU','suppresu','OPU','insertar','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','OTRO','OPU','vbpresupuestos','OPU','insertar','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','NOTINT','OPU','vbpresupuestos','OPU','insertar','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','INFORME','OPU','vbpresupuestos','OPU','insertar','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','CORELE','OPU','vbpresupuestos','OPU','insertar','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','DAPROPAG','OPU','borrador','OPU','crear','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','DAPROPAG','OPU','en_pago','OPU','insertar','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','DAPROPAG','OPU','vbpoa','OPU','exigir','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','PIR','OPU','borrador','OPU','insertar','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','PIR','OPU','borrador','OPU','crear','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','NOTINT','OPU','borrador','OPU','crear','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','INFORME','OPU','borrador','OPU','crear','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','DOCRES','OPU','borrador','OPU','eliminar','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','FACTURA','OPU','vb_jefe_aeropuerto','OPU','exigir','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','FACTURA','OPU','vb_jefe_aeropuerto','OPU','eliminar','superior','');
+select wf.f_import_ttipo_documento_estado ('delete','CER_PRE_OPU','OPU','suppresu','OPU',NULL,NULL,NULL);
+select wf.f_import_ttipo_documento_estado ('insert','CER_PRE_OPU','OPU','suppresu','OPU','insertar','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','CER_PRE_OPU','OPU','vbpresupuestos','OPU','insertar','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','CER_PRE_OPU','OPU','registrado','OPU','insertar','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','CER_PRE_OPU','OPU','en_pago','OPU','insertar','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','DOCRES','OPU','en_pago','OPU','insertar','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','OTRO','OPU','en_pago','OPU','insertar','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','CER_PRE_OPU','OPU','vbpoa','OPU','crear','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','CER_PRE_OPU','OPU','vbpoa','OPU','insertar','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','CERTPRESIG','OPU','suppresu','OPU','crear','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','CERTPRESIG','OPU','vbpresupuestos','OPU','insertar','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','CERTPRESIG','OPU','en_pago','OPU','insertar','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','CERTPRESIG','OPU','vbcostos','PUPLAP','exigir','superior','{$tabla.id_moneda}<>2');
+select wf.f_import_ttipo_documento_estado ('insert','CERTPRESIG','OPU','supcostos','PUPLAP','eliminar','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','DOCRES','OPU','vb_jefe_aeropuerto','OPU','exigir','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','DOCRES','OPU','vbpoa','OPU','exigir','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','ACTCONF','PUPLAP','pago_exterior','PUPLAP','eliminar','superior','');
+select wf.f_import_ttipo_documento_estado ('insert','ACTCONF','PUPLAP','pago_exterior','PUPLAP','insertar','superior','');
+select wf.f_import_ttipo_proceso_origen ('insert','PU_AP_ANT','PU','TPLAP','pendiente','manual','');
+select wf.f_import_ttipo_proceso_origen ('insert','PUPLAP','PU','PGA','en_pago','obligatorio','');
+select wf.f_import_ttipo_proceso_origen ('insert','PUPLAP','PU','PPM','en_pago','obligatorio','');
+select wf.f_import_ttipo_proceso_origen ('insert','PUPLAP','PU','PCE','en_pago','obligatorio','');
+
+/***********************************F-DEP-FEA-TES-0-27/11/2018****************************************/
+
+
 
 
