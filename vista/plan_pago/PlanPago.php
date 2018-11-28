@@ -601,8 +601,8 @@ header("content-type: text/javascript; charset=UTF-8");
             {
                 config:{
                     name:'desc_moneda',
-                    fieldLabel:'Mon.',
-                    gwidth: 40,
+                    fieldLabel:'Moneda',
+                    gwidth: 70,
                 },
                 type:'Field',
                 id_grupo:1,
@@ -610,7 +610,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     pfiltro:'mon.codigo',
                     type:'string'
                 },
-                grid:false,
+                grid:true,
                 form:false
             },
 
