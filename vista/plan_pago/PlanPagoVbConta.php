@@ -173,6 +173,16 @@ header("content-type: text/javascript; charset=UTF-8");
                 'ObligacionPagoApropiacion');
         },
         onButtonEdit:function(){
+
+            var anio = new Date();
+            anio = anio.getFullYear();
+            var fecha_inicio = new Date(anio+'/01/1');
+            var fecha_fin = new Date(anio+'/12/31');
+            this.Cmp.fecha_costo_ini.setMinValue(fecha_inicio);
+            this.Cmp.fecha_costo_ini.setMaxValue(fecha_fin);
+            this.Cmp.fecha_costo_fin.setMinValue(fecha_inicio);
+            this.Cmp.fecha_costo_fin.setMaxValue(fecha_fin);
+
             var data = this.getSelectedData();
             Phx.vista.PlanPagoVbConta.superclass.onButtonEdit.call(this);
 

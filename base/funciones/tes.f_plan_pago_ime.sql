@@ -183,13 +183,13 @@ BEGIN
                raise exception 'LA FECHA FINAL NO PUEDE SER MENOR A LA FECHA INICIAL';
             END IF;
 
-		/*	--validador de gestion
+			--validador de gestion
 			v_anio_gestion = ( select date_part('year',now()))::INTEGER;
 
 			IF NOT ((date_part('year',v_parametros.fecha_costo_ini) = v_anio_gestion) and (date_part('year',v_parametros.fecha_costo_fin)=v_anio_gestion)) THEN
                raise exception 'LAS FECHAS NO CORRESPONDEN A LA GESTION ACTUAL';
             END IF;
-		*/
+
 
         	select tipo_obligacion into v_tipo_obligacion
             from tes.tobligacion_pago
