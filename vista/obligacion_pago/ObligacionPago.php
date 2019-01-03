@@ -897,7 +897,8 @@ header("content-type: text/javascript; charset=UTF-8");
             {name: 'fecha_conformidad_final', type: 'date', dateFormat: 'Y-m-d'},
             {name: 'fecha_inicio', type: 'date', dateFormat: 'Y-m-d'},
             {name: 'fecha_fin', type: 'date', dateFormat: 'Y-m-d'},
-            {name: 'observaciones', type: 'string'}
+            {name: 'observaciones', type: 'string'},
+            {name: 'fecha_certificacion_pres', type: 'date', dateFormat: 'Y-m-d'}
 
         ],
 
@@ -1613,11 +1614,12 @@ header("content-type: text/javascript; charset=UTF-8");
         addBotones: function () {
             this.menuAdq = new Ext.Toolbar.SplitButton({
                 id: 'btn-adq-' + this.idContenedor,
-                text: 'Orden de Compra',
+                text: 'Orden Compra',
                 grupo: [0, 1, 2],
                 handler: this.onBtnAdq,
                 disabled: true,
                 scope: this,
+                iconCls: 'bcharge',
                 menu: {
                     items: [{
                         id: 'btn-cot-' + this.idContenedor,
@@ -1939,43 +1941,52 @@ header("content-type: text/javascript; charset=UTF-8");
                             scope: this
                         });
                 }
-            } else {
-
-                this.objWizard = Phx.CP.loadWindows('../../../sis_workflow/vista/estado_wf/FormEstadoWf.php',
-                    'Estado de Wf',
-                    {
-                        modal: true,
-                        width: 700,
-                        height: 450
-                    }, {
-                        configExtra: configExtra,
-                        data: {
-                            id_estado_wf: rec.data.id_estado_wf,
-                            id_proceso_wf: rec.data.id_proceso_wf,
-                            id_obligacion_pago: rec.data.id_obligacion_pago,
-                            fecha_ini: rec.data.fecha_tentativa
-
-                        },
-                        obsValorInicial: obsValorInicial,
-                    }, this.idContenedor, 'FormEstadoWf',
-                    {
-                        config: [{
-                            event: 'beforesave',
-                            delegate: this.onSaveWizard,
-
-                        },
-                            {
-                                event: 'requirefields',
-                                delegate: function () {
-                                    this.onButtonEdit();
-                                    this.window.setTitle('Registre los campos antes de pasar al siguiente estado');
-                                    this.formulario_wizard = 'si';
-                                }
-
-                            }],
-
-                        scope: this
+            }else{
+                if (rec.data.tipo_obligacion == 'pbr' && rec.data.estado == 'vbpresupuestos' && (rec.data.fecha_certificacion_pres == '' || rec.data.fecha_certificacion_pres == null)){
+                    Ext.Msg.show({
+                        title: 'Información',
+                        msg: '<b>Estimado usuario:</b><br>No puede pasar al siguiente estado porque no ha definido la fecha de Certificación Presupuestaria.',
+                        buttons: Ext.Msg.OK,
+                        width: 512,
+                        icon: Ext.Msg.INFO
                     });
+                }else {
+                    this.objWizard = Phx.CP.loadWindows('../../../sis_workflow/vista/estado_wf/FormEstadoWf.php',
+                        'Estado de Wf',
+                        {
+                            modal: true,
+                            width: 700,
+                            height: 450
+                        }, {
+                            configExtra: configExtra,
+                            data: {
+                                id_estado_wf: rec.data.id_estado_wf,
+                                id_proceso_wf: rec.data.id_proceso_wf,
+                                id_obligacion_pago: rec.data.id_obligacion_pago,
+                                fecha_ini: rec.data.fecha_tentativa
+
+                            },
+                            obsValorInicial: obsValorInicial,
+                        }, this.idContenedor, 'FormEstadoWf',
+                        {
+                            config: [{
+                                event: 'beforesave',
+                                delegate: this.onSaveWizard,
+
+                            },
+                                {
+                                    event: 'requirefields',
+                                    delegate: function () {
+                                        this.onButtonEdit();
+                                        this.window.setTitle('Registre los campos antes de pasar al siguiente estado');
+                                        this.formulario_wizard = 'si';
+                                    }
+
+                                }],
+
+                            scope: this
+                        });
+                }
             }
         },
         onSaveWizard: function (wizard, resp) {

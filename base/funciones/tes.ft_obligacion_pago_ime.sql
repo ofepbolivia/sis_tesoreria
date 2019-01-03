@@ -181,7 +181,7 @@ BEGIN
 	if(p_transaccion='TES_OBPG_INS')then
 
         begin
-
+ --raise exception 'v_parametros: %', v_parametros.tipo_obligacion;
              v_resp = tes.f_inserta_obligacion_pago(p_administrador, p_id_usuario,hstore(v_parametros));
             --Devuelve la respuesta
             return v_resp;
@@ -1075,7 +1075,7 @@ BEGIN
 
 
                             -- si es un proceso de pago unico,  la primera cuota pasa de borrador al siguiente estado de manera automatica
-                            IF  ((v_tipo_obligacion = 'ppm' or v_tipo_obligacion = 'pga' or v_tipo_obligacion = 'pce' or v_tipo_obligacion = 'pago_unico') and   v_i = 1)   THEN
+                            IF  ((v_tipo_obligacion = 'pbr' or v_tipo_obligacion = 'ppm' or v_tipo_obligacion = 'pga' or v_tipo_obligacion = 'pce' or v_tipo_obligacion = 'pago_unico') and   v_i = 1)   THEN
                                v_sw_saltar = TRUE;
                             else
                                v_sw_saltar = FALSE;
@@ -1964,9 +1964,9 @@ BEGIN
 
 		begin
 
-
              update tes.tobligacion_pago set
-              obs_presupuestos = v_parametros.obs
+              obs_presupuestos = v_parametros.obs,
+              fecha_certificacion_pres = v_parametros.fecha_cer_pres
              where id_obligacion_pago = v_parametros.id_obligacion_pago;
 
              --Definicion de la respuesta
