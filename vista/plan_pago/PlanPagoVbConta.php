@@ -173,18 +173,24 @@ header("content-type: text/javascript; charset=UTF-8");
                 'ObligacionPagoApropiacion');
         },
         onButtonEdit:function(){
-
-            var anio = new Date();
-            anio = anio.getFullYear();
-            var fecha_inicio = new Date(anio+'/01/1');
-            var fecha_fin = new Date(anio+'/12/31');
-            this.Cmp.fecha_costo_ini.setMinValue(fecha_inicio);
-            this.Cmp.fecha_costo_ini.setMaxValue(fecha_fin);
-            this.Cmp.fecha_costo_fin.setMinValue(fecha_inicio);
-            this.Cmp.fecha_costo_fin.setMaxValue(fecha_fin);
+            this.cmpFecha_tentativa = this.getComponente('fecha_tentativa');
 
             var data = this.getSelectedData();
             Phx.vista.PlanPagoVbConta.superclass.onButtonEdit.call(this);
+
+            // this.Cmp.fecha_tentativa.on('select', function (value, date) {
+            //     var anio = date.getFullYear();
+            //
+            //     var fecha_inicio = new Date(anio + '/01/1');
+            //     var fecha_fin = new Date(anio + '/12/31');
+            //     //control de fechas de inicio y fin de costos
+            //
+            //     this.Cmp.fecha_costo_ini.setMinValue(fecha_inicio);
+            //     this.Cmp.fecha_costo_ini.setMaxValue(fecha_fin);
+            //     this.Cmp.fecha_costo_fin.setMinValue(fecha_inicio);
+            //     this.Cmp.fecha_costo_fin.setMaxValue(fecha_fin);
+            //
+            // }, this);
 
             if(this.Cmp.id_depto_lb.getValue() > 0){
                 this.Cmp.id_cuenta_bancaria.store.baseParams = Ext.apply(this.Cmp.id_cuenta_bancaria.store.baseParams,{ id_depto_lb:this.Cmp.id_depto_lb.getValue(), permiso: 'todos'});
@@ -356,14 +362,27 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.Cmp.fecha_costo_fin.setMinValue(newValue);
                 this.Cmp.fecha_costo_fin.reset();
 
-            }, this)
+            }, this);
 
             //eventos de fechas de costo
             this.Cmp.fecha_costo_fin.on('change',function(o, newValue, oldValue){
                 this.Cmp.fecha_costo_ini.setMaxValue(newValue);
-            }, this)
+            }, this);
 
+            this.Cmp.fecha_costo_ini.on('select', function (value, date) {
 
+                        var anio = date.getFullYear();
+
+                        var fecha_inicio = new Date(anio + '/01/1');
+                        var fecha_fin = new Date(anio + '/12/31');
+                        //control de fechas de inicio y fin de costos
+
+                        this.Cmp.fecha_costo_ini.setMinValue(fecha_inicio);
+                        this.Cmp.fecha_costo_ini.setMaxValue(fecha_fin);
+                        this.Cmp.fecha_costo_fin.setMinValue(fecha_inicio);
+                        this.Cmp.fecha_costo_fin.setMaxValue(fecha_fin);
+
+                    }, this);
 
         },
 
