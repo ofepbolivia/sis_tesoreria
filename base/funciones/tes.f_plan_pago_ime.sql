@@ -162,6 +162,10 @@ DECLARE
     v_desc_persona				varchar;
     v_id_alarma					integer;
 
+    v_fecha_op					varchar;
+    v_anio_op					integer;
+    v_num_tramite				varchar;
+
 BEGIN
 
     v_nombre_funcion = 'tes.f_plan_pago_ime';
@@ -697,6 +701,17 @@ BEGIN
             fecha_costo_fin = v_parametros.fecha_costo_fin/*,
             es_ultima_cuota = v_parametros.es_ultima_cuota*/
             where id_plan_pago = v_parametros.id_plan_pago;
+
+            --control de fechas inicio y fin
+            select date_part('year',op.fecha), to_char(op.fecha,'DD/MM/YYYY')::varchar as fecha, op.num_tramite
+            into v_anio_op, v_fecha_op, v_num_tramite
+            from tes.tobligacion_pago op
+            join tes.tplan_pago pp on pp.id_obligacion_pago = op.id_obligacion_pago
+            where pp.id_obligacion_pago = v_parametros.id_obligacion_pago;
+
+            IF NOT ((date_part('year',v_parametros.fecha_costo_ini) = v_anio_op) and (date_part('year',v_parametros.fecha_costo_fin)=v_anio_op)) THEN
+               raise exception 'LAS FECHAS NO CORRESPONDEN A LA GESTIÓN, NÚMERO DE TRÁMITE % TIENE COMO FECHA %', v_num_tramite,v_fecha_op;
+            END IF;
 
 
             -- chequea fechas de costos inicio y fin

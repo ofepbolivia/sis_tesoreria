@@ -218,16 +218,28 @@ header("content-type: text/javascript; charset=UTF-8");
                 'ObligacionPagoApropiacion');
         },
         onButtonEdit: function () {
+            // this.Cmp.fecha_tentativa.on('select', function (value, anio) {
+            //
+            //     var anio = anio.getFullYear();
+            //
+            //     var fecha_inicio = new Date(anio + '/01/1');
+            //     var fecha_fin = new Date(anio + '/12/31');
+            //     //control de fechas de inicio y fin de costos
+            //
+            //     this.Cmp.fecha_costo_ini.setMinValue(fecha_inicio);
+            //     this.Cmp.fecha_costo_ini.setMaxValue(fecha_fin);
+            //     this.Cmp.fecha_costo_fin.setMinValue(fecha_inicio);
+            //     this.Cmp.fecha_costo_fin.setMaxValue(fecha_fin);
+            // } );
 
-            var anio = new Date();
-            anio = anio.getFullYear();
-            var fecha_inicio = new Date(anio+'/01/1');
-
-            var fecha_fin = new Date(anio+'/12/31');
-            this.Cmp.fecha_costo_ini.setMinValue(fecha_inicio);
-            this.Cmp.fecha_costo_ini.setMaxValue(fecha_fin);
-            this.Cmp.fecha_costo_fin.setMinValue(fecha_inicio);
-            this.Cmp.fecha_costo_fin.setMaxValue(fecha_fin);
+            // var anio = new Date();
+            // anio = anio.getFullYear();
+            // var fecha_inicio = new Date(anio+'/01/1');
+            // var fecha_fin = new Date(anio+'/12/31');
+            // this.Cmp.fecha_costo_ini.setMinValue(fecha_inicio);
+            // this.Cmp.fecha_costo_ini.setMaxValue(fecha_fin);
+            // this.Cmp.fecha_costo_fin.setMinValue(fecha_inicio);
+            // this.Cmp.fecha_costo_fin.setMaxValue(fecha_fin);
 
 
             var data = this.getSelectedData();
@@ -439,6 +451,20 @@ header("content-type: text/javascript; charset=UTF-8");
             //eventos de fechas de costo
             this.Cmp.fecha_costo_fin.on('change', function (o, newValue, oldValue) {
                 this.Cmp.fecha_costo_ini.setMaxValue(newValue);
+            }, this);
+
+            this.Cmp.fecha_costo_ini.on('select', function (value, date) {
+
+                var anio = date.getFullYear();
+
+                var fecha_inicio = new Date(anio + '/01/1');
+                var fecha_fin = new Date(anio + '/12/31');
+                //control de fechas de inicio y fin de costos
+
+                this.Cmp.fecha_costo_ini.setMinValue(fecha_inicio);
+                this.Cmp.fecha_costo_ini.setMaxValue(fecha_fin);
+                this.Cmp.fecha_costo_fin.setMinValue(fecha_inicio);
+                this.Cmp.fecha_costo_fin.setMaxValue(fecha_fin);
             }, this);
 
 

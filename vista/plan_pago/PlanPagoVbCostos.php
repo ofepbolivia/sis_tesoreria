@@ -247,15 +247,20 @@ header("content-type: text/javascript; charset=UTF-8");
         },
         onButtonEdit: function () {
 
-            var anio = new Date();
-            anio = anio.getFullYear();
-            var fecha_inicio = new Date(anio+'/01/1');
+            this.Cmp.fecha_costo_ini.on('select', function (value, date) {
 
-            var fecha_fin = new Date(anio+'/12/31');
-            this.Cmp.fecha_costo_ini.setMinValue(fecha_inicio);
-            this.Cmp.fecha_costo_ini.setMaxValue(fecha_fin);
-            this.Cmp.fecha_costo_fin.setMinValue(fecha_inicio);
-            this.Cmp.fecha_costo_fin.setMaxValue(fecha_fin);
+                var anio = date.getFullYear();
+
+                var fecha_inicio = new Date(anio + '/01/1');
+                var fecha_fin = new Date(anio + '/12/31');
+                //control de fechas de inicio y fin de costos
+
+                this.Cmp.fecha_costo_ini.setMinValue(fecha_inicio);
+                this.Cmp.fecha_costo_ini.setMaxValue(fecha_fin);
+                this.Cmp.fecha_costo_fin.setMinValue(fecha_inicio);
+                this.Cmp.fecha_costo_fin.setMaxValue(fecha_fin);
+            }, this);
+
 
             var data = this.getSelectedData();
             if (data.estado == 'vbfin') {
