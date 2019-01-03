@@ -95,11 +95,11 @@ BEGIN
                        where per.fecha_ini <= (p_hstore->'fecha')::date
                          and per.fecha_fin >= (p_hstore->'fecha')::date
                          limit 1 offset 0;
-
+--raise exception 'tipo: %', (p_hstore->'tipo_obligacion')::varchar;
         IF   (p_hstore->'tipo_obligacion')::varchar = 'adquisiciones'    THEN
              raise exception 'Los pagos de adquisiciones tienen que ser habilitados desde el sistema de adquisiciones';
 
-        ELSIF   (p_hstore->'tipo_obligacion')::varchar  in ('pago_directo','pago_unico','pago_especial', 'pga', 'ppm', 'pce')    THEN
+        ELSIF   (p_hstore->'tipo_obligacion')::varchar  in ('pago_directo','pago_unico','pago_especial', 'pga', 'ppm', 'pce', 'pbr')    THEN
 
 
                  IF (p_hstore->'tipo_obligacion')::varchar  = 'pago_directo' and p_administrador != 2 THEN
@@ -117,6 +117,9 @@ BEGIN
                  ELSIF(p_administrador = 2 OR (p_hstore->'tipo_obligacion')::varchar  = 'pce') THEN
                  	  v_tipo_documento = 'PCE';
                       v_codigo_proceso_macro = 'PCE';
+                 ELSIF(p_administrador = 2 OR (p_hstore->'tipo_obligacion')::varchar  = 'pbr') THEN
+                 	  v_tipo_documento = 'BR';
+                      v_codigo_proceso_macro = 'BR';
                  ELSE
                       v_tipo_documento =  pxp.f_get_variable_global('tes_tipo_documento_especial'); --'PE';
                       v_codigo_proceso_macro = pxp.f_get_variable_global('tes_codigo_macro_especial');--'TES-PD';

@@ -92,6 +92,7 @@ class MODObligacionPago extends MODbase
         $this->captura('fecha_inicio', 'date');
         $this->captura('fecha_fin', 'date');
         $this->captura('observaciones', 'varchar');
+        $this->captura('fecha_certificacion_pres', 'date');
 
 
         //Ejecuta la instruccion
@@ -304,6 +305,7 @@ class MODObligacionPago extends MODbase
         //Define los parametros para la funcion
         $this->setParametro('id_obligacion_pago', 'id_obligacion_pago', 'int4');
         $this->setParametro('obs', 'obs', 'varchar');
+        $this->setParametro('fecha_cer_pres', 'fecha_cer_pres', 'date');
 
         //Ejecuta la instruccion
         $this->armarConsulta();
@@ -892,6 +894,9 @@ class MODObligacionPago extends MODbase
         $this->captura('gestion', 'integer');
         $this->captura('codigo_poa', 'varchar');
         $this->captura('codigo_descripcion', 'varchar');
+        $this->captura('tipo_obligacion', 'varchar');
+        $this->captura('fecha_certificacion_pres', 'date');
+
 
         //Ejecuta la instruccion
         $this->armarConsulta();
