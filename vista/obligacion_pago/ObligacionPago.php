@@ -614,12 +614,13 @@ header("content-type: text/javascript; charset=UTF-8");
                     allowBlank: false,
                     qtip: 'Descripcion del objetivo del pago, o Si el proveedor es PASAJEROS PERJUDICADOS aqui va el nombre del pasajero',
                     anchor: '80%',
-                    gwidth: 100,
+                    gwidth: 200,
                     maxLength: 1000
                 },
                 type: 'TextArea',
                 filters: {pfiltro: 'obpg.obs', type: 'string'},
                 id_grupo: 1,
+                bottom_filter: true,
                 grid: true,
                 form: true
             },
