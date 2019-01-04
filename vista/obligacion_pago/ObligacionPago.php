@@ -610,11 +610,11 @@ header("content-type: text/javascript; charset=UTF-8");
             {
                 config: {
                     name: 'obs',
-                    fieldLabel: 'Desc',
+                    fieldLabel: 'Justificación',
                     allowBlank: false,
                     qtip: 'Descripcion del objetivo del pago, o Si el proveedor es PASAJEROS PERJUDICADOS aqui va el nombre del pasajero',
                     anchor: '80%',
-                    gwidth: 200,
+                    gwidth: 250,
                     maxLength: 1000
                 },
                 type: 'TextArea',
