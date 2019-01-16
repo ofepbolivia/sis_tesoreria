@@ -1843,3 +1843,18 @@ ALTER TABLE tes.ttipo_plan_pago
 ALTER TABLE tes.tts_libro_bancos
   ADD COLUMN tabla VARCHAR(255);
 /*****************************F-SCP-FEA-TES-0-07/11/2018*************/
+
+/*****************************I-SCP-MAY-TES-0-11/01/2019*************/
+ALTER TABLE tes.tobligacion_pago
+  ADD COLUMN fecha_costo_ini_pp DATE;
+
+COMMENT ON COLUMN tes.tobligacion_pago.fecha_costo_ini_pp
+IS 'fecha inicial para reflejar en plan de pago';
+
+
+ALTER TABLE tes.tobligacion_pago
+  ADD COLUMN fecha_costo_fin_pp DATE;
+
+COMMENT ON COLUMN tes.tobligacion_pago.fecha_costo_fin_pp
+IS 'fecha fin para reflejar en plan de pago';
+/*****************************F-SCP-MAY-TES-0-11/01/2019*************/
