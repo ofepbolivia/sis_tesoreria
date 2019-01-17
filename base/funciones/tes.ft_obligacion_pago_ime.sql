@@ -439,7 +439,7 @@ BEGIN
                into
                	v_id_tipo_estado
                from wf.tproceso_wf pw
-               inner join wf.ttipo_proceso tp on pw.id_tipo_proceso = tp.id_tipo_proceso
+               inner join wf.ttipo_proceso tp on pw.id_tipo_proceso = tp.id_tipo_proceso and tp.estado_reg != 'inactivo'
                inner join wf.ttipo_estado te on te.id_tipo_proceso = tp.id_tipo_proceso and te.codigo = 'anulado'
                where pw.id_proceso_wf = v_registros.id_proceso_wf;
 
@@ -854,7 +854,7 @@ BEGIN
 
                         -- Chequear si la obligacion original tiene un saldo anticipado
                         v_saldo_x_pagar = 0;
-                        v_saldo_x_pagar = tes.f_determinar_total_faltante(v_registros_op_ori.id_obligacion_pago,'anticipo_sin_aplicar');
+                        --v_saldo_x_pagar = tes.f_determinar_total_faltante(v_registros_op_ori.id_obligacion_pago,'anticipo_sin_aplicar');
 
 
 

@@ -706,6 +706,9 @@ class MODObligacionPago extends MODbase
             $this->setParametro('tipo_anticipo', 'tipo_anticipo', 'varchar');
             $this->setParametro('id_contrato', 'id_contrato', 'int4');
 
+            $this->setParametro('fecha_costo_ini_pp', 'fecha_costo_ini_pp', 'date');
+            $this->setParametro('fecha_costo_fin_pp', 'fecha_costo_fin_pp', 'date');
+
             //Ejecuta la instruccion
             $this->armarConsulta();
             $stmt = $link->prepare($this->consulta);

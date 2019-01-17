@@ -48,7 +48,7 @@ DECLARE
     v_registros_con 			record;
     v_id_documento_wf_op 		integer;
 
-
+    v_anio_ges					integer;
 
 
 
@@ -243,6 +243,17 @@ BEGIN
 
             -- raise exception 'estado %',v_codigo_estado;
 
+            --control fecha inicio y fin
+            IF ((p_hstore->'fecha_costo_ini_pp')::date > (p_hstore->'fecha_costo_fin_pp')::date) then
+            	raise exception 'LA FECHA FINAL NO PUEDE SER MENOR A LA FECHA INICIAL';
+            END IF;
+
+            --control de fecha inicio y fin que correspondan a la gestion de fecha sol
+            v_anio_ges = date_part('year',(p_hstore->'fecha')::date);
+            IF NOT ((date_part('year',(p_hstore->'fecha_costo_ini_pp')::date) = v_anio_ges) and (date_part('year',(p_hstore->'fecha_costo_fin_pp')::date)=v_anio_ges)) THEN
+               raise exception 'LA FECHA INICIO Y FECHA FIN NO CORRESPONDEN A LA GESTION DE LA FECHA SOLICITADA. FECHA SOL: % PERTENECE A LA GESTION: %',(p_hstore->'fecha')::date,v_anio_ges;
+            END IF;
+
 
         	--Sentencia de la insercion
         	insert into tes.tobligacion_pago(
@@ -277,7 +288,9 @@ BEGIN
             usuario_ai,
             tipo_anticipo,
             id_funcionario_gerente,
-            id_contrato
+            id_contrato,
+            fecha_costo_ini_pp,
+            fecha_costo_fin_pp
 
           	) values(
 			(p_hstore->'id_proveedor')::integer,
@@ -311,10 +324,19 @@ BEGIN
             (p_hstore->'_nombre_usuario_ai')::varchar,
             (p_hstore->'tipo_anticipo')::varchar,
              va_id_funcionario_gerente[1],
-            (p_hstore->'id_contrato')::integer
+            (p_hstore->'id_contrato')::integer,
+            (p_hstore->'fecha_costo_ini_pp')::date,
+            (p_hstore->'fecha_costo_fin_pp')::date
 
 			)RETURNING id_obligacion_pago into v_id_obligacion_pago;
 
+
+            --actualizar fecha inicio y fecha fin de forma automatica al pasarse a un PGA
+                update tes.tobligacion_pago set
+                fecha_costo_ini_pp = case when p_administrador = 2 then (p_hstore->'fecha')::date else (p_hstore->'fecha_costo_ini_pp')::date end,
+                fecha_costo_fin_pp = case when p_administrador = 2 then (p_hstore->'fecha')::date else (p_hstore->'fecha_costo_fin_pp')::date end
+            	where
+                id_proceso_wf = v_id_proceso_wf;
 
             -- inserta documentos en estado borrador si estan configurados
             v_resp_doc =  wf.f_inserta_documento_wf(p_id_usuario, v_id_proceso_wf, v_id_estado_wf);

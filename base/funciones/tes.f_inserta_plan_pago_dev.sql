@@ -248,7 +248,7 @@ BEGIN
 
           v_monto_ant_parcial_descontado = tes.f_determinar_total_faltante((p_hstore->'id_obligacion_pago')::integer, 'ant_parcial_descontado' );
           IF v_monto_ant_parcial_descontado <  COALESCE((p_hstore->'descuento_anticipo')::numeric,0)  THEN
-              raise exception 'El decuento por anticipo no puede exceder el faltante por descontar que es  %',v_monto_ant_parcial_descontado;
+              raise exception 'El descuento por anticipo no puede exceder el faltante por descontar que es  %',v_monto_ant_parcial_descontado;
           END IF;
 
 
