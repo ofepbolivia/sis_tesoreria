@@ -52,8 +52,6 @@ DECLARE
 
 
 
-
-
 BEGIN
 
     v_nombre_funcion = 'f_inserta_obligacion_pago';
@@ -332,6 +330,13 @@ BEGIN
 
 			)RETURNING id_obligacion_pago into v_id_obligacion_pago;
 
+
+            --actualizar fecha inicio y fecha fin de forma automatica al pasarse a un PGA
+                update tes.tobligacion_pago set
+                fecha_costo_ini_pp = case when p_administrador = 2 then (p_hstore->'fecha')::date else (p_hstore->'fecha_costo_ini_pp')::date end,
+                fecha_costo_fin_pp = case when p_administrador = 2 then (p_hstore->'fecha')::date else (p_hstore->'fecha_costo_fin_pp')::date end
+            	where
+                id_proceso_wf = v_id_proceso_wf;
 
             -- inserta documentos en estado borrador si estan configurados
             v_resp_doc =  wf.f_inserta_documento_wf(p_id_usuario, v_id_proceso_wf, v_id_estado_wf);
