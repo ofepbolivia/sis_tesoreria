@@ -131,14 +131,14 @@ Phx.vista.ObligacionPagoSol = {
                  this.cmpFuncionario.enable();             
                  this.cmpFuncionario.store.baseParams.fecha = this.cmpFecha.getValue().dateFormat(this.cmpFecha.format);
                  
-                 this.cmpFuncionario.store.load({params:{start:0,limit:this.tam_pag}, 
+                 this.cmpFuncionario.store.load({params:{start:0,limit:this.tam_pag},
                        callback : function (r) {
-                            Phx.CP.loadingHide();                        
-                            if (r.length == 1 ) {                        
+                            Phx.CP.loadingHide();
+                            if (r.length == 1 ) {
                                 this.cmpFuncionario.setValue(r[0].data.id_funcionario);
                                 this.cmpFuncionario.fireEvent('select',  this.cmpFuncionario, r[0]);
-                            }     
-                                            
+                            }
+
                         }, scope : this
                     });
                  
@@ -158,12 +158,12 @@ Phx.vista.ObligacionPagoSol = {
             	this.Cmp.id_depto.modificado = true;
             	this.Cmp.id_depto.enable();
             	
-            	this.Cmp.id_depto.store.load({params:{start:0,limit:this.tam_pag}, 
+                this.Cmp.id_depto.store.load({params:{start:0,limit:this.tam_pag},
 		           callback : function (r) {
-		                if (r.length == 1 ) {                       
+		                if (r.length == 1 ) {
 		                    this.Cmp.id_depto.setValue(r[0].data.id_depto);
-		                }    
-		                                
+		                }
+
 		            }, scope : this
 		        });
             	
@@ -246,11 +246,15 @@ Phx.vista.ObligacionPagoSol = {
             
        
 		this.Cmp.id_proveedor.on('select', function(cmb,rec,ind){
+            var fecha = this.Cmp.fecha.getValue().toLocaleDateString();
+
 			this.Cmp.id_contrato.enable();
 			this.Cmp.id_contrato.reset();
 			this.Cmp.id_contrato.store.baseParams.filter = "[{\"type\":\"numeric\",\"comparison\":\"eq\", \"value\":\""+cmb.getValue()+"\",\"field\":\"CON.id_proveedor\"}]";
 			//this.Cmp.id_contrato.store.baseParams.filtro_directo = "((CON.fecha_fin is null) or ((con.fecha_fin + interval ''3 month'')::date >= now()::date))";
-            this.Cmp.id_contrato.store.baseParams.filtro_directo = "((CON.fecha_fin is null) or ((con.fecha_fin)::date >= now()::date))";
+            // this.Cmp.id_contrato.store.baseParams.filtro_directo = "((CON.fecha_fin is null) or ((con.fecha_fin)::date >= now()::date))";
+            this.Cmp.id_contrato.store.baseParams.filtro_directo = "((CON.fecha_fin is null) or (con.fecha_fin)::date >= ''"+fecha+"''::date)";
+
             this.Cmp.id_contrato.modificado = true;
 		}, this);
 		
@@ -324,7 +328,6 @@ Phx.vista.ObligacionPagoSol = {
     
     onButtonNew:function(){
 
-
         Phx.vista.ObligacionPagoSol.superclass.onButtonNew.call(this);
        
         
@@ -346,7 +349,7 @@ Phx.vista.ObligacionPagoSol = {
         this.ocultarComponente(this.Cmp.rotacion);
         
         this.cmpFecha.setValue(new Date());
-        this.cmpFecha.fireEvent('change')
+        this.cmpFecha.fireEvent('change');
         this.cmpTipoObligacion.setValue('pago_directo');
 
 
