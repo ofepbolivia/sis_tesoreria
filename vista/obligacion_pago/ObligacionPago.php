@@ -407,20 +407,56 @@ header("content-type: text/javascript; charset=UTF-8");
             {
                 config: {
                     name: 'id_proveedor',
+                    hiddenName: 'id_proveedor',
                     fieldLabel: 'Proveedor',
-                    anchor: '80%',
-                    tinit: false,
+                    // typeAhead: false,
+                    forceSelection: true,
                     allowBlank: false,
-                    origen: 'PROVEEDOR',
-                    gdisplayField: 'desc_proveedor',
+                    // disabled: true,
+                    emptyText: 'Proveedor...',
+                    store: new Ext.data.JsonStore({
+                        url:'../../sis_parametros/control/Proveedor/listarProveedorCombos',
+                        id: 'id_proveedor',
+                        root: 'datos',
+                        sortInfo:{
+                            field: 'rotulo_comercial',
+                            direction: 'ASC'
+                        },
+                        totalProperty: 'total',
+                        fields: ['id_proveedor','desc_proveedor','codigo','nit','rotulo_comercial','lugar','email'],
+                        // turn on remote sorting
+                        remoteSort: true,
+                        baseParams:Ext.apply({par_filtro:'desc_proveedor#codigo#nit#rotulo_comercial'})
+
+                    }),
+                    valueField: 'id_proveedor',
+                    displayField: 'desc_proveedor',
+                    // gdisplayField: 'desc_contrato',
+                    triggerAction: 'all',
+                    lazyRender: true,
+                    resizable: true,
+                    mode: 'remote',
+                    pageSize: 10,
+                    queryDelay: 1000,
+                    listWidth: 280,
+                    minChars: 2,
                     gwidth: 100,
-                    listWidth: '280',
-                    resizable: true
+                    anchor: '80%',
+                    renderer: function (value, p, record) {
+                        if (record.data['desc_proveedor']) {
+                            return String.format('{0}', record.data['desc_proveedor']);
+                        }
+                        return '';
+
+                    },
+                    tpl: '<tpl for="."><div class="x-combo-list-item"><p><b>{rotulo_comercial}</b></p><p>{desc_proveedor}</p><p>{codigo}</p><p>NIT:{nit}</p><p>Lugar:{lugar}</p><p>Email: {email}</p></div></tpl>',
                 },
-                type: 'ComboRec',
-                id_grupo: 1,
-                filters: {pfiltro: 'pv.desc_proveedor', type: 'string'},
-                bottom_filter: true,
+                type: 'ComboBox',
+                id_grupo: 0,
+                filters: {
+                    pfiltro: 'pv.desc_proveedor',
+                    type: 'string'
+                },
                 grid: true,
                 form: true
             },
@@ -443,11 +479,11 @@ header("content-type: text/javascript; charset=UTF-8");
                             direction: 'ASC'
                         },
                         totalProperty: 'total',
-                        fields: ['id_contrato', 'numero', 'tipo', 'objeto', 'estado', 'desc_proveedor', 'monto', 'moneda', 'fecha_inicio', 'fecha_fin'],
+                        fields: ['id_contrato','nro_tramite', 'numero', 'tipo', 'objeto', 'estado', 'desc_proveedor', 'monto', 'moneda', 'fecha_inicio', 'fecha_fin'],
                         // turn on remote sorting
                         remoteSort: true,
                         baseParams: {
-                            par_filtro: 'con.numero#con.tipo#con.monto#prov.desc_proveedor#con.objeto#con.monto',
+                            par_filtro: 'con.nro_tramite#con.numero#con.tipo#con.monto#prov.desc_proveedor#con.objeto#con.monto',
                             tipo_proceso: "CON",
                             tipo_estado: "finalizado"
                         }
@@ -472,7 +508,7 @@ header("content-type: text/javascript; charset=UTF-8");
                         return '';
 
                     },
-                    tpl: '<tpl for="."><div class="x-combo-list-item"><p>Nro: {numero} ({tipo})</p><p>Obj: <strong>{objeto}</strong></p><p>Prov : {desc_proveedor}</p> <p>Monto: {monto} {moneda}</p><p>Rango: {fecha_inicio} al {fecha_fin}</p></div></tpl>'
+                    tpl: '<tpl for="."><div class="x-combo-list-item"><p><b>Nro: {numero} ({tipo})</b></p><p>Obj: <strong>{objeto}</strong></p><p>Prov : {desc_proveedor}</p> <p>Nro.Trámite: {nro_tramite}</p><p>Monto: {monto} {moneda}</p><p>Rango: {fecha_inicio} al {fecha_fin}</p></div></tpl>'
                 },
                 type: 'ComboBox',
                 id_grupo: 0,
@@ -501,20 +537,60 @@ header("content-type: text/javascript; charset=UTF-8");
             {
                 config: {
                     name: 'id_moneda',
+                    hiddenName: 'id_moneda',
                     fieldLabel: 'Moneda',
-                    anchor: '80%',
-                    tinit: false,
+                    // typeAhead: false,
+                    forceSelection: true,
                     allowBlank: false,
-                    origen: 'MONEDA',
-                    gdisplayField: 'moneda',
+                    // disabled: true,
+                    emptyText: 'Moneda...',
+                    store: new Ext.data.JsonStore({
+                        url:'../../sis_parametros/control/Moneda/listarMoneda',
+                        id: 'id_moneda',
+                        root: 'datos',
+                        sortInfo:{
+                            field: 'moneda',
+                            direction: 'ASC'
+                        },
+                        totalProperty: 'total',
+                        fields: ['id_moneda','moneda','codigo','tipo_moneda','codigo_internacional'],
+                        // turn on remote sorting
+                        remoteSort: true,
+                        baseParams:Ext.apply({par_filtro:'moneda#codigo',filtrar:'si'})
+
+                    }),
+                    valueField: 'id_moneda',
+                    displayField: 'moneda',
+                     // gdisplayField: 'desc_contrato',
+                    triggerAction: 'all',
+                    lazyRender: true,
+                    resizable: true,
+                    mode: 'remote',
+                    pageSize: 10,
+                    queryDelay: 1000,
+                    listWidth: 280,
+                    minChars: 2,
                     gwidth: 100,
+                    anchor: '80%',
+                    renderer: function (value, p, record) {
+                        if (record.data['moneda']) {
+                            return String.format('{0}', record.data['moneda']);
+                        }
+                        return '';
+
+                    },
+                    tpl: '<tpl for="."><div class="x-combo-list-item"><p><b>Moneda:{moneda}</b></p><p>Codigo:{codigo}</p> <p>Codigo Internacional:{codigo_internacional}</p></div></tpl>',
                 },
-                type: 'ComboRec',
-                id_grupo: 1,
-                filters: {pfiltro: 'mn.moneda', type: 'string'},
+                type: 'ComboBox',
+                id_grupo: 0,
+                filters: {
+                    pfiltro: 'mn.moneda',
+                    type: 'string'
+                },
                 grid: true,
                 form: true
-            }, {
+            },
+            {
                 config: {
                     name: 'pago_variable',
                     fieldLabel: 'Pago Variable',
