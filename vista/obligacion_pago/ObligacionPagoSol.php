@@ -251,7 +251,21 @@ header("content-type: text/javascript; charset=UTF-8");
 
 
             this.Cmp.id_proveedor.on('select', function (cmb, rec, ind) {
-                var fecha = this.Cmp.fecha.getValue().toLocaleDateString();
+                // var fecha = this.Cmp.fecha.getValue().toLocaleDateString();
+                var fecha = this.Cmp.fecha.getValue();
+
+                var dd = fecha.getDate();
+                var mm = fecha.getMonth() + 1; //January is 0!
+                var yyyy = fecha.getFullYear();
+                if (dd < 10) {
+                    dd = '0' + dd;
+                }
+                if (mm < 10) {
+                    mm = '0' + mm;
+                }
+
+                var today = dd + '/' + mm + '/' + yyyy;
+
 
                 var anio = this.Cmp.fecha.getValue();
                 anio = anio.getFullYear();
@@ -261,34 +275,10 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.Cmp.id_contrato.store.baseParams.filter = "[{\"type\":\"numeric\",\"comparison\":\"eq\", \"value\":\"" + cmb.getValue() + "\",\"field\":\"CON.id_proveedor\"}]";
                 //this.Cmp.id_contrato.store.baseParams.filtro_directo = "((CON.fecha_fin is null) or ((con.fecha_fin + interval ''3 month'')::date >= now()::date))";
                 // this.Cmp.id_contrato.store.baseParams.filtro_directo = "((CON.fecha_fin is null) or ((con.fecha_fin)::date >= now()::date))";
-                this.Cmp.id_contrato.store.baseParams.filtro_directo = "(((CON.fecha_fin is null) or (con.fecha_fin)::date >= (''" + fecha + "''::date)) and (pw.nro_tramite LIKE ''LEGAL%'' or ((pw.nro_tramite LIKE ''CI%'' or pw.nro_tramite LIKE ''CN%'')  and  (ges.gestion < ''"+ anio +"''))))";
+                this.Cmp.id_contrato.store.baseParams.filtro_directo = "(((CON.fecha_fin is null) or (con.fecha_fin)::date >= (''" + today + "''::date)) and (pw.nro_tramite LIKE ''LEGAL%'' or ((pw.nro_tramite LIKE ''CI%'' or pw.nro_tramite LIKE ''CN%'')  and  (ges.gestion < ''"+ anio +"''))))";
                 this.Cmp.id_contrato.modificado = true;
 
             }, this);
-
-            //comparacion de gestion entre fecha y tramite
-            // this.Cmp.id_proveedor.on('select', function (cmb, rec, ind) {
-            //     var anio = this.Cmp.fecha.getValue();
-            //     anio = anio.getFullYear();
-            //     // switch (anio){
-            //     //     case  2016: var id = '14'; break;
-            //     //     case  2017: var id = '15'; break;
-            //     //     case  2018: var id = '16'; break;
-            //     //     case  2019: var id = '17'; break;
-            //     //     case  2020: var id = '18'; break;
-            //     //     case  2021: var id = '19'; break;
-            //     //     case  2022: var id = '20'; break;
-            //     //      }
-            //     console.log(anio);
-            //
-            //    //  this.Cmp.id_contrato.store.baseParams.filtro_directo = "(((CON.nro_tramite = 'CI%' and con.nro_tramite = 'CN%')  and (con.id_gestion != ''"+id+"'')) )";
-            //    //  this.Cmp.id_contrato.store.baseParams.filtro_directo = "(ges.gestion = ''"+anio+"'')";
-            //    //  this.Cmp.id_contrato.store.baseParams.filtro_directo = "(pw.nro_tramite = ''LEGAL%'' or ((pw.nro_tramite = ''CI%'' or pw.nro_tramite = ''CN%'')  and  (ges.gestion != ''"+anio+"'')))";
-            //     this.Cmp.id_contrato.store.baseParams.filtro_directo = "(pw.nro_tramite LIKE ''LEGAL%'' or ((pw.nro_tramite LIKE ''CI%'' or pw.nro_tramite LIKE ''CN%'')  and  (ges.gestion != ''"+anio+"'')))";
-            //
-            //
-            //
-            // }, this);
 
             this.Cmp.id_funcionario.on('select', function (combo, record, index) {
                 if (!record.data.id_lugar) {
