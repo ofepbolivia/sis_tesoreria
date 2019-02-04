@@ -102,7 +102,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     config:{
                         name:'id_concepto_ingas',
                         fieldLabel:'Concepto Ingreso Gasto',
-                        allowBlank:true,
+                        allowBlank:false,
                         emptyText:'Concepto Ingreso Gasto...',
                         store: new Ext.data.JsonStore({
                             url: '../../sis_parametros/control/ConceptoIngas/listarConceptoIngasMasPartida',
@@ -116,7 +116,7 @@ header("content-type: text/javascript; charset=UTF-8");
                             fields: ['id_concepto_ingas','tipo','desc_ingas','movimiento','desc_partida','id_grupo_ots','filtro_ot','requiere_ot'],
                             // turn on remote sorting
                             remoteSort: true,
-                            baseParams:{par_filtro:'desc_ingas#par.codigo#par.nombre_partida',movimiento:'gasto', autorizacion: 'pago_directo',autorizacion_nulos: 'no'}
+                            baseParams:{par_filtro:'desc_ingas#par.codigo#par.nombre_partida',movimiento:'gasto' ,autorizacion_nulos: 'no'}
                         }),
                         valueField: 'id_concepto_ingas',
                         displayField: 'desc_ingas',
@@ -663,4 +663,4 @@ header("content-type: text/javascript; charset=UTF-8");
             bsave:false
         }
     )
-</script>	
+</script>
