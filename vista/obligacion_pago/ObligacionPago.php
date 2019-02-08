@@ -114,12 +114,12 @@ header("content-type: text/javascript; charset=UTF-8");
 
             //RCM: reporte de verificacion presupeustaria
             this.addButton('btnCheckPresupeusto', {
-                text: 'Rev. Pres.',
+                text: 'Rev./Incr. Pres.',
                 grupo: [0, 1, 2],
                 iconCls: 'bassign',
                 disabled: false,
                 handler: this.onBtnCheckPresup,
-                tooltip: '<b>Revertir  presupuestos,  permite ver la evolucón presupuestaria y revertir parcialmente</b>'
+                tooltip: '<b>Revertir/Incrementar  presupuestos,  permite ver la evolucón presupuestaria y revertir parcialmente</b>'
             });
 
             //this.addButton('diagrama_gantt',{grupo:[0,1,2],text:'Gant', iconCls: 'bgantt', disabled:true, handler:diagramGantt,tooltip: '<b>Diagrama Gantt de proceso macro</b>'});
@@ -457,6 +457,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     pfiltro: 'pv.desc_proveedor',
                     type: 'string'
                 },
+                bottom_filter: true,
                 grid: true,
                 form: true
             },

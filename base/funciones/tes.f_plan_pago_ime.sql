@@ -167,6 +167,12 @@ DECLARE
     v_num_tramite				varchar;
     v_anio_ges					integer;
 
+    v_sum_monto_pp				numeric;
+    v_sum_monto_pe				numeric;
+    v_sum_total_pp				numeric;
+    v_sum_monto_solo_pp			numeric;
+
+
 BEGIN
 
     v_nombre_funcion = 'tes.f_plan_pago_ime';
@@ -218,6 +224,67 @@ BEGIN
                raise exception 'LAS FECHAS NO CORRESPONDEN A LA GESTION ACTUAL';
             END IF;
 			*/
+
+             --si es un pago variable, controla que el total del plan de pago no sea mayor a lo comprometido
+                       select
+
+                            op.num_tramite,
+                            op.id_proceso_wf,
+                            op.id_estado_wf,
+                            op.estado,
+                            op.id_depto,
+                            op.pago_variable
+                          into v_registros
+                           from tes.tobligacion_pago op
+                           where op.id_obligacion_pago = v_parametros.id_obligacion_pago;
+
+
+                        select
+                            pp.monto,
+                            pp.estado,
+                            pp.tipo,
+                            pp.id_plan_pago_fk,
+                            pp.porc_monto_retgar,
+                            pp.descuento_anticipo,
+                            pp.monto_ejecutar_total_mo,
+                            pp.monto_anticipo
+                           into
+                             v_registros_pp
+                           from tes.tplan_pago pp
+                           where pp.estado_reg='activo'
+                           and pp.id_obligacion_pago = v_parametros.id_obligacion_pago;
+
+                      IF v_registros.pago_variable='si' or v_registros.pago_variable='no' THEN
+
+                            SELECT sum(pp.monto)
+                            INTO v_sum_monto_pp
+                            FROM tes.tplan_pago pp
+                            WHERE pp.estado != 'anulado'
+                            and pp.id_obligacion_pago = v_parametros.id_obligacion_pago;
+
+                            SELECT sum(pe.monto)
+                            INTO v_sum_monto_pe
+                            FROM pre.tpartida_ejecucion pe
+                            join tes.tobligacion_pago opa on opa.num_tramite = pe.nro_tramite
+                            WHERE opa.id_obligacion_pago = v_parametros.id_obligacion_pago;
+
+                            v_sum_total_pp = v_sum_monto_pp + v_parametros.monto;
+
+                          -- raise exception 'llegaaaa %>= %', v_sum_monto_pp,v_sum_monto_pe ;
+                            IF (v_sum_total_pp > v_sum_monto_pe) THEN
+                              raise exception ' El monto total de las cuotas es de % y excede al monto total certificado de % para el trámite %. Comunicarse con la Unidad de Presupuestos. ',v_sum_total_pp, v_sum_monto_pe, v_registros.num_tramite ;
+                            END IF;
+
+                            v_sum_total_pp = v_parametros.monto;
+
+                            IF (v_sum_total_pp > v_sum_monto_pe) THEN
+                              raise exception ' El monto total de las cuotas es de % y excede al monto total certificado de % para el trámite %. Comunicarse con la Unidad de Presupuestos. ',v_sum_total_pp, v_sum_monto_pe, v_registros.num_tramite ;
+                            END IF;
+
+
+
+                      END IF;
+                 ----
 
         	select tipo_obligacion into v_tipo_obligacion
             from tes.tobligacion_pago
@@ -429,7 +496,7 @@ BEGIN
                      IF v_registros.pago_variable='no' THEN
                         v_monto_total = tes.f_determinar_total_faltante(v_parametros.id_obligacion_pago, 'registrado');
                         IF (v_monto_total + v_registros_pp.monto)  <  v_parametros.monto  THEN
-                          raise exception 'No puede exceder el total a pagar en obligaciones no variables';
+                          raise exception 'No puede exceder el total a pagar en obligaciones no variables.';
                         END IF;
 
                         --   si es  un pago no variable  (si es una cuota de devengao_pagado, devegando_pagado_1c, pagado)
@@ -481,6 +548,36 @@ BEGIN
                                 END IF;
                      END IF;
 
+
+                      --si es un pago variable, controla que el total del plan de pago no sea mayor a lo comprometido
+                      IF v_registros.pago_variable='si' or v_registros.pago_variable='no' THEN
+
+                            SELECT sum(pp.monto)
+                            INTO v_sum_monto_pp
+                            FROM tes.tplan_pago pp
+                            WHERE pp.estado != 'anulado'
+                            and pp.id_obligacion_pago = v_parametros.id_obligacion_pago;
+
+                            SELECT pp.monto
+                            INTO v_sum_monto_solo_pp
+                            FROM tes.tplan_pago pp
+                            WHERE pp.id_obligacion_pago = v_parametros.id_obligacion_pago;
+
+                            SELECT sum(pe.monto)
+                            INTO v_sum_monto_pe
+                            FROM pre.tpartida_ejecucion pe
+                            join tes.tobligacion_pago opa on opa.num_tramite = pe.nro_tramite
+                            WHERE opa.id_obligacion_pago = v_parametros.id_obligacion_pago;
+
+                            v_sum_total_pp = (v_sum_monto_pp - v_sum_monto_solo_pp) + v_parametros.monto;
+                             -- raise exception '% = % - % + %',v_sum_total_pp,  v_sum_monto_pp, v_sum_monto_solo_pp, v_parametros.monto;
+
+                           IF ((v_sum_total_pp) > v_sum_monto_pe) THEN
+                              raise exception ' El monto total de las cuotas es de % y excede al monto total certificado de % para el trámite %. Comunicarse con la Unidad de Presupuestos. ',v_sum_total_pp, v_sum_monto_pe, v_registros.num_tramite ;
+                            END IF;
+
+                        END IF;
+                   --
 
                END IF;
 
