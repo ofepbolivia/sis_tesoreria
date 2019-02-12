@@ -561,7 +561,7 @@ BEGIN
                             SELECT pp.monto
                             INTO v_sum_monto_solo_pp
                             FROM tes.tplan_pago pp
-                            WHERE pp.id_obligacion_pago = v_parametros.id_obligacion_pago;
+                            WHERE pp.id_plan_pago= v_parametros.id_plan_pago;
 
                             SELECT sum(pe.monto)
                             INTO v_sum_monto_pe

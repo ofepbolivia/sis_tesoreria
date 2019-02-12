@@ -1858,3 +1858,8 @@ ALTER TABLE tes.tobligacion_pago
 COMMENT ON COLUMN tes.tobligacion_pago.fecha_costo_fin_pp
 IS 'fecha fin para reflejar en plan de pago';
 /*****************************F-SCP-MAY-TES-0-11/01/2019*************/
+
+/*****************************I-SCP-MAY-TES-0-11/02/2019*************/
+ALTER TABLE tes.tobligacion_det
+  ALTER COLUMN id_orden_trabajo SET NOT NULL;
+/*****************************F-SCP-MAY-TES-0-11/02/2019*************/
