@@ -548,10 +548,121 @@ header("content-type: text/javascript; charset=UTF-8");
                 id_grupo:1,
                 grid:true,
                 form:true
-            },{
+            },
+            {
+                config:{
+                    name:'id_depto_lb',
+                    hiddenName: 'id_depto_lb',
+                    //url: '../../sis_parametros/control/Depto/listarDepto',
+                    origen: 'DEPTO',
+                    allowBlank: false,
+                    fieldLabel: 'Libro de bancos destino',
+                    disabled: false,
+                    width: '80%',
+                    baseParams: { estado:'activo', codigo_subsistema: 'TES',modulo:'LB',tipo_filtro:'DEPTO_UO' },
+                    gdisplayField:'desc_depto_lb',
+                    gwidth: 120
+                },
+                //type:'TrigguerCombo',
+                filters:{pfiltro:'depto.nombre',type:'string'},
+                type:'ComboRec',
+                id_grupo: 1,
+                form: false,
+                grid: true
+            },
+            {
+                config:{
+                    name: 'id_cuenta_bancaria',
+                    fieldLabel: 'Cuenta Bancaria Pago',
+                    allowBlank: false,
+                    emptyText:'Elija una Cuenta...',
+                    store:new Ext.data.JsonStore(
+                        {
+                            url: '../../sis_tesoreria/control/CuentaBancaria/listarCuentaBancariaUsuario',
+                            id: 'id_cuenta_bancaria',
+                            root:'datos',
+                            sortInfo:{
+                                field:'id_cuenta_bancaria',
+                                direction:'ASC'
+                            },
+                            totalProperty:'total',
+                            fields: ['id_cuenta_bancaria','nro_cuenta','nombre_institucion','codigo_moneda','centro','denominacion'],
+                            remoteSort: true,
+                            baseParams : {
+                                par_filtro :'nro_cuenta'
+                            }
+                        }),
+                    tpl:'<tpl for="."><div class="x-combo-list-item"><p><b>{nro_cuenta}</b></p><p>Moneda: {codigo_moneda}, {nombre_institucion}</p><p>{denominacion}, Centro: {centro}</p></div></tpl>',
+                    valueField: 'id_cuenta_bancaria',
+                    hiddenValue: 'id_cuenta_bancaria',
+                    displayField: 'nro_cuenta',
+                    gdisplayField:'desc_cuenta_bancaria',
+                    listWidth:'280',
+                    forceSelection:true,
+                    typeAhead: false,
+                    triggerAction: 'all',
+                    lazyRender:true,
+                    mode:'remote',
+                    pageSize:20,
+                    queryDelay:500,
+                    gwidth: 250,
+                    minChars:2,
+                    renderer:function(value, p, record){return String.format('{0}', record.data['desc_cuenta_bancaria']);}
+                },
+                type:'ComboBox',
+                filters:{pfiltro:'cb.nro_cuenta',type:'string'},
+                id_grupo:1,
+                grid:true,
+                form:false
+            },
+            {
+                config:{
+                    name: 'id_cuenta_bancaria_mov',
+                    fieldLabel: 'Depósito',
+                    allowBlank: true,
+                    emptyText : 'Depósito...',
+                    store: new Ext.data.JsonStore({
+                        url:'../../sis_tesoreria/control/TsLibroBancos/listarTsLibroBancosDepositosConSaldo',
+                        id : 'id_cuenta_bancaria_mov',
+                        root: 'datos',
+                        sortInfo:{
+                            field: 'fecha',
+                            direction: 'DESC'
+                        },
+                        totalProperty: 'total',
+                        fields: ['id_libro_bancos','id_cuenta_bancaria','fecha','detalle','observaciones','importe_deposito','saldo'],
+                        remoteSort: true,
+                        baseParams:{par_filtro:'detalle#observaciones#fecha'}
+                    }),
+                    valueField: 'id_libro_bancos',
+                    displayField: 'importe_deposito',
+                    gdisplayField: 'desc_deposito',
+                    hiddenName: 'id_cuenta_bancaria_mov',
+                    forceSelection:true,
+                    typeAhead: false,
+                    triggerAction: 'all',
+                    listWidth:350,
+                    lazyRender:true,
+                    mode:'remote',
+                    pageSize:10,
+                    queryDelay:1000,
+                    anchor: '100%',
+                    gwidth:200,
+                    minChars:2,
+                    tpl: '<tpl for="."><div class="x-combo-list-item"><p>{detalle}</p><p>Fecha:<strong>{fecha}</strong></p><p>Importe:<strong>{importe_deposito}</strong></p><p>Saldo:<strong>{saldo}</strong></p></div></tpl>',
+                    renderer:function(value, p, record){return String.format('{0}', record.data['desc_deposito']);}
+                },
+                type:'ComboBox',
+                filters:{pfiltro:'cbanmo.detalle#cbanmo.nro_doc_tipo',type:'string'},
+                id_grupo:1,
+                grid:false,
+                form:false
+            },
+            {
                 config:{
                     name: 'forma_pago',
                     fieldLabel: 'Forma de Pago',
+                    allowBlank: false,
                     gwidth: 100,
                     maxLength:30,
                     items: [
@@ -578,7 +689,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 type: 'NumberField',
                 filters: {pfiltro:'plapa.nro_cheque',type:'numeric'},
                 id_grupo:1,
-                grid:true,
+                grid:false,
                 form:false
             },
             {
@@ -782,115 +893,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 grid:true,
                 form:true
             },
-            {
-                config:{
-                    name:'id_depto_lb',
-                    hiddenName: 'id_depto_lb',
-                    //url: '../../sis_parametros/control/Depto/listarDepto',
-                    origen: 'DEPTO',
-                    allowBlank: false,
-                    fieldLabel: 'Libro de bancos destino',
-                    disabled: false,
-                    width: '80%',
-                    baseParams: { estado:'activo', codigo_subsistema: 'TES',modulo:'LB',tipo_filtro:'DEPTO_UO' },
-                    gdisplayField:'desc_depto_lb',
-                    gwidth: 120
-                },
-                //type:'TrigguerCombo',
-                filters:{pfiltro:'depto.nombre',type:'string'},
-                type:'ComboRec',
-                id_grupo: 1,
-                form: false,
-                grid: true
-            },
-            {
-                config:{
-                    name: 'id_cuenta_bancaria',
-                    fieldLabel: 'Cuenta Bancaria Pago',
-                    allowBlank: false,
-                    emptyText:'Elija una Cuenta...',
-                    store:new Ext.data.JsonStore(
-                        {
-                            url: '../../sis_tesoreria/control/CuentaBancaria/listarCuentaBancariaUsuario',
-                            id: 'id_cuenta_bancaria',
-                            root:'datos',
-                            sortInfo:{
-                                field:'id_cuenta_bancaria',
-                                direction:'ASC'
-                            },
-                            totalProperty:'total',
-                            fields: ['id_cuenta_bancaria','nro_cuenta','nombre_institucion','codigo_moneda','centro','denominacion'],
-                            remoteSort: true,
-                            baseParams : {
-                                par_filtro :'nro_cuenta'
-                            }
-                        }),
-                    tpl:'<tpl for="."><div class="x-combo-list-item"><p><b>{nro_cuenta}</b></p><p>Moneda: {codigo_moneda}, {nombre_institucion}</p><p>{denominacion}, Centro: {centro}</p></div></tpl>',
-                    valueField: 'id_cuenta_bancaria',
-                    hiddenValue: 'id_cuenta_bancaria',
-                    displayField: 'nro_cuenta',
-                    gdisplayField:'desc_cuenta_bancaria',
-                    listWidth:'280',
-                    forceSelection:true,
-                    typeAhead: false,
-                    triggerAction: 'all',
-                    lazyRender:true,
-                    mode:'remote',
-                    pageSize:20,
-                    queryDelay:500,
-                    gwidth: 250,
-                    minChars:2,
-                    renderer:function(value, p, record){return String.format('{0}', record.data['desc_cuenta_bancaria']);}
-                },
-                type:'ComboBox',
-                filters:{pfiltro:'cb.nro_cuenta',type:'string'},
-                id_grupo:1,
-                grid:true,
-                form:false
-            },
-            {
-                config:{
-                    name: 'id_cuenta_bancaria_mov',
-                    fieldLabel: 'Depósito',
-                    allowBlank: true,
-                    emptyText : 'Depósito...',
-                    store: new Ext.data.JsonStore({
-                        url:'../../sis_tesoreria/control/TsLibroBancos/listarTsLibroBancosDepositosConSaldo',
-                        id : 'id_cuenta_bancaria_mov',
-                        root: 'datos',
-                        sortInfo:{
-                            field: 'fecha',
-                            direction: 'DESC'
-                        },
-                        totalProperty: 'total',
-                        fields: ['id_libro_bancos','id_cuenta_bancaria','fecha','detalle','observaciones','importe_deposito','saldo'],
-                        remoteSort: true,
-                        baseParams:{par_filtro:'detalle#observaciones#fecha'}
-                    }),
-                    valueField: 'id_libro_bancos',
-                    displayField: 'importe_deposito',
-                    gdisplayField: 'desc_deposito',
-                    hiddenName: 'id_cuenta_bancaria_mov',
-                    forceSelection:true,
-                    typeAhead: false,
-                    triggerAction: 'all',
-                    listWidth:350,
-                    lazyRender:true,
-                    mode:'remote',
-                    pageSize:10,
-                    queryDelay:1000,
-                    anchor: '100%',
-                    gwidth:200,
-                    minChars:2,
-                    tpl: '<tpl for="."><div class="x-combo-list-item"><p>{detalle}</p><p>Fecha:<strong>{fecha}</strong></p><p>Importe:<strong>{importe_deposito}</strong></p><p>Saldo:<strong>{saldo}</strong></p></div></tpl>',
-                    renderer:function(value, p, record){return String.format('{0}', record.data['desc_deposito']);}
-                },
-                type:'ComboBox',
-                filters:{pfiltro:'cbanmo.detalle#cbanmo.nro_doc_tipo',type:'string'},
-                id_grupo:1,
-                grid:true,
-                form:false
-            },
+
             {
                 config:{
                     name: 'obs_wf',
@@ -1329,7 +1332,7 @@ header("content-type: text/javascript; charset=UTF-8");
         arrayDefaultColumHidden:['id_fecha_reg','id_fecha_mod',
             'fecha_mod','usr_reg','usr_mod','estado_reg','fecha_reg','numero_op','id_plantilla','monto_excento','forma_pago','nro_cheque','nro_cuenta_bancaria',
             'descuento_anticipo','monto_retgar_mo','monto_no_pagado','otros_descuentos','descuento_inter_serv','descuento_ley','id_depto_lb',
-            'id_depto_lb','id_cuenta_bancaria','id_cuenta_bancaria_mov','obs_wf','fecha_dev','fecha_pag','obs_descuentos_anticipo','obs_monto_no_pagado',
+            'id_depto_lb','id_cuenta_bancaria','obs_wf','fecha_dev','fecha_pag','obs_descuentos_anticipo','obs_monto_no_pagado',
             'obs_otros_descuentos','obs_descuentos_ley','obs_descuento_inter_serv','monto_ajuste_ag','monto_ajuste_siguiente_pag','fecha_costo_ini',
             'fecha_costo_fin','funcionario_wf','monto_anticipo','monto','monto_ejecutar_total_mo'],
 
@@ -1947,14 +1950,27 @@ header("content-type: text/javascript; charset=UTF-8");
 
         },
 
+        ocultarFP: function(me,pFormaPago){
+
+            if ((this.Cmp.id_cuenta_bancaria.getValue()== 61) || (this.Cmp.id_cuenta_bancaria.getValue()== 78 ) || (this.Cmp.id_cuenta_bancaria.getValue()== 79 )) {
+                me.Cmp.forma_pago.disable();
+                me.Cmp.forma_pago.setValue('transferencia');
+
+            }else{
+                me.Cmp.forma_pago.disable();
+                me.Cmp.forma_pago.setValue('cheque');
+            }
+
+        },
+
         ocultarCheCue: function(me,pFormaPago){
 
             if(pFormaPago=='transferencia'){
 
                 //Deshabilita campo cheque
-                me.Cmp.nro_cheque.allowBlank=true;
-                me.Cmp.nro_cheque.setValue('');
-                me.Cmp.nro_cheque.disable();
+                // me.Cmp.nro_cheque.allowBlank=true;
+                // me.Cmp.nro_cheque.setValue('');
+                // me.Cmp.nro_cheque.disable();
 
                 //Habilita nrocuenta bancaria destino
                 me.Cmp.nro_cuenta_bancaria.allowBlank=false;
@@ -1965,8 +1981,8 @@ header("content-type: text/javascript; charset=UTF-8");
 
                 //cheque
                 //Habilita campo cheque
-                me.Cmp.nro_cheque.allowBlank=false;
-                me.Cmp.nro_cheque.enable();
+                // me.Cmp.nro_cheque.allowBlank=false;
+                // me.Cmp.nro_cheque.enable();
                 //Habilita nrocuenta bancaria destino
                 me.Cmp.nro_cuenta_bancaria.allowBlank=true;
                 me.Cmp.nro_cuenta_bancaria.setValue('');
@@ -2032,12 +2048,12 @@ header("content-type: text/javascript; charset=UTF-8");
                 me.mostrarComponente(me.Cmp.monto_no_pagado);
                 me.mostrarComponente(me.Cmp.obs_monto_no_pagado);
                 me.mostrarComponente(me.Cmp.liquido_pagable);
-                me.mostrarComponente(me.Cmp.monto_retgar_mo)
+                me.mostrarComponente(me.Cmp.monto_retgar_mo);
                 me.mostrarComponente(me.Cmp.obs_descuentos_ley);
                 me.mostrarComponente(me.Cmp.descuento_ley);
                 me.mostrarComponente(me.Cmp.monto_anticipo);
 
-                me.habilitarDescuentos(me)
+                me.habilitarDescuentos(me);
                 me.mostrarComponentesPago(me);
                 me.Cmp.monto_retgar_mo.setReadOnly(false);
                 me.mostrarGrupo(3); //mostra el grupo rango de costo
@@ -2198,7 +2214,7 @@ header("content-type: text/javascript; charset=UTF-8");
 
                 me.mostrarComponente(me.Cmp.id_depto_lb);
                 me.mostrarComponente(me.Cmp.id_cuenta_bancaria);
-                me.mostrarComponente(me.Cmp.id_cuenta_bancaria_mov);
+                // me.mostrarComponente(me.Cmp.id_cuenta_bancaria_mov);
             }
             if(me.Cmp.forma_pago){
                 me.mostrarComponente(me.Cmp.forma_pago);

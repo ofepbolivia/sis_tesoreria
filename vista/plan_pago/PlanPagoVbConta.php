@@ -31,12 +31,12 @@ header("content-type: text/javascript; charset=UTF-8");
             this.Atributos[this.getIndAtributo('numero_op')].grid=true;
             this.Atributos[this.getIndAtributo('nro_cuota')].form=false;
             this.Atributos[this.getIndAtributo('forma_pago')].form=true;
-            this.Atributos[this.getIndAtributo('nro_cheque')].form=true;
+            this.Atributos[this.getIndAtributo('nro_cheque')].form=false;
             this.Atributos[this.getIndAtributo('nro_cheque')].valorInicial=0;
             this.Atributos[this.getIndAtributo('nro_cuenta_bancaria')].form=true;
             this.Atributos[this.getIndAtributo('id_depto_lb')].form=true;
             this.Atributos[this.getIndAtributo('id_cuenta_bancaria')].form=true;
-            this.Atributos[this.getIndAtributo('id_cuenta_bancaria_mov')].form=true;
+            // this.Atributos[this.getIndAtributo('id_cuenta_bancaria_mov')].form=false;
             this.Atributos[this.getIndAtributo('num_tramite')].bottom_filter=true;
             this.Atributos[this.getIndAtributo('nombre_pago')].bottom_filter=true;
             this.Atributos[this.getIndAtributo('desc_funcionario1')].bottom_filter=true;
@@ -197,14 +197,14 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.Cmp.id_cuenta_bancaria.modificado = true;
             }
             //RCM, resetea store del deposito para no mostrar datos al hacer nuevo
-            if(this.Cmp.id_cuenta_bancaria.getValue() > 0){
-                this.Cmp.id_cuenta_bancaria_mov.store.baseParams={ id_cuenta_bancaria:-1,
-                    fecha:this.Cmp.fecha_tentativa.getValue()}
-            }
-            else{
-                //RCM, resetea store del deposito para no mostrar datos al hacer nuevo
-                this.Cmp.id_cuenta_bancaria_mov.store.baseParams={id_cuenta_bancaria:-1,fecha:this.Cmp.fecha_tentativa.getValue()}
-            }
+            // if(this.Cmp.id_cuenta_bancaria.getValue() > 0){
+            //     this.Cmp.id_cuenta_bancaria_mov.store.baseParams={ id_cuenta_bancaria:-1,
+            //         fecha:this.Cmp.fecha_tentativa.getValue()}
+            // }
+            // else{
+            //     //RCM, resetea store del deposito para no mostrar datos al hacer nuevo
+            //     this.Cmp.id_cuenta_bancaria_mov.store.baseParams={id_cuenta_bancaria:-1,fecha:this.Cmp.fecha_tentativa.getValue()}
+            // }
 
             if(data.estado == 'vbsolicitante'){
                 this.Cmp.fecha_tentativa.disable();
@@ -217,10 +217,11 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.Cmp.monto_no_pagado.disable();
                 this.Cmp.id_depto_lb.disable();
                 this.Cmp.id_cuenta_bancaria.disable();
-                this.Cmp.id_cuenta_bancaria_mov.disable();
+                // this.Cmp.id_cuenta_bancaria_mov.disable();
                 this.Cmp.obs_monto_no_pagado.disable();
                 this.Cmp.obs_descuentos_ley.disable();
             }
+            this.Cmp.forma_pago.disable();
 
         },
 
@@ -322,11 +323,11 @@ header("content-type: text/javascript; charset=UTF-8");
 
 
 
-            this.Cmp.fecha_tentativa.on('blur',function(a){
-                this.Cmp.id_cuenta_bancaria_mov.setValue('');
-                Ext.apply(this.Cmp.id_cuenta_bancaria_mov.store.baseParams,{fecha: this.Cmp.fecha_tentativa.getValue()})
-                this.Cmp.id_cuenta_bancaria_mov.modificado=true;
-            },this);
+            // this.Cmp.fecha_tentativa.on('blur',function(a){
+            //     this.Cmp.id_cuenta_bancaria_mov.setValue('');
+            //     Ext.apply(this.Cmp.id_cuenta_bancaria_mov.store.baseParams,{fecha: this.Cmp.fecha_tentativa.getValue()})
+            //     this.Cmp.id_cuenta_bancaria_mov.modificado=true;
+            // },this);
 
             this.Cmp.id_depto_lb.on('select',function(a,b,c){
                 this.Cmp.id_cuenta_bancaria.setValue('');
@@ -336,21 +337,29 @@ header("content-type: text/javascript; charset=UTF-8");
             },this);
 
             //Evento para filtrar los depósitos a partir de la cuenta bancaria
-            this.Cmp.id_cuenta_bancaria.on('select',function(data,rec,ind){
-                if(rec.data.centro=='no'){
-                    if(this.Cmp.desc_depto_conta_pp.value='CON-CBB'){
-                        this.Cmp.id_cuenta_bancaria_mov.allowBlank= true;
-                    }else{
-                        this.Cmp.id_cuenta_bancaria_mov.allowBlank= false;
-                    }
-                }
-                else{
-                    this.Cmp.id_cuenta_bancaria_mov.allowBlank = true;
-                }
-                this.Cmp.id_cuenta_bancaria_mov.setValue('');
-                this.Cmp.id_cuenta_bancaria_mov.modificado=true;
-                this.Cmp.id_cuenta_bancaria_mov.store.baseParams = Ext.apply(this.Cmp.id_cuenta_bancaria_mov.store.baseParams,{id_cuenta_bancaria: rec.id});
-            },this);
+            // this.Cmp.id_cuenta_bancaria.on('select',function(data,rec,ind){
+            //     if(rec.data.centro=='no'){
+            //         if(this.Cmp.desc_depto_conta_pp.value='CON-CBB'){
+            //             this.Cmp.id_cuenta_bancaria_mov.allowBlank= true;
+            //         }else{
+            //             this.Cmp.id_cuenta_bancaria_mov.allowBlank= false;
+            //         }
+            //     }
+            //     else{
+            //         this.Cmp.id_cuenta_bancaria_mov.allowBlank = true;
+            //     }
+            //     this.Cmp.id_cuenta_bancaria_mov.setValue('');
+            //     this.Cmp.id_cuenta_bancaria_mov.modificado=true;
+            //     this.Cmp.id_cuenta_bancaria_mov.store.baseParams = Ext.apply(this.Cmp.id_cuenta_bancaria_mov.store.baseParams,{id_cuenta_bancaria: rec.id});
+            // },this);
+
+
+            //(may)para controlar que id de estas cuentas bancarias sean desactivados los campos en forma de pago (61,78,79)
+            this.Cmp.id_cuenta_bancaria.on('select', function (groupRadio,radio) {
+                this.ocultarFP(this,radio.inputValue);
+
+            }, this);
+
 
             //Evento para ocultar/motrar componentes por cheque o transferencia
             this.Cmp.forma_pago.on('change',function(groupRadio,radio){

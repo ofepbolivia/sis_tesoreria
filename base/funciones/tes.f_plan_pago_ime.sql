@@ -172,6 +172,9 @@ DECLARE
     v_sum_total_pp				numeric;
     v_sum_monto_solo_pp			numeric;
 
+    v_forma_pago_cb				varchar;
+    v_nro_cuenta				varchar;
+
 
 BEGIN
 
@@ -217,6 +220,15 @@ BEGIN
                raise exception 'LAS FECHAS NO CORRESPONDEN A LA GESTIÓN, NÚMERO DE TRÁMITE % gestión %', v_num_tramite, v_anio_ges;
             END IF;
 
+
+            IF v_parametros.fecha_costo_ini is Null THEN
+            	raise EXCEPTION 'Debe completar la fecha inicio';
+            END IF;
+
+            IF v_parametros.fecha_costo_fin is Null THEN
+            	raise EXCEPTION 'Debe completar la fecha fin';
+            END IF;
+
 			/*--validador de gestion
 			v_anio_gestion = ( select date_part('year',now()))::INTEGER;
 
@@ -224,6 +236,7 @@ BEGIN
                raise exception 'LAS FECHAS NO CORRESPONDEN A LA GESTION ACTUAL';
             END IF;
 			*/
+
 
              --si es un pago variable, controla que el total del plan de pago no sea mayor a lo comprometido
                        select
@@ -578,9 +591,18 @@ BEGIN
 
                         END IF;
                    --
+                    --valida si forma_pago es igual a forma_pago cuenta bancaria
+                      select cb.forma_pago, cb.nro_cuenta
+                      into v_forma_pago_cb, v_nro_cuenta
+                      from tes.tcuenta_bancaria cb
+                      where cb.id_cuenta_bancaria = v_parametros.id_cuenta_bancaria;
+
+                      IF (v_forma_pago_cb != v_parametros.forma_pago) then
+                            raise exception 'Modificar la Forma de Pago, este pertenece como  %  para la Cuenta Bancaria %', UPPER(v_forma_pago_cb), v_nro_cuenta;
+                      END IF;
+                    --
 
                END IF;
-
 
 
            -------------------------------------------------------------
