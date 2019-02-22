@@ -266,7 +266,7 @@ header("content-type: text/javascript; charset=UTF-8");
             if (data.estado == 'vbfin') {
                 this.Cmp.id_cuenta_bancaria.allowBlank = true;
             } else {
-                this.Cmp.id_cuenta_bancaria.allowBlank = false;
+                this.Cmp.id_cuenta_bancaria.allowBlank = true;
             }
 
             Phx.vista.PlanPagoVbCostos.superclass.onButtonEdit.call(this);

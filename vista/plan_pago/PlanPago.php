@@ -1712,6 +1712,28 @@ header("content-type: text/javascript; charset=UTF-8");
             this.setTipoPago[data.tipo](this, data);
             this.tmp_porc_monto_excento_var = undefined;
 
+            //may
+            if (data.estado == 'vbsolicitante'){
+                this.Cmp.id_cuenta_bancaria.disable();
+                this.Cmp.id_depto_lb.disable();
+                this.Cmp.nro_cuenta_bancaria.allowBlank=true;
+                this.Cmp.nro_cuenta_bancaria.disable();
+            }
+            if (data.estado == 'vbfin'){
+                this.Cmp.id_cuenta_bancaria.disable();
+                this.Cmp.nro_cuenta_bancaria.disable();
+
+            }
+            if (data.estado == 'vbcostos'){
+                this.Cmp.id_cuenta_bancaria.disable();
+                this.Cmp.id_depto_lb.disable();
+
+            }
+            if (data.estado == 'vbdeposito'){
+                this.Cmp.id_cuenta_bancaria.disable();
+
+            }
+
             if(data.tipo == 'pagado'){
                 this.accionFormulario = 'EDIT_PAGO';
                 this.porc_ret_gar = data.porc_monto_retgar;
@@ -1728,6 +1750,8 @@ header("content-type: text/javascript; charset=UTF-8");
             if(this.Cmp.id_plantilla.getValue()){
                 this.getPlantilla(this.Cmp.id_plantilla.getValue());
             }
+
+
 
         },
 
