@@ -1863,3 +1863,7 @@ IS 'fecha fin para reflejar en plan de pago';
 ALTER TABLE tes.tobligacion_det
   ALTER COLUMN id_orden_trabajo SET NOT NULL;
 /*****************************F-SCP-MAY-TES-0-11/02/2019*************/
+/*****************************I-SCP-MAY-TES-0-18/02/2019*************/
+ALTER TABLE tes.tcuenta_bancaria
+  ADD COLUMN forma_pago VARCHAR(30);
+/*****************************F-SCP-MAY-TES-0-18/02/2019*************/

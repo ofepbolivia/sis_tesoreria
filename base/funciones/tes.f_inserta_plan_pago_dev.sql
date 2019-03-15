@@ -70,10 +70,8 @@ DECLARE
     v_monto_anticipo  numeric;
     v_check_ant_mixto numeric;
 
-
-
-
-
+    v_fecha_ini_pp		date;
+    v_fecha_fin_pp 		date;
 
 
 BEGIN
@@ -412,6 +410,11 @@ BEGIN
                                COALESCE(v_registros.numero,'s/n')||'-N# '||v_nro_cuota::varchar
                            );
 
+                 select op.fecha_costo_ini_pp, op.fecha_costo_fin_pp
+                 into v_fecha_ini_pp, v_fecha_fin_pp
+                 from tes.tobligacion_pago op
+                 where op.id_obligacion_pago = (p_hstore->'id_obligacion_pago')::integer;
+
 
 
 
@@ -584,6 +587,13 @@ BEGIN
             (p_hstore->'fecha_costo_fin')::date,
             true
            )RETURNING id_plan_pago into v_id_plan_pago;
+
+           IF (v_fecha_ini_pp is not Null or v_fecha_fin_pp is not Null) THEN
+           update tes.tplan_pago set
+           fecha_costo_ini = v_fecha_ini_pp,
+           fecha_costo_fin = v_fecha_fin_pp
+           where id_obligacion_pago = (p_hstore->'id_obligacion_pago')::integer;
+           END IF;
 
 
             -- chequea fechas de costos inicio y fin

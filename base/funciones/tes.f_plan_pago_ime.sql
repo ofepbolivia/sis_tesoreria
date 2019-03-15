@@ -172,6 +172,9 @@ DECLARE
     v_sum_total_pp				numeric;
     v_sum_monto_solo_pp			numeric;
 
+    v_forma_pago_cb				varchar;
+    v_nro_cuenta				varchar;
+
 
 BEGIN
 
@@ -217,6 +220,15 @@ BEGIN
                raise exception 'LAS FECHAS NO CORRESPONDEN A LA GESTIÓN, NÚMERO DE TRÁMITE % gestión %', v_num_tramite, v_anio_ges;
             END IF;
 
+
+            IF v_parametros.fecha_costo_ini is Null THEN
+            	raise EXCEPTION 'Debe completar la fecha inicio';
+            END IF;
+
+            IF v_parametros.fecha_costo_fin is Null THEN
+            	raise EXCEPTION 'Debe completar la fecha fin';
+            END IF;
+
 			/*--validador de gestion
 			v_anio_gestion = ( select date_part('year',now()))::INTEGER;
 
@@ -224,6 +236,7 @@ BEGIN
                raise exception 'LAS FECHAS NO CORRESPONDEN A LA GESTION ACTUAL';
             END IF;
 			*/
+
 
              --si es un pago variable, controla que el total del plan de pago no sea mayor a lo comprometido
                        select
@@ -259,14 +272,15 @@ BEGIN
                             SELECT sum(pp.monto)
                             INTO v_sum_monto_pp
                             FROM tes.tplan_pago pp
-                            WHERE pp.estado != 'anulado'
+                            WHERE pp.estado != 'anulado' and pp.estado != 'pago_exterior' and pp.estado != 'pagado'
                             and pp.id_obligacion_pago = v_parametros.id_obligacion_pago;
 
                             SELECT sum(pe.monto)
                             INTO v_sum_monto_pe
                             FROM pre.tpartida_ejecucion pe
                             join tes.tobligacion_pago opa on opa.num_tramite = pe.nro_tramite
-                            WHERE opa.id_obligacion_pago = v_parametros.id_obligacion_pago;
+                            WHERE pe.tipo_movimiento = 'comprometido'
+                            and opa.id_obligacion_pago = v_parametros.id_obligacion_pago;
 
                             v_sum_total_pp = v_sum_monto_pp + v_parametros.monto;
 
@@ -552,13 +566,15 @@ BEGIN
                       --si es un pago variable, controla que el total del plan de pago no sea mayor a lo comprometido
                       IF v_registros.pago_variable='si' or v_registros.pago_variable='no' THEN
 
-                            SELECT sum(pp.monto)
+                            --SELECT sum(pp.monto)
+                            SELECT sum(pp.monto_ejecutar_total_mo)
                             INTO v_sum_monto_pp
                             FROM tes.tplan_pago pp
-                            WHERE pp.estado != 'anulado'
+                            WHERE pp.estado != 'anulado' and pp.estado != 'pago_exterior' and pp.estado != 'pagado'
                             and pp.id_obligacion_pago = v_parametros.id_obligacion_pago;
 
-                            SELECT pp.monto
+                            --SELECT pp.monto
+                            SELECT pp.monto_ejecutar_total_mo
                             INTO v_sum_monto_solo_pp
                             FROM tes.tplan_pago pp
                             WHERE pp.id_plan_pago= v_parametros.id_plan_pago;
@@ -567,10 +583,11 @@ BEGIN
                             INTO v_sum_monto_pe
                             FROM pre.tpartida_ejecucion pe
                             join tes.tobligacion_pago opa on opa.num_tramite = pe.nro_tramite
-                            WHERE opa.id_obligacion_pago = v_parametros.id_obligacion_pago;
+                            WHERE pe.tipo_movimiento = 'comprometido'
+                            and opa.id_obligacion_pago = v_parametros.id_obligacion_pago;
 
                             v_sum_total_pp = (v_sum_monto_pp - v_sum_monto_solo_pp) + v_parametros.monto;
-                             -- raise exception '% = % - % + %',v_sum_total_pp,  v_sum_monto_pp, v_sum_monto_solo_pp, v_parametros.monto;
+                         --raise exception '% = % - % + %',v_sum_total_pp,  v_sum_monto_pp, v_sum_monto_solo_pp, v_parametros.monto;
 
                            IF ((v_sum_total_pp) > v_sum_monto_pe) THEN
                               raise exception ' El monto total de las cuotas es de % y excede al monto total certificado de % para el trámite %. Comunicarse con la Unidad de Presupuestos. ',v_sum_total_pp, v_sum_monto_pe, v_registros.num_tramite ;
@@ -578,9 +595,20 @@ BEGIN
 
                         END IF;
                    --
+                    --valida si forma_pago es igual a forma_pago cuenta bancaria
+                   	  IF v_id_cuenta_bancaria is Not NULL THEN
+                        select cb.forma_pago, cb.nro_cuenta
+                        into v_forma_pago_cb, v_nro_cuenta
+                        from tes.tcuenta_bancaria cb
+                        where cb.id_cuenta_bancaria = v_parametros.id_cuenta_bancaria;
+
+                        IF (v_forma_pago_cb != v_parametros.forma_pago) then
+                              raise exception 'Modificar la Forma de Pago, este pertenece como  %  para la Cuenta Bancaria %', UPPER(v_forma_pago_cb), v_nro_cuenta;
+                        END IF;
+                      END IF;
+                    --
 
                END IF;
-
 
 
            -------------------------------------------------------------
