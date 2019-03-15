@@ -114,8 +114,8 @@ class RConciliacionBancariaPDF extends  ReportePDF{
 	$fecha_table = explode('-', $fecha_elaboracion);
 	$dia = $fecha_table[2];
 	$mes = $fecha_table[1];
-	$anio = $fecha_table[0];		
-			
+	$anio = $fecha_table[0];
+		
 $html = '<table border="1" cellpadding="2">
 <tr>
 <table border="1" cellpadding="2">
@@ -304,6 +304,22 @@ $this->writeHTML($html,true, false, false, false, '');
 		$this->SetFont('','B',12);
 		$this->Cell(20, 5, 'DIFERENCIA DE SALDOS REALES: '.number_format($diff,2,',','.'), 0, 0, 'L', false, '', 0, false, 'T', 'C');
 	 }
-    }	
+    }
+    public function Footer() {
+        $this->SetFontSize(5);
+    			$this->setY(-10);
+    			$ormargins = $this->getOriginalMargins();
+    			$this->SetTextColor(0, 0, 0);
+    			//set style for cell border
+    			$line_width = 0.85 / $this->getScaleFactor();
+    			$this->SetLineStyle(array('width' => $line_width, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(0, 0, 0)));
+    			$ancho = round(($this->getPageWidth() - $ormargins['left'] - $ormargins['right']) / 3);
+    			$this->Ln(2);
+    			$cur_y = $this->GetY();    			
+    			$this->Cell($ancho, 0, 'Usuario: '.$_SESSION['_LOGIN'], '', 0, 'L');
+    			$pagenumtxt = 'Página'.' '.$this->getAliasNumPage().' de '.$this->getAliasNbPages();
+    			$this->Cell($ancho, 0, $pagenumtxt, '', 0, 'C');
+    			$this->Ln($line_width);
+			 }	
 }
 ?>
