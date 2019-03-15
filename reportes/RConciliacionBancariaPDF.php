@@ -125,7 +125,7 @@ $html = '<table border="1" cellpadding="2">
  </tr>
  <tr>
   <td colspan="4" width="600" align="left"><b>1. SALDO SEGUN LIBROS</b><br />
-  <b>Memos: Debitos registrados por el banco y no Cotabilizados:</b></td>
+  <b>Menos: Debitos registrados por el banco y no Cotabilizados:</b></td>
   <td width="80" align="right" rowspan="'.$con.'"><b>'.number_format($saldo_ext_banca,2,',','.').'<br>'.number_format($cheque,2,',','.').'</b></td>
  </tr>  
  <tr align="center">
@@ -162,7 +162,7 @@ $html = '<table border="1" cellpadding="2">
    <td align="right">'.number_format($sum_debito,2,',','.').'</td>
  </tr>
  <tr>
-  <td colspan="4"><b>Más: Abonos resitrados por el Banco y no Contabilizados:</b></td>
+  <td colspan="4"><b>Más: Abonos registrados por el Banco y no Contabilizados:</b></td>
   <td align="right"><b>'.number_format($deposito,2,',','.').'</b></td>    
  </tr>
  <tr align="center">
@@ -204,7 +204,7 @@ $html = '<table border="1" cellpadding="2">
  </tr> 
  <tr>
   <td colspan="4" width="600" align="left"><b>2. SALDO SEGUN EXTRACTO BANCARIO:</b><br />
-  <b>Memos: Cheques Girados y no Cobrados(</b> y Otros conceptos no registrados por el Banco<b>):</b></td>
+  <b>Menos: Cheques Girados y no Cobrados(</b> y Otros conceptos no registrados por el Banco<b>):</b></td>
   <td width="80" align="right" rowspan="'.$con1.'"><b>'.number_format($saldo_erp,2,',','.').'<br>'.number_format($sum_3ra_tabla,2,',','.').'</b></td>
  </tr>  
  <tr nobr="true" align="center">
