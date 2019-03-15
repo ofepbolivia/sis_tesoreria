@@ -75,6 +75,7 @@ class MODCuentaBancaria extends MODbase{
 		$this->captura('denominacion','varchar');
 		$this->captura('centro','varchar');
 		$this->captura('id_finalidads','varchar');
+		$this->captura('forma_pago','varchar');
 		
 		
 		
