@@ -1867,3 +1867,43 @@ ALTER TABLE tes.tobligacion_det
 ALTER TABLE tes.tcuenta_bancaria
   ADD COLUMN forma_pago VARCHAR(30);
 /*****************************F-SCP-MAY-TES-0-18/02/2019*************/
+/*****************************I-SCP-BVP-TES-0-15/03/2019*************/
+
+CREATE TABLE tes.tconciliacion_bancaria (
+  id_conciliacion_bancaria SERIAL,
+  id_cuenta_bancaria INTEGER NOT NULL,
+  id_gestion INTEGER NOT NULL,
+  id_periodo INTEGER NOT NULL,
+  id_funcionario_elabo INTEGER,
+  id_funcionario_vb INTEGER,
+  fecha DATE,
+  observaciones TEXT,
+  saldo_banco NUMERIC(18,2),
+  CONSTRAINT tconciliacion_bancaria_pkey PRIMARY KEY(id_conciliacion_bancaria),
+  CONSTRAINT tconciliacion_bancaria_fk FOREIGN KEY (id_gestion)
+    REFERENCES param.tgestion(id_gestion)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE,
+  CONSTRAINT tconciliacion_bancaria_fk1 FOREIGN KEY (id_periodo)
+    REFERENCES param.tperiodo(id_periodo)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE
+) INHERITS (pxp.tbase)
+
+WITH (oids = false);
+
+CREATE TABLE tes.tdetalle_conciliacion_bancaria (
+  id_detalle_conciliacion_bancaria SERIAL,
+  id_conciliacion_bancaria INTEGER NOT NULL,
+  fecha DATE,
+  concepto VARCHAR(255),
+  nro_comprobante VARCHAR(255),
+  importe NUMERIC(18,2),
+  tipo VARCHAR(255),
+  CONSTRAINT tdetalle_conciliacion_bancaria_pkey PRIMARY KEY(id_detalle_conciliacion_bancaria)
+) INHERITS (pxp.tbase)
+
+WITH (oids = false);  
+/*****************************F-SCP-BVP-TES-0-15/03/2019*************/
