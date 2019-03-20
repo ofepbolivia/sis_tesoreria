@@ -261,7 +261,8 @@ BEGIN
                         tcon.c31,
                         op.id_gestion,
                         tcon.fecha_costo_ini as fecha_cbte_ini,
-                        tcon.fecha_costo_fin as fecha_cbte_fin
+                        tcon.fecha_costo_fin as fecha_cbte_fin,
+                        plapa.monto_establecido
                         from tes.tplan_pago plapa
                         inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = plapa.id_proceso_wf
                         inner join tes.tobligacion_pago op on op.id_obligacion_pago = plapa.id_obligacion_pago

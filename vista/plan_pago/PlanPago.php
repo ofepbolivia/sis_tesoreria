@@ -875,7 +875,22 @@ header("content-type: text/javascript; charset=UTF-8");
                 form:true
             },
 
-
+            {
+                config:{
+                    name: 'monto_establecido',
+                    currencyChar:' ',
+                    fieldLabel: 'Monto sin IVA',
+                    allowBlank: true,
+                    readOnly:true,
+                    gwidth: 100,
+                    maxLength:1245186
+                },
+                type:'MoneyField',
+                filters:{pfiltro:'plapa.monto_establecido',type:'numeric'},
+                id_grupo:1,
+                grid:true,
+                form:false
+            },
 
             {
                 config:{
@@ -1327,6 +1342,7 @@ header("content-type: text/javascript; charset=UTF-8");
             {name:'es_ultima_cuota', type: 'boolean'},
             {name:'fecha_cbte_ini', type: 'date',dateFormat:'Y-m-d'},
             {name:'fecha_cbte_fin', type: 'date',dateFormat:'Y-m-d'},
+            {name:'monto_establecido', type: 'numeric'},
         ],
 
         arrayDefaultColumHidden:['id_fecha_reg','id_fecha_mod',
@@ -1334,7 +1350,7 @@ header("content-type: text/javascript; charset=UTF-8");
             'descuento_anticipo','monto_retgar_mo','monto_no_pagado','otros_descuentos','descuento_inter_serv','descuento_ley','id_depto_lb',
             'id_depto_lb','id_cuenta_bancaria','obs_wf','fecha_dev','fecha_pag','obs_descuentos_anticipo','obs_monto_no_pagado',
             'obs_otros_descuentos','obs_descuentos_ley','obs_descuento_inter_serv','monto_ajuste_ag','monto_ajuste_siguiente_pag','fecha_costo_ini',
-            'fecha_costo_fin','funcionario_wf','monto_anticipo','monto','monto_ejecutar_total_mo'],
+            'fecha_costo_fin','funcionario_wf','monto_anticipo','monto','monto_ejecutar_total_mo', 'monto_establecido'],
 
 
         rowExpander: new Ext.ux.grid.RowExpander({
@@ -1696,8 +1712,9 @@ header("content-type: text/javascript; charset=UTF-8");
 
             var liquido =  this.Cmp.monto.getValue()  -  this.Cmp.monto_no_pagado.getValue() -  this.Cmp.otros_descuentos.getValue() - monto_ret_gar -  this.Cmp.descuento_ley.getValue() -  this.Cmp.descuento_inter_serv.getValue() -  this.Cmp.descuento_anticipo.getValue();
             this.Cmp.liquido_pagable.setValue(liquido>0?liquido:0);
-            var eje = this.Cmp.monto.getValue()  -  this.Cmp.monto_no_pagado.getValue() - this.Cmp.monto_anticipo.getValue()
+            var eje = this.Cmp.monto.getValue()  -  this.Cmp.monto_no_pagado.getValue() - this.Cmp.monto_anticipo.getValue();
             this.Cmp.monto_ejecutar_total_mo.setValue(eje>0?eje:0);
+
         },
 
         onButtonEdit:function(){

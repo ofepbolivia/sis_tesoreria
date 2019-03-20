@@ -1907,3 +1907,11 @@ CREATE TABLE tes.tdetalle_conciliacion_bancaria (
 
 WITH (oids = false);  
 /*****************************F-SCP-BVP-TES-0-15/03/2019*************/
+
+/*****************************I-SCP-MAY-TES-0-20/03/2019*************/
+ALTER TABLE tes.tplan_pago
+  ADD COLUMN monto_establecido NUMERIC(19,2);
+
+COMMENT ON COLUMN tes.tplan_pago.monto_establecido
+IS 'monto establecido para facturas con el descuento del 13%';
+/*****************************F-SCP-MAY-TES-0-10/03/2019*************/

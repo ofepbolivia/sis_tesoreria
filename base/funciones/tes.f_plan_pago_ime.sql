@@ -175,6 +175,11 @@ DECLARE
     v_forma_pago_cb				varchar;
     v_nro_cuenta				varchar;
 
+    v_monto_establecido			numeric;
+    v_porcentaje13_monto		numeric;
+    v_codigo_tipo_relacion		varchar;
+
+
 
 BEGIN
 
@@ -251,7 +256,6 @@ BEGIN
                            from tes.tobligacion_pago op
                            where op.id_obligacion_pago = v_parametros.id_obligacion_pago;
 
-
                         select
                             pp.monto,
                             pp.estado,
@@ -267,9 +271,14 @@ BEGIN
                            where pp.estado_reg='activo'
                            and pp.id_obligacion_pago = v_parametros.id_obligacion_pago;
 
-                      IF v_registros.pago_variable='si' or v_registros.pago_variable='no' THEN
+                           SELECT pc.codigo_tipo_relacion
+                           INTO v_codigo_tipo_relacion
+                           FROM param.tplantilla p
+                           inner join conta.tplantilla_calculo pc on pc.id_plantilla = p.id_plantilla
+                           WHERE p.id_plantilla = v_parametros.id_plantilla;
 
-                            SELECT sum(pp.monto)
+                           --SELECT sum(pp.monto)
+                            SELECT sum(pp.monto_establecido)
                             INTO v_sum_monto_pp
                             FROM tes.tplan_pago pp
                             WHERE pp.estado != 'anulado' and pp.estado != 'pago_exterior' and pp.estado != 'pagado'
@@ -282,14 +291,30 @@ BEGIN
                             WHERE pe.tipo_movimiento = 'comprometido'
                             and opa.id_obligacion_pago = v_parametros.id_obligacion_pago;
 
-                            v_sum_total_pp = v_sum_monto_pp + v_parametros.monto;
+                      IF v_registros.pago_variable='si' or v_registros.pago_variable='no' THEN
+                      	--para los que se descuentan el IVA 13%
+						IF (v_codigo_tipo_relacion = 'IVA-CF') THEN
 
-                          -- raise exception 'llegaaaa %>= %', v_sum_monto_pp,v_sum_monto_pe ;
+                            v_porcentaje13_monto = COALESCE(v_parametros.monto * 0.13, 0);
+          					v_monto_establecido  = COALESCE(v_parametros.monto, 0) - v_porcentaje13_monto;
+
+                            v_sum_total_pp = COALESCE(v_sum_monto_pp,0) + COALESCE(v_monto_establecido, 0);
+
+                           --raise exception 'llegaaaa %>= %', v_sum_total_pp,v_sum_monto_pe ;
                             IF (v_sum_total_pp > v_sum_monto_pe) THEN
                               raise exception ' El monto total de las cuotas es de % y excede al monto total certificado de % para el trámite %. Comunicarse con la Unidad de Presupuestos. ',v_sum_total_pp, v_sum_monto_pe, v_registros.num_tramite ;
                             END IF;
 
-                            v_sum_total_pp = v_parametros.monto;
+						ELSE
+
+                            v_sum_total_pp = COALESCE(v_sum_monto_pp, 0) + COALESCE(v_parametros.monto, 0);
+
+                           --raise exception 'llegaaaa %>= %', v_sum_total_pp,v_sum_monto_pe ;
+                            IF (v_sum_total_pp > v_sum_monto_pe) THEN
+                              raise exception ' El monto total de las cuotas es de % y excede al monto total certificado de % para el trámite %. Comunicarse con la Unidad de Presupuestos. ',v_sum_total_pp, v_sum_monto_pe, v_registros.num_tramite ;
+                            END IF;
+                      END IF;
+                            v_sum_total_pp = COALESCE(v_parametros.monto,0);
 
                             IF (v_sum_total_pp > v_sum_monto_pe) THEN
                               raise exception ' El monto total de las cuotas es de % y excede al monto total certificado de % para el trámite %. Comunicarse con la Unidad de Presupuestos. ',v_sum_total_pp, v_sum_monto_pe, v_registros.num_tramite ;
@@ -564,17 +589,15 @@ BEGIN
 
 
                       --si es un pago variable, controla que el total del plan de pago no sea mayor a lo comprometido
-                      IF v_registros.pago_variable='si' or v_registros.pago_variable='no' THEN
-
-                            --SELECT sum(pp.monto)
-                            SELECT sum(pp.monto_ejecutar_total_mo)
+                      		--SELECT sum(pp.monto_ejecutar_total_mo)
+                            SELECT sum(pp.monto_establecido)
                             INTO v_sum_monto_pp
                             FROM tes.tplan_pago pp
                             WHERE pp.estado != 'anulado' and pp.estado != 'pago_exterior' and pp.estado != 'pagado'
                             and pp.id_obligacion_pago = v_parametros.id_obligacion_pago;
 
-                            --SELECT pp.monto
-                            SELECT pp.monto_ejecutar_total_mo
+                            --SELECT pp.monto_ejecutar_total_mo
+                            SELECT pp.monto_establecido
                             INTO v_sum_monto_solo_pp
                             FROM tes.tplan_pago pp
                             WHERE pp.id_plan_pago= v_parametros.id_plan_pago;
@@ -586,14 +609,46 @@ BEGIN
                             WHERE pe.tipo_movimiento = 'comprometido'
                             and opa.id_obligacion_pago = v_parametros.id_obligacion_pago;
 
-                            v_sum_total_pp = (v_sum_monto_pp - v_sum_monto_solo_pp) + v_parametros.monto;
+
+
+
+                      IF v_registros.pago_variable='si' or v_registros.pago_variable='no' THEN
+
+                        SELECT pc.codigo_tipo_relacion
+                        INTO v_codigo_tipo_relacion
+                        FROM param.tplantilla p
+                        inner join conta.tplantilla_calculo pc on pc.id_plantilla = p.id_plantilla
+                        WHERE  pc.codigo_tipo_relacion = 'IVA-CF'
+                        and p.id_plantilla = v_parametros.id_plantilla;
+
+
+                      	--para los que se descuentan el IVA 13%
+						IF (v_codigo_tipo_relacion = 'IVA-CF') THEN
+
+                            v_porcentaje13_monto = COALESCE(v_parametros.monto * 0.13, 0);
+          					v_monto_establecido  = COALESCE(v_parametros.monto, 0) - v_porcentaje13_monto;
+
+                            --v_sum_total_pp = (v_sum_monto_pp - v_sum_monto_solo_pp) + v_parametros.monto;
+                            v_sum_total_pp = (v_sum_monto_pp - v_sum_monto_solo_pp) + v_monto_establecido;
                          --raise exception '% = % - % + %',v_sum_total_pp,  v_sum_monto_pp, v_sum_monto_solo_pp, v_parametros.monto;
 
                            IF ((v_sum_total_pp) > v_sum_monto_pe) THEN
                               raise exception ' El monto total de las cuotas es de % y excede al monto total certificado de % para el trámite %. Comunicarse con la Unidad de Presupuestos. ',v_sum_total_pp, v_sum_monto_pe, v_registros.num_tramite ;
-                            END IF;
+                           END IF;
 
-                        END IF;
+                       ELSE
+
+                      	 v_monto_establecido  = COALESCE(v_parametros.monto);
+                         v_sum_total_pp = (COALESCE(v_sum_monto_pp,0) - COALESCE(v_sum_monto_solo_pp, 0)) + COALESCE(v_parametros.monto, 0);
+                         --raise exception '% = % - % + %',v_sum_total_pp,  v_sum_monto_pp, v_sum_monto_solo_pp, v_parametros.monto;
+
+                           IF ((v_sum_total_pp) > v_sum_monto_pe) THEN
+                              raise exception ' El monto total de las cuotas es de % y excede al monto total certificado de % para el trámite %. Comunicarse con la Unidad de Presupuestos. ',v_sum_total_pp, v_sum_monto_pe, v_registros.num_tramite ;
+                           END IF;
+                       END IF;
+
+
+                     END IF;
                    --
                     --valida si forma_pago es igual a forma_pago cuenta bancaria
                    	  IF v_id_cuenta_bancaria is Not NULL THEN
@@ -847,8 +902,9 @@ BEGIN
             monto_ajuste_ag = v_parametros.monto_ajuste_ag,
             monto_anticipo = v_monto_anticipo,
             fecha_costo_ini = v_parametros.fecha_costo_ini,
-            fecha_costo_fin = v_parametros.fecha_costo_fin/*,
-            es_ultima_cuota = v_parametros.es_ultima_cuota*/
+            fecha_costo_fin = v_parametros.fecha_costo_fin,
+            /*es_ultima_cuota = v_parametros.es_ultima_cuota*/
+            monto_establecido =v_monto_establecido
             where id_plan_pago = v_parametros.id_plan_pago;
 
             /*--control de fechas inicio y fin

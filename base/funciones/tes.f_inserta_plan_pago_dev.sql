@@ -23,9 +23,9 @@ $body$
 
 DECLARE
 
-    v_resp		            varchar;
-	v_nombre_funcion        text;
-	v_mensaje_error         text;
+    v_resp		           			varchar;
+	v_nombre_funcion       			text;
+	v_mensaje_error         		text;
 
     v_id_cuenta_bancaria 			integer;
     v_id_cuenta_bancaria_mov 		integer;
@@ -61,17 +61,21 @@ DECLARE
     v_porc_monto_retgar             numeric;
 
     v_monto_ant_parcial_descontado  numeric;
-    v_saldo_x_pagar  numeric;
-    v_saldo_x_descontar   numeric;
+    v_saldo_x_pagar  				numeric;
+    v_saldo_x_descontar   			numeric;
 
-    v_resp_doc   boolean;
-    v_obligacion	record;
+    v_resp_doc   					boolean;
+    v_obligacion					record;
 
-    v_monto_anticipo  numeric;
-    v_check_ant_mixto numeric;
+    v_monto_anticipo  				numeric;
+    v_check_ant_mixto 				numeric;
 
-    v_fecha_ini_pp		date;
-    v_fecha_fin_pp 		date;
+    v_fecha_ini_pp					date;
+    v_fecha_fin_pp 					date;
+
+    v_monto_establecido				numeric;
+    v_porcentaje13_monto			numeric;
+    v_codigo_tipo_relacion			varchar;
 
 
 BEGIN
@@ -259,6 +263,21 @@ BEGIN
 
           v_liquido_pagable = COALESCE((p_hstore->'monto')::numeric,0)  - COALESCE((p_hstore->'monto_no_pagado')::numeric,0) - COALESCE((p_hstore->'otros_descuentos')::numeric,0) - COALESCE((p_hstore->'monto_retgar_mo')::numeric,0) - COALESCE((p_hstore->'descuento_ley')::numeric,0) - COALESCE((p_hstore->'descuento_anticipo')::numeric,0) - COALESCE((p_hstore->'descuento_inter_serv')::numeric,0);
           v_monto_ejecutar_total_mo  = COALESCE((p_hstore->'monto')::numeric,0) -  COALESCE((p_hstore->'monto_no_pagado')::numeric,0) - v_monto_anticipo;
+
+		  -- calcula el monto_establecido
+          SELECT pc.codigo_tipo_relacion
+          INTO v_codigo_tipo_relacion
+          FROM param.tplantilla p
+          inner join conta.tplantilla_calculo pc on pc.id_plantilla = p.id_plantilla
+          WHERE p.id_plantilla = (p_hstore->'id_plantilla')::numeric;
+
+          --para los que se descuentan el IVA 13%
+		  IF (v_codigo_tipo_relacion = 'IVA-CF') THEN
+          v_porcentaje13_monto = COALESCE((p_hstore->'monto')::numeric,0) * 0.13;
+          v_monto_establecido  = COALESCE((p_hstore->'monto')::numeric,0) - v_porcentaje13_monto;
+          ELSE
+          v_monto_establecido  = COALESCE((p_hstore->'monto')::numeric,0);
+          END IF;
 
           --revision de anticipo
           IF (p_hstore->'tipo') in('devengado','devengado_pagado','devengado_pagado_1c') THEN
@@ -537,7 +556,8 @@ BEGIN
             monto_anticipo,
             fecha_costo_ini,
             fecha_costo_fin,
-            es_ultima_cuota
+            es_ultima_cuota,
+            monto_establecido
           	) values(
 			'activo',
 			v_nro_cuota,
@@ -585,7 +605,8 @@ BEGIN
             v_monto_anticipo,
             (p_hstore->'fecha_costo_ini')::date,
             (p_hstore->'fecha_costo_fin')::date,
-            true
+            true,
+            v_monto_establecido
            )RETURNING id_plan_pago into v_id_plan_pago;
 
            IF (v_fecha_ini_pp is not Null or v_fecha_fin_pp is not Null) THEN
