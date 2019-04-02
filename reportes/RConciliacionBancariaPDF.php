@@ -73,16 +73,14 @@ class RConciliacionBancariaPDF extends  ReportePDF{
 		$deposito = 0;
 		
 	foreach ($this->datos as $value) {					
-			$n1 +=1;
+			//$n1 +=1;
 			$sum_3ra_tabla += $value['saldo'];			
 	}
+	
 	foreach ($this->datos1 as $value) {
 		$value['tipo']=='cheque' && $cheque += $value['importe'];
 		$value['tipo']=='deposito' && $deposito += $value['importe'];
 		$value['tipo']=='transito' && $transito += $value['importe'];			
-		$value['tipo']=='cheque' && $n += 1; 
-		$value['tipo']=='deposito' && $n3 +=1;
-		$value['tipo']=='transito' && $n2 +=1;
 		$saldo_ext_banca = $value['sal_ext_ban'];
 		$saldo_erp = $value['saldo'];
 		$fecha_elaboracion = $value['fecha'];
@@ -90,31 +88,44 @@ class RConciliacionBancariaPDF extends  ReportePDF{
 		$fun_elba = $value['fun_elab'];
 		$fun_vb = $value['fun_vb'];			
 	}
-	if(count($this->datos1)<=1 and count($this->datos1)>0 ){
-		$value['tipo']!='cheque' && $n = 4; 
-		$value['tipo']!='deposito' && $n3 = 4;
-		$value['tipo']!='transito' && $n2 = 4;		
+
+
+
+	$datos = array();
+	$datos1 = array();
+	switch (count($this->datos)) {
+		case 1:$datos=$this->agree(4,$this->datos);break;
+		case 2:$datos=$this->agree(3,$this->datos);break;
+		case 3:$datos=$this->agree(2,$this->datos);break;
+		case 4:$datos=$this->agree(1,$this->datos);break;
+		default:$datos=$this->agree(5,null,null);break;
 	}
-	$t1 = 0;
-	$t2 = 0;
-	$t3 = 0;
-	$t4 = 0;
-	foreach ($this->datos1 as $value) {
-		$value['tipo']=='cheque' && $t1 +=1;
-		$value['tipo']=='deposito' && $t2 +=1;
-		$value['tipo']=='transito' && $t4 +=1;
+
+	$datos1= $this->complete($this->datos1);
+
+	foreach ($datos1 as $value) {		
+		$value['tipo']=='cheque' && $n += 1; 
+		$value['tipo']=='deposito' && $n3 +=1;
+		$value['tipo']=='transito' && $n2 +=1;	
 	}
-	
+	foreach ($datos as $value) {					
+		$n1 +=1;				
+	}
+		
 	$saldo_real1 = $saldo_ext_banca - $cheque + $deposito;
-	$saldo_real2 = $saldo_erp - $sum_3ra_tabla + $transito;				
-	$con = 3 + $n;
-	$con1 = 3 + $n1;
-	$con2 = 2 + $n2;
-	$con3 = 2 + $n3;
+	$saldo_real2 = $saldo_erp - $sum_3ra_tabla + $transito;
+					
+	$con = 2 + $n;
+	$con1 = 2 + $n1;
+	$con2 = 1 + $n2;
+	$con3 = 1 + $n3;
+	
 	$fecha_table = explode('-', $fecha_elaboracion);
 	$dia = $fecha_table[2];
 	$mes = $fecha_table[1];
 	$anio = $fecha_table[0];
+	//var_dump($datos1);exit;
+	
 		
 $html = '<table border="1" cellpadding="2">
 <tr>
@@ -134,29 +145,19 @@ $html = '<table border="1" cellpadding="2">
   <td width="90"><b>Compbte.No.</b></td>
   <td width="90"><b>Importe</b></td>
  </tr>
- ';
- if($this->datos1[0]['tipo']=='cheque' && $this->datos1[0]['tipo']!=null){
-   foreach ($this->datos1 as $row){
+ '; 
+   foreach ($datos1 as $row){
 	  	if ($row['tipo']=='cheque'){
+	  		($row['importe']=='')?$importe=$row['importe']:$importe=number_format($row['importe'],2,',','.');	  		
 	        $html.='<tr align="center" style="font-size:6;">
 	        <td>'.$row['fecha_reg'].'</td>
 	        <td align="left" >'.$row['concepto'].'</td>
 	        <td>'.$row['nro_comprobante'].'</td>
-	        <td align="right">'.number_format($row['importe'],2,',','.').'</td>
+	        <td align="right">'.$importe.'</td>
 	        </tr>';
 			$sum_debito += $row['importe'];		
 			}
-    	}
-    }else{
-    	for ($i=0; $i < 4; $i++) { 
-		$html.='<tr align="center" style="font-size:6;">
-			        <td></td>
-			        <td></td>
-			        <td></td>
-			        <td></td>			        
-			        </tr>';			
-		}
-    }
+    	}    
  $html.='<tr align="center">
    <td colspan="3">TOTAL</td>
    <td align="right">'.number_format($sum_debito,2,',','.').'</td>
@@ -171,29 +172,19 @@ $html = '<table border="1" cellpadding="2">
   <td width="90"><b>Compbte.No.</b></td>
   <td width="90"><b>Importe</b></td>
   <td width="80" align="right" rowspan="'.$con3.'"></td>
- </tr>'; 
-  if($this->datos1[0]['tipo']=='deposito' && $this->datos1[0]['tipo']!=null){
-   foreach ($this->datos1 as $row){
+ </tr>';   
+   foreach ($datos1 as $row){
 	  	if ($row['tipo']=='deposito'){
+	  		($row['importe']=='')?$importe=$row['importe']:$importe=number_format($row['importe'],2,',','.');
 	        $html.='<tr align="center" style="font-size:6;">
 	        <td>'.$row['fecha_reg'].'</td>
 	        <td align="left" >'.$row['concepto'].'</td>
 	        <td>'.$row['nro_comprobante'].'</td>
-	        <td align="right">'.number_format($row['importe'],2,',','.').'</td>
+	        <td align="right">'.$importe.'</td>
 	        </tr>';
 			$sum_abono += $row['importe'];		
 			}
-	    }
-    }else{
-    	for ($i=0; $i < 4; $i++) { 
-		$html.='<tr align="center" style="font-size:6;">
-			        <td></td>
-			        <td></td>
-			        <td></td>
-			        <td></td>			        
-			        </tr>';			
-		}
-    }     
+	    }     
  $html.='<tr align="center">
    <td colspan="3">TOTAL</td>
    <td align="right">'.number_format($sum_abono,2,',','.').'</td>
@@ -213,12 +204,13 @@ $html = '<table border="1" cellpadding="2">
   <td width="90"><b>Cheque No.</b></td>
   <td width="90"><b>Importe</b></td>
  </tr>';
-   foreach ($this->datos as $row){  	
+   foreach ($datos as $row){
+   	($row['saldo']=='')?$importe=$row['saldo']:$importe=number_format($row['saldo'],2,',','.');  	
         $html.='<tr align="center" style="font-size:6;">
         <td>'.$row['fecha'].'</td>
         <td align="left" >'.$row['concepto'].'</td>
         <td>'.$row['nro_cheque'].'</td>
-        <td align="right">'.number_format($row['saldo'],2,',','.').'</td>
+        <td align="right">'.$importe.'</td>
         </tr>';
 		$sum_cheque += $row['saldo'];		
     } 
@@ -237,28 +229,18 @@ $html = '<table border="1" cellpadding="2">
   <td width="90"><b>Importe</b></td>
   <td width="80" rowspan="'.$con2.'"></td>
  </tr>';
- if($this->datos1[0]['tipo']=='transito' && $this->datos1[0]['tipo']!=null){
-    foreach ($this->datos1 as $row){    	    
+    foreach ($datos1 as $row){    	    
 	  	if ($row['tipo']=='transito'){
+	  		($row['importe']=='')?$importe=$row['importe']:$importe=number_format($row['importe'],2,',','.');
 	        $html.='<tr align="center" style="font-size:6;">
 	        <td>'.$row['fecha_reg'].'</td>
 	        <td align="left" >'.$row['concepto'].'</td>
 	        <td>'.$row['nro_comprobante'].'</td>
-	        <td align="right">'.number_format($row['importe'],2,',','.').'</td>
+	        <td align="right">'.$importe.'</td>
 	        </tr>';
 			$sum_transito += $row['importe'];
 			}
-	    }
-    }else{
-    	for ($i=0; $i < 4; $i++) { 
-		$html.='<tr align="center" style="font-size:6;">
-			        <td></td>
-			        <td></td>
-			        <td></td>
-			        <td></td>			        
-			        </tr>';			
-		}
-    } 		    
+	    }     		    
  $html.=' 
  <tr align="center">
    <td colspan="3">TOTAL</td>
@@ -298,7 +280,7 @@ $html = '<table border="1" cellpadding="2">
 ';
 $this->writeHTML($html,true, false, false, false, '');
 	$diff = $saldo_real1 - $saldo_real2; 
-	if($diff!=0){
+	if($diff<0 || $diff>0){
 		$this->SetFillColor(224, 235, 100);
 		$this->SetTextColor(200,0,0);
 		$this->SetFont('','B',12);
@@ -320,6 +302,147 @@ $this->writeHTML($html,true, false, false, false, '');
     			$pagenumtxt = 'Página'.' '.$this->getAliasNumPage().' de '.$this->getAliasNbPages();
     			$this->Cell($ancho, 0, $pagenumtxt, '', 0, 'C');
     			$this->Ln($line_width);
-			 }	
+	}
+
+	function complete($rows){
+		
+		$tab0 = array();
+		$tab1 = array();
+		$tab2 = array();				
+					
+		$datos1 = array();
+		
+		$table1 = array();	
+		$table2 = array();
+		$table3 = array();
+		$t0 = 0;
+		$t1 = 0;		
+		$t2 = 0;
+		foreach ($this->datos1 as $value) {
+			$value['tipo']=='cheque' && $t0 +=1;
+			$value['tipo']=='deposito' && $t1 +=1;
+			$value['tipo']=='transito' && $t2 +=1;
+		}				
+		$cantidad = count($rows);
+		
+		for ($i=0; $i < $cantidad ; $i++) { 
+			$rows[$i]['tipo']=='cheque' && array_push($tab0,$rows[$i]);
+			$rows[$i]['tipo']=='deposito' && array_push($tab1,$rows[$i]);
+			$rows[$i]['tipo']=='transito' && array_push($tab2,$rows[$i]);
+		}
+		switch ($t0) {
+			case 1:$table1=$this->agree(4,$tab0,'t1');break;
+			case 2:$table1=$this->agree(3,$tab0,'t1');break;
+			case 3:$table1=$this->agree(2,$tab0,'t1');break;
+			case 4:$table1=$this->agree(1,$tab0,'t1');break;
+			default:$table1=$this->agree(5,null,'t1');break;									
+		}
+		switch ($t1) {
+			case 1:$table2=$this->agree(4,$tab1,'t2');break;
+			case 2:$table2=$this->agree(3,$tab1,'t2');break;
+			case 3:$table2=$this->agree(2,$tab1,'t2');break;
+			case 4:$table2=$this->agree(1,$tab1,'t2');break;
+			default:$table2=$this->agree(5,null,'t2');break;		
+		}
+		switch ($t2) {
+			case 1:$table3=$this->agree(4,$tab2,'t3');break;
+			case 2:$table3=$this->agree(3,$tab2,'t3');break;
+			case 3:$table3=$this->agree(2,$tab2,'t3');break;
+			case 4:$table3=$this->agree(1,$tab2,'t3');break;
+			default:$table3=$this->agree(5,null,'t3');break;		
+		}		
+		$datos1 = array_merge($table1,$table2,$table3);			
+		return $datos1;
+				
+	}	
+	function agree($n,$array=null,$table=null){
+	
+	 $array == null && $array=array();
+	  				
+	 if($table==null){				
+		for ($i=0; $i <$n ; $i++) { 
+			array_push($array,array("nombre_institucion"=>"",
+			"nro_cuenta"=>"",
+			"concepto"=>"",
+			"fecha"=>"",
+			"saldo"=>"",
+			"moneda"=>"",			
+			"denominacion"=>"",
+			"nro_cheque"=>"")
+			);				
+		}			
+		return $array;
+	 }elseif($table=='t1'){	 	
+		for ($i=0; $i <$n ; $i++) { 
+			array_push($array,array(
+	  'nombre_institucion' => '',
+      'fecha' => '',
+      'saldo' => '',
+      'observaciones' => '',
+      'fun_elab' => '',
+      'fun_vb' => '',
+      'moneda' => '',
+      'fecha_reg' => '',
+      'concepto' => '',
+      'importe' => '',
+      'nro_comprobante' => '',
+      'tipo' => 'cheque',
+      'sal_ext_ban' => '',
+      'periodo' => '',
+      'gestion' => '',
+      'nro_cuenta' => '',
+      'denominacion' => ''
+      )); 				
+		}			
+		return $array;	 	
+	 }elseif($table=='t2'){	 	
+		for ($i=0; $i <$n ; $i++) { 
+			array_push($array,array(
+	  'nombre_institucion' => '',
+      'fecha' => '',
+      'saldo' => '',
+      'observaciones' => '',
+      'fun_elab' => '',
+      'fun_vb' => '',
+      'moneda' => '',
+      'fecha_reg' => '',
+      'concepto' => '',
+      'importe' => '',
+      'nro_comprobante' => '',
+      'tipo' => 'deposito',
+      'sal_ext_ban' => '',
+      'periodo' => '',
+      'gestion' => '',
+      'nro_cuenta' => '',
+      'denominacion' => ''
+      )); 				
+		}			
+		return $array;
+	 }elseif($table=='t3'){
+		for ($i=0; $i <$n ; $i++) { 
+			array_push($array,array(
+	  'nombre_institucion' => '',
+      'fecha' => '',
+      'saldo' => '',
+      'observaciones' => '',
+      'fun_elab' => '',
+      'fun_vb' => '',
+      'moneda' => '',
+      'fecha_reg' => '',
+      'concepto' => '',
+      'importe' => '',
+      'nro_comprobante' => '',
+      'tipo' => 'transito',
+      'sal_ext_ban' => '',
+      'periodo' => '',
+      'gestion' => '',
+      'nro_cuenta' => '',
+      'denominacion' => ''
+      ));			
+		}			
+		return $array;
+	 }
+ }
+		
 }
 ?>

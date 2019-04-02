@@ -352,7 +352,8 @@ header("content-type: text/javascript; charset=UTF-8");
 		console.log('valeus',data);		
 
 			if(NumSelect != 0)
-			{						 				
+			{	
+				Phx.CP.loadingShow();					 				
 				Ext.Ajax.request({
 								url:'../../sis_tesoreria/control/ConciliacionBancaria/reporteConciliacionBancaria',
 								params:{id_cuenta_bancaria:data.id_cuenta_bancaria,
