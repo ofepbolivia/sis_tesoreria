@@ -279,7 +279,7 @@ $html = '<table border="1" cellpadding="2">
 </table>
 ';
 $this->writeHTML($html,true, false, false, false, '');
-	$diff = $saldo_real1 - $saldo_real2; 
+	$diff = round($saldo_real1,2) - round($saldo_real2,2); 
 	if($diff<0 || $diff>0){
 		$this->SetFillColor(224, 235, 100);
 		$this->SetTextColor(200,0,0);
