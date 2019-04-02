@@ -130,7 +130,7 @@ class MODConciliacionBancaria extends MODbase{
 		$this->captura('saldo','numeric');					
 		$this->captura('moneda','varchar');					
 		$this->captura('denominacion','varchar');
-		$this->captura('nro_cheque','integer');							
+		$this->captura('nro_cheque','varchar');							
 		//Ejecuta la instruccion
 		$this->armarConsulta();	
 	    //echo ($this->consulta);exit;			

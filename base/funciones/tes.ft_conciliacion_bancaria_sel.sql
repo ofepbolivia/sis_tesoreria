@@ -127,7 +127,7 @@ BEGIN
         nro_cuenta 			varchar,
         denominacion		varchar,
         moneda				varchar,
-        nro_cheque 			integer,
+        nro_cheque 			varchar,
         concepto			text,        
         total_haber 		numeric(18,2),
         indice 				numeric(18,2),
@@ -170,7 +170,10 @@ BEGIN
          cuba.nro_cuenta,
          cuba.denominacion,
          mon.moneda,                
-         LB.nro_cheque,
+         case when v_count > 1 then
+         'VARIOS'::varchar
+         else                
+         ''||LB.nro_cheque||''::varchar end,         
         ('CHEQUES EN CIRCULACION '||upper(tes.f_month(lb.fecha))||'/'||substr((''||extract(year from lb.fecha)||'')::text,3,4)),         
         (Select sum(lbr.importe_cheque)
                          From tes.tts_libro_bancos lbr
