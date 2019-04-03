@@ -136,7 +136,7 @@ $html = '<table border="1" cellpadding="2">
  </tr>
  <tr>
   <td colspan="4" width="600" align="left"><b>1. SALDO SEGUN LIBROS</b><br />
-  <b>Menos: Debitos registrados por el banco y no Cotabilizados:</b></td>
+  <b>Menos: Debitos registrados por el banco y no Contabilizados:</b></td>
   <td width="80" align="right" rowspan="'.$con.'"><b>'.number_format($saldo_ext_banca,2,',','.').'<br>'.number_format($cheque,2,',','.').'</b></td>
  </tr>  
  <tr align="center">
