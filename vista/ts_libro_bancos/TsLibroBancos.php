@@ -395,7 +395,7 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
 				mode: 'local',
 				valueField: 'estilo',
 				gwidth: 60,
-				store:['CBB','SRZ','LPB','TJA','SRE','CIJ','TDD','UYU','MIA','MAD']
+				store:['BUE','SLA','CBB','SRZ','LPB','TJA','SRE','CIJ','TDD','MIA','MAD','SAO']
 			},
 			type:'ComboBox',
 			id_grupo:1,

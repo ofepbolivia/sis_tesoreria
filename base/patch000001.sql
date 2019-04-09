@@ -3,30 +3,30 @@
 --tabla tes.tobligacion_pago
 
 CREATE TABLE tes.tobligacion_pago (
-  id_obligacion_pago SERIAL, 
+  id_obligacion_pago SERIAL,
   id_proveedor INTEGER NOT NULL,
   id_funcionario INTEGER,
-  id_subsistema INTEGER, 
-  id_moneda INTEGER, 
-  id_depto INTEGER, 
-  id_estado_wf INTEGER, 
-  id_proceso_wf INTEGER, 
+  id_subsistema INTEGER,
+  id_moneda INTEGER,
+  id_depto INTEGER,
+  id_estado_wf INTEGER,
+  id_proceso_wf INTEGER,
   id_gestion integer not NULL,
   fecha DATE,
   numero VARCHAR(50),
-  estado VARCHAR(255), 
-  obs VARCHAR(1000), 
-  porc_anticipo NUMERIC(4,2) DEFAULT 0, 
-  porc_retgar NUMERIC(4,2) DEFAULT 0, 
-  tipo_cambio_conv NUMERIC(19,2), 
-  num_tramite VARCHAR(200), 
-  tipo_obligacion VARCHAR(30), 
-  comprometido VARCHAR(2) DEFAULT 'no'::character varying, 
-  pago_variable VARCHAR(2) DEFAULT 'no'::character varying NOT NULL, 
+  estado VARCHAR(255),
+  obs VARCHAR(1000),
+  porc_anticipo NUMERIC(4,2) DEFAULT 0,
+  porc_retgar NUMERIC(4,2) DEFAULT 0,
+  tipo_cambio_conv NUMERIC(19,2),
+  num_tramite VARCHAR(200),
+  tipo_obligacion VARCHAR(30),
+  comprometido VARCHAR(2) DEFAULT 'no'::character varying,
+  pago_variable VARCHAR(2) DEFAULT 'no'::character varying NOT NULL,
   nro_cuota_vigente NUMERIC(1,0) DEFAULT 0 NOT NULL,
-  total_pago NUMERIC(19,2),  
-  CONSTRAINT pk_tobligacion_pago__id_obligacion_pago PRIMARY KEY(id_obligacion_pago), 
-  CONSTRAINT chk_tobligacion_pago__estado CHECK ((estado)::text = ANY (ARRAY[('borrador'::character varying)::text, ('registrado'::character varying)::text,('en_pago'::character varying)::text, ('finalizado'::character varying)::text,('anulado'::character varying)::text])), 
+  total_pago NUMERIC(19,2),
+  CONSTRAINT pk_tobligacion_pago__id_obligacion_pago PRIMARY KEY(id_obligacion_pago),
+  CONSTRAINT chk_tobligacion_pago__estado CHECK ((estado)::text = ANY (ARRAY[('borrador'::character varying)::text, ('registrado'::character varying)::text,('en_pago'::character varying)::text, ('finalizado'::character varying)::text,('anulado'::character varying)::text])),
   CONSTRAINT chk_tobligacion_pago__tipo_obligacion CHECK ((tipo_obligacion)::text = ANY ((ARRAY['adquisiciones'::character varying, 'caja_chica'::character varying, 'viaticos'::character varying, 'fondos_en_avance'::character varying])::text[]))
 ) INHERITS (pxp.tbase)
 WITHOUT OIDS;
@@ -46,19 +46,19 @@ ALTER TABLE tes.tobligacion_pago OWNER TO postgres;
 --tabla tes.tobligacion_det
 
 CREATE TABLE tes.tobligacion_det (
-  id_obligacion_det SERIAL, 
-  id_obligacion_pago INTEGER NOT NULL, 
-  id_concepto_ingas INTEGER NOT NULL, 
-  id_centro_costo INTEGER, 
-  id_partida INTEGER, 
-  id_cuenta INTEGER, 
-  id_auxiliar INTEGER, 
+  id_obligacion_det SERIAL,
+  id_obligacion_pago INTEGER NOT NULL,
+  id_concepto_ingas INTEGER NOT NULL,
+  id_centro_costo INTEGER,
+  id_partida INTEGER,
+  id_cuenta INTEGER,
+  id_auxiliar INTEGER,
   id_partida_ejecucion_com INTEGER,
-  descripcion TEXT, 
-  monto_pago_mo NUMERIC(19,2), 
-  monto_pago_mb NUMERIC(19,2), 
-   factor_porcentual NUMERIC, 
- 
+  descripcion TEXT,
+  monto_pago_mo NUMERIC(19,2),
+  monto_pago_mb NUMERIC(19,2),
+   factor_porcentual NUMERIC,
+
   CONSTRAINT pk_tobligacion_det__id_obligacion_det PRIMARY KEY(id_obligacion_det)
 ) INHERITS (pxp.tbase)
 WITHOUT OIDS;
@@ -100,12 +100,12 @@ CREATE TABLE tes.tplan_pago(
     otros_descuentos_mb numeric(19, 2) DEFAULT 0 NOT NULL,
     monto_ejecutar_total_mo numeric(19, 2) DEFAULT 0 NOT NULL,
     monto_ejecutar_total_mb numeric(19, 2) DEFAULT 0 NOT NULL,
-    total_prorrateado numeric(19, 2) DEFAULT 0 NOT NULL, 
-      liquido_pagable NUMERIC(19,2) DEFAULT 0 NOT NULL, 
-  liquido_pagable_mb NUMERIC(19,2) DEFAULT 0 NOT NULL, 
+    total_prorrateado numeric(19, 2) DEFAULT 0 NOT NULL,
+      liquido_pagable NUMERIC(19,2) DEFAULT 0 NOT NULL,
+  liquido_pagable_mb NUMERIC(19,2) DEFAULT 0 NOT NULL,
     PRIMARY KEY (id_plan_pago)) INHERITS (pxp.tbase);
-    
-  
+
+
  CREATE TABLE tes.tprorrateo(
     id_prorrateo SERIAL NOT NULL,
     id_plan_pago int4 NOT NULL,
@@ -117,8 +117,8 @@ CREATE TABLE tes.tplan_pago(
     monto_ejecutar_mo numeric(19, 2),
     monto_ejecutar_mb numeric(19, 2),
     PRIMARY KEY (id_prorrateo))
-     INHERITS (pxp.tbase); 
-    
+     INHERITS (pxp.tbase);
+
 
 /***********************************F-SCP-GSS-TES-45-01/04/2013****************************************/
 
@@ -126,13 +126,13 @@ CREATE TABLE tes.tplan_pago(
 --tabla tes.tplan_pago
 
 CREATE TABLE tes.tcuenta_bancaria (
-  id_cuenta_bancaria SERIAL, 
-  id_institucion INTEGER NOT NULL, 
-  id_cuenta INTEGER NOT NULL, 
-  id_auxiliar INTEGER, 
-  nro_cuenta VARCHAR, 
-  fecha_alta DATE, 
-  fecha_baja DATE, 
+  id_cuenta_bancaria SERIAL,
+  id_institucion INTEGER NOT NULL,
+  id_cuenta INTEGER NOT NULL,
+  id_auxiliar INTEGER,
+  nro_cuenta VARCHAR,
+  fecha_alta DATE,
+  fecha_baja DATE,
   CONSTRAINT pk_tcuenta_bancaria_id_cuenta_bancaria PRIMARY KEY(id_cuenta_bancaria)
 ) INHERITS (pxp.tbase)
 WITHOUT OIDS;
@@ -140,10 +140,10 @@ WITHOUT OIDS;
 --tabla tes.chequera
 
 CREATE TABLE tes.tchequera (
-  id_chequera SERIAL,  
-  id_cuenta_bancaria INTEGER NOT NULL,  
-  codigo VARCHAR, 
-  nro_chequera INTEGER NOT NULL, 
+  id_chequera SERIAL,
+  id_cuenta_bancaria INTEGER NOT NULL,
+  codigo VARCHAR,
+  nro_chequera INTEGER NOT NULL,
   CONSTRAINT pk_tchequera_id_chequera PRIMARY KEY(id_chequera)
 ) INHERITS (pxp.tbase)
 WITHOUT OIDS;
@@ -168,25 +168,25 @@ ALTER TABLE tes.tplan_pago
 
 COMMENT ON COLUMN tes.tplan_pago.total_pagado
 IS 'ESta columana acumula el total de pago registrados, solo es util para cuotas del tipo devengado o devengado_pago';
-  
+
 
 /***********************************F-SCP-RAC-TES-0-04/06/2013***************************************/
 
 /***********************************I-SCP-RAC-TES-170-19/06/2013***************************************/
 ALTER TABLE tes.tcuenta_bancaria
   DROP COLUMN id_cuenta;
-  
+
   --------------- SQL ---------------
 
 ALTER TABLE tes.tcuenta_bancaria
   DROP COLUMN id_auxiliar;
-  
+
 -------------------------------
-  
+
   ALTER TABLE tes.tcuenta_bancaria
   ADD COLUMN id_moneda INTEGER;
-  
-  
+
+
 /***********************************F-SCP-RAC-TES-170-19/06/2013***************************************/
 
 
@@ -194,17 +194,17 @@ ALTER TABLE tes.tcuenta_bancaria
 
 ALTER TABLE tes.tobligacion_det
   ADD COLUMN revertido_mb NUMERIC(19,2) DEFAULT 0 NOT NULL;
-  
+
 ALTER TABLE tes.tplan_pago
-  ALTER COLUMN tipo_cambio SET DEFAULT 1;  
-  
+  ALTER COLUMN tipo_cambio SET DEFAULT 1;
+
 --------------- SQL ---------------
 
 ALTER TABLE tes.tplan_pago
   ADD COLUMN sinc_presupuesto VARCHAR(2) DEFAULT 'no' NOT NULL;
 
 COMMENT ON COLUMN tes.tplan_pago.sinc_presupuesto
-IS 'este campo indica que falta presupuesto comprometido para realizar el pago, y es necesario incremetar con una sincronizacion';  
+IS 'este campo indica que falta presupuesto comprometido para realizar el pago, y es necesario incremetar con una sincronizacion';
 
 ALTER TABLE tes.tobligacion_det
   ADD COLUMN incrementado_mb NUMERIC(19,2) DEFAULT 0 NOT NULL;
@@ -234,24 +234,24 @@ IS 'conto de retencion de garantia en moneda base';
 
 ALTER TABLE tes.tobligacion_pago
   ADD COLUMN id_depto_conta INTEGER;
-  
+
 /***********************************F-SCP-RAC-TES-0-20/08/2013***************************************/
-  
-  
+
+
 /***********************************I-SCP-RAC-TES-0-09/09/2013***************************************/
-  
+
 ALTER TABLE tes.tplan_pago
-  RENAME COLUMN id_comprobante TO id_int_comprobante;  
+  RENAME COLUMN id_comprobante TO id_int_comprobante;
 
 /***********************************F-SCP-RAC-TES-0-09/09/2013***************************************/
- 
+
 /***********************************I-SCP-RAC-TES-0-18/09/2013***************************************/
 
 ALTER TABLE tes.tprorrateo
   ADD COLUMN id_int_transaccion INTEGER;
 
 COMMENT ON COLUMN tes.tprorrateo.id_int_transaccion
-IS 'relaciona el prorrateo del devengado con la transaccion don de se ejecuta el presupuesto'; 
+IS 'relaciona el prorrateo del devengado con la transaccion don de se ejecuta el presupuesto';
 
 ALTER TABLE tes.tprorrateo
   ADD COLUMN id_prorrateo_fk INTEGER;
@@ -288,8 +288,8 @@ IS 'cste campo almacena el porcentaje de descuentos de ley, se utiliza para las 
 
 /***********************************F-SCP-RAC-TES-0-18/09/2013***************************************/
 
-/***********************************I-SCP-RCM-TES-0-05/12/2013***************************************/ 
- 
+/***********************************I-SCP-RCM-TES-0-05/12/2013***************************************/
+
 ALTER TABLE tes.tplan_pago
   ADD COLUMN nro_cheque INTEGER;
 
@@ -311,18 +311,18 @@ ALTER TABLE tes.tplan_pago
 /***********************************I-SCP-RCM-TES-0-12/12/2013***************************************/
 
 CREATE TABLE tes.tcuenta_bancaria_mov (
-  id_cuenta_bancaria_mov SERIAL, 
-  id_cuenta_bancaria INTEGER NOT NULL, 
-  id_int_comprobante INTEGER, 
-  id_cuenta_bancaria_mov_fk INTEGER, 
-  tipo_mov VARCHAR(15) NOT NULL, 
-  tipo varchar(15) NOT NULL, 
-  descripcion VARCHAR(2000) NOT NULL, 
-  nro_doc_tipo VARCHAR(50), 
+  id_cuenta_bancaria_mov SERIAL,
+  id_cuenta_bancaria INTEGER NOT NULL,
+  id_int_comprobante INTEGER,
+  id_cuenta_bancaria_mov_fk INTEGER,
+  tipo_mov VARCHAR(15) NOT NULL,
+  tipo varchar(15) NOT NULL,
+  descripcion VARCHAR(2000) NOT NULL,
+  nro_doc_tipo VARCHAR(50),
   importe NUMERIC(18,2) NOT NULL,
-  fecha date, 
-  estado VARCHAR(20) NOT NULL, 
-  observaciones VARCHAR(2000), 
+  fecha date,
+  estado VARCHAR(20) NOT NULL,
+  observaciones VARCHAR(2000),
   CONSTRAINT pk_tcuenta_bancaria_mov__id_cuenta_bancaria_mov PRIMARY KEY(id_cuenta_bancaria_mov)
 ) INHERITS (pxp.tbase)
 WITHOUT OIDS;
@@ -340,14 +340,14 @@ IS 'tipo in (''cheque'',''transferencia'')';
 
 /***********************************I-SCP-ECR-TES-0-20/12/2013***************************************/
 CREATE TABLE tes.tcaja (
-  id_caja SERIAL, 
-  id_depto INTEGER NOT NULL, 
-  id_moneda INTEGER NOT NULL, 
-  codigo VARCHAR(20) NOT NULL, 
-  tipo VARCHAR(20) NOT NULL, 
-  estado VARCHAR(20) NOT NULL, 
-  importe_maximo NUMERIC(18,2) NOT NULL, 
-  porcentaje_compra NUMERIC(6,2) NOT NULL, 
+  id_caja SERIAL,
+  id_depto INTEGER NOT NULL,
+  id_moneda INTEGER NOT NULL,
+  codigo VARCHAR(20) NOT NULL,
+  tipo VARCHAR(20) NOT NULL,
+  estado VARCHAR(20) NOT NULL,
+  importe_maximo NUMERIC(18,2) NOT NULL,
+  porcentaje_compra NUMERIC(6,2) NOT NULL,
   CONSTRAINT pk_tcaja__id_caja PRIMARY KEY(id_caja)
 ) INHERITS (pxp.tbase)
 WITHOUT OIDS;
@@ -355,11 +355,11 @@ WITHOUT OIDS;
 
 /***********************************I-SCP-ECR-TES-2-20/12/2013***************************************/
 CREATE TABLE tes.tcajero (
-  id_cajero SERIAL, 
-  id_funcionario INTEGER NOT NULL, 
-  tipo VARCHAR(20) NOT NULL, 
-  estado VARCHAR(20) NOT NULL, 
-  id_caja INTEGER, 
+  id_cajero SERIAL,
+  id_funcionario INTEGER NOT NULL,
+  tipo VARCHAR(20) NOT NULL,
+  estado VARCHAR(20) NOT NULL,
+  id_caja INTEGER,
   CONSTRAINT pk_tcajero__id_cajero PRIMARY KEY(id_cajero)
 ) INHERITS (pxp.tbase)
 WITHOUT OIDS;
@@ -452,8 +452,8 @@ IS 'Cada cuantos meses se registrar las fechas tentaivas a partir de la inicial'
 
 ALTER TABLE tes.tplan_pago
   ADD COLUMN monto_excento NUMERIC(12,2) DEFAULT 0 NOT NULL;
-  
-  
+
+
 ALTER TABLE tes.tplan_pago
   ADD COLUMN porc_monto_excento_var NUMERIC DEFAULT 0 NOT NULL;
 /***********************************F-SCP-RAC-TES-0-08/02/2014***************************************/
@@ -466,7 +466,7 @@ ALTER TABLE tes.tplan_pago
 
 ALTER TABLE tes.tobligacion_pago
   ALTER COLUMN nro_cuota_vigente TYPE NUMERIC(20,0);
-  
+
 /***********************************F-SCP-RAC-TES-0-05/03/2014***************************************/
 
 /***********************************I-SCP-JRR-TES-0-01/04/2014***************************************/
@@ -502,11 +502,11 @@ IS 'ultimo estado del plan de pago correpondiente a la cuota indicada en ultima_
 /***********************************I-SCP-RAC-TES-0-08/07/2014***************************************/
 
 CREATE TABLE tes.ttipo_plan_pago (
-  id_tipo_plan_pago SERIAL NOT NULL, 
-  codigo VARCHAR NOT NULL, 
-  descripcion VARCHAR, 
-  codigo_proceso_llave_wf VARCHAR NOT NULL, 
-  codigo_plantilla_comprobante VARCHAR, 
+  id_tipo_plan_pago SERIAL NOT NULL,
+  codigo VARCHAR NOT NULL,
+  descripcion VARCHAR,
+  codigo_proceso_llave_wf VARCHAR NOT NULL,
+  codigo_plantilla_comprobante VARCHAR,
   PRIMARY KEY(id_tipo_plan_pago)
 ) INHERITS (pxp.tbase)
 WITHOUT OIDS;
@@ -545,12 +545,12 @@ ALTER TABLE tes.tplan_pago
 /***********************************I-SCP-JRR-TES-0-31/07/2014***************************************/
 
 CREATE TABLE tes.ttipo_prorrateo (
-  id_tipo_prorrateo SERIAL, 
-  codigo VARCHAR (50) NOT NULL, 
+  id_tipo_prorrateo SERIAL,
+  codigo VARCHAR (50) NOT NULL,
   nombre VARCHAR (150) NOT NULL,
   descripcion TEXT,
   es_plantilla VARCHAR (2) NOT NULL,
-  tiene_cuenta VARCHAR (2) NOT NULL,  
+  tiene_cuenta VARCHAR (2) NOT NULL,
   CONSTRAINT ttipo_prorrateo_pkey PRIMARY KEY(id_tipo_prorrateo)
 ) INHERITS (pxp.tbase)
 WITHOUT OIDS;
@@ -838,7 +838,7 @@ ALTER TABLE tes.tplan_pago
 /***********************************I-SCP-JRR-TES-0-26/09/2014***************************************/
 ALTER TABLE tes.tplan_pago
   ADD COLUMN conformidad TEXT;
-  
+
 
 ALTER TABLE tes.tplan_pago
   ADD COLUMN fecha_conformidad DATE;
@@ -852,7 +852,7 @@ ALTER TABLE tes.tplan_pago
 
 ALTER TABLE tes.tplan_pago
   ALTER COLUMN nro_cheque DROP DEFAULT;
-  
+
 /***********************************F-SCP-RAC-TES-0-02/10/2014***************************************/
 
 
@@ -903,10 +903,10 @@ IS 'Se utiliza para hacer cuadrad el monto anticipado total con el monto aplicad
 
 /***********************************I-SCP-GSS-TES-0-27/10/2014***************************************/
 CREATE TABLE tes.tfinalidad (
-  id_finalidad SERIAL, 
-  nombre_finalidad VARCHAR(200), 
-  color VARCHAR(50), 
-  estado VARCHAR(20), 
+  id_finalidad SERIAL,
+  nombre_finalidad VARCHAR(200),
+  color VARCHAR(50),
+  estado VARCHAR(20),
   CONSTRAINT pk_tfinalidad__id_finalidad PRIMARY KEY(id_finalidad)
 ) INHERITS (pxp.tbase)
 
@@ -978,7 +978,7 @@ IS 'este campo almacena en obligaciones entendidas el saldo de anticipo parcial 
 
 ALTER TABLE tes.tplan_pago
   ALTER COLUMN porc_descuento_ley TYPE NUMERIC;
-  
+
 /***********************************F-SCP-RAC-TES-0-10/11/2014***************************************/
 
 /***********************************I-SCP-JRR-TES-0-18/11/2014***************************************/
@@ -1004,12 +1004,12 @@ IS 'arreglo que almacena los ids de la tabla finalidad al cual corresponde la cu
 --------------- SQL ---------------
 
 CREATE TABLE tes.tusuario_cuenta_banc (
-  id_usuario_cuenta_banc SERIAL, 
-  id_usuario INTEGER NOT NULL, 
-  id_cuenta_bancaria INTEGER NOT NULL, 
-  tipo_permiso VARCHAR(20) DEFAULT 'todos'::character varying NOT NULL, 
+  id_usuario_cuenta_banc SERIAL,
+  id_usuario INTEGER NOT NULL,
+  id_cuenta_bancaria INTEGER NOT NULL,
+  tipo_permiso VARCHAR(20) DEFAULT 'todos'::character varying NOT NULL,
   CONSTRAINT pk_tusuario_cuenta_banc__id_usuario_cuenta_banc PRIMARY KEY(id_usuario_cuenta_banc)
-  
+
 ) INHERITS (pxp.tbase);
 
 /***********************************F-SCP-GSS-TES-0-27/11/2014***************************************/
@@ -1125,30 +1125,30 @@ IS 'identifica la ultima cuota  del tipo devengado para alertar sobre ultimo pag
 /***********************************I-SCP-GSS-TES-0-23/04/2015***************************************/
 
 CREATE TABLE tes.tts_libro_bancos (
-  id_libro_bancos SERIAL, 
-  id_cuenta_bancaria INTEGER NOT NULL, 
-  fecha DATE, 
-  a_favor VARCHAR(200) NOT NULL, 
-  detalle TEXT NOT NULL, 
-  observaciones TEXT, 
-  nro_liquidacion VARCHAR(20), 
-  nro_comprobante VARCHAR(20), 
-  nro_cheque INTEGER, 
-  tipo VARCHAR(20) NOT NULL, 
-  importe_deposito NUMERIC(20,2) NOT NULL, 
-  importe_cheque NUMERIC(20,2) NOT NULL, 
-  origen VARCHAR(20), 
-  estado VARCHAR(20) DEFAULT 'borrador'::character varying NOT NULL, 
-  id_libro_bancos_fk INTEGER, 
-  indice NUMERIC(20,2), 
-  notificado VARCHAR(2) DEFAULT 'no'::character varying, 
-  id_finalidad INTEGER, 
-  id_estado_wf INTEGER, 
-  id_proceso_wf INTEGER, 
-  num_tramite VARCHAR(200), 
-  id_depto INTEGER, 
-  sistema_origen VARCHAR(30), 
-  comprobante_sigma VARCHAR(50), 
+  id_libro_bancos SERIAL,
+  id_cuenta_bancaria INTEGER NOT NULL,
+  fecha DATE,
+  a_favor VARCHAR(200) NOT NULL,
+  detalle TEXT NOT NULL,
+  observaciones TEXT,
+  nro_liquidacion VARCHAR(20),
+  nro_comprobante VARCHAR(20),
+  nro_cheque INTEGER,
+  tipo VARCHAR(20) NOT NULL,
+  importe_deposito NUMERIC(20,2) NOT NULL,
+  importe_cheque NUMERIC(20,2) NOT NULL,
+  origen VARCHAR(20),
+  estado VARCHAR(20) DEFAULT 'borrador'::character varying NOT NULL,
+  id_libro_bancos_fk INTEGER,
+  indice NUMERIC(20,2),
+  notificado VARCHAR(2) DEFAULT 'no'::character varying,
+  id_finalidad INTEGER,
+  id_estado_wf INTEGER,
+  id_proceso_wf INTEGER,
+  num_tramite VARCHAR(200),
+  id_depto INTEGER,
+  sistema_origen VARCHAR(30),
+  comprobante_sigma VARCHAR(50),
   CONSTRAINT tts_libro_bancos_pkey PRIMARY KEY(id_libro_bancos)
 ) INHERITS (pxp.tbase)
 WITH (oids = false);
@@ -1160,9 +1160,9 @@ COMMENT ON COLUMN tes.tts_libro_bancos.id_int_comprobante
 IS 'comprobante de pago que corresponde al cheque';
 
 CREATE TABLE tes.tdepto_cuenta_bancaria (
-  id_depto_cuenta_bancaria SERIAL, 
-  id_depto INTEGER NOT NULL, 
-  id_cuenta_bancaria INTEGER NOT NULL, 
+  id_depto_cuenta_bancaria SERIAL,
+  id_depto INTEGER NOT NULL,
+  id_cuenta_bancaria INTEGER NOT NULL,
   CONSTRAINT pk_tdepto_cuenta_bancaria PRIMARY KEY(id_depto_cuenta_bancaria)
 ) INHERITS (pxp.tbase)
 
@@ -1198,8 +1198,8 @@ ALTER TABLE tes.tobligacion_pago
 
 ALTER TABLE tes.tobligacion_pago
   ADD CONSTRAINT chk_tobligacion_pago__estado CHECK ((estado)::text = ANY (ARRAY[('borrador'::character varying)::text, ('registrado'::character varying)::text, ('en_pago'::character varying)::text, ('finalizado'::character varying)::text, ('vbpoa'::character varying)::text, ('vbpresupuestos'::character varying)::text, ('anulado'::character varying)::text]));
- 
- 
+
+
 --------------- SQL ---------------
 
 ALTER TABLE tes.tobligacion_pago
@@ -1257,7 +1257,7 @@ ALTER TABLE tes.tobligacion_pago
 
 ALTER TABLE tes.tobligacion_pago
   ADD CONSTRAINT chk_tobligacion_pago__tipo_obligacion CHECK ((tipo_obligacion)::text = ANY (ARRAY[('adquisiciones'::character varying)::text, ('pago_unico'::character varying)::text, ('pago_especial'::character varying)::text,('caja_chica'::character varying)::text, ('viaticos'::character varying)::text, ('fondos_en_avance'::character varying)::text, ('pago_directo'::character varying)::text, ('rrhh'::character varying)::text]));
-  
+
 /*****************************F-SCP-RAC-TES-0-1/07/2015*************/
 
 
@@ -1276,22 +1276,22 @@ ALTER TABLE tes.tcajero
 
 ALTER TABLE tes.tcajero
   ADD COLUMN fecha_fin DATE;
- 
+
 ALTER TABLE tes.tcaja
   DROP COLUMN importe_maximo;
-  
+
 ALTER TABLE tes.tcaja
   DROP COLUMN porcentaje_compra;
-  
+
 ALTER TABLE tes.tcaja
   DROP COLUMN codigo;
-  
+
 ALTER TABLE tes.tcaja
   ADD COLUMN nombre VARCHAR(255) NOT NULL;
-  
+
 ALTER TABLE tes.tcaja
   ADD COLUMN monto_fondo NUMERIC(18,2) NOT NULL;
-  
+
 ALTER TABLE tes.tcaja
   ADD COLUMN monto_maximo_compra NUMERIC(18,2) NOT NULL;
 
@@ -1299,49 +1299,49 @@ ALTER TABLE tes.tcaja
   ADD COLUMN tipo_ejecucion VARCHAR(40) NOT NULL;
 
 CREATE TABLE tes.tsolicitud_efectivo (
-  id_solicitud_efectivo SERIAL, 
+  id_solicitud_efectivo SERIAL,
   id_funcionario INTEGER NOT NULL,
   id_proceso_wf INTEGER NOT NULL,
   id_estado_wf INTEGER NOT NULL,
-  id_caja INTEGER NOT NULL, 
-  estado VARCHAR(50) NOT NULL, 
+  id_caja INTEGER NOT NULL,
+  estado VARCHAR(50) NOT NULL,
   motivo TEXT,
-  nro_tramite VARCHAR(50) NOT NULL, 
+  nro_tramite VARCHAR(50) NOT NULL,
   fecha DATE NOT NULL,
-  monto NUMERIC(18,2), 
+  monto NUMERIC(18,2),
   CONSTRAINT pk_tsolicitud_efectivo__id_solicitud_efectivo PRIMARY KEY(id_solicitud_efectivo)
 ) INHERITS (pxp.tbase)
 WITHOUT OIDS;
 
 CREATE TABLE tes.tsolicitud_efectivo_det (
-  id_solicitud_efectivo_det SERIAL, 
+  id_solicitud_efectivo_det SERIAL,
   id_solicitud_efectivo INTEGER,
   id_solicitud_rendicion_det INTEGER,
   id_concepto_ingas INTEGER NOT NULL,
   id_cc INTEGER NOT NULL,
-  id_partida_ejecucion INTEGER NOT NULL,   
-  monto NUMERIC(18,2) NOT NULL, 
+  id_partida_ejecucion INTEGER NOT NULL,
+  monto NUMERIC(18,2) NOT NULL,
   CONSTRAINT pk_tsolicitud_efectivo_det__id_solicitud_efectivo_det PRIMARY KEY(id_solicitud_efectivo_det)
 ) INHERITS (pxp.tbase)
 WITHOUT OIDS;
 
 CREATE TABLE tes.tproceso_caja (
-  id_proceso_caja SERIAL, 
+  id_proceso_caja SERIAL,
   id_comprobante_diario INTEGER,
   id_comprobante_pago INTEGER,
   id_proceso_wf INTEGER NOT NULL,
   id_estado_wf INTEGER NOT NULL,
-  id_caja INTEGER NOT NULL, 
-  estado VARCHAR(50) NOT NULL, 
+  id_caja INTEGER NOT NULL,
+  estado VARCHAR(50) NOT NULL,
   motivo TEXT NOT NULL,
-  nro_tramite VARCHAR(50) NOT NULL, 
+  nro_tramite VARCHAR(50) NOT NULL,
   fecha DATE NOT NULL,
-  monto_reposicion NUMERIC(18,2), 
-  tipo VARCHAR(50) NOT NULL, 
+  monto_reposicion NUMERIC(18,2),
+  tipo VARCHAR(50) NOT NULL,
   CONSTRAINT pk_tproceso_caja__id_proceso_caja PRIMARY KEY(id_proceso_caja)
 ) INHERITS (pxp.tbase)
 WITHOUT OIDS;
-  
+
 /*****************************F-SCP-JRR-TES-0-10/08/2015*************/
 
 
@@ -1354,7 +1354,7 @@ CREATE TABLE tes.testacion (
   puerto VARCHAR,
   dbname VARCHAR,
   usuario VARCHAR,
-  password VARCHAR,  
+  password VARCHAR,
   id_depto_lb INTEGER,
   CONSTRAINT testacion_pkey PRIMARY KEY(id_estacion)
 ) INHERITS (pxp.tbase)
@@ -1382,17 +1382,17 @@ DROP VIEW IF EXISTS tes.vcomp_devtesprov_plan_pago;
 
 ALTER TABLE tes.tobligacion_pago
   ALTER COLUMN tipo_cambio_conv TYPE NUMERIC;
-  
-  
+
+
 /*****************************F-SCP-RAC-TES-0-08/22/2015*************/
 
 /*****************************I-SCP-GSS-TES-0-20/21/2016*************/
 CREATE TABLE tes.tsolicitud_rendicion_det (
-  id_solicitud_rendicion_det SERIAL, 
-  id_documento_respaldo INTEGER, 
-  id_solicitud_efectivo INTEGER, 
-  id_proceso_caja INTEGER, 
-  monto NUMERIC(18,2), 
+  id_solicitud_rendicion_det SERIAL,
+  id_documento_respaldo INTEGER,
+  id_solicitud_efectivo INTEGER,
+  id_proceso_caja INTEGER,
+  monto NUMERIC(18,2),
   CONSTRAINT tsolicitud_rendicion_det_pkey PRIMARY KEY(id_solicitud_rendicion_det)
 ) INHERITS (pxp.tbase)
 
@@ -1403,19 +1403,19 @@ WITHOUT OIDS;;
 /*****************************I-SCP-GSS-TES-0-21/01/2016*************/
 ALTER TABLE tes.tcaja
   ADD COLUMN id_cuenta_bancaria INTEGER;
-  
+
 ALTER TABLE tes.tcaja
   RENAME COLUMN nombre TO codigo;
 
 ALTER TABLE tes.tcaja
   ALTER COLUMN codigo TYPE VARCHAR(20);
-  
+
 ALTER TABLE tes.tcaja
   ALTER COLUMN estado SET DEFAULT 'cerrado';
-  
+
 ALTER TABLE tes.tcaja
   RENAME COLUMN monto_fondo TO importe_maximo;
-  
+
 ALTER TABLE tes.tcaja
   RENAME COLUMN monto_maximo_compra TO porcentaje_compra;
 
@@ -1424,7 +1424,7 @@ ALTER TABLE tes.tcaja
 
 ALTER TABLE tes.tcaja
   ALTER COLUMN tipo_ejecucion TYPE VARCHAR(25);
-  
+
 /*****************************F-SCP-GSS-TES-0-21/01/2016*************/
 
 /*****************************I-SCP-GSS-TES-0-29/01/2016*************/
@@ -1434,14 +1434,14 @@ ALTER TABLE tes.tproceso_caja
 
 ALTER TABLE tes.tproceso_caja
   ADD COLUMN fecha_fin DATE;
-  
+
 ALTER TABLE tes.tsolicitud_efectivo_det
   ALTER COLUMN id_partida_ejecucion DROP NOT NULL;
-  
+
 /*****************************F-SCP-GSS-TES-0-29/01/2016*************/
 
 
-  
+
 /*****************************I-SCP-RAC-TES-0-22/03/2016*************/
 
 --------------- SQL ---------------
@@ -1516,7 +1516,7 @@ ALTER TABLE tes.tcaja
 
 ALTER TABLE tes.tsolicitud_efectivo
   ADD COLUMN id_solicitud_efectivo_fk INTEGER;
-  
+
   --------------- SQL ---------------
 
 ALTER TABLE tes.tproceso_caja
@@ -1524,7 +1524,7 @@ ALTER TABLE tes.tproceso_caja
 
 COMMENT ON COLUMN tes.tproceso_caja.id_solicitud_efectivo_rel
 IS 'en lso procesos de  apertura, reposición o cierre se inserta un registro en solicitud efectivo para facilitar el arqueo de caja';
-  
+
 /*****************************F-SCP-GSS-TES-0-28/03/2016*************/
 
 
@@ -1536,7 +1536,7 @@ ADD COLUMN id_funcionario_jefe_aprobador INTEGER;
 
 COMMENT ON COLUMN tes.tsolicitud_efectivo.id_funcionario_jefe_aprobador
 IS 'id del jefe que aprobo la solicitud de efectivo del solicitante';
-  
+
 /*****************************F-SCP-GSS-TES-0-28/04/2016*************/
 
 
@@ -1556,11 +1556,11 @@ IS 'id del proceso de caja que identifica el proceso con el que se repone la ren
 /*****************************I-SCP-GSS-TES-0-05/05/2016*************/
 ---------------- SQL ---------------
 CREATE TABLE tes.ttipo_solicitud (
-  id_tipo_solicitud SERIAL, 
-  codigo VARCHAR, 
-  nombre VARCHAR, 
-  codigo_proceso_llave_wf VARCHAR, 
-  codigo_plantilla_comprobante VARCHAR, 
+  id_tipo_solicitud SERIAL,
+  codigo VARCHAR,
+  nombre VARCHAR,
+  codigo_proceso_llave_wf VARCHAR,
+  codigo_plantilla_comprobante VARCHAR,
   CONSTRAINT ttipo_solicitud_pkey PRIMARY KEY(id_tipo_solicitud)
 ) INHERITS (pxp.tbase)
 
@@ -1583,7 +1583,7 @@ ALTER TABLE tes.tfinalidad
 
 COMMENT ON COLUMN tes.tfinalidad.tipo
 IS 'ingreso o egreso';
- 
+
 /*****************************F-SCP-GSS-TES-0-24/05/2016*************/
 
 
@@ -1592,7 +1592,7 @@ IS 'ingreso o egreso';
 ---------------- SQL ---------------
 ALTER TABLE tes.tfinalidad
   ADD COLUMN sw_tipo_interfaz VARCHAR(50)[];
- 
+
 /*****************************F-SCP-GSS-TES-0-30/05/2016*************/
 
 /*****************************I-SCP-GSS-TES-0-08/06/2016*************/
@@ -1623,7 +1623,7 @@ ALTER TABLE tes.tcaja
 
 ALTER TABLE tes.tcaja
   RENAME COLUMN importe_maximo TO importe_maximo_caja;
- 
+
 ALTER TABLE tes.tcaja
   RENAME COLUMN porcentaje_compra TO importe_maximo_item;
 
@@ -1631,16 +1631,16 @@ ALTER TABLE tes.tcaja
 
 /*****************************I-SCP-GSS-TES-0-15/06/2016*************/
 
-  
-  
+
+
 CREATE TABLE tes.ttipo_proceso_caja (
-  id_tipo_proceso_caja SERIAL, 
-  codigo VARCHAR, 
-  nombre VARCHAR, 
-  codigo_plantilla_cbte VARCHAR, 
-  codigo_wf VARCHAR, 
-  visible_en VARCHAR, 
-  CONSTRAINT ttipo_proceso_caja_pkey PRIMARY KEY(id_tipo_proceso_caja), 
+  id_tipo_proceso_caja SERIAL,
+  codigo VARCHAR,
+  nombre VARCHAR,
+  codigo_plantilla_cbte VARCHAR,
+  codigo_wf VARCHAR,
+  visible_en VARCHAR,
+  CONSTRAINT ttipo_proceso_caja_pkey PRIMARY KEY(id_tipo_proceso_caja),
   CONSTRAINT chk_ttipo_proceso_caja__visible_en CHECK (((((visible_en)::text = 'abierto'::text) OR ((visible_en)::text = 'cerrado'::text)) OR ((visible_en)::text = 'ninguno'::text)) OR ((visible_en)::text = 'todos'::text))
 ) INHERITS (pxp.tbase)
 WITHOUT OIDS;
@@ -1651,26 +1651,26 @@ WITHOUT OIDS;
 
 ALTER TABLE tes.tcaja
   ADD COLUMN dias_maximo_rendicion INTEGER;
- 
+
 ALTER TABLE tes.tts_libro_bancos
   ADD COLUMN nro_deposito INTEGER UNIQUE;
-  
+
 /*****************************F-SCP-GSS-TES-0-23/06/2016*************/
 
 
 /*****************************I-SCP-GSS-TES-0-22/08/2016*************/
 
 CREATE TABLE cd.tdeposito_cd (
-  id_deposito_cd SERIAL, 
-  id_cuenta_doc INTEGER, 
-  id_libro_bancos INTEGER, 
-  importe_contable_deposito NUMERIC(20,2), 
-  CONSTRAINT tdeposito_cd_pkey PRIMARY KEY(id_deposito_cd), 
+  id_deposito_cd SERIAL,
+  id_cuenta_doc INTEGER,
+  id_libro_bancos INTEGER,
+  importe_contable_deposito NUMERIC(20,2),
+  CONSTRAINT tdeposito_cd_pkey PRIMARY KEY(id_deposito_cd),
   CONSTRAINT fk_tdeposito_cd__id_cuenta_doc FOREIGN KEY (id_cuenta_doc)
     REFERENCES cd.tcuenta_doc(id_cuenta_doc)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
-    NOT DEFERRABLE, 
+    NOT DEFERRABLE,
   CONSTRAINT fk_tdeposito_cd__id_libro_bancos FOREIGN KEY (id_libro_bancos)
     REFERENCES tes.tts_libro_bancos(id_libro_bancos)
     ON DELETE NO ACTION
@@ -1685,13 +1685,13 @@ WITH (oids = false);
 
 ALTER TABLE tes.tts_libro_bancos
   ADD COLUMN fondo_devolucion_retencion VARCHAR(2);
-  
+
   --------------- SQL ---------------
 
 ALTER TABLE tes.tts_libro_bancos
   ADD COLUMN columna_pk VARCHAR(100);
-  
-  
+
+
   --------------- SQL ---------------
 
 ALTER TABLE tes.tts_libro_bancos
@@ -1753,8 +1753,8 @@ ALTER TABLE tes.tobligacion_pago
 
 ALTER TABLE tes.tobligacion_pago
   ADD COLUMN id_funcionario_responsable INTEGER;
-  
- 
+
+
 /*****************************F-SCP-RAC-TES-0-09/08/2017*************/
 
 
@@ -1797,7 +1797,7 @@ CREATE TABLE tes.tconformidad (
 
 WITH (oids = false);
   /*****************************F-SCP-MAY-TES-0-31/08/2018*************/
-  
+
  /*****************************I-SCP-MAY-TES-0-05/09/2018*************/
 
 ALTER TABLE tes.tconformidad
@@ -1843,3 +1843,41 @@ ALTER TABLE tes.ttipo_plan_pago
 ALTER TABLE tes.tts_libro_bancos
   ADD COLUMN tabla VARCHAR(255);
 /*****************************F-SCP-FEA-TES-0-07/11/2018*************/
+
+/*****************************I-SCP-MAY-TES-0-11/01/2019*************/
+ALTER TABLE tes.tobligacion_pago
+  ADD COLUMN fecha_costo_ini_pp DATE;
+
+COMMENT ON COLUMN tes.tobligacion_pago.fecha_costo_ini_pp
+IS 'fecha inicial para reflejar en plan de pago';
+
+
+ALTER TABLE tes.tobligacion_pago
+  ADD COLUMN fecha_costo_fin_pp DATE;
+
+COMMENT ON COLUMN tes.tobligacion_pago.fecha_costo_fin_pp
+IS 'fecha fin para reflejar en plan de pago';
+/*****************************F-SCP-MAY-TES-0-11/01/2019*************/
+
+/*****************************I-SCP-MAY-TES-0-11/02/2019*************/
+ALTER TABLE tes.tobligacion_det
+  ALTER COLUMN id_orden_trabajo SET NOT NULL;
+/*****************************F-SCP-MAY-TES-0-11/02/2019*************/
+/*****************************I-SCP-MAY-TES-0-18/02/2019*************/
+ALTER TABLE tes.tcuenta_bancaria
+  ADD COLUMN forma_pago VARCHAR(30);
+/*****************************F-SCP-MAY-TES-0-18/02/2019*************/
+
+/*****************************I-SCP-MAY-TES-0-21/02/2019*************/
+ -- object recreation
+ALTER TABLE tes.tobligacion_pago
+  DROP CONSTRAINT chk_tobligacion_pago__tipo_obligacion RESTRICT;
+
+ALTER TABLE tes.tobligacion_pago
+  ADD CONSTRAINT chk_tobligacion_pago__tipo_obligacion CHECK ((tipo_obligacion)::text = ANY (ARRAY[('adquisiciones'::character varying)::text, ('pago_unico'::character varying)::text, ('pago_especial'::character varying)::text, ('caja_chica'::character varying)::text, ('viaticos'::character varying)::text, ('fondos_en_avance'::character varying)::text, ('pago_directo'::character varying)::text, ('rrhh'::character varying)::text, ('pga'::character varying)::text, ('ppm'::character varying)::text, ('pce'::character varying)::text, ('pbr'::character varying)::text, ('sp'::character varying)::text]));
+/*****************************F-SCP-MAY-TES-0-21/02/2019*************/
+
+/*****************************I-SCP-MAY-TES-0-25/02/2019*************/
+ALTER TABLE tes.tplan_pago
+  ADD COLUMN id_proveedor_cta_bancaria INTEGER;
+/*****************************F-SCP-MAY-TES-0-25/02/2019*************/
