@@ -415,23 +415,23 @@ header("content-type: text/javascript; charset=UTF-8");
                     // disabled: true,
                     emptyText: 'Proveedor...',
                     store: new Ext.data.JsonStore({
-                        url:'../../sis_parametros/control/Proveedor/listarProveedorCombos',
+                        url: '../../sis_parametros/control/Proveedor/listarProveedorCombos',
                         id: 'id_proveedor',
                         root: 'datos',
-                        sortInfo:{
+                        sortInfo: {
                             field: 'rotulo_comercial',
                             direction: 'ASC'
                         },
                         totalProperty: 'total',
-                        fields: ['id_proveedor','desc_proveedor','codigo','nit','rotulo_comercial','lugar','email'],
+                        fields: ['id_proveedor', 'desc_proveedor', 'codigo', 'nit', 'rotulo_comercial', 'lugar', 'email'],
                         // turn on remote sorting
                         remoteSort: true,
-                        baseParams:Ext.apply({par_filtro:'desc_proveedor#codigo#nit#rotulo_comercial'})
+                        baseParams: Ext.apply({par_filtro: 'desc_proveedor#codigo#nit#rotulo_comercial'})
 
                     }),
                     valueField: 'id_proveedor',
                     displayField: 'desc_proveedor',
-                    // gdisplayField: 'desc_contrato',
+                    gdisplayField: 'desc_proveedor',
                     triggerAction: 'all',
                     lazyRender: true,
                     resizable: true,
@@ -480,7 +480,7 @@ header("content-type: text/javascript; charset=UTF-8");
                             direction: 'ASC'
                         },
                         totalProperty: 'total',
-                        fields: ['id_contrato','nro_tramite', 'numero', 'tipo', 'objeto', 'estado', 'desc_proveedor', 'monto', 'moneda', 'fecha_inicio', 'fecha_fin'],
+                        fields: ['id_contrato', 'nro_tramite', 'numero', 'tipo', 'objeto', 'estado', 'desc_proveedor', 'monto', 'moneda', 'fecha_inicio', 'fecha_fin'],
                         // turn on remote sorting
                         remoteSort: true,
                         baseParams: {
@@ -546,23 +546,23 @@ header("content-type: text/javascript; charset=UTF-8");
                     // disabled: true,
                     emptyText: 'Moneda...',
                     store: new Ext.data.JsonStore({
-                        url:'../../sis_parametros/control/Moneda/listarMoneda',
+                        url: '../../sis_parametros/control/Moneda/listarMoneda',
                         id: 'id_moneda',
                         root: 'datos',
-                        sortInfo:{
+                        sortInfo: {
                             field: 'moneda',
                             direction: 'ASC'
                         },
                         totalProperty: 'total',
-                        fields: ['id_moneda','moneda','codigo','tipo_moneda','codigo_internacional'],
+                        fields: ['id_moneda', 'moneda', 'codigo', 'tipo_moneda', 'codigo_internacional'],
                         // turn on remote sorting
                         remoteSort: true,
-                        baseParams:Ext.apply({par_filtro:'moneda#codigo',filtrar:'si'})
+                        baseParams: Ext.apply({par_filtro: 'moneda#codigo', filtrar: 'si'})
 
                     }),
                     valueField: 'id_moneda',
                     displayField: 'moneda',
-                     // gdisplayField: 'desc_contrato',
+                    // gdisplayField: 'desc_contrato',
                     triggerAction: 'all',
                     lazyRender: true,
                     resizable: true,
@@ -2019,8 +2019,8 @@ header("content-type: text/javascript; charset=UTF-8");
                             scope: this
                         });
                 }
-            }else{
-                if (rec.data.tipo_obligacion == 'pbr' && rec.data.estado == 'vbpresupuestos' && (rec.data.fecha_certificacion_pres == '' || rec.data.fecha_certificacion_pres == null)){
+            } else {
+                if (rec.data.tipo_obligacion == 'pbr' && rec.data.estado == 'vbpresupuestos' && (rec.data.fecha_certificacion_pres == '' || rec.data.fecha_certificacion_pres == null)) {
                     Ext.Msg.show({
                         title: 'Información',
                         msg: '<b>Estimado usuario:</b><br>No puede pasar al siguiente estado porque no ha definido la fecha de Certificación Presupuestaria.',
@@ -2028,7 +2028,7 @@ header("content-type: text/javascript; charset=UTF-8");
                         width: 512,
                         icon: Ext.Msg.INFO
                     });
-                }else {
+                } else {
                     this.objWizard = Phx.CP.loadWindows('../../../sis_workflow/vista/estado_wf/FormEstadoWf.php',
                         'Estado de Wf',
                         {
