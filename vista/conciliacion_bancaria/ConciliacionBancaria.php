@@ -194,7 +194,7 @@ header("content-type: text/javascript; charset=UTF-8");
    			config:{
        		    name:'id_funcionario_elabo',
        		    hiddenName: 'id_funcionario',
-   				origen:'FUNCIONARIOCAR',
+   				origen:'FUNCIONARIO',
    				fieldLabel:'Elaborado por',
    				allowBlank:true,
                 gwidth:200,
@@ -214,7 +214,7 @@ header("content-type: text/javascript; charset=UTF-8");
    			config:{
        		    name:'id_funcionario_vb',
        		    hiddenName: 'id_funcionario',
-   				origen:'FUNCIONARIOCAR',
+   				origen:'FUNCIONARIO',
    				fieldLabel:'Vo.Bo',
    				allowBlank:true,
                 gwidth:200,

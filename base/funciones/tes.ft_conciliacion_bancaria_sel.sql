@@ -223,7 +223,7 @@ BEGIN
                    t3.denominacion,
                    t3.nro_cheque    
                  from tt_conciliacion_t3 t3
-                 where ';
+                 where  t3.total_haber > 0 and';
 			v_consulta:=v_consulta||v_parametros.filtro;
 
 			--Devuelve la respuesta
