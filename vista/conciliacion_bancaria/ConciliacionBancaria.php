@@ -220,7 +220,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 gwidth:200,
    				valueField: 'id_funcionario',
    			    gdisplayField: 'fun_vb',
-   			    baseParams: { es_combo_solicitud : 'si' },
+   			    baseParams: { es_combo_solicitud : 'no' },
       			renderer:function(value, p, record){return String.format('{0}', record.data['fun_vb']);}
        	     },
    			type:'ComboRec',//ComboRec
