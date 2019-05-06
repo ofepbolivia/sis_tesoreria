@@ -56,8 +56,8 @@ class MODConciliacionBancaria extends MODbase{
 		$this->setParametro('id_cuenta_bancaria','id_cuenta_bancaria','int4');
 		$this->setParametro('id_gestion','id_gestion','int4');
 		$this->setParametro('id_periodo','id_periodo','int4');
-		$this->setParametro('id_funcionario_elabo','id_funcionario_elabo','int4');
-		$this->setParametro('id_funcionario_vb','id_funcionario_vb','int4');		
+		//$this->setParametro('id_funcionario_elabo','id_funcionario_elabo','int4');
+		//$this->setParametro('id_funcionario_vb','id_funcionario_vb','int4');		
 		$this->setParametro('fecha','fecha','date');		
 		$this->setParametro('observaciones','observaciones','text');
 		$this->setParametro('saldo_banco','saldo_banco','numeric');
@@ -82,8 +82,8 @@ class MODConciliacionBancaria extends MODbase{
 		$this->setParametro('id_conciliacion_bancaria','id_conciliacion_bancaria','int4');
 		$this->setParametro('id_gestion','id_gestion','int4');
 		$this->setParametro('id_periodo','id_periodo','int4');
-		$this->setParametro('id_funcionario_elabo','id_funcionario_elabo','int4');
-		$this->setParametro('id_funcionario_vb','id_funcionario_vb','int4');		
+		//$this->setParametro('id_funcionario_elabo','id_funcionario_elabo','int4');
+		//$this->setParametro('id_funcionario_vb','id_funcionario_vb','int4');		
 		$this->setParametro('fecha','fecha','date');		
 		$this->setParametro('observaciones','observaciones','text');
 		$this->setParametro('saldo_banco','saldo_banco','numeric');		

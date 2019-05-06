@@ -152,8 +152,8 @@ header("content-type: text/javascript; charset=UTF-8");
 				name: 'fecha',
 				fieldLabel: 'Fecha Elaboración',
 				allowBlank: false,
-				anchor: '50%',
-				gwidth: 90,
+				anchor: '70%',
+				gwidth: 120,
 				format: 'd/m/Y',
 				renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
 			},
@@ -168,8 +168,8 @@ header("content-type: text/javascript; charset=UTF-8");
 				name: 'saldo_banco',
 				fieldLabel: 'Saldo Según Extracto Bancario',
 				allowBlank: false,
-				anchor: '50%',
-				gwidth: 90				
+				anchor: '80%',
+				gwidth: 170				
 			},
 				type:'NumberField',				
 				id_grupo:1,
@@ -181,8 +181,8 @@ header("content-type: text/javascript; charset=UTF-8");
 				name: 'observaciones',
 				fieldLabel: 'Observaciones',
 				allowBlank: false,
-				anchor: '80%',
-				gwidth: 150
+				anchor: '100%',
+				gwidth: 170
 			},
 			type:'TextArea',
 			filters:{pfiltro:'conci.observaciones',type:'string'},			
@@ -207,8 +207,8 @@ header("content-type: text/javascript; charset=UTF-8");
    			id_grupo:0,
    			filters:{pfiltro:'fun.desc_funcionario2',type:'string'},
    			bottom_filter:true,
-   		    grid:true,
-   			form:true
+   		    grid:false,
+   			form:false
 		 },
 		{
    			config:{
@@ -227,8 +227,8 @@ header("content-type: text/javascript; charset=UTF-8");
    			id_grupo:0,
    			filters:{pfiltro:'fu.desc_funcionario2',type:'string'},
    			bottom_filter:true,
-   		    grid:true,
-   			form:true
+   		    grid:false,
+   			form:false
 		 },		 				
 		{
 			config:{

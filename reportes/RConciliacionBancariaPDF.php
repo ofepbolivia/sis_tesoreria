@@ -269,7 +269,7 @@ $html = '<table border="1" cellpadding="2">
       </table><br/>
     </td>
     <td colspan="1" width="270"><b>Elaborado por:</b> <br>'.$fun_elba.'</td>
-    <td colspan="2"  width="260"><b>Vo.Bo: </b> <br>'. $fun_vb.'</td>
+    <td colspan="2"  width="260"><b>Vo.Bo.: </b> <br>'. $fun_vb.'</td>
   </tr>
   <tr>
     <td colspan="4"><b>OBSERVACIONES: </b>'. $observa.'</td>
