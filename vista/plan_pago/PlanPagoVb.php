@@ -31,7 +31,7 @@ header("content-type: text/javascript; charset=UTF-8");
             this.Atributos[this.getIndAtributo('numero_op')].grid = true;
             this.Atributos[this.getIndAtributo('nro_cuota')].form = false;
             this.Atributos[this.getIndAtributo('forma_pago')].form = true;
-            this.Atributos[this.getIndAtributo('nro_cheque')].form = false;
+            this.Atributos[this.getIndAtributo('nro_cheque')].form = true;
             this.Atributos[this.getIndAtributo('nro_cheque')].valorInicial = 0;
             this.Atributos[this.getIndAtributo('nro_cuenta_bancaria')].form = true;
             this.Atributos[this.getIndAtributo('id_depto_lb')].form = true;
@@ -438,8 +438,8 @@ header("content-type: text/javascript; charset=UTF-8");
             // }, this);
 
             //(may)para controlar que id de estas cuentas bancarias sean desactivados los campos en forma de pago (61,78,79)
-            this.Cmp.id_cuenta_bancaria.on('select', function (groupRadio,radio) {
-                this.ocultarFP(this,radio.inputValue);
+            this.Cmp.id_cuenta_bancaria.on('select', function (groupRadio, radio) {
+                this.ocultarFP(this, radio.inputValue);
 
             }, this);
 
@@ -473,7 +473,6 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.Cmp.fecha_costo_fin.setMinValue(fecha_inicio);
                 this.Cmp.fecha_costo_fin.setMaxValue(fecha_fin);
             }, this);
-
 
 
         },
