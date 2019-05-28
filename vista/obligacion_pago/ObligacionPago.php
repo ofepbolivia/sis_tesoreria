@@ -113,14 +113,15 @@ header("content-type: text/javascript; charset=UTF-8");
             });
 
             //RCM: reporte de verificacion presupeustaria
-            this.addButton('btnCheckPresupeusto', {
-                text: 'Rev./Incr. Pres.',
-                grupo: [0, 1, 2],
-                iconCls: 'bassign',
-                disabled: false,
-                handler: this.onBtnCheckPresup,
-                tooltip: '<b>Revertir/Incrementar  presupuestos,  permite ver la evolucón presupuestaria y revertir parcialmente</b>'
-            });
+            //28-05-2019 se comenta porque se hizo de otra forma el registro.
+            // this.addButton('btnCheckPresupeusto', {
+            //     text: 'Rev./Incr. Pres.',
+            //     grupo: [0, 1, 2],
+            //     iconCls: 'bassign',
+            //     disabled: false,
+            //     handler: this.onBtnCheckPresup,
+            //     tooltip: '<b>Revertir/Incrementar  presupuestos,  permite ver la evolucón presupuestaria y revertir parcialmente</b>'
+            // });
 
             //this.addButton('diagrama_gantt',{grupo:[0,1,2],text:'Gant', iconCls: 'bgantt', disabled:true, handler:diagramGantt,tooltip: '<b>Diagrama Gantt de proceso macro</b>'});
 
