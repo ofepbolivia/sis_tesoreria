@@ -1361,9 +1361,9 @@ header("content-type: text/javascript; charset=UTF-8");
                     this.getBoton('ajustes').disable();
                 }
 
-                if (data['pago_variable'] != 'finalizado' && data['estado'] != 'anulado') {
-                    this.getBoton('btnCheckPresupeusto').enable();
-                }
+                // if (data['pago_variable'] != 'finalizado' && data['estado'] != 'anulado') {
+                //     this.getBoton('btnCheckPresupeusto').enable();
+                // }
 
 
                 if (this.getBoton('edit')) {
@@ -1429,7 +1429,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.getBoton('ajustes').disable();
                 this.getBoton('est_anticipo').disable();
                 this.getBoton('btnExtender').disable();
-                this.getBoton('btnCheckPresupeusto').disable();
+                // this.getBoton('btnCheckPresupeusto').disable();
                 this.getBoton('btnObs').disable();
 
                 //Inhabilita el reporte de disponibilidad
