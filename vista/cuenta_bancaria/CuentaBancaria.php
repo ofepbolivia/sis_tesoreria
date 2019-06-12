@@ -322,18 +322,44 @@ Phx.vista.CuentaBancaria=Ext.extend(Phx.gridInterfaz,{
             config:{
                 name: 'forma_pago',
                 fieldLabel: 'Forma de Pago',
-                gwidth: 100,
-                maxLength:30,
-                items: [
-                    {boxLabel: 'Cheque',name: 'fp-auto',  inputValue: 'cheque', checked:true},
-                    {boxLabel: 'Transferencia',name: 'fp-auto', inputValue: 'transferencia'}
-                    //,{boxLabel: 'Caja',name: 'fp-auto', inputValue: 'Caja'}
-                ]
+                allowBlank: false,
+                emptyText:'Forma de Pago...',
+                store:new Ext.data.JsonStore(
+                    {
+                        url: '../../sis_parametros/control/FormaPago/listarFormaPago',
+                        id: 'id_forma_pago',
+                        root:'datos',
+                        sortInfo:{
+                            field:'desc_forma_pago',
+                            direction:'ASC'
+                        },
+                        totalProperty:'total',
+                        fields: ['id_forma_pago','desc_forma_pago','observaciones','cod_inter'],
+                        remoteSort: true,
+                        baseParams:{par_filtro:'desc_forma_pago'}
+                    }),
+                tpl:'<tpl for="."><div class="x-combo-list-item"><p>{desc_forma_pago}</p></div></tpl>',
+                valueField: 'desc_forma_pago',
+                hiddenValue: 'id_forma_pago',
+                displayField: 'desc_forma_pago',
+                gdisplayField:'desc_forma_pago',
+                listWidth:'280',
+                forceSelection:true,
+                typeAhead: false,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode:'remote',
+                pageSize:20,
+                queryDelay:500,
+
+                gwidth: 250,
+                minChars:2,
+                renderer:function (value, p, record){return String.format('{0}', record.data['forma_pago']);}
             },
-            type:'RadioGroupField',
+            type:'ComboBox',
             filters:{pfiltro:'ctaban.forma_pago',type:'string'},
             id_grupo:1,
-            grid:true,
+            grid:false,
             form:true
         }
 	],

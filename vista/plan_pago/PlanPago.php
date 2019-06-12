@@ -72,7 +72,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                 text: 'Dividir gasto',
                                 handler: me.calcularAnticipo,
                                 scope: me,
-                                tooltip: 'Según las fechas,  ayuda con el calculo  del importe anticipado'
+                                tooltip: 'Según las fechas,  ayuda con el cálculo  del importe anticipado'
                             }],
                             id_grupo: 3,
                             flex: 1
@@ -109,7 +109,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 iconCls: 'badelante',
                 disabled: true,
                 handler: this.sigEstado,
-                tooltip: '<b>Apueba y pasar al Siguiente Estado</b>'
+                tooltip: '<b>Aprueba y pasa al Siguiente Estado</b>'
             });
             this.addButton('SolPlanPago', {
                 grupo: [0, 1],
@@ -126,7 +126,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     iconCls: 'bchecklist',
                     disabled: true,
                     handler: this.loadCheckDocumentosSolWf,
-                    tooltip: '<b>Documentos de la Solicitud</b><br/>Subir los documetos requeridos en la solicitud seleccionada.'
+                    tooltip: '<b>Documentos de la Solicitud</b><br/>Subir los documentos requeridos en la solicitud seleccionada.'
                 }
             );
 
@@ -538,7 +538,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     emptyText: 'Elija una plantilla...',
                     store: new Ext.data.JsonStore(
                         {
-                            url: '../../sis_parametros/control/Plantilla/listarPlantilla',
+                            url: '../../sis_parametros/control/Plantilla/listarPlantillaFil',
                             id: 'id_plantilla',
                             root: 'datos',
                             sortInfo: {
@@ -710,24 +710,69 @@ header("content-type: text/javascript; charset=UTF-8");
                 grid: false,
                 form: false
             },
+            // {
+            //     config: {
+            //         name: 'forma_pago',
+            //         fieldLabel: 'Forma de Pago',
+            //         allowBlank: false,
+            //         gwidth: 100,
+            //         maxLength: 30,
+            //         items: [
+            //             {boxLabel: 'Cheque', name: 'fp-auto', inputValue: 'cheque', checked: true},
+            //             {boxLabel: 'Transferencia', name: 'fp-auto', inputValue: 'transferencia'}
+            //             //,{boxLabel: 'Caja',name: 'fp-auto', inputValue: 'Caja'}
+            //         ]
+            //     },
+            //     type: 'RadioGroupField',
+            //     filters: {pfiltro: 'plapa.forma_pago', type: 'string'},
+            //     id_grupo: 1,
+            //     grid: false,
+            //     form: false
+            // },
+
             {
-                config: {
+                config:{
                     name: 'forma_pago',
                     fieldLabel: 'Forma de Pago',
                     allowBlank: false,
-                    gwidth: 100,
-                    maxLength: 30,
-                    items: [
-                        {boxLabel: 'Cheque', name: 'fp-auto', inputValue: 'cheque', checked: true},
-                        {boxLabel: 'Transferencia', name: 'fp-auto', inputValue: 'transferencia'}
-                        //,{boxLabel: 'Caja',name: 'fp-auto', inputValue: 'Caja'}
-                    ]
+                    emptyText:'Forma de Pago...',
+                    store:new Ext.data.JsonStore(
+                        {
+                            url: '../../sis_parametros/control/FormaPago/listarFormaPagofil',
+                            id: 'id_forma_pago',
+                            root:'datos',
+                            sortInfo:{
+                                field:'desc_forma_pago',
+                                direction:'ASC'
+                            },
+                            totalProperty:'total',
+                            fields: ['id_forma_pago','desc_forma_pago','observaciones','cod_inter'],
+                            remoteSort: true,
+                            baseParams:{par_filtro:'desc_forma_pago'}
+                        }),
+                    tpl:'<tpl for="."><div class="x-combo-list-item"><p>{desc_forma_pago}</p></div></tpl>',
+                    valueField: 'desc_forma_pago',
+                    hiddenValue: 'id_forma_pago',
+                    displayField: 'desc_forma_pago',
+                    gdisplayField:'desc_forma_pago',
+                    listWidth:'280',
+                    forceSelection:true,
+                    typeAhead: false,
+                    triggerAction: 'all',
+                    lazyRender:true,
+                    mode:'remote',
+                    pageSize:20,
+                    queryDelay:500,
+
+                    gwidth: 250,
+                    minChars:2,
+                    renderer:function (value, p, record){return String.format('{0}', record.data['forma_pago']);}
                 },
-                type: 'RadioGroupField',
-                filters: {pfiltro: 'plapa.forma_pago', type: 'string'},
-                id_grupo: 1,
-                grid: false,
-                form: false
+                type:'ComboBox',
+                filters:{pfiltro:'plapa.forma_pago',type:'string'},
+                id_grupo:1,
+                grid:false,
+                form:false
             },
             {
                 config: {
@@ -1848,7 +1893,7 @@ header("content-type: text/javascript; charset=UTF-8");
 
                 this.Cmp.id_plantilla.fireEvent('select', this.Cmp.id_plantilla, {data: reg.datos[0]}, 0);
             } else {
-                alert('error al recuperar la plantilla para editar, actualice su navegador');
+                alert('Error al recuperar la plantilla para editar, actualice su navegador');
             }
         },
 
