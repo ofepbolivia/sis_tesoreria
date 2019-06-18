@@ -150,14 +150,15 @@ header("content-type: text/javascript; charset=UTF-8");
                 handler: this.onOpenObs,
                 tooltip: '<b>Observaciones</b><br/><b>Observaciones del WF</b>'
             });
-            this.addButton('SincPresu', {
-                grupo: [0, 1],
-                text: 'Inc. Pres.',
-                iconCls: 'balert',
-                disabled: true,
-                handler: this.onBtnSincPresu,
-                tooltip: '<b>Incrementar Presupuesto</b><br/> Incremeta el presupuesto exacto para proceder con el pago'
-            });
+            //18-06-2019, se oculta boton Inc. Pres.
+            // this.addButton('SincPresu', {
+            //     grupo: [0, 1],
+            //     text: 'Inc. Pres.',
+            //     iconCls: 'balert',
+            //     disabled: true,
+            //     handler: this.onBtnSincPresu,
+            //     tooltip: '<b>Incrementar Presupuesto</b><br/> Incremeta el presupuesto exacto para proceder con el pago'
+            // });
 
         },
         tam_pag: 50,
@@ -797,7 +798,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     anchor: '80%',
                     gwidth: 100,
                     maxLength: 50,
-                    disabled: true
+                    disabled: false
                 },
                 type: 'TextField',
                 filters: {pfiltro: 'plapa.nro_cuenta_bancaria', type: 'string'},
@@ -1837,19 +1838,23 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.Cmp.id_depto_lb.disable();
                 this.Cmp.nro_cuenta_bancaria.allowBlank = true;
                 this.Cmp.nro_cuenta_bancaria.disable();
+                this.Cmp.forma_pago.disable();
             }
             if (data.estado == 'vbfin') {
                 this.Cmp.id_cuenta_bancaria.disable();
                 this.Cmp.nro_cuenta_bancaria.disable();
+                this.Cmp.forma_pago.disable();
 
             }
             if (data.estado == 'vbcostos') {
                 this.Cmp.id_cuenta_bancaria.disable();
                 this.Cmp.id_depto_lb.disable();
+                this.Cmp.forma_pago.disable();
 
             }
             if (data.estado == 'vbdeposito') {
                 this.Cmp.id_cuenta_bancaria.disable();
+                this.Cmp.forma_pago.disable();
 
             }
 
