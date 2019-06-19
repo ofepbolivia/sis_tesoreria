@@ -244,6 +244,7 @@ BEGIN
                         plapa.monto_anticipo,
                         plapa.fecha_costo_ini,
                         plapa.fecha_costo_fin,
+                        plapa.fecha_conclusion_pago,
                         funwf.desc_funcionario1::text as funcionario_wf,
                         plapa.tiene_form500,
                         plapa.id_depto_lb,
@@ -1262,3 +1263,6 @@ VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
 COST 100;
+
+ALTER FUNCTION tes.f_plan_pago_sel (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
+  OWNER TO postgres;

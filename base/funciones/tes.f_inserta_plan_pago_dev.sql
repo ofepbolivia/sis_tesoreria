@@ -394,7 +394,7 @@ BEGIN
 
                     --actualiza el proceso
 
-                    -- actuliaza el stado en la solicitud
+                    -- actuliaza el stado en la solictud
                      update tes.tobligacion_pago  p set
                        id_estado_wf =  v_id_estado_actual,
                        estado = va_codigo_estado_pro[1],
@@ -556,6 +556,7 @@ BEGIN
             monto_anticipo,
             fecha_costo_ini,
             fecha_costo_fin,
+            fecha_conclusion_pago,
             es_ultima_cuota,
             monto_establecido
           	) values(
@@ -605,6 +606,7 @@ BEGIN
             v_monto_anticipo,
             (p_hstore->'fecha_costo_ini')::date,
             (p_hstore->'fecha_costo_fin')::date,
+            (p_hstore->'fecha_conclusion_pago')::date,
             true,
             v_monto_establecido
            )RETURNING id_plan_pago into v_id_plan_pago;
@@ -684,6 +686,7 @@ LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
+PARALLEL UNSAFE
 COST 100;
 
 ALTER FUNCTION tes.f_inserta_plan_pago_dev (p_administrador integer, p_id_usuario integer, p_hstore public.hstore, p_salta boolean)

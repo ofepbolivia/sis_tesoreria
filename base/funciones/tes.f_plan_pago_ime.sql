@@ -918,6 +918,7 @@ BEGIN
             monto_anticipo = v_monto_anticipo,
             fecha_costo_ini = v_parametros.fecha_costo_ini,
             fecha_costo_fin = v_parametros.fecha_costo_fin,
+            fecha_conclusion_pago = v_parametros.fecha_conclusion_pago,
             /*es_ultima_cuota = v_parametros.es_ultima_cuota*/
             monto_establecido =v_monto_establecido
             where id_plan_pago = v_parametros.id_plan_pago;
@@ -1011,6 +1012,11 @@ BEGIN
 
             IF NOT ((date_part('year',v_parametros.fecha_costo_ini) = v_anio_ges) and (date_part('year',v_parametros.fecha_costo_fin)=v_anio_ges)) THEN
                raise exception 'LAS FECHAS NO CORRESPONDEN A LA GESTIÓN, NÚMERO DE TRÁMITE % gestión %', v_num_tramite, v_anio_ges;
+            END IF;
+
+            --control fecha de conclusion del pago
+            IF (v_parametros.fecha_conclusion_pago<now()) THEN
+                raise exception 'LA FECHA CONCLUSION ES MENOR A LA FECHA %',to_char(now(), 'DD-MM-YYYY');
             END IF;
 
             -- chequea fechas de costos inicio y fin
@@ -2209,4 +2215,8 @@ LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
+PARALLEL UNSAFE
 COST 100;
+
+ALTER FUNCTION tes.f_plan_pago_ime (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
+  OWNER TO postgres;
