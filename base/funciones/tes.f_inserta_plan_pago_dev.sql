@@ -394,7 +394,7 @@ BEGIN
 
                     --actualiza el proceso
 
-                    -- actuliaza el stado en la solictud
+                    -- actuliaza el stado en la solicitud
                      update tes.tobligacion_pago  p set
                        id_estado_wf =  v_id_estado_actual,
                        estado = va_codigo_estado_pro[1],
@@ -685,3 +685,6 @@ VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
 COST 100;
+
+ALTER FUNCTION tes.f_inserta_plan_pago_dev (p_administrador integer, p_id_usuario integer, p_hstore public.hstore, p_salta boolean)
+  OWNER TO postgres;

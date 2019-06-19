@@ -179,6 +179,19 @@ DECLARE
     v_porcentaje13_monto		numeric;
     v_codigo_tipo_relacion		varchar;
 
+    --variables para internacionales
+    v_res_cone  				varchar;
+    v_cadena_cnx 				varchar;
+    v_cadena_inter				varchar;
+    v_obligacion_pago_json  	json;
+    v_obligacion_det_json		json;
+    v_obligacion_pp_json		json;
+    v_obligacion_pago			integer;
+    v_documentos 				json;
+
+    v_pre_integrar_presupuestos	varchar;
+    v_id_depto_lb_pp			integer;
+
 
 
 BEGIN
@@ -918,73 +931,8 @@ BEGIN
                raise exception 'LAS FECHAS NO CORRESPONDEN A LA GESTIÓN, NÚMERO DE TRÁMITE % TIENE COMO FECHA %', v_num_tramite,v_fecha_op;
             END IF;
 			*/
-            
-            /*------------------------------------------------------------------
-            --conexion a BUE
-            si elige  Libro de bancos destino a BUE copia su obligacion, 
-            detalle y plan de pago al servidor BUE con un nuevo proceso
-            
-            --conexion para MIAMI falta desarrollar conexion
-            --------------------------------------------------------------------*/
-            /*
-            v_obligacion_pago_json=(select json_agg(top.*) 
-            						from tes.tobligacion_pago top
-            						inner join tes.tplan_pago tp on tp.id_obligacion_pago = top.id_obligacion_pago
-            						where tp.id_plan_pago = v_parametros.id_plan_pago );
-                                
-            v_obligacion_pago=(select top.id_obligacion_pago
-                                  from tes.tobligacion_pago top
-                                  inner join tes.tplan_pago tp on tp.id_obligacion_pago = top.id_obligacion_pago
-                                  where tp.id_plan_pago = v_parametros.id_plan_pago);
-                                  
-            v_obligacion_det_json=(select json_agg(tod.*) 
-            						from tes.tobligacion_det tod
-                                    inner join tes.tobligacion_pago top on top.id_obligacion_pago = tod.id_obligacion_pago
-                                    where tod.id_obligacion_pago = v_obligacion_pago ); 
-            
-             v_obligacion_pp_json=(select json_agg(pp.*) 
-            				      from tes.tplan_pago pp 
-                                  inner join tes.tobligacion_pago top on top.id_obligacion_pago = pp.id_obligacion_pago
-                                  where top.id_obligacion_pago = v_obligacion_pago ); 
-                                  
-             v_documentos=(select json_agg(dw.*) 
-            				      from wf.tdocumento_wf dw 
-                                  inner join tes.tplan_pago pp on pp.id_proceso_wf = dw.id_proceso_wf
-                                  --inner join tes.tobligacion_pago op on op.id_proceso_wf = dw.id_proceso_wf
-                                  --where op.id_obligacion_pago = v_obligacion_pago );
-                                  where pp.id_plan_pago = v_parametros.id_plan_pago);
-                    
-           --registra op para una internacional
-           IF (v_registros_pp.estado = 'vbfin') THEN
-             
-             IF (v_parametros.id_depto_lb = 27 )THEN
-                -- funcion para revertir tb en bolivia 
-                v_cadena_cnx =  tes.f_obtener_cadena_conexion_argentina();
-                
-                --Se realizara la creacion de la funcion de insertando datos en buenos aires
-                v_cadena_inter = 'select tes.ft_obligacion_pago_inter_bue_ime('''||p_administrador::integer||''','''||p_id_usuario::integer||''','''||v_obligacion_pago_json::json||''','''||v_obligacion_det_json::json||''','''||v_obligacion_pp_json::json||''','''||v_documentos::json||''')';
-               
-              
-               v_resp =  (SELECT dblink_connect(v_cadena_cnx));
-			          
-			             IF(v_resp!='OK') THEN
-			            --raise exception 'FALLA1111';
-			             	--modificar bandera de fallo  
-			                 raise exception 'FALLA CONEXION A LA BASE DE DATOS CON DBLINK';
-			                 
-			             ELSE 
-                        
-                        --raise exception 'FALLA %',v_obligacion_pago_json;
-					   
-                            PERFORM * FROM dblink(v_cadena_inter,true)AS ( xx varchar);
-                            --raise exception 'llega9999';
-                            --v_res_cone=(select dblink_disconnect());
-			        		
-			   			 END IF;  
-              END IF;
-            END IF;*/
-            
-            
+
+
             --control de fechas inicio y fin que esten en el rango del la gestion del tramite
             select date_part('year',op.fecha), to_char(op.fecha,'DD/MM/YYYY')::varchar as fecha, op.num_tramite, ges.gestion
             into v_anio_op, v_fecha_op, v_num_tramite, v_anio_ges
@@ -1286,6 +1234,8 @@ BEGIN
            inner join tes.tobligacion_pago op on op.id_obligacion_pago = pp.id_obligacion_pago
            where pp.id_plan_pago = v_parametros.id_plan_pago;
 
+v_pre_integrar_presupuestos = pxp.f_get_variable_global('pre_integrar_presupuestos');
+	IF v_pre_integrar_presupuestos = 'true' THEN
            /*jrr:29/10/2014
            1) si el presupuesto no esta comprometido*/
            if (v_registros.comprometido = 'no') then
@@ -1311,7 +1261,7 @@ BEGIN
                 where id_obligacion_pago = v_registros.id_obligacion_pago;
 
           end if;
-
+	  END IF;
 
           IF  v_registros.tipo  in ('pagado' ,'devengado_pagado','devengado_pagado_1c','anticipo','ant_parcial') THEN
 
@@ -1625,7 +1575,8 @@ BEGIN
             pp.monto_ejecutar_total_mo,
             pp.estado,
             pp.id_estado_wf,
-            op.tipo_obligacion
+            op.tipo_obligacion,
+            pp.id_depto_lb
         into
             v_id_plan_pago,
             v_id_proceso_wf,
@@ -1636,7 +1587,8 @@ BEGIN
             v_monto_ejecutar_total_mo,
             v_estado_aux,
             v_id_estado_actual,
-            v_tipo_obligacion
+            v_tipo_obligacion,
+            v_id_depto_lb_pp
 
         from tes.tplan_pago  pp
         inner  join tes.tobligacion_pago op on op.id_obligacion_pago = pp.id_obligacion_pago
@@ -1807,6 +1759,77 @@ BEGIN
                                             v_codigo_estado_siguiente) THEN
 
           END IF;
+
+        /*  ---
+          ------------------------------------------------------------------
+            CONEXION A BUE
+            si elige  Libro de bancos destino a BUE copia su obligacion,
+            detalle y plan de pago al servidor BUE con un nuevo proceso
+
+            --conexion para MIAMI falta desarrollar conexion
+            --------------------------------------------------------------------
+
+            v_obligacion_pago_json=(select json_agg(top.*)
+            						from tes.tobligacion_pago top
+            						inner join tes.tplan_pago tp on tp.id_obligacion_pago = top.id_obligacion_pago
+                                    where tp.id_plan_pago = v_id_plan_pago );
+            						--where tp.id_plan_pago = v_parametros.id_plan_pago );
+
+            v_obligacion_pago=(select top.id_obligacion_pago
+                                  from tes.tobligacion_pago top
+                                  inner join tes.tplan_pago tp on tp.id_obligacion_pago = top.id_obligacion_pago
+                                  where tp.id_plan_pago = v_id_plan_pago);
+                                  --where tp.id_plan_pago = v_parametros.id_plan_pago);
+
+            v_obligacion_det_json=(select json_agg(tod.*)
+            						from tes.tobligacion_det tod
+                                    inner join tes.tobligacion_pago top on top.id_obligacion_pago = tod.id_obligacion_pago
+                                    where tod.id_obligacion_pago = v_obligacion_pago );
+
+             v_obligacion_pp_json=(select json_agg(pp.*)
+            				      from tes.tplan_pago pp
+                                  inner join tes.tobligacion_pago top on top.id_obligacion_pago = pp.id_obligacion_pago
+                                  where top.id_obligacion_pago = v_obligacion_pago );
+
+             v_documentos=(select json_agg(dw.*)
+            				      from wf.tdocumento_wf dw
+                                  inner join tes.tplan_pago pp on pp.id_proceso_wf = dw.id_proceso_wf
+                                  --inner join tes.tobligacion_pago op on op.id_proceso_wf = dw.id_proceso_wf
+                                  --where op.id_obligacion_pago = v_obligacion_pago );
+                                  where pp.id_plan_pago = v_id_plan_pago);
+                                  --where pp.id_plan_pago = v_parametros.id_plan_pago);
+
+           --registra op para una internacional
+           --IF (v_registros_pp.estado = 'vbfin') THEN
+           IF (v_estado_aux = 'vbfin') THEN
+
+             --IF (v_parametros.id_depto_lb = 27 )THEN
+             IF (v_id_depto_lb_pp = 27 )THEN
+                --conexion BUE
+                v_cadena_cnx =  tes.f_obtener_cadena_conexion_argentina();
+
+                --Se realizara la creacion de la funcion de insertando datos en buenos aires
+                v_cadena_inter = 'select tes.ft_obligacion_pago_inter_bue_ime('''||p_administrador::integer||''','''||p_id_usuario::integer||''','''||v_obligacion_pago_json::json||''','''||v_obligacion_det_json::json||''','''||v_obligacion_pp_json::json||''','''||v_documentos::json||''')';
+
+
+               v_resp =  (SELECT dblink_connect(v_cadena_cnx));
+
+			             IF(v_resp!='OK') THEN
+
+			             	--modificar bandera de fallo
+			                 raise exception 'FALLA CONEXION A LA BASE DE DATOS CON DBLINK';
+
+			             ELSE
+
+                        --raise exception 'FALLA %',v_obligacion_pago_json;
+
+                            PERFORM * FROM dblink(v_cadena_inter,true)AS ( xx varchar);
+
+
+			   			 END IF;
+              END IF;
+            END IF;
+          ---*/
 
 
           -- si hay mas de un estado disponible  preguntamos al usuario
