@@ -1012,6 +1012,31 @@ class MODObligacionPago extends MODbase
         //Devuelve la respuesta
         return $this->respuesta;
     }
+    function TsLibroBancosExterior() {
+		$this->procedimiento='tes.ft_obligacion_pago_sel';
+		$this->transaccion='TES_LIBAN_EXT_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+        
+        $this->setParametro('id_gestion','id_gestion','int4');
+		$this->captura('id_obligacion_pago','int4');
+        $this->captura('num_tramite','varchar');
+        $this->captura('fecha','timestamp');
+        $this->captura('nro_cuenta','numeric');
+        $this->captura('nombre','varchar');
+        $this->captura('codigo','varchar');
+        $this->captura('nombre_estado','varchar');
+        $this->captura('obs','text');
+        $this->captura('desc_persona','text');
+        $this->captura('usuario_ai','text');
+        $this->captura('monto','numeric');
+		
+		//Ejecuta la instruccion
+        $this->armarConsulta();     
+        $this->ejecutarConsulta();        
+		
+		//Devuelve la respuesta
+		return $this->respuesta;        
+    }    
 }
 
 ?>
