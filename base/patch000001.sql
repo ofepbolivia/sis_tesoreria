@@ -1915,3 +1915,8 @@ ALTER TABLE tes.tplan_pago
 COMMENT ON COLUMN tes.tplan_pago.monto_establecido
 IS 'monto establecido para facturas con el descuento del 13%';
 /*****************************F-SCP-MAY-TES-0-10/03/2019*************/
+
+/*****************************I-SCP-MAY-TES-0-19/06/2019*************/
+ALTER TABLE tes.tplan_pago
+  ADD COLUMN fecha_conclusion_pago DATE;
+/*****************************F-SCP-MAY-TES-0-19/06/2019*************/

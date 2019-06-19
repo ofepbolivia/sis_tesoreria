@@ -262,7 +262,8 @@ BEGIN
                         op.id_gestion,
                         tcon.fecha_costo_ini as fecha_cbte_ini,
                         tcon.fecha_costo_fin as fecha_cbte_fin,
-                        plapa.monto_establecido
+                        plapa.monto_establecido,
+                        pro.id_proveedor
                         from tes.tplan_pago plapa
                         inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = plapa.id_proceso_wf
                         inner join tes.tobligacion_pago op on op.id_obligacion_pago = plapa.id_obligacion_pago
@@ -280,6 +281,8 @@ BEGIN
 
                         left join param.tdepto depc on depc.id_depto = plapa.id_depto_conta
                         left join conta.tint_comprobante tcon on tcon.id_int_comprobante = plapa.id_int_comprobante
+
+
                        where  plapa.estado_reg=''activo''  and '||v_filtro;
 
 			--Definicion de la respuesta
@@ -380,6 +383,7 @@ BEGIN
                         left join param.tdepto depto on depto.id_depto = plapa.id_depto_lb
                         left join tes.tts_libro_bancos lb on plapa.id_int_comprobante = lb.id_int_comprobante
                         left join conta.tint_comprobante tcon on tcon.id_int_comprobante = plapa.id_int_comprobante
+
                       where  plapa.estado_reg=''activo''   and '||v_filtro;
 
 			--Definicion de la respuesta

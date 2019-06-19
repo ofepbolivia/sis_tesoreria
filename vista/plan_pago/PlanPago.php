@@ -10,73 +10,98 @@ header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
     Phx.vista.PlanPago = Ext.extend(Phx.gridInterfaz, {
-        fheight: '80%',
-        fwidth: '95%',
+        fheight: '90%',
+        fwidth: '85%',
         accionFormulario: undefined, //define la accion que se ejcuta en formulario new o edit
         porc_ret_gar: 0,//valor por defecto de retencion de garantia
         constructor: function (config) {
-
-
+            this.idContenedor = config.idContenedor;
             //definicion de grupos para fomrulario
             var me = this;
             this.Grupos = [
                 {
-                    layout: 'hbox',
+                    // layout: 'hbox',
+                    layout: 'column',
                     border: false,
                     defaults: {
-                        border: true
+                        border: false
                     },
                     items: [
                         {
-                            xtype: 'fieldset',
-                            title: 'Tipo de Pago',
-                            autoHeight: true,
-                            //layout:'hbox',
-                            items: [],
-                            id_grupo: 0,
-                            margins: '2 2 2 2'
-                        },
+                            bodyStyle: 'padding-right:10px;',
+                            items: [
+                                {
+                                    xtype: 'fieldset',
+                                    title: 'Tipo de Pago',
+                                    autoHeight: true,
+                                    //layout:'hbox',
+                                    items: [],
+                                    id_grupo: 0
+                                    //margins: '2 2 2 2'
+                                },
+                                {
+                                    xtype: 'fieldset',
+                                    title: 'Periodo al que corresponde el gasto',
+                                    autoHeight: true,
+                                    hiden: true,
+                                    //layout:'hbox',
+                                    items: [],
+                                    margins: '2 2 2 2',
+                                    // margins: '2 10 2 2',
+                                    //19-06-2019 , se comenta botn Dividir gasto
+                                    // buttons: [{
+                                    //     text: 'Dividir gasto',
+                                    //     handler: me.calcularAnticipo,
+                                    //     scope: me,
+                                    //     tooltip: 'Según las fechas,  ayuda con el cálculo  del importe anticipado'
+                                    // }],
+                                    id_grupo: 3
 
-                        {
-                            xtype: 'fieldset',
-                            title: 'Detalle de Pago',
-                            autoHeight: true,
-                            //layout:'hbox',
-                            items: [],
-                            margins: '2 10 2 2',
-                            id_grupo: 1,
-                            flex: 1
+                                }
+                            ]
                         },
-
                         {
-                            xtype: 'fieldset',
-                            title: 'Ajustes',
-                            autoHeight: true,
-                            hiden: true,
-                            //layout:'hbox',
-                            items: [],
-                            margins: '2 10 2 2',
-                            id_grupo: 2,
-                            flex: 1
+                            bodyStyle: 'padding-right:10px;',
+                            items: [
+                                    {
+                                        xtype: 'fieldset',
+                                        title: 'Detalle de Pago',
+                                        autoHeight: true,
+                                        // layout:'hbox',
+                                        items: [],
+                                        margins: '2 10 2 2',
+                                        id_grupo: 1
+                                    },
+                                    {
+                                        xtype: 'fieldset',
+                                        title: 'Ajustes',
+                                        autoHeight: true,
+                                        hiden: true,
+                                        // layout:'hbox',
+                                        items: [],
+                                        margins: '2 10 2 2',
+                                        id_grupo: 2
+                                    }
+                            ]
                         },
-
                         {
-                            xtype: 'fieldset',
-                            title: 'Periodo al que corresponde el gasto',
-                            autoHeight: true,
-                            hiden: true,
-                            //layout:'hbox',
-                            items: [],
-                            margins: '2 10 2 2',
-                            buttons: [{
-                                text: 'Dividir gasto',
-                                handler: me.calcularAnticipo,
-                                scope: me,
-                                tooltip: 'Según las fechas,  ayuda con el cálculo  del importe anticipado'
-                            }],
-                            id_grupo: 3,
-                            flex: 1
+                            bodyStyle: 'padding-right:10px;',
+                            items: [
+                                {
+                                    xtype: 'fieldset',
+                                    title: 'Observaciones',
+                                    autoHeight: true,
+                                    hiden: true,
+                                    // layout:'hbox',
+                                    items: [],
+                                    margins: '2 10 2 2',
+                                    id_grupo: 4
+                                }
+
+                            ]
                         }
+
+
                     ]
 
                 }];
@@ -622,7 +647,7 @@ header("content-type: text/javascript; charset=UTF-8");
             {
                 config: {
                     name: 'id_cuenta_bancaria',
-                    fieldLabel: 'Cuenta Bancaria Pago',
+                    fieldLabel: 'Cuenta Bancaria Pago (BOA)',
                     allowBlank: false,
                     emptyText: 'Elija una Cuenta...',
                     store: new Ext.data.JsonStore(
@@ -790,21 +815,64 @@ header("content-type: text/javascript; charset=UTF-8");
                 grid: false,
                 form: true
             },
+
             {
-                config: {
-                    name: 'nro_cuenta_bancaria',
-                    fieldLabel: 'Banco y Cuenta Bancaria Dest.',
-                    allowBlank: true,
-                    anchor: '80%',
-                    gwidth: 100,
-                    maxLength: 50,
-                    disabled: false
+                config:{
+
+                    name:'nro_cuenta_bancaria',
+                    fieldLabel:'Cuenta Bancaria(Prov.)',
+                    allowBlank:false,
+                    emptyText:'Elija una opción...',
+                    resizable:true,
+                    // dato: 'reclamo',
+                    qtip:'Ingrese la Cuenta Bancaria Dest.,si no se encuentra la opción deseada registre Nuevo con el botón de Lupa.',
+                    store: new Ext.data.JsonStore({
+                        url: '../../sis_parametros/control/ProveedorCtaBancaria/listarProveedorCtaBancariaActivo',
+                        id: 'id_proveedor_cta_bancaria',
+                        root: 'datos',
+                        sortInfo:{
+                            field: 'nro_cuenta',
+                            direction: 'ASC'
+                        },
+                        totalProperty: 'total',
+                        fields: ['id_proveedor_cta_bancaria','nro_cuenta', 'id_proveedor'],
+                        // turn on remote sorting
+                        remoteSort: true,
+                        baseParams:{par_filtro:'nro_cuenta'}
+                    }),
+                    valueField: 'nro_cuenta',
+                    displayField: 'nro_cuenta',
+                    gdisplayField:'nro_cuenta',//mapea al store del grid
+                    tpl:'<tpl for="."><div class="x-combo-list-item"><p>{nro_cuenta}</p></div></tpl>',
+                    hiddenName: 'id_proveedor_cta_bancaria',
+                    forceSelection:true,
+                    typeAhead: false,
+                    triggerAction: 'all',
+                    lazyRender:true,
+                    mode:'remote',
+                    pageSize:10,
+                    queryDelay:1000,
+                    // width:250,
+                    gwidth: 250,
+                    minChars:1,
+                    turl:'../../../sis_parametros/vista/proveedor_cta_bancaria/FormProvCta.php',
+                    ttitle:'Banco y Cuenta Bancaria Dest.',
+                    tconfig:{width: '35%' ,height:'50%'},
+                    tdata:{},
+                    tcls:'FormProvCta',
+                    pid:this.idContenedor,
+
+                    renderer:function (value, p, record){return String.format('{0}', record.data['nro_cuenta_bancaria']);}
                 },
-                type: 'TextField',
-                filters: {pfiltro: 'plapa.nro_cuenta_bancaria', type: 'string'},
-                id_grupo: 1,
-                grid: true,
-                form: false
+                type:'TrigguerCombo',
+                bottom_filter:true,
+                id_grupo:1,
+                filters:{
+                    pfiltro:'plapa.nro_cuenta_bancaria',
+                    type:'string'
+                },
+                grid:true,
+                form:false
             },
 
             {
@@ -1063,13 +1131,14 @@ header("content-type: text/javascript; charset=UTF-8");
                     name: 'obs_descuentos_anticipo',
                     fieldLabel: 'Obs. Desc. Antic.',
                     allowBlank: true,
-                    anchor: '80%',
-                    gwidth: 100,
+                    // anchor: '80%',
+                    width: 280,
+                    gwidth: 250,
                     maxLength: 300
                 },
                 type: 'TextArea',
                 filters: {pfiltro: 'plapa.obs_descuentos_anticipo', type: 'string'},
-                id_grupo: 1,
+                id_grupo: 4,
                 grid: true,
                 form: true
             },
@@ -1079,13 +1148,14 @@ header("content-type: text/javascript; charset=UTF-8");
                     fieldLabel: 'Obs. Pago',
                     qtip: 'Estas observaciones van a la glosa del comprobante que se genere',
                     allowBlank: true,
-                    anchor: '80%',
-                    gwidth: 100,
+                    // anchor: '80%',
+                    width: 280,
+                    gwidth: 300,
                     maxLength: 300
                 },
                 type: 'TextArea',
                 filters: {pfiltro: 'plapa.obs_monto_no_pagado', type: 'string'},
-                id_grupo: 1,
+                id_grupo: 4,
                 grid: true,
                 form: true
             },
@@ -1094,13 +1164,14 @@ header("content-type: text/javascript; charset=UTF-8");
                     name: 'obs_otros_descuentos',
                     fieldLabel: 'Obs. otros desc.',
                     allowBlank: true,
-                    anchor: '80%',
-                    gwidth: 100,
+                    width: 280,
+                    // anchor: '80%',
+                    gwidth: 300,
                     maxLength: 300
                 },
                 type: 'TextArea',
                 filters: {pfiltro: 'plapa.obs_otros_descuentos', type: 'string'},
-                id_grupo: 1,
+                id_grupo: 4,
                 grid: true,
                 form: true
             },
@@ -1109,14 +1180,15 @@ header("content-type: text/javascript; charset=UTF-8");
                     name: 'obs_descuentos_ley',
                     fieldLabel: 'Obs. desc. ley',
                     allowBlank: true,
-                    anchor: '80%',
+                    // anchor: '80%',
+                    width: 280,
+                    gwidth: 300,
                     readOnly: true,
-                    gwidth: 100,
                     maxLength: 300
                 },
                 type: 'TextArea',
                 filters: {pfiltro: 'plapa.obs_descuentos_ley', type: 'string'},
-                id_grupo: 1,
+                id_grupo: 4,
                 grid: true,
                 form: true
             },
@@ -1125,13 +1197,14 @@ header("content-type: text/javascript; charset=UTF-8");
                     name: 'obs_descuento_inter_serv',
                     fieldLabel: 'Obs. desc. inter. serv.',
                     allowBlank: true,
-                    anchor: '80%',
-                    gwidth: 100,
+                    // anchor: '80%',
+                    width: 280,
+                    gwidth: 300,
                     maxLength: 300
                 },
                 type: 'TextArea',
                 filters: {pfiltro: 'plapa.obs_descuento_inter_serv', type: 'string'},
-                id_grupo: 1,
+                id_grupo: 4,
                 grid: true,
                 form: true
             },
@@ -1214,6 +1287,23 @@ header("content-type: text/javascript; charset=UTF-8");
                 },
                 type: 'DateField',
                 filters: {pfiltro: 'plapa.fecha_costo_fin', type: 'date'},
+                id_grupo: 3,
+                grid: true,
+                form: true
+            },
+            {
+                config: {
+                    name: 'fecha_conclusion_pago',
+                    fieldLabel: 'Fecha Conclusión Pago',
+                    allowBlank: true,
+                    gwidth: 100,
+                    format: 'd/m/Y',
+                    renderer: function (value, p, record) {
+                        return value ? value.dateFormat('d/m/Y') : ''
+                    }
+                },
+                type: 'DateField',
+                filters: {pfiltro: 'plapa.fecha_conclusion_pago', type: 'date'},
                 id_grupo: 3,
                 grid: true,
                 form: true
@@ -1444,6 +1534,7 @@ header("content-type: text/javascript; charset=UTF-8");
             'monto_ajuste_siguiente_pag', 'pago_variable', 'monto_anticipo', 'contador_estados',
             {name: 'fecha_costo_ini', type: 'date', dateFormat: 'Y-m-d'},
             {name: 'fecha_costo_fin', type: 'date', dateFormat: 'Y-m-d'},
+            {name: 'fecha_conclusion_pago', type: 'date', dateFormat: 'Y-m-d'},
             'id_depto_conta_pp', 'desc_depto_conta_pp', 'funcionario_wf', 'tiene_form500',
             'id_depto_lb', 'desc_depto_lb', 'prioridad_lp', {name: 'ultima_cuota_dev', type: 'numeric'},
             'nro_cbte',
@@ -1453,6 +1544,7 @@ header("content-type: text/javascript; charset=UTF-8");
             {name: 'fecha_cbte_ini', type: 'date', dateFormat: 'Y-m-d'},
             {name: 'fecha_cbte_fin', type: 'date', dateFormat: 'Y-m-d'},
             {name: 'monto_establecido', type: 'numeric'},
+            {name: 'id_proveedor', type: 'numeric'}
         ],
 
         arrayDefaultColumHidden: ['id_fecha_reg', 'id_fecha_mod',
@@ -1832,29 +1924,34 @@ header("content-type: text/javascript; charset=UTF-8");
             this.setTipoPago[data.tipo](this, data);
             this.tmp_porc_monto_excento_var = undefined;
 
-            //may
+
+          //may
             if (data.estado == 'vbsolicitante') {
-                this.Cmp.id_cuenta_bancaria.disable();
-                this.Cmp.id_depto_lb.disable();
+
+                this.ocultarComponente(this.Cmp.id_cuenta_bancaria);
+                this.ocultarComponente(this.Cmp.id_depto_lb);
                 this.Cmp.nro_cuenta_bancaria.allowBlank = true;
-                this.Cmp.nro_cuenta_bancaria.disable();
-                this.Cmp.forma_pago.disable();
+                this.ocultarComponente(this.Cmp.nro_cuenta_bancaria);
+                this.ocultarComponente(this.Cmp.forma_pago);
             }
             if (data.estado == 'vbfin') {
-                this.Cmp.id_cuenta_bancaria.disable();
-                this.Cmp.nro_cuenta_bancaria.disable();
-                this.Cmp.forma_pago.disable();
+                this.ocultarComponente(this.Cmp.id_cuenta_bancaria);
+                this.ocultarComponente(this.Cmp.nro_cuenta_bancaria);
+                this.ocultarComponente(this.Cmp.forma_pago);
 
             }
             if (data.estado == 'vbcostos') {
-                this.Cmp.id_cuenta_bancaria.disable();
+                this.ocultarComponente(this.Cmp.id_cuenta_bancaria);
+                this.ocultarComponente(this.Cmp.nro_cuenta_bancaria);
+                // this.ocultarComponente(this.Cmp.id_depto_lb);
                 this.Cmp.id_depto_lb.disable();
-                this.Cmp.forma_pago.disable();
+                this.ocultarComponente(this.Cmp.forma_pago);
 
             }
             if (data.estado == 'vbdeposito') {
-                this.Cmp.id_cuenta_bancaria.disable();
-                this.Cmp.forma_pago.disable();
+                this.ocultarComponente(this.Cmp.id_cuenta_bancaria);
+                this.ocultarComponente(this.Cmp.nro_cuenta_bancaria);
+                this.ocultarComponente(this.Cmp.forma_pago);
 
             }
 
@@ -1875,6 +1972,8 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.getPlantilla(this.Cmp.id_plantilla.getValue());
             }
 
+            this.Cmp.nro_cuenta_bancaria.store.baseParams.id_proveedor = data.id_proveedor;
+            this.Cmp.nro_cuenta_bancaria.tdata.id_padre = this.idContenedor;
 
         },
 
@@ -2556,6 +2655,10 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.idContenedor,
                 'Obs'
             )
+        },
+        cargarCuenta : function (nro_cuenta_bancaria,nro_cuenta_bancaria ) {
+            this.Cmp.nro_cuenta_bancaria.setValue(nro_cuenta_bancaria);
+            this.Cmp.nro_cuenta_bancaria.setRawValue(nro_cuenta_bancaria.toUpperCase());
         }
 
     })

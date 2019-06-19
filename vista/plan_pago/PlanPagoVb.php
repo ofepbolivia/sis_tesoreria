@@ -199,7 +199,7 @@ header("content-type: text/javascript; charset=UTF-8");
             this.getBoton('sig_estado').disable();
             this.getBoton('SolDevPag').disable();
             this.getBoton('edit').disable();
-            this.getBoton('SincPresu').disable();
+            // this.getBoton('SincPresu').disable();
 
         },
 
@@ -285,7 +285,7 @@ header("content-type: text/javascript; charset=UTF-8");
 
             if (data.estado == 'vbsolicitante' || data.estado == 'vbfin' || data.estado == 'vbdeposito' || (data.estado == 'vbcostos' && data['prioridad_lp'] != 3)) {
                 this.Cmp.fecha_tentativa.disable();
-                this.Cmp.forma_pago.disable();
+                // this.Cmp.forma_pago.disable();
                 this.Cmp.nombre_pago.disable();
                 this.Cmp.nro_cheque.disable();
                 this.Cmp.nro_cuenta_bancaria.disable();
@@ -307,7 +307,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.Cmp.obs_monto_no_pagado.enable();
                 this.Cmp.obs_descuentos_ley.disable();
             }
-            this.Cmp.forma_pago.disable();
+            // this.Cmp.forma_pago.disable();
 
         },
 
@@ -546,12 +546,12 @@ header("content-type: text/javascript; charset=UTF-8");
                     }
                 }
                 this.getBoton('SolPlanPago').enable();
-                if (data['sinc_presupuesto'] == 'si' && data['estado'] == 'vbconta') {
-                    this.getBoton('SincPresu').enable();
-                }
-                else {
-                    this.getBoton('SincPresu').disable();
-                }
+                // if (data['sinc_presupuesto'] == 'si' && data['estado'] == 'vbconta') {
+                //     this.getBoton('SincPresu').enable();
+                // }
+                // else {
+                //     this.getBoton('SincPresu').disable();
+                // }
 
             }
             else {
@@ -586,7 +586,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.getBoton('btnChequeoDocumentosWf').disable();
                 this.getBoton('btnPagoRel').disable();
 
-                this.getBoton('SincPresu').disable();
+                // this.getBoton('SincPresu').disable();
                 this.getBoton('ModAprop').disable();
                 this.getBoton('btnObs').disable();
                 this.getBoton('btnConformidad').disable();
