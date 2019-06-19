@@ -15,7 +15,8 @@ header("content-type: text/javascript; charset=UTF-8");
 			this.maestro = config;
 			Phx.vista.CheckPresupuesto.superclass.constructor.call(this, config);
 			this.init();
-			this.addButton('inserAuto',{ text: 'Revertir/Incrementar', iconCls: 'blist', disabled: false, handler: this.revertirParcial, tooltip: '<b>Configurar autorizaciones</b><br/>Permite seleccionar desde que modulos  puede selecionarse el concepto'});
+			//18-06-2019, se oculta boton Revertir/Incrementar.
+			// this.addButton('inserAuto',{ text: 'Revertir/Incrementar', iconCls: 'blist', disabled: false, handler: this.revertirParcial, tooltip: '<b>Configurar autorizaciones</b><br/>Permite seleccionar desde que modulos  puede selecionarse el concepto'});
     
 			this.grid.on('validateedit',function(event){
 				if((event.record.data.comprometido - event.record.data.ejecutado) < event.value){
@@ -100,7 +101,10 @@ header("content-type: text/javascript; charset=UTF-8");
 			config : {
 				name : 'comprometido',
 				fieldLabel : 'Comprometido',
-				gwidth : 100
+				gwidth : 100,
+                renderer:function (value,p,record){
+                    return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
+                }
 			},
 			type : 'NumberField',
 			id_grupo : 1,
@@ -110,7 +114,10 @@ header("content-type: text/javascript; charset=UTF-8");
 			config : {
 				name : 'ejecutado',
 				fieldLabel : 'Ejecutado',
-				gwidth : 100
+				gwidth : 100,
+                renderer:function (value,p,record){
+                    return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
+                }
 			},
 			type : 'TextField',
 			id_grupo : 1,
@@ -120,7 +127,10 @@ header("content-type: text/javascript; charset=UTF-8");
 			config : {
 				name : 'pagado',
 				fieldLabel : 'Pagado',
-				gwidth : 100
+				gwidth : 100,
+                renderer:function (value,p,record){
+                    return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
+                }
 			},
 			type : 'NumberField',
 			id_grupo : 1,
@@ -130,7 +140,10 @@ header("content-type: text/javascript; charset=UTF-8");
 			config : {
 				name : 'revertible',
 				fieldLabel : 'Revertible',
-				gwidth : 100
+				gwidth : 100,
+                renderer:function (value,p,record){
+                    return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
+                }
 			},
 			type : 'NumberField',
 			filters : {
@@ -149,8 +162,8 @@ header("content-type: text/javascript; charset=UTF-8");
 			},
 			type : 'NumberField',
 			id_grupo : 1,
-			grid : true,
-			egrid: true,
+			grid : false,
+			egrid: false,
 			form : false
 		}],
 		title : 'Verificación presupuestaria',

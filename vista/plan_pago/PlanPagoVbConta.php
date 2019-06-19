@@ -153,7 +153,8 @@ header("content-type: text/javascript; charset=UTF-8");
             this.getBoton('sig_estado').disable();
             this.getBoton('SolDevPag').disable();
             this.getBoton('edit').disable();
-            this.getBoton('SincPresu').disable();
+            //18-06-2019, se oculta boton Inc. Pres.
+            // this.getBoton('SincPresu').disable();
 
         },
 
@@ -438,12 +439,13 @@ header("content-type: text/javascript; charset=UTF-8");
                     }
                 }
                 this.getBoton('SolPlanPago').enable();
-                if(data['sinc_presupuesto']=='si' && data['estado']== 'vbconta'){
-                    this.getBoton('SincPresu').enable();
-                }
-                else{
-                    this.getBoton('SincPresu').disable();
-                }
+                //18-06-2019, se oculta boton Inc. Pres.
+                // if(data['sinc_presupuesto']=='si' && data['estado']== 'vbconta'){
+                //     this.getBoton('SincPresu').enable();
+                // }
+                // else{
+                //     this.getBoton('SincPresu').disable();
+                // }
 
             }
             else{
@@ -470,7 +472,8 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.getBoton('diagrama_gantt').disable();
                 this.getBoton('btnChequeoDocumentosWf').disable();
                 this.getBoton('btnPagoRel').disable();
-                this.getBoton('SincPresu').disable();
+                //18-06-2019, se oculta boton Inc. Pres.
+                // this.getBoton('SincPresu').disable();
                 this.getBoton('ModAprop').disable();
                 this.getBoton('btnObs').disable();
                 this.menuAdq.disable();

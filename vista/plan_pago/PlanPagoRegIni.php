@@ -624,12 +624,12 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.getBoton('SolPlanPago').enable();
             }
 
-            if(data['sinc_presupuesto']=='si'&& (data['estado']== 'vbconta'||data['estado']== 'borrador')){
-                this.getBoton('SincPresu').enable();
-            }
-            else{
-                this.getBoton('SincPresu').disable();
-            }
+            // if(data['sinc_presupuesto']=='si'&& (data['estado']== 'vbconta'||data['estado']== 'borrador')){
+            //     this.getBoton('SincPresu').enable();
+            // }
+            // else{
+            //     this.getBoton('SincPresu').disable();
+            // }
 
 
             /*if (data.tipo=='devengado'  || data.tipo=='devengado_pagado' || data.tipo=='devengado_pagado_1c') {
@@ -646,7 +646,7 @@ header("content-type: text/javascript; charset=UTF-8");
         liberaMenu:function(){
             var tb = Phx.vista.PlanPagoRegIni.superclass.liberaMenu.call(this);
             if(tb){
-                this.getBoton('SincPresu').disable();
+                // this.getBoton('SincPresu').disable();
                 this.getBoton('SolPlanPago').disable();
                 //this.getBoton('btnVerifPresup').disable();
                 this.getBoton('ant_estado').disable();
