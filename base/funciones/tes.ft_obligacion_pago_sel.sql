@@ -54,6 +54,9 @@ DECLARE
 
     v_id_gestion				integer;
     v_add_filtro				varchar;
+    v_gestion 					integer;
+    v_fecha_ini					date;
+    v_fecha_fin					date;    
 
 BEGIN
 
@@ -1250,7 +1253,81 @@ BEGIN
 			return v_consulta;
 
 		end;
+    /*********************************
+ 	#TRANSACCION:  'TES_LIBAN_EXT_SEL'
+ 	#DESCRIPCION:	Listado libro de bancos exterior y observacion
+ 	#AUTOR:	 BVP
+ 	#FECHA:		
+	***********************************/
 
+	elsif(p_transaccion='TES_LIBAN_EXT_SEL')then
+
+		begin
+
+        select ges.gestion into v_gestion 
+        from param.tgestion ges
+        where ges.id_gestion = v_parametros.id_gestion;
+        
+        v_fecha_ini = ('01/01/'||v_gestion::varchar)::date;
+        v_fecha_fin = ('31/12/'||v_gestion::varchar)::date;
+        
+        
+			--Sentencia pagos con libro de bancos exterior y observacion
+			v_consulta:='select  
+                        plbex.id_obligacion_pago,
+                        plbex.num_tramite,
+                        plbex.fecha,
+                        plbex.nro_cuenta,
+                        plbex.nombre,
+                        plbex.codigo,
+                        plbex.nombre_estado,
+                        plbex.obs,
+                        plbex.desc_persona,
+                        plbex.usuario_ai,
+                        plbex.monto
+                    from tes.v_pagos_libro_banco_exterior plbex
+					where plbex.fecha between '''||v_fecha_ini||''' and '''||v_fecha_fin||'''
+                    and ' ;
+
+			--Definicion de la respuesta
+            v_consulta:=v_consulta||v_parametros.filtro;
+            v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+			raise notice '%',v_consulta;
+			--Devuelve la respuesta
+			return v_consulta;
+
+		end;
+    /*********************************
+ 	#TRANSACCION:  'TES_LIBAN_EXT_CONT'
+ 	#DESCRIPCION:	Conteo de registros
+ 	#AUTOR:	 BVP
+ 	#FECHA:		
+	***********************************/
+
+	elsif(p_transaccion='TES_LIBAN_EXT_CONT')then
+
+		begin
+
+        select ges.gestion into v_gestion 
+        from param.tgestion ges
+        where ges.id_gestion = v_parametros.id_gestion;
+        
+        v_fecha_ini = ('01/01/'||v_gestion::varchar)::date;
+        v_fecha_fin = ('31/12/'||v_gestion::varchar)::date;
+        
+        
+			--Sentencia de la consulta de conteo de registros
+			v_consulta:='select count(plbex.id_obligacion_pago)
+						from tes.v_pagos_libro_banco_exterior plbex
+                        where plbex.fecha between '''||v_fecha_ini||''' and '''||v_fecha_fin||'''
+                        and ';
+
+			--Definicion de la respuesta
+			v_consulta:=v_consulta||v_parametros.filtro;
+			--Devuelve la respuesta
+			return v_consulta;
+
+		end;
 
    else
 
