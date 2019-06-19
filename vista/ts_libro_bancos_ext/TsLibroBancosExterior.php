@@ -172,22 +172,22 @@ Phx.vista.TsLibroBancosExterior=Ext.extend(Phx.gridInterfaz,{
 				filters:{pfiltro:'plbex.desc_persona',type:'string'},
 				id_grupo:1,
 				grid:true,
-				form:true
+				form:true,
+                bottom_filter: true
 		},        
 		{
 			config:{
 				name: 'usuario_ai',
 				fieldLabel: 'Funcionaro AI',
 				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-				maxLength:300
+				anchor: '100%',
+				gwidth: 200		
 			},
 				type:'TextField',
 				filters:{pfiltro:'plbex.usuario_ai',type:'string'},
 				id_grupo:1,
 				grid:true,
-				form:false,
+                form:true,				
                 bottom_filter: true
 		}
 	],
