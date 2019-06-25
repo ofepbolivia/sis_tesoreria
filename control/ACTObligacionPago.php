@@ -693,7 +693,12 @@ class ACTObligacionPago extends ACTbase{
     function TsLibroBancosExterior() {
 		$this->objParam->defecto('ordenacion','id_obligacion_pago');
         $this->objParam->defecto('dir_ordenacion','asc');        
-		
+
+        if ($this->objParam->getParametro('pes_estado') == 'exterior') {            	
+            $this->objParam->addFiltro("plbex.prioridad = 3");
+        }else{
+            $this->objParam->addFiltro("plbex.prioridad <> 3");
+        }        
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODObligacionPago','TsLibroBancosExterior');

@@ -23,8 +23,25 @@ Phx.vista.TsLibroBancosExterior=Ext.extend(Phx.gridInterfaz,{
 		Phx.vista.TsLibroBancosExterior.superclass.constructor.call(this,config);
 		this.init();        
         this.iniciarEventos();
-		this.load({params:{start:0, limit:this.tam_pag}})
+		this.load({params:{start:0, limit:this.tam_pag}});
+        this.store.baseParams.pes_estado = 'exterior'; 
+        this.finCons = true;        
 	},
+    gruposBarraTareas:[        
+        {name:'exterior',title:'<H1 align="center"><i class="fa fa-list-ul"></i>Exterior</h1>',grupo:0,height:0},
+        {name:'interior',title:'<H1 align="center"><i class="fa fa-list-ul"></i>Locales</h1>',grupo:2,height:0},
+    ],     
+    bactGroups:  [0,2],        
+    bexcelGroups: [0,2],    
+
+    actualizarSegunTab: function(name, indice){
+        this.cmbGestion.show(true);        
+        console.log('name',this.initButtons);
+            if(this.finCons){
+                this.store.baseParams.pes_estado = name;
+                this.load({params:{start:0, limit:this.tam_pag}});
+            }
+        },    
 			
 	Atributos:[
 		{
@@ -88,12 +105,12 @@ Phx.vista.TsLibroBancosExterior=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'monto',
-				fieldLabel: 'Monto Cuota $US',
+				fieldLabel: 'Importe Cuota',
 				allowBlank: false,
 				anchor: '80%',
 				gwidth: 150,
                 renderer: function (value, p, record){                    
-                    return  String.format('<div style="text-align:center;">{0}</div>', Ext.util.Format.number(value,'0.000,00/i'));
+                    return  String.format('<div style="text-align:right;">{0}</div>', Ext.util.Format.number(value,'0.000,00/i'));
                 }
 			},
 				type:'TextField',
@@ -101,7 +118,25 @@ Phx.vista.TsLibroBancosExterior=Ext.extend(Phx.gridInterfaz,{
 				id_grupo:1,
 				grid:true,
 				form:true
-		},        
+		},
+		{
+			config:{
+				name: 'cod_moneda',
+				fieldLabel: 'Moneda',
+				allowBlank: false,
+				anchor: '60%',
+				gwidth: 60,
+                renderer: function (value, p, record){                    
+                    if(value == 'Bs') return  String.format('<div style="text-align:center;color:green;">{0}</div>',value);
+                    else return  String.format('<div style="text-align:center;color:blue;">{0}</div>',value);                    
+                }
+			},
+				type:'TextField',
+				filters:{pfiltro:'plbex.nombre',type:'string'},
+				id_grupo:1,
+				grid:true,
+				form:true
+		},                
 		{
 			config:{
 				name: 'nombre',
@@ -172,12 +207,12 @@ Phx.vista.TsLibroBancosExterior=Ext.extend(Phx.gridInterfaz,{
 				filters:{pfiltro:'plbex.desc_persona',type:'string'},
 				id_grupo:1,
 				grid:true,
-				form:true,
+				form:false,
                 bottom_filter: true
 		},        
 		{
 			config:{
-				name: 'usuario_ai',
+				name: 'fun_usuario_ai',
 				fieldLabel: 'Funcionaro AI',
 				allowBlank: true,
 				anchor: '100%',
@@ -192,7 +227,7 @@ Phx.vista.TsLibroBancosExterior=Ext.extend(Phx.gridInterfaz,{
 		}
 	],
 	tam_pag:50,	
-	title:'Consulta de procesos pagados en el exterior',	
+	title:'procesos pagos exterior',	
 	ActList:'../../sis_tesoreria/control/ObligacionPago/TsLibroBancosExterior',
 	id_store:'id_obligacion_pago',
 	fields: [
@@ -205,8 +240,10 @@ Phx.vista.TsLibroBancosExterior=Ext.extend(Phx.gridInterfaz,{
 		{name:'nombre_estado', type: 'string'},		
 		{name:'obs', type: 'string'},
 		{name:'desc_persona', type: 'string'},	
-		{name:'usuario_ai', type: 'string'},		
+		{name:'fun_usuario_ai', type: 'string'},		
         {name:'monto', type: 'numeric'},
+        {name:'moneda', type: 'string'},
+        {name:'cod_moneda', type: 'string'}
 	],
 	sortInfo:{
 		field: 'fecha',
@@ -217,7 +254,7 @@ Phx.vista.TsLibroBancosExterior=Ext.extend(Phx.gridInterfaz,{
     btest:false,
     bedit:false,
     bnew:false,
-    cmbGestion: new Ext.form.ComboBox({
+    cmbGestion: new Ext.form.ComboBox({            
             fieldLabel: 'Gestion',            
             allowBlank: false,
             blankText: '... ?',
