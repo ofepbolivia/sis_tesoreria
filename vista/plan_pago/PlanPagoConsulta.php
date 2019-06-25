@@ -105,7 +105,7 @@ Phx.vista.PlanPagoConsulta = {
            this.getBoton('ant_estado').disable();
            this.getBoton('sig_estado').disable();
            Phx.vista.PlanPagoConsulta.superclass.preparaMenu.call(this,n); 
-           this.getBoton('SincPresu').disable();
+           // this.getBoton('SincPresu').disable();
 	       this.getBoton('SolPlanPago').disable();
 	     
 	       this.getBoton('ant_estado').disable();
@@ -118,7 +118,7 @@ Phx.vista.PlanPagoConsulta = {
     liberaMenu:function(){
         var tb = Phx.vista.PlanPagoConsulta.superclass.liberaMenu.call(this);
         if(tb){          
-           this.getBoton('SincPresu').disable();
+           // this.getBoton('SincPresu').disable();
            this.getBoton('SolPlanPago').disable();
           
            this.getBoton('ant_estado').disable();

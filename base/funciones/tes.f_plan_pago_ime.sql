@@ -1014,10 +1014,6 @@ BEGIN
                raise exception 'LAS FECHAS NO CORRESPONDEN A LA GESTIÓN, NÚMERO DE TRÁMITE % gestión %', v_num_tramite, v_anio_ges;
             END IF;
 
-            --control fecha de conclusion del pago
-            IF (v_parametros.fecha_conclusion_pago<now()) THEN
-                raise exception 'LA FECHA CONCLUSION ES MENOR A LA FECHA %',to_char(now(), 'DD-MM-YYYY');
-            END IF;
 
             -- chequea fechas de costos inicio y fin
             v_resp_doc =  tes.f_validar_periodo_costo(v_parametros.id_plan_pago);
@@ -1834,7 +1830,7 @@ v_pre_integrar_presupuestos = pxp.f_get_variable_global('pre_integrar_presupuest
 
           END IF;
 
-          ---
+       /*   ---
           /*------------------------------------------------------------------
             CONEXION A BUE
             si elige  Libro de bancos destino a BUE copia su obligacion,
@@ -1911,7 +1907,7 @@ v_pre_integrar_presupuestos = pxp.f_get_variable_global('pre_integrar_presupuest
             END IF;
          END IF;
           ---
-
+*/
 
           -- si hay mas de un estado disponible  preguntamos al usuario
           v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Se realizo el cambio de estado del plan de pagos)');
@@ -2215,7 +2211,6 @@ LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
-PARALLEL UNSAFE
 COST 100;
 
 ALTER FUNCTION tes.f_plan_pago_ime (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)

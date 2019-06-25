@@ -123,6 +123,7 @@ class MODPlanPago extends MODbase{
 
         $this->captura('monto_establecido','numeric');
         $this->captura('id_proveedor','int4');
+        $this->captura('nit','varchar');
 
         //Ejecuta la instruccion
         $this->armarConsulta();
