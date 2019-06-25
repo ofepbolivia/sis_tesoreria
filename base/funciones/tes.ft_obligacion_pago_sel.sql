@@ -1284,8 +1284,11 @@ BEGIN
                         plbex.obs,
                         plbex.desc_persona,
                         plbex.usuario_ai,
-                        plbex.monto
+                        plbex.monto,
+                        mone.moneda,
+                        mone.codigo as cod_moneda
                     from tes.v_pagos_libro_banco_exterior plbex
+                    inner join param.tmoneda mone on mone.id_moneda = plbex.id_moneda                    
 					where plbex.fecha between '''||v_fecha_ini||''' and '''||v_fecha_fin||'''
                     and ' ;
 
@@ -1319,6 +1322,7 @@ BEGIN
 			--Sentencia de la consulta de conteo de registros
 			v_consulta:='select count(plbex.id_obligacion_pago)
 						from tes.v_pagos_libro_banco_exterior plbex
+                        inner join param.tmoneda mone on mone.id_moneda = plbex.id_moneda                                            
                         where plbex.fecha between '''||v_fecha_ini||''' and '''||v_fecha_fin||'''
                         and ';
 

@@ -1027,11 +1027,13 @@ class MODObligacionPago extends MODbase
         $this->captura('nombre_estado','varchar');
         $this->captura('obs','text');
         $this->captura('desc_persona','text');
-        $this->captura('usuario_ai','text');
+        $this->captura('fun_usuario_ai','text');
         $this->captura('monto','numeric');
+        $this->captura('moneda','varchar');
+        $this->captura('cod_moneda','varchar');
 		
 		//Ejecuta la instruccion
-        $this->armarConsulta();     
+        $this->armarConsulta();        
         $this->ejecutarConsulta();        
 		
 		//Devuelve la respuesta
