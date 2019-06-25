@@ -686,7 +686,6 @@ LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
-PARALLEL UNSAFE
 COST 100;
 
 ALTER FUNCTION tes.f_inserta_plan_pago_dev (p_administrador integer, p_id_usuario integer, p_hstore public.hstore, p_salta boolean)
