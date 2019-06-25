@@ -518,6 +518,22 @@ header("content-type: text/javascript; charset=UTF-8");
             },
             {
                 config: {
+                    name: 'nit',
+                    fieldLabel: 'Nit',
+                    allowBlank: true,
+                    disabled: true,
+                    anchor: '80%',
+                    gwidth: 250,
+                    maxLength: 100
+                },
+                type: 'TextField',
+                filters: {pfiltro: 'pro.nit', type: 'string'},
+                id_grupo: 1,
+                grid: true,
+                form: true
+            },
+            {
+                config: {
                     name: 'nro_sol_pago',
                     fieldLabel: 'Número',
                     allowBlank: true,
@@ -821,7 +837,7 @@ header("content-type: text/javascript; charset=UTF-8");
 
                     name:'nro_cuenta_bancaria',
                     fieldLabel:'Cuenta Bancaria(Prov.)',
-                    allowBlank:false,
+                    allowBlank:true,
                     emptyText:'Elija una opción...',
                     resizable:true,
                     // dato: 'reclamo',
@@ -1294,7 +1310,7 @@ header("content-type: text/javascript; charset=UTF-8");
             {
                 config: {
                     name: 'fecha_conclusion_pago',
-                    fieldLabel: 'Fecha Conclusión Pago',
+                    fieldLabel: 'Fecha Vencimiento de Pago',
                     allowBlank: true,
                     gwidth: 100,
                     format: 'd/m/Y',
@@ -1544,7 +1560,8 @@ header("content-type: text/javascript; charset=UTF-8");
             {name: 'fecha_cbte_ini', type: 'date', dateFormat: 'Y-m-d'},
             {name: 'fecha_cbte_fin', type: 'date', dateFormat: 'Y-m-d'},
             {name: 'monto_establecido', type: 'numeric'},
-            {name: 'id_proveedor', type: 'numeric'}
+            {name: 'id_proveedor', type: 'numeric'},
+            {name: 'nit', type: 'string'}
         ],
 
         arrayDefaultColumHidden: ['id_fecha_reg', 'id_fecha_mod',
@@ -1552,7 +1569,7 @@ header("content-type: text/javascript; charset=UTF-8");
             'descuento_anticipo', 'monto_retgar_mo', 'monto_no_pagado', 'otros_descuentos', 'descuento_inter_serv', 'descuento_ley', 'id_depto_lb',
             'id_depto_lb', 'id_cuenta_bancaria', 'obs_wf', 'fecha_dev', 'fecha_pag', 'obs_descuentos_anticipo', 'obs_monto_no_pagado',
             'obs_otros_descuentos', 'obs_descuentos_ley', 'obs_descuento_inter_serv', 'monto_ajuste_ag', 'monto_ajuste_siguiente_pag', 'fecha_costo_ini',
-            'fecha_costo_fin', 'funcionario_wf', 'monto_anticipo', 'monto', 'monto_ejecutar_total_mo', 'monto_establecido'],
+            'fecha_costo_fin', 'funcionario_wf', 'monto_anticipo', 'monto', 'monto_ejecutar_total_mo', 'monto_establecido','nit'],
 
 
         rowExpander: new Ext.ux.grid.RowExpander({
@@ -1967,6 +1984,8 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.tmp_porc_monto_excento_var = undefined;
             }
 
+
+
             Phx.vista.PlanPago.superclass.onButtonEdit.call(this);
             if (this.Cmp.id_plantilla.getValue()) {
                 this.getPlantilla(this.Cmp.id_plantilla.getValue());
@@ -1974,6 +1993,8 @@ header("content-type: text/javascript; charset=UTF-8");
 
             this.Cmp.nro_cuenta_bancaria.store.baseParams.id_proveedor = data.id_proveedor;
             this.Cmp.nro_cuenta_bancaria.tdata.id_padre = this.idContenedor;
+
+            
 
         },
 
@@ -2208,6 +2229,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 me.Cmp.forma_pago.disable();
                 me.Cmp.forma_pago.setValue('cheque');
             }
+
 
         },
 
