@@ -832,34 +832,92 @@ header("content-type: text/javascript; charset=UTF-8");
                 form: true
             },
 
-            {
-                config:{
+            // {
+            //     config:{
+            //
+            //         name:'nro_cuenta_bancaria',
+            //         fieldLabel:'Cuenta Bancaria(Prov.)',
+            //         allowBlank:true,
+            //         emptyText:'Elija una opción...',
+            //         resizable:true,
+            //         // dato: 'reclamo',
+            //         qtip:'Ingrese la Cuenta Bancaria Dest.,si no se encuentra la opción deseada registre Nuevo con el botón de Lupa.',
+            //         store: new Ext.data.JsonStore({
+            //             url: '../../sis_parametros/control/ProveedorCtaBancaria/listarProveedorCtaBancariaActivo',
+            //             id: 'id_proveedor_cta_bancaria',
+            //             root: 'datos',
+            //             sortInfo:{
+            //                 field: 'nro_cuenta',
+            //                 direction: 'ASC'
+            //             },
+            //             totalProperty: 'total',
+            //             fields: ['id_proveedor_cta_bancaria','nro_cuenta', 'id_proveedor'],
+            //             // turn on remote sorting
+            //             remoteSort: true,
+            //             baseParams:{par_filtro:'nro_cuenta'}
+            //         }),
+            //         valueField: 'nro_cuenta',
+            //         displayField: 'nro_cuenta',
+            //         gdisplayField:'nro_cuenta',//mapea al store del grid
+            //         tpl:'<tpl for="."><div class="x-combo-list-item"><p>{nro_cuenta}</p></div></tpl>',
+            //         hiddenName: 'id_proveedor_cta_bancaria',
+            //         forceSelection:true,
+            //         typeAhead: false,
+            //         triggerAction: 'all',
+            //         lazyRender:true,
+            //         mode:'remote',
+            //         pageSize:10,
+            //         queryDelay:1000,
+            //         // width:250,
+            //         gwidth: 250,
+            //         minChars:1,
+            //         turl:'../../../sis_parametros/vista/proveedor_cta_bancaria/FormProvCta.php',
+            //         ttitle:'Banco y Cuenta Bancaria Dest.',
+            //         tconfig:{width: '35%' ,height:'50%'},
+            //         tdata:{},
+            //         tcls:'FormProvCta',
+            //         pid:this.idContenedor,
+            //
+            //         renderer:function (value, p, record){return String.format('{0}', record.data['nro_cuenta_bancaria']);}
+            //     },
+            //     type:'TrigguerCombo',
+            //     bottom_filter:true,
+            //     id_grupo:1,
+            //     filters:{
+            //         pfiltro:'plapa.nro_cuenta_bancaria',
+            //         type:'string'
+            //     },
+            //     grid:true,
+            //     form:false
+            // },
 
-                    name:'nro_cuenta_bancaria',
-                    fieldLabel:'Cuenta Bancaria(Prov.)',
-                    allowBlank:true,
-                    emptyText:'Elija una opción...',
+            {
+                config: {
+                    name: 'id_proveedor_cta_bancaria',
+                    fieldLabel: 'Cuenta Bancaria(Prov.)',
+                    allowBlank: true,
                     resizable:true,
-                    // dato: 'reclamo',
-                    qtip:'Ingrese la Cuenta Bancaria Dest.,si no se encuentra la opción deseada registre Nuevo con el botón de Lupa.',
-                    store: new Ext.data.JsonStore({
-                        url: '../../sis_parametros/control/ProveedorCtaBancaria/listarProveedorCtaBancariaActivo',
-                        id: 'id_proveedor_cta_bancaria',
-                        root: 'datos',
-                        sortInfo:{
-                            field: 'nro_cuenta',
-                            direction: 'ASC'
-                        },
-                        totalProperty: 'total',
-                        fields: ['id_proveedor_cta_bancaria','nro_cuenta', 'id_proveedor'],
-                        // turn on remote sorting
-                        remoteSort: true,
-                        baseParams:{par_filtro:'nro_cuenta'}
-                    }),
-                    valueField: 'nro_cuenta',
+                    emptyText: 'Elija una Cuenta...',
+                    store: new Ext.data.JsonStore(
+                        {
+                            url: '../../sis_parametros/control/ProveedorCtaBancaria/listarProveedorCtaBancariaActivo',
+                            id: 'id_proveedor_cta_bancaria',
+                            root: 'datos',
+                            sortInfo: {
+                                field: 'prioridad',
+                                direction: 'ASC'
+                            },
+                            totalProperty: 'total',
+                            fields: ['id_proveedor_cta_bancaria', 'nro_cuenta', 'banco_beneficiario','prioridad'],
+                            remoteSort: true,
+                            baseParams: {
+                                par_filtro: 'id_proveedor#nro_cuenta'
+                            }
+                        }),
+                    tpl: '<tpl for="."><div class="x-combo-list-item"><b>Nro Cuenta: {nro_cuenta}</b></p><p><b>Banco Beneficiario:</b> {banco_beneficiario}</p><p><b>Prioridad:</b>{prioridad}</p><p></div></tpl>',
+                    valueField: 'id_proveedor_cta_bancaria',
                     displayField: 'nro_cuenta',
-                    gdisplayField:'nro_cuenta',//mapea al store del grid
-                    tpl:'<tpl for="."><div class="x-combo-list-item"><p>{nro_cuenta}</p></div></tpl>',
+                    gdisplayField: 'nro_cuenta_bancaria',
                     hiddenName: 'id_proveedor_cta_bancaria',
                     forceSelection:true,
                     typeAhead: false,
@@ -870,27 +928,28 @@ header("content-type: text/javascript; charset=UTF-8");
                     queryDelay:1000,
                     // width:250,
                     gwidth: 250,
-                    minChars:1,
+                    listWidth: '290',
+                    // minChars:2,
+                    lazyRender:true,
+                    // tinit: true,
+                    // tname:'id_proveedor_cta_bancaria',
+                    // tasignacion:true,
                     turl:'../../../sis_parametros/vista/proveedor_cta_bancaria/FormProvCta.php',
                     ttitle:'Banco y Cuenta Bancaria Dest.',
                     tconfig:{width: '35%' ,height:'50%'},
                     tdata:{},
                     tcls:'FormProvCta',
                     pid:this.idContenedor,
-
-                    renderer:function (value, p, record){return String.format('{0}', record.data['nro_cuenta_bancaria']);}
+                    renderer: function (value, p, record) {
+                        return String.format('{0}', record.data['nro_cuenta_bancaria']);
+                    }
                 },
-                type:'TrigguerCombo',
-                bottom_filter:true,
-                id_grupo:1,
-                filters:{
-                    pfiltro:'plapa.nro_cuenta_bancaria',
-                    type:'string'
-                },
-                grid:true,
-                form:false
+                type: 'TrigguerCombo',
+                filters: {pfiltro: 'plapa.nro_cuenta_bancaria', type: 'string'},
+                id_grupo: 1,
+                grid: true,
+                form: false
             },
-
             {
                 config: {
                     name: 'desc_moneda',
@@ -1561,7 +1620,8 @@ header("content-type: text/javascript; charset=UTF-8");
             {name: 'fecha_cbte_fin', type: 'date', dateFormat: 'Y-m-d'},
             {name: 'monto_establecido', type: 'numeric'},
             {name: 'id_proveedor', type: 'numeric'},
-            {name: 'nit', type: 'string'}
+            {name: 'nit', type: 'string'},
+            'id_proveedor_cta_bancaria'
         ],
 
         arrayDefaultColumHidden: ['id_fecha_reg', 'id_fecha_mod',
@@ -1947,19 +2007,23 @@ header("content-type: text/javascript; charset=UTF-8");
 
                 this.ocultarComponente(this.Cmp.id_cuenta_bancaria);
                 this.ocultarComponente(this.Cmp.id_depto_lb);
-                this.Cmp.nro_cuenta_bancaria.allowBlank = true;
-                this.ocultarComponente(this.Cmp.nro_cuenta_bancaria);
+                // this.Cmp.nro_cuenta_bancaria.allowBlank = true;
+                // this.ocultarComponente(this.Cmp.nro_cuenta_bancaria);
+                this.Cmp.id_proveedor_cta_bancaria.allowBlank = true;
+                this.ocultarComponente(this.Cmp.id_proveedor_cta_bancaria);
                 this.ocultarComponente(this.Cmp.forma_pago);
             }
             if (data.estado == 'vbfin') {
                 this.ocultarComponente(this.Cmp.id_cuenta_bancaria);
-                this.ocultarComponente(this.Cmp.nro_cuenta_bancaria);
+                // this.ocultarComponente(this.Cmp.nro_cuenta_bancaria);
+                this.ocultarComponente(this.Cmp.id_proveedor_cta_bancaria);
                 this.ocultarComponente(this.Cmp.forma_pago);
 
             }
             if (data.estado == 'vbcostos') {
                 this.ocultarComponente(this.Cmp.id_cuenta_bancaria);
-                this.ocultarComponente(this.Cmp.nro_cuenta_bancaria);
+                // this.ocultarComponente(this.Cmp.nro_cuenta_bancaria);
+                this.ocultarComponente(this.Cmp.id_proveedor_cta_bancaria);
                 // this.ocultarComponente(this.Cmp.id_depto_lb);
                 this.Cmp.id_depto_lb.disable();
                 this.ocultarComponente(this.Cmp.forma_pago);
@@ -1967,7 +2031,8 @@ header("content-type: text/javascript; charset=UTF-8");
             }
             if (data.estado == 'vbdeposito') {
                 this.ocultarComponente(this.Cmp.id_cuenta_bancaria);
-                this.ocultarComponente(this.Cmp.nro_cuenta_bancaria);
+                // this.ocultarComponente(this.Cmp.nro_cuenta_bancaria);
+                this.ocultarComponente(this.Cmp.id_proveedor_cta_bancaria);
                 this.ocultarComponente(this.Cmp.forma_pago);
 
             }
@@ -1991,10 +2056,12 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.getPlantilla(this.Cmp.id_plantilla.getValue());
             }
 
-            this.Cmp.nro_cuenta_bancaria.store.baseParams.id_proveedor = data.id_proveedor;
-            this.Cmp.nro_cuenta_bancaria.tdata.id_padre = this.idContenedor;
+            // this.Cmp.nro_cuenta_bancaria.store.baseParams.id_proveedor = data.id_proveedor;
+            // this.Cmp.nro_cuenta_bancaria.tdata.id_padre = this.idContenedor;
+            this.Cmp.id_proveedor_cta_bancaria.store.baseParams.id_proveedor = data.id_proveedor;
+            this.Cmp.id_proveedor_cta_bancaria.tdata.id_padre = this.idContenedor;
 
-            
+
 
         },
 
@@ -2225,10 +2292,19 @@ header("content-type: text/javascript; charset=UTF-8");
                 me.Cmp.forma_pago.disable();
                 me.Cmp.forma_pago.setValue('transferencia');
 
+                me.Cmp.id_proveedor_cta_bancaria.enable();
+                me.Cmp.id_proveedor_cta_bancaria.allowBlank = false;
+
             } else {
                 me.Cmp.forma_pago.disable();
                 me.Cmp.forma_pago.setValue('cheque');
+
+                me.Cmp.id_proveedor_cta_bancaria.disable();
+                me.Cmp.id_proveedor_cta_bancaria.allowBlank = true;
+                me.Cmp.id_proveedor_cta_bancaria.setValue('');
             }
+
+
 
 
         },
@@ -2243,8 +2319,13 @@ header("content-type: text/javascript; charset=UTF-8");
                 // me.Cmp.nro_cheque.disable();
 
                 //Habilita nrocuenta bancaria destino
-                me.Cmp.nro_cuenta_bancaria.allowBlank = false;
-                me.Cmp.nro_cuenta_bancaria.enable();
+                // me.Cmp.nro_cuenta_bancaria.allowBlank = false;
+                // me.Cmp.nro_cuenta_bancaria.enable();
+                me.Cmp.id_proveedor_cta_bancaria.allowBlank = false;
+                me.Cmp.id_proveedor_cta_bancaria.enable();
+
+                // me.Cmp.id_proveedor_cta_bancaria.allowBlank = false;
+                // me.Cmp.id_proveedor_cta_bancaria.enable();
 
             }
             else {
@@ -2254,9 +2335,16 @@ header("content-type: text/javascript; charset=UTF-8");
                 // me.Cmp.nro_cheque.allowBlank=false;
                 // me.Cmp.nro_cheque.enable();
                 //Habilita nrocuenta bancaria destino
-                me.Cmp.nro_cuenta_bancaria.allowBlank = true;
-                me.Cmp.nro_cuenta_bancaria.setValue('');
-                me.Cmp.nro_cuenta_bancaria.disable();
+                // me.Cmp.nro_cuenta_bancaria.allowBlank = true;
+                // me.Cmp.nro_cuenta_bancaria.setValue('');
+                // me.Cmp.nro_cuenta_bancaria.disable();
+                me.Cmp.id_proveedor_cta_bancaria.allowBlank = true;
+                me.Cmp.id_proveedor_cta_bancaria.setValue('');
+                me.Cmp.id_proveedor_cta_bancaria.disable();
+
+                // me.Cmp.id_proveedor_cta_bancaria.allowBlank = true;
+                // me.Cmp.id_proveedor_cta_bancaria.setValue('');
+                // me.Cmp.id_proveedor_cta_bancaria.disable();
             }
 
         },
@@ -2485,8 +2573,11 @@ header("content-type: text/javascript; charset=UTF-8");
             if (me.Cmp.forma_pago) {
                 me.mostrarComponente(me.Cmp.forma_pago);
             }
-            if (me.Cmp.nro_cuenta_bancaria) {
-                me.mostrarComponente(me.Cmp.nro_cuenta_bancaria);
+            // if (me.Cmp.nro_cuenta_bancaria) {
+            //     me.mostrarComponente(me.Cmp.nro_cuenta_bancaria);
+            // }
+            if (me.Cmp.id_proveedor_cta_bancaria) {
+                me.mostrarComponente(me.Cmp.id_proveedor_cta_bancaria);
             }
             if (me.Cmp.nro_cheque) {
                 // me.mostrarComponente(me.Cmp.nro_cheque);
@@ -2505,8 +2596,11 @@ header("content-type: text/javascript; charset=UTF-8");
             if (me.Cmp.forma_pago) {
                 me.ocultarComponente(me.Cmp.forma_pago);
             }
-            if (me.Cmp.nro_cuenta_bancaria) {
-                me.ocultarComponente(me.Cmp.nro_cuenta_bancaria);
+            // if (me.Cmp.nro_cuenta_bancaria) {
+            //     me.ocultarComponente(me.Cmp.nro_cuenta_bancaria);
+            // }
+            if (me.Cmp.id_proveedor_cta_bancaria) {
+                me.ocultarComponente(me.Cmp.id_proveedor_cta_bancaria);
             }
             if (me.Cmp.nro_cheque) {
                 me.ocultarComponente(me.Cmp.nro_cheque);
@@ -2677,10 +2771,19 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.idContenedor,
                 'Obs'
             )
-        },
-        cargarCuenta : function (nro_cuenta_bancaria,nro_cuenta_bancaria ) {
-            this.Cmp.nro_cuenta_bancaria.setValue(nro_cuenta_bancaria);
-            this.Cmp.nro_cuenta_bancaria.setRawValue(nro_cuenta_bancaria.toUpperCase());
+        }
+        ,
+        // cargarCuenta : function (nro_cuenta_bancaria,nro_cuenta_bancaria ) {
+        //     this.Cmp.nro_cuenta_bancaria.setValue(nro_cuenta_bancaria);
+        //     this.Cmp.nro_cuenta_bancaria.setRawValue(nro_cuenta_bancaria.toUpperCase());
+        // }
+        // cargarCuenta : function (id_proveedor_cta_bancaria,nro_cuenta_bancaria ) {
+        //     this.Cmp.id_proveedor_cta_bancaria.setValue(nro_cuenta_bancaria);
+        //     this.Cmp.id_proveedor_cta_bancaria.setRawValue(nro_cuenta_bancaria);
+        // }
+        cargarCuenta : function (id_proveedor_cta_bancaria,nro_cuenta_bancaria ) {
+            this.Cmp.id_proveedor_cta_bancaria.setValue(id_proveedor_cta_bancaria);
+            this.Cmp.id_proveedor_cta_bancaria.setRawValue(id_proveedor_cta_bancaria);
         }
 
     })

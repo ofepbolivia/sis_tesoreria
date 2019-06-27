@@ -33,13 +33,15 @@ header("content-type: text/javascript; charset=UTF-8");
             this.Atributos[this.getIndAtributo('forma_pago')].form=true;
             this.Atributos[this.getIndAtributo('nro_cheque')].form=false;
             this.Atributos[this.getIndAtributo('nro_cheque')].valorInicial=0;
-            this.Atributos[this.getIndAtributo('nro_cuenta_bancaria')].form=true;
+            // this.Atributos[this.getIndAtributo('nro_cuenta_bancaria')].form=false;
             this.Atributos[this.getIndAtributo('id_depto_lb')].form=true;
             this.Atributos[this.getIndAtributo('id_cuenta_bancaria')].form=true;
             // this.Atributos[this.getIndAtributo('id_cuenta_bancaria_mov')].form=false;
             this.Atributos[this.getIndAtributo('num_tramite')].bottom_filter=true;
             this.Atributos[this.getIndAtributo('nombre_pago')].bottom_filter=true;
             this.Atributos[this.getIndAtributo('desc_funcionario1')].bottom_filter=true;
+
+            this.Atributos[this.getIndAtributo('id_proveedor_cta_bancaria')].form=true;
 
 
             //funcionalidad para listado de historicos
@@ -213,7 +215,8 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.Cmp.forma_pago.disable();
                 this.Cmp.nombre_pago.disable();
                 this.Cmp.nro_cheque.disable();
-                this.Cmp.nro_cuenta_bancaria.disable();
+                // this.Cmp.nro_cuenta_bancaria.disable();
+                this.Cmp.id_proveedor_cta_bancaria.disable();
                 this.Cmp.monto_retgar_mo.disable();
                 this.Cmp.monto_no_pagado.disable();
                 this.Cmp.id_depto_lb.disable();
@@ -366,6 +369,7 @@ header("content-type: text/javascript; charset=UTF-8");
             this.Cmp.forma_pago.on('change',function(groupRadio,radio){
                 this.ocultarCheCue(this,radio.inputValue);
             },this);
+
 
             //eventos de fechas de costo
             this.Cmp.fecha_costo_ini.on('change',function( o, newValue, oldValue ){

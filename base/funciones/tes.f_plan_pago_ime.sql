@@ -193,6 +193,8 @@ DECLARE
 
     v_id_depto_lb_pp			integer;
     v_prorrateo_json			json;
+    v_cuenta_bancaria_benef		varchar;
+    v_id_proveedor_cta_bancaria	integer;
 
 
 BEGIN
@@ -449,9 +451,26 @@ BEGIN
                v_nro_cheque =  v_parametros.nro_cheque;
              END IF;
 
-             IF  pxp.f_existe_parametro(p_tabla,'nro_cuenta_bancaria') THEN
+  			--modificacion para v_nro_cuenta_bancaria
+            /* IF  pxp.f_existe_parametro(p_tabla,'nro_cuenta_bancaria') THEN
                 v_nro_cuenta_bancaria =  v_parametros.nro_cuenta_bancaria;
              END IF;
+			*/
+            	/*	select pcb.id_proveedor_cta_bancaria
+                    into v_id_proveedor_cta_bancaria
+                    from param.tproveedor_cta_bancaria pcb
+                    where pcb.nro_cuenta = v_parametros.id_proveedor_cta_bancaria::varchar;
+            */
+            --  raise exception 'llegaa21a %',v_id_proveedor_cta_bancaria;
+            		  select ins.nombre||'-'|| pcb.nro_cuenta
+                      into v_cuenta_bancaria_benef
+                      from param.tproveedor_cta_bancaria pcb
+                      left join param.tinstitucion ins on ins.id_institucion=pcb.id_banco_beneficiario
+                      --where pcb.id_proveedor_cta_bancaria = v_parametros.id_proveedor_cta_bancaria;
+                      where pcb.id_proveedor_cta_bancaria = v_parametros.id_proveedor_cta_bancaria;
+
+             		v_nro_cuenta_bancaria = v_cuenta_bancaria_benef::varchar;
+             --
 
              IF  pxp.f_existe_parametro(p_tabla,'porc_monto_excento_var') THEN
                 v_porc_monto_excento_var =  v_parametros.porc_monto_excento_var;
@@ -876,7 +895,7 @@ BEGIN
                 v_porc_monto_excento_var = 0;
            END IF;
 
-
+--raise exception 'llegaaa %, %',v_parametros.id_proveedor_cta_bancaria,v_nro_cuenta_bancaria ;
 
 --RAISE EXCEPTION 'v_parametros.es_ultima_cuota : %', v_parametros.es_ultima_cuota;
 
@@ -920,7 +939,9 @@ BEGIN
             fecha_costo_fin = v_parametros.fecha_costo_fin,
             fecha_conclusion_pago = v_parametros.fecha_conclusion_pago,
             /*es_ultima_cuota = v_parametros.es_ultima_cuota*/
-            monto_establecido =v_monto_establecido
+            monto_establecido =v_monto_establecido,
+            id_proveedor_cta_bancaria = v_parametros.id_proveedor_cta_bancaria
+
             where id_plan_pago = v_parametros.id_plan_pago;
 
             /*--control de fechas inicio y fin
@@ -1014,6 +1035,10 @@ BEGIN
                raise exception 'LAS FECHAS NO CORRESPONDEN A LA GESTIÓN, NÚMERO DE TRÁMITE % gestión %', v_num_tramite, v_anio_ges;
             END IF;
 
+            --control fecha de conclusion del pago
+            /*IF (v_parametros.fecha_conclusion_pago<now()) THEN
+                raise exception 'LA FECHA CONCLUSION ES MENOR A LA FECHA %',to_char(now(), 'DD-MM-YYYY');
+            END IF;*/
 
             -- chequea fechas de costos inicio y fin
             v_resp_doc =  tes.f_validar_periodo_costo(v_parametros.id_plan_pago);
@@ -2211,6 +2236,7 @@ LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
+PARALLEL UNSAFE
 COST 100;
 
 ALTER FUNCTION tes.f_plan_pago_ime (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)

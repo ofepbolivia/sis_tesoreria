@@ -77,6 +77,7 @@ DECLARE
     v_porcentaje13_monto			numeric;
     v_codigo_tipo_relacion			varchar;
 
+	v_cuenta_bancaria_benef			varchar;
 
 BEGIN
 
@@ -138,12 +139,20 @@ BEGIN
              v_id_cuenta_bancaria_mov =  (p_hstore->'id_cuenta_bancaria_mov')::integer;
              v_forma_pago =  (p_hstore->'forma_pago')::varchar;
              v_nro_cheque =  (p_hstore->'nro_cheque')::integer;
-             v_nro_cuenta_bancaria =  (p_hstore->'nro_cuenta_bancaria')::varchar;
+             --v_nro_cuenta_bancaria =  (p_hstore->'nro_cuenta_bancaria')::varchar;
              v_porc_monto_excento_var = (p_hstore->'porc_monto_excento_var')::numeric;
              v_monto_excento = (p_hstore->'monto_excento')::numeric;
              v_monto_anticipo = COALESCE((p_hstore->'monto_anticipo')::numeric, 0);
 
+            --modificacion para v_nro_cuenta_bancaria
+				select ins.nombre||'-'|| pcb.nro_cuenta
+                into v_cuenta_bancaria_benef
+                from param.tproveedor_cta_bancaria pcb
+                left join param.tinstitucion ins on ins.id_institucion=pcb.id_banco_beneficiario
+                where pcb.id_proveedor_cta_bancaria = (p_hstore->'id_proveedor_cta_bancaria')::integer;
 
+             v_nro_cuenta_bancaria = v_cuenta_bancaria_benef::varchar;
+			--
            -- segun el tipo  recuepramos el tipo_plan_pago, determinamos el flujos para el WF
            select
             tpp.id_tipo_plan_pago,
@@ -558,7 +567,8 @@ BEGIN
             fecha_costo_fin,
             fecha_conclusion_pago,
             es_ultima_cuota,
-            monto_establecido
+            monto_establecido,
+            id_proveedor_cta_bancaria
           	) values(
 			'activo',
 			v_nro_cuota,
@@ -608,7 +618,8 @@ BEGIN
             (p_hstore->'fecha_costo_fin')::date,
             (p_hstore->'fecha_conclusion_pago')::date,
             true,
-            v_monto_establecido
+            v_monto_establecido,
+            (p_hstore->'id_proveedor_cta_bancaria')::integer
            )RETURNING id_plan_pago into v_id_plan_pago;
 
            IF (v_fecha_ini_pp is not Null or v_fecha_fin_pp is not Null) THEN
@@ -686,6 +697,7 @@ LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
+PARALLEL UNSAFE
 COST 100;
 
 ALTER FUNCTION tes.f_inserta_plan_pago_dev (p_administrador integer, p_id_usuario integer, p_hstore public.hstore, p_salta boolean)

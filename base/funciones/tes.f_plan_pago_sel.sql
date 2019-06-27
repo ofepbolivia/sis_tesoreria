@@ -265,7 +265,8 @@ BEGIN
                         tcon.fecha_costo_fin as fecha_cbte_fin,
                         plapa.monto_establecido,
                         pro.id_proveedor,
-                        pro.nit
+                        pro.nit,
+                        plapa.id_proveedor_cta_bancaria
 
                         from tes.tplan_pago plapa
                         inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = plapa.id_proceso_wf
@@ -1264,6 +1265,7 @@ LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
+PARALLEL UNSAFE
 COST 100;
 
 ALTER FUNCTION tes.f_plan_pago_sel (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
