@@ -948,7 +948,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 filters: {pfiltro: 'plapa.nro_cuenta_bancaria', type: 'string'},
                 id_grupo: 1,
                 grid: true,
-                form: false
+                form: true
             },
             {
                 config: {
@@ -2003,6 +2003,11 @@ header("content-type: text/javascript; charset=UTF-8");
 
 
           //may
+            if (data.estado == 'borrador') {
+
+                this.Cmp.id_proveedor_cta_bancaria.allowBlank = true;
+                this.ocultarComponente(this.Cmp.id_proveedor_cta_bancaria);
+            }
             if (data.estado == 'vbsolicitante') {
 
                 this.ocultarComponente(this.Cmp.id_cuenta_bancaria);
@@ -2777,10 +2782,7 @@ header("content-type: text/javascript; charset=UTF-8");
         //     this.Cmp.nro_cuenta_bancaria.setValue(nro_cuenta_bancaria);
         //     this.Cmp.nro_cuenta_bancaria.setRawValue(nro_cuenta_bancaria.toUpperCase());
         // }
-        // cargarCuenta : function (id_proveedor_cta_bancaria,nro_cuenta_bancaria ) {
-        //     this.Cmp.id_proveedor_cta_bancaria.setValue(nro_cuenta_bancaria);
-        //     this.Cmp.id_proveedor_cta_bancaria.setRawValue(nro_cuenta_bancaria);
-        // }
+
         cargarCuenta : function (id_proveedor_cta_bancaria,nro_cuenta_bancaria ) {
             this.Cmp.id_proveedor_cta_bancaria.setValue(id_proveedor_cta_bancaria);
             this.Cmp.id_proveedor_cta_bancaria.setRawValue(id_proveedor_cta_bancaria);
