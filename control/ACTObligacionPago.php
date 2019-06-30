@@ -140,7 +140,17 @@ class ACTObligacionPago extends ACTbase{
             $this->objParam->addFiltro("obpg.id_gestion = ".$this->objParam->getParametro('id_gestion')." ");
 
         }
-
+        //para internacionales SP, SPD, SPI
+        if ($this->objParam->getParametro('tipo_interfaz') == 'obligacionPagoS') {
+            $this->objParam->addFiltro("obpg.tipo_obligacion in (''sp'')");
+        }
+        if ($this->objParam->getParametro('tipo_interfaz') == 'solicitudObligacionPagoUnico') {
+            $this->objParam->addFiltro("obpg.tipo_obligacion in (''spd'')");
+        }
+        if ($this->objParam->getParametro('tipo_interfaz') == 'obligacionPagoInterS') {
+            $this->objParam->addFiltro("obpg.tipo_obligacion in (''spi'')");
+        }
+        //
         
         if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
             $this->objReporte = new Reporte($this->objParam,$this);

@@ -3,7 +3,7 @@
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
-    Phx.vista.SolicitudObligacionPago = Ext.extend(Phx.gridInterfaz, {
+    Phx.vista.SolicitudPagoInter = Ext.extend(Phx.gridInterfaz, {
         fheight: '90%',
         fwidth: '70%',
 
@@ -13,7 +13,7 @@ header("content-type: text/javascript; charset=UTF-8");
 
             this.maestro = config;
             //llama al constructor de la clase padre
-            Phx.vista.SolicitudObligacionPago.superclass.constructor.call(this, config);
+            Phx.vista.SolicitudPagoInter.superclass.constructor.call(this, config);
             this.init();
 
             this.store.baseParams = {
@@ -995,6 +995,10 @@ header("content-type: text/javascript; charset=UTF-8");
             direction: 'DESC'
         },
 
+        bdel: true,
+        bedit: true,
+        bsave: false,
+
         repComEjePag: function () {
             var rec = this.sm.getSelected();
             if (rec) {
@@ -1074,7 +1078,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 n = rec.data.variable;
 
                 // if (n == 'adquisiciones' || n == 'pago_directo') {
-                if (n == 'adquisiciones' || n == 'sp') {
+                if (n == 'adquisiciones' || n == 'spi') {
                     this.cmpProveedor.enable();
                     this.mostrarComponente(this.cmpProveedor);
                     this.ocultarComponente(this.cmpFuncionario);
@@ -1270,7 +1274,7 @@ header("content-type: text/javascript; charset=UTF-8");
             var tb = this.tbar;
 
 
-            Phx.vista.SolicitudObligacionPago.superclass.preparaMenu.call(this, n);
+            Phx.vista.SolicitudPagoInter.superclass.preparaMenu.call(this, n);
 
             if (data['estado'] == 'borrador') {
                 this.getBoton('edit').enable();
@@ -1338,7 +1342,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     this.disableTabPagos();
                     // this.enableTabPagos();
                     //if (this.nombreVista == 'ObligacionPagoVb' || this.nombreVista == 'ObligacionPagoVbPoa') {
-                    if (this.nombreVista == 'SP'){
+                    if (this.nombreVista == 'SPI'){
                         this.getBoton('fin_registro').enable();
                         this.getBoton('ant_estado').enable();
                     }
@@ -1350,7 +1354,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 }
 
                 // if (this.nombreVista == 'ObligacionPagoVb') {
-                if (this.nombreVista == 'SP') {
+                if (this.nombreVista == 'SPI') {
                     this.getBoton('fin_registro').enable();
                     this.getBoton('ant_estado').enable();
                 }
@@ -1419,7 +1423,7 @@ header("content-type: text/javascript; charset=UTF-8");
 
 
         liberaMenu: function () {
-            var tb = Phx.vista.SolicitudObligacionPago.superclass.liberaMenu.call(this);
+            var tb = Phx.vista.SolicitudPagoInter.superclass.liberaMenu.call(this);
             if (tb) {
                 this.getBoton('fin_registro').disable();
                 this.getBoton('ant_estado').disable();
@@ -1448,18 +1452,18 @@ header("content-type: text/javascript; charset=UTF-8");
         },
 
         tabsouth: [
-            {
-                url: '../../../sis_tesoreria/vista/solicitud_obligacion_det/SolicitudObligacionDet.php',
-                title: 'Detalle',
-                height: '50%',
-                cls: 'SolicitudObligacionDet'
-            },
             // {
-            //     url: '../../../sis_tesoreria/vista/obligacion_det/ObligacionDet.php',
+            //     url: '../../../sis_tesoreria/vista/solicitud_obligacion_det/SolicitudObligacionDet.php',
             //     title: 'Detalle',
             //     height: '50%',
-            //     cls: 'ObligacionDet'
+            //     cls: 'SolicitudObligacionDet'
             // },
+            {
+                url: '../../../sis_tesoreria/vista/obligacion_det/ObligacionDet.php',
+                title: 'Detalle',
+                height: '50%',
+                cls: 'ObligacionDet'
+            },
 
             {
                 url: '../../../sis_tesoreria/vista/solicitud_plan_pago/SoliPlanPagoReq.php',
@@ -2125,6 +2129,44 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.idContenedor,
                 'Obs'
             )
+        },
+        extenderSP: function () {
+            var me = this,
+                d = me.sm.getSelected().data;
+            console.log('holaaaa',d)
+            // if (d.estado = 'vfin'){
+            //     if (){
+            //
+            //     }
+            //
+            // }
+
+            if (!d.id_obligacion_pago_extendida && d.id_obligacion_pago_extendida != '') {
+                if (confirm('¿Está seguro de extender la obligación para pago de Gestion Anterior?. \n Si  no existen   registros de presupuestos y partidas para la siguiente gestión , no se copiara nada, tendrá que hacer los registros faltantes manualmente. No podrá volver a ejecutar este comando')) {
+                    if (confirm('¿Está realmente seguro?')) {
+                        Phx.CP.loadingShow();
+                        Ext.Ajax.request({
+                            url: '../../sis_tesoreria/control/ObligacionPago/extenderOp',
+                            success: function () {
+                                Phx.CP.loadingHide();
+                                me.reload();
+                            },
+                            failure: me.conexionFailure,
+                            params: {
+                                'id_obligacion_pago': d.id_obligacion_pago,
+                                'id_administrador': 2
+                            },
+                            timeout: me.timeout,
+                            scope: me
+                        });
+
+                    }
+                }
+            }
+            else {
+
+                alert('La obligación ya fue extendida')
+            }
         }
 
     })

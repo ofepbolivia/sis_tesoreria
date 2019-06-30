@@ -1920,3 +1920,12 @@ IS 'monto establecido para facturas con el descuento del 13%';
 ALTER TABLE tes.tplan_pago
   ADD COLUMN fecha_conclusion_pago DATE;
 /*****************************F-SCP-MAY-TES-0-19/06/2019*************/
+
+/*****************************I-SCP-MAY-TES-0-28/06/2019*************/
+ -- object recreation
+ALTER TABLE tes.tobligacion_pago
+  DROP CONSTRAINT chk_tobligacion_pago__tipo_obligacion RESTRICT;
+
+ALTER TABLE tes.tobligacion_pago
+  ADD CONSTRAINT chk_tobligacion_pago__tipo_obligacion CHECK ((tipo_obligacion)::text = ANY (ARRAY[('adquisiciones'::character varying)::text, ('pago_unico'::character varying)::text, ('pago_especial'::character varying)::text, ('caja_chica'::character varying)::text, ('viaticos'::character varying)::text, ('fondos_en_avance'::character varying)::text, ('pago_directo'::character varying)::text, ('rrhh'::character varying)::text, ('pga'::character varying)::text, ('ppm'::character varying)::text, ('pce'::character varying)::text, ('pbr'::character varying)::text, ('sp'::character varying)::text, ('spd'::character varying)::text, ('spi'::character varying)::text]));
+/*****************************F-SCP-MAY-TES-0-28/06/2019*************/
