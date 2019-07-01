@@ -324,13 +324,14 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.Cmp.id_cuenta_bancaria.modificado=true;
             },this);
 
-            //para filtro de id_proveedor_cta_bancaria
-            //this.maestro.id_proveedor.on('blur',function(a,b,c){
-            this.Cmp.id_proveedor_cta_bancaria.setValue('');
-            this.Cmp.id_proveedor_cta_bancaria.store.baseParams.nombre_pago = this.maestro.desc_proveedor;
-            // this.Cmp.id_cuenta_bancaria.store.baseParams.permiso = 'todos';s
-            this.Cmp.id_proveedor_cta_bancaria.modificado=true;
-            //},this);
+            // //para filtro de id_proveedor_cta_bancaria
+            // //this.maestro.id_proveedor.on('blur',function(a,b,c){
+            //     this.Cmp.id_proveedor_cta_bancaria.setValue('');
+            //     this.Cmp.id_proveedor_cta_bancaria.store.baseParams.nombre_pago = this.maestro.desc_proveedor;
+            //     // this.Cmp.id_cuenta_bancaria.store.baseParams.permiso = 'todos';s
+            //     this.Cmp.id_proveedor_cta_bancaria.modificado=true;
+            // //},this);
+
 
 
 
@@ -522,9 +523,11 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.Cmp.id_cuenta_bancaria.store.baseParams = Ext.apply(this.Cmp.id_cuenta_bancaria.store.baseParams,{ id_depto_lb:this.Cmp.id_depto_lb.getValue(), permiso: 'todos'});
                 this.Cmp.id_cuenta_bancaria.modificado = true;
             }
-            //para filtro de id_proveedor_cta_bancaria
-            this.Cmp.id_proveedor_cta_bancaria.store.baseParams = Ext.apply(this.Cmp.id_proveedor_cta_bancaria.store.baseParams,{ id_proveedor: this.maestro.id_proveedor});
-            this.Cmp.id_proveedor_cta_bancaria.modificado = true;
+
+            // //para filtro de id_proveedor_cta_bancaria
+            // this.Cmp.id_proveedor_cta_bancaria.store.baseParams = Ext.apply(this.Cmp.id_proveedor_cta_bancaria.store.baseParams,{ id_proveedor: this.maestro.id_proveedor});
+            // this.Cmp.id_proveedor_cta_bancaria.modificado = true;
+
 
 
         },
@@ -541,9 +544,11 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.Cmp.id_cuenta_bancaria.store.baseParams = Ext.apply(this.Cmp.id_cuenta_bancaria.store.baseParams,{ id_depto_lb:this.Cmp.id_depto_lb.getValue(), permiso: 'todos'});
                 this.Cmp.id_cuenta_bancaria.modificado = true;
             }
-            //para filtro de id_proveedor_cta_bancaria
-            this.Cmp.id_proveedor_cta_bancaria.store.baseParams = Ext.apply(this.Cmp.id_proveedor_cta_bancaria.store.baseParams,{ id_proveedor: this.maestro.id_proveedor});
-            this.Cmp.id_proveedor_cta_bancaria.modificado = true;
+
+            // //para filtro de id_proveedor_cta_bancaria
+            // this.Cmp.id_proveedor_cta_bancaria.store.baseParams = Ext.apply(this.Cmp.id_proveedor_cta_bancaria.store.baseParams,{ id_proveedor: this.maestro.id_proveedor});
+            // this.Cmp.id_proveedor_cta_bancaria.modificado = true;
+
 
 
         },
@@ -674,9 +679,16 @@ header("content-type: text/javascript; charset=UTF-8");
               this.getBoton('btnConformidad').disable();
            }*/
 
+
+            // this.getBoton('btnVerifPresup').enable();
+
+            // this.getBoton('btnDocCmpVnt').enable();
+
             this.getBoton('btnChequeoDocumentosWf').enable();
             this.getBoton('btnPagoRel').enable();
             this.getBoton('btnDocCmpVnt').enable();
+            this.getBoton('btnImportePP').enable();
+
 
             // if (data['id_int_comprobante'] != 'Null' || data['id_int_comprobante'] != ''){
             //     this.getBoton('btnDocCmpVnt').enable();
@@ -703,6 +715,9 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.getBoton('btnPagoRel').disable();
 
                 this.getBoton('btnDocCmpVnt').disable();
+
+                this.getBoton('btnImportePP').disable();
+
 
 
 

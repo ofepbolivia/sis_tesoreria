@@ -417,15 +417,15 @@ header("content-type: text/javascript; charset=UTF-8");
         },
 
         onButtonNew:function(){
-            var anio = this.maestro.fecha;
-            anio = anio.getFullYear();
-            var fecha_inicio = new Date(anio+'/01/1');
-
-            var fecha_fin = new Date(anio+'/12/31');
-            this.Cmp.fecha_costo_ini.setMinValue(fecha_inicio);
-            this.Cmp.fecha_costo_ini.setMaxValue(fecha_fin);
-            this.Cmp.fecha_costo_fin.setMinValue(fecha_inicio);
-            this.Cmp.fecha_costo_fin.setMaxValue(fecha_fin);
+            // var anio = this.maestro.fecha;
+            // anio = anio.getFullYear();
+            // var fecha_inicio = new Date(anio+'/01/1');
+            //
+            // var fecha_fin = new Date(anio+'/12/31');
+            // this.Cmp.fecha_costo_ini.setMinValue(fecha_inicio);
+            // this.Cmp.fecha_costo_ini.setMaxValue(fecha_fin);
+            // this.Cmp.fecha_costo_fin.setMinValue(fecha_inicio);
+            // this.Cmp.fecha_costo_fin.setMaxValue(fecha_fin);
             this.porc_ret_gar = 0; //resetea valor por defecto de retencion de garantia
             var data = this.getSelectedData();
             this.ocultarGrupo(2); //ocultar el grupo de ajustes
@@ -624,12 +624,12 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.getBoton('SolPlanPago').enable();
             }
 
-            if(data['sinc_presupuesto']=='si'&& (data['estado']== 'vbconta'||data['estado']== 'borrador')){
-                this.getBoton('SincPresu').enable();
-            }
-            else{
-                this.getBoton('SincPresu').disable();
-            }
+            // if(data['sinc_presupuesto']=='si'&& (data['estado']== 'vbconta'||data['estado']== 'borrador')){
+            //     this.getBoton('SincPresu').enable();
+            // }
+            // else{
+            //     this.getBoton('SincPresu').disable();
+            // }
 
 
             /*if (data.tipo=='devengado'  || data.tipo=='devengado_pagado' || data.tipo=='devengado_pagado_1c') {
@@ -646,7 +646,7 @@ header("content-type: text/javascript; charset=UTF-8");
         liberaMenu:function(){
             var tb = Phx.vista.PlanPagoRegIni.superclass.liberaMenu.call(this);
             if(tb){
-                this.getBoton('SincPresu').disable();
+                // this.getBoton('SincPresu').disable();
                 this.getBoton('SolPlanPago').disable();
                 //this.getBoton('btnVerifPresup').disable();
                 this.getBoton('ant_estado').disable();

@@ -2,8 +2,8 @@
 /**
  *@package pXP
  *@file    FormObligacion.php
- *@author  Rensi Arteaga Copari
- *@date    30-01-2014
+ *@author  Maylee Perez Pastor
+ *@date    30-03-2019
  *@description permites subir archivos a la tabla de documento_sol
  */
 header("content-type: text/javascript; charset=UTF-8");
@@ -842,7 +842,8 @@ header("content-type: text/javascript; charset=UTF-8");
 
                 }
                 else{
-                    this.cmpTipoCambioConv.enable()
+
+                    this.cmpTipoCambioConv.enable();
                     this.obtenerTipoCambio();
                 }
 

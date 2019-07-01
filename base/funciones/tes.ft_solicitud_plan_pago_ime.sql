@@ -422,7 +422,9 @@ BEGIN
             from tes.tobligacion_pago
             where id_obligacion_pago = v_parametros.id_obligacion_pago;
 
-            IF v_tipo_obligacion = 'sp' or v_tipo_obligacion = 'spd' then
+
+            IF v_tipo_obligacion = 'sp' or v_tipo_obligacion = 'spd' or v_tipo_obligacion = 'spi'then
+
 
             		  select pcb.nro_cuenta ||'-'|| ins.nombre
                       into v_cuenta_bancaria_benef
@@ -903,7 +905,8 @@ BEGIN
                       from tes.tobligacion_pago
                       where id_obligacion_pago = v_parametros.id_obligacion_pago;
 
-                    IF v_tipo_obligacion = 'sp' then
+
+                    IF v_tipo_obligacion = 'sp' or v_tipo_obligacion = 'spd' or v_tipo_obligacion = 'spi' then
                       select pcb.nro_cuenta ||'-'|| ins.nombre
                       into v_cuenta_bancaria_benef
                       from param.tproveedor_cta_bancaria pcb

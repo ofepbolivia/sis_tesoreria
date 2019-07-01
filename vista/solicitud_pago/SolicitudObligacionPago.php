@@ -1448,18 +1448,20 @@ header("content-type: text/javascript; charset=UTF-8");
         },
 
         tabsouth: [
-            // {
-            //     url: '../../../sis_tesoreria/vista/solicitud_obligacion_det/SolicitudObligacionDet.php',
-            //     title: 'Detalle',
-            //     height: '50%',
-            //     cls: 'SolicitudObligacionDet'
-            // },
+
             {
-                url: '../../../sis_tesoreria/vista/obligacion_det/ObligacionDet.php',
+                url: '../../../sis_tesoreria/vista/solicitud_obligacion_det/SolicitudObligacionDet.php',
                 title: 'Detalle',
                 height: '50%',
-                cls: 'ObligacionDet'
+                cls: 'SolicitudObligacionDet'
             },
+            // {
+            //     url: '../../../sis_tesoreria/vista/obligacion_det/ObligacionDet.php',
+            //     title: 'Detalle',
+            //     height: '50%',
+            //     cls: 'ObligacionDet'
+            // },
+
 
             {
                 url: '../../../sis_tesoreria/vista/solicitud_plan_pago/SoliPlanPagoReq.php',
@@ -1638,6 +1640,7 @@ header("content-type: text/javascript; charset=UTF-8");
             var me = this,
                 d = me.sm.getSelected().data;
 
+            console.log(d);
             if (!d.id_obligacion_pago_extendida && d.id_obligacion_pago_extendida != '') {
                 if (confirm('¿Está seguro de extender la obligación para pago de Gestion Anterior?. \n Si  no existen   registros de presupuestos y partidas para la siguiente gestión , no se copiara nada, tendrá que hacer los registros faltantes manualmente. No podrá volver a ejecutar este comando')) {
                     if (confirm('¿Está realmente seguro?')) {

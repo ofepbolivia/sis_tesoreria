@@ -78,6 +78,14 @@ class ACTObligacionPago extends ACTbase
             $this->objParam->addFiltro("obpg.estado in (''vobogerencia'',''vbgaf'',''vbpoa'', ''vb_jefe_aeropuerto'', ''suppresu'', ''vbpresupuestos'', ''registrado'', ''en_pago'', ''finalizado'')");
         }
 
+        //(f.e.a) Pagos Boa Rep
+        if($this->objParam->getParametro('pbr_estado')=='borrador_pbr'){
+            $this->objParam->addFiltro("obpg.estado in (''borrador'')");
+        }
+        if($this->objParam->getParametro('pbr_estado')=='proceso_pbr'){
+            $this->objParam->addFiltro("obpg.estado in (''vobogerencia'',''vbgaf'',''vbpoa'', ''vb_jefe_aeropuerto'', ''suppresu'', ''vbpresupuestos'', ''registrado'', ''en_pago'', ''finalizado'')");
+        }
+
         //(fea) Pagos Moneda base y moneda extranjera
         if ($this->objParam->getParametro('moneda_base') == 'base' && $this->objParam->getParametro('tipo_interfaz') == 'ObligacionPagoVb') {
             $this->objParam->addFiltro("mn.tipo_moneda = ''base''");
@@ -141,6 +149,8 @@ class ACTObligacionPago extends ACTbase
             $this->objParam->addFiltro("obpg.id_gestion = " . $this->objParam->getParametro('id_gestion') . " ");
 
         }
+
+        //para internacionales SP, SPD, SPI
         if ($this->objParam->getParametro('tipo_interfaz') == 'obligacionPagoS') {
             $this->objParam->addFiltro("obpg.tipo_obligacion in (''sp'')");
         }
@@ -148,13 +158,18 @@ class ACTObligacionPago extends ACTbase
             $this->objParam->addFiltro("obpg.tipo_obligacion in (''spd'')");
         }
 
-        if ($this->objParam->getParametro('tipoReporte') == 'excel_grid' || $this->objParam->getParametro('tipoReporte') == 'pdf_grid') {
-            $this->objReporte = new Reporte($this->objParam, $this);
-            $this->res = $this->objReporte->generarReporteListado('MODObligacionPago', 'listarObligacionPagoSol');
-        } else {
-            $this->objFunc = $this->create('MODObligacionPago');
-
-            $this->res = $this->objFunc->listarObligacionPagoSol($this->objParam);
+        if ($this->objParam->getParametro('tipo_interfaz') == 'obligacionPagoInterS') {
+            $this->objParam->addFiltro("obpg.tipo_obligacion in (''spi'')");
+        }
+        //
+        
+        if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
+            $this->objReporte = new Reporte($this->objParam,$this);
+            $this->res = $this->objReporte->generarReporteListado('MODObligacionPago','listarObligacionPagoSol');
+        } else{
+            $this->objFunc=$this->create('MODObligacionPago');
+            
+            $this->res=$this->objFunc->listarObligacionPagoSol($this->objParam);
         }
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
@@ -712,6 +727,25 @@ class ACTObligacionPago extends ACTbase
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
 
+    function TsLibroBancosExterior() {
+		$this->objParam->defecto('ordenacion','id_obligacion_pago');
+        $this->objParam->defecto('dir_ordenacion','asc');        
+
+        if ($this->objParam->getParametro('pes_estado') == 'exterior') {            	
+            $this->objParam->addFiltro("plbex.prioridad = 3");
+        }else{
+            $this->objParam->addFiltro("plbex.prioridad <> 3");
+        }        
+		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
+			$this->objReporte = new Reporte($this->objParam,$this);
+			$this->res = $this->objReporte->generarReporteListado('MODObligacionPago','TsLibroBancosExterior');
+		} else{
+			$this->objFunc=$this->create('MODObligacionPago');
+			
+			$this->res=$this->objFunc->TsLibroBancosExterior($this->objParam);
+		}
+		$this->res->imprimirRespuesta($this->res->generarJson());        
+    }
 
 }
 

@@ -103,6 +103,7 @@ class MODPlanPago extends MODbase{
         $this->captura('monto_anticipo','numeric');
         $this->captura('fecha_costo_ini','date');
         $this->captura('fecha_costo_fin','date');
+        $this->captura('fecha_conclusion_pago','date');
         $this->captura('funcionario_wf','text');
         $this->captura('tiene_form500','varchar');
         $this->captura('id_depto_lb','integer');
@@ -120,7 +121,11 @@ class MODPlanPago extends MODbase{
         $this->captura('fecha_cbte_ini','date');
         $this->captura('fecha_cbte_fin','date');
 
+        $this->captura('monto_establecido','numeric');
+        $this->captura('id_proveedor','int4');
+        $this->captura('nit','varchar');
 
+        $this->captura('id_proveedor_cta_bancaria','integer');
 
         //Ejecuta la instruccion
         $this->armarConsulta();
@@ -203,8 +208,11 @@ class MODPlanPago extends MODbase{
         $this->setParametro('monto_anticipo','monto_anticipo','numeric');
         $this->setParametro('fecha_costo_ini','fecha_costo_ini','date');
         $this->setParametro('fecha_costo_fin','fecha_costo_fin','date');
+        $this->setParametro('fecha_conclusion_pago','fecha_conclusion_pago','date');
         $this->setParametro('es_ultima_cuota','es_ultima_cuota','boolean');
 
+        $this->setParametro('monto_establecido','monto_establecido','numeric');
+        $this->setParametro('id_proveedor_cta_bancaria','id_proveedor_cta_bancaria','int4');
 
 
 
@@ -260,8 +268,12 @@ class MODPlanPago extends MODbase{
         $this->setParametro('monto_anticipo','monto_anticipo','numeric');
         $this->setParametro('fecha_costo_ini','fecha_costo_ini','date');
         $this->setParametro('fecha_costo_fin','fecha_costo_fin','date');
+        $this->setParametro('fecha_conclusion_pago','fecha_conclusion_pago','date');
         $this->setParametro('id_depto_lb','id_depto_lb','int4');
         $this->setParametro('es_ultima_cuota','es_ultima_cuota','boolean');
+
+        $this->setParametro('monto_establecido','monto_establecido','numeric');
+        $this->setParametro('id_proveedor_cta_bancaria','id_proveedor_cta_bancaria','int4');
 
 
 

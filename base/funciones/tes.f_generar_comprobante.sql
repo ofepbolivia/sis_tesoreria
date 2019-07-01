@@ -6,7 +6,7 @@ CREATE OR REPLACE FUNCTION tes.f_generar_comprobante (
   p_id_depto_conta integer,
   p_conexion varchar = NULL::character varying
 )
-RETURNS varchar [] [] AS
+RETURNS varchar [] AS
 $body$
 /* Autor:   RAC
 *  DESC:     Generar comprobantes de devengado o pago segun corresponda al tipo de plan de pago
@@ -122,7 +122,8 @@ BEGIN
 
           -- obtener el estado de la cuota anterior
           --validar que no se salte el orden de los devengados
-
+     -- 19-06-2019 , comentar para que no controle si pagos anteriores tienen comprobantes
+/*
                 IF  EXISTS (SELECT 1
                 FROM tes.tplan_pago pp
                 WHERE pp.id_obligacion_pago = v_registros.id_obligacion_pago
@@ -139,7 +140,7 @@ BEGIN
 
                  END IF;
 
-
+*/
 
           v_sw_verificacion = true;
           v_mensaje_verificacion ='';
@@ -410,3 +411,6 @@ VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
 COST 100;
+
+ALTER FUNCTION tes.f_generar_comprobante (p_id_usuario integer, p_id_usuario_ai integer, p_usuario_ai varchar, p_id_plan_pago integer, p_id_depto_conta integer, p_conexion varchar)
+  OWNER TO postgres;

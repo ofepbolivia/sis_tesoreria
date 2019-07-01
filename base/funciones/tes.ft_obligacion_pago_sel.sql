@@ -54,6 +54,9 @@ DECLARE
 
     v_id_gestion				integer;
     v_add_filtro				varchar;
+    v_gestion 					integer;
+    v_fecha_ini					date;
+    v_fecha_fin					date;    
 
 BEGIN
 
@@ -83,7 +86,7 @@ BEGIN
 
 
 
-         IF   v_parametros.tipo_interfaz in ('obligacionPagoTes','obligacionPagoUnico', 'PGA', 'PPM', 'PCE') THEN
+         IF   v_parametros.tipo_interfaz in ('obligacionPagoTes','obligacionPagoUnico', 'PGA', 'PPM', 'PCE', 'PBR') THEN
 
                  IF   p_administrador != 1 THEN
 
@@ -118,6 +121,14 @@ BEGIN
                         INNER JOIN orga.tfuncionario tf on tf.id_persona = tu.id_persona
                         WHERE tu.id_usuario = p_id_usuario ;
                         v_filadd = v_filadd ||'(obpg.id_funcionario = '||v_id_funcionario||' or obpg.id_usuario_reg = '||p_id_usuario||') and ';
+                   elsif(v_parametros.tipo_interfaz  = 'PBR')then
+
+                      SELECT tf.id_funcionario
+                      into v_id_funcionario
+                      FROM segu.tusuario tu
+                      INNER JOIN orga.tfuncionario tf on tf.id_persona = tu.id_persona
+                      WHERE tu.id_usuario = p_id_usuario ;
+                      v_filadd = v_filadd ||'(obpg.id_funcionario = '||v_id_funcionario||' or obpg.id_usuario_reg = '||p_id_usuario||') and ';
                     else
                  		v_filadd='(obpg.id_depto  in ('|| COALESCE(array_to_string(va_id_depto,','),'0')||')) and';
                     end if;
@@ -131,8 +142,10 @@ BEGIN
                     v_filadd=v_filadd ||' obpg.tipo_obligacion = ''pga'' and';
                 ELSIF v_parametros.tipo_interfaz  = 'PPM' THEN
                 	v_filadd=v_filadd ||' obpg.tipo_obligacion = ''ppm'' and';
-                    ELSIF v_parametros.tipo_interfaz  = 'PCE' THEN
+                ELSIF v_parametros.tipo_interfaz  = 'PCE' THEN
                 	v_filadd=v_filadd ||' obpg.tipo_obligacion = ''pce'' and';
+         		ELSIF v_parametros.tipo_interfaz  = 'PBR' THEN
+                	v_filadd=v_filadd ||' obpg.tipo_obligacion = ''pbr'' and';
                 ELSE
                    v_filadd=v_filadd ||' obpg.tipo_obligacion in (''pago_directo'',''rrhh'') and';
                 END IF;
@@ -260,7 +273,8 @@ BEGIN
                               conf.fecha_conformidad_final::date,
                               conf.fecha_inicio::date,
                               conf.fecha_fin::date,
-                              conf.observaciones
+                              conf.observaciones,
+                              obpg.fecha_certificacion_pres
 
                               from tes.tobligacion_pago obpg
                               inner join segu.tusuario usu1 on usu1.id_usuario = obpg.id_usuario_reg
@@ -314,7 +328,7 @@ BEGIN
               END IF;
 
 
-             IF   v_parametros.tipo_interfaz in ('obligacionPagoTes','obligacionPagoUnico', 'PGA', 'PPM', 'PCE') THEN
+             IF   v_parametros.tipo_interfaz in ('obligacionPagoTes','obligacionPagoUnico', 'PGA', 'PPM', 'PCE', 'PBR') THEN
 
                      IF   p_administrador != 1 THEN
 
@@ -348,6 +362,14 @@ BEGIN
                           INNER JOIN orga.tfuncionario tf on tf.id_persona = tu.id_persona
                           WHERE tu.id_usuario = p_id_usuario ;
                           v_filadd = v_filadd ||'(obpg.id_funcionario = '||v_id_funcionario||' or obpg.id_usuario_reg = '||p_id_usuario||') and ';
+                        elsif(v_parametros.tipo_interfaz  = 'PBR')then
+
+                          SELECT tf.id_funcionario
+                          into v_id_funcionario
+                          FROM segu.tusuario tu
+                          INNER JOIN orga.tfuncionario tf on tf.id_persona = tu.id_persona
+                          WHERE tu.id_usuario = p_id_usuario ;
+                          v_filadd = v_filadd ||'(obpg.id_funcionario = '||v_id_funcionario||' or obpg.id_usuario_reg = '||p_id_usuario||') and ';
                         else
                             v_filadd='(obpg.id_depto  in ('|| COALESCE(array_to_string(va_id_depto,','),'0')||')) and';
                         end if;
@@ -364,6 +386,8 @@ BEGIN
                    	   v_filadd=v_filadd ||' obpg.tipo_obligacion = ''ppm'' and';
                     ELSIF v_parametros.tipo_interfaz  = 'PCE' THEN
                 	   v_filadd=v_filadd ||' obpg.tipo_obligacion = ''pce'' and';
+                    ELSIF v_parametros.tipo_interfaz  = 'PBR' THEN
+                	   v_filadd=v_filadd ||' obpg.tipo_obligacion = ''pbr'' and';
                     ELSE
                        v_filadd=v_filadd ||' obpg.tipo_obligacion in (''pago_directo'',''rrhh'') and';
                     END IF;
@@ -1029,8 +1053,9 @@ BEGIN
             (select  pxp.list(distinct ob.codigo|| '' ''||ob.descripcion||'' '')
             from pre.tobjetivo ob
             where ob.codigo = ANY (string_to_array(ts.codigo_poa,'','')) and ob.id_gestion = '||v_record_op.id_gestion||'
-            )::varchar as codigo_descripcion
-
+            )::varchar as codigo_descripcion,
+            ts.tipo_obligacion,
+			ts.fecha_certificacion_pres
             FROM tes.tobligacion_pago ts
             INNER JOIN tes.tobligacion_det tsd ON tsd.id_obligacion_pago = ts.id_obligacion_pago
             INNER JOIN pre.tpartida tpar ON tpar.id_partida = tsd.id_partida
@@ -1064,7 +1089,7 @@ BEGIN
             ' GROUP BY vcp.id_categoria_programatica, tpar.codigo, ttc.codigo, vcp.codigo_programa,
             vcp.codigo_proyecto, vcp.codigo_actividad, vcp.codigo_fuente_fin, vcp.codigo_origen_fin,
     		tpar.nombre_partida, tcg.codigo, tcg.nombre, tmo.codigo, ts.num_tramite, tet.codigo,
-    		funcionario_solicitante, ts.fecha, tg.gestion, ts.codigo_poa, tuo.codigo, tuo.nombre_unidad ';
+    		funcionario_solicitante, ts.fecha, tg.gestion, ts.codigo_poa, tuo.codigo, tuo.nombre_unidad, ts.tipo_obligacion, ts.fecha_certificacion_pres ';
 			v_consulta =  v_consulta || 'ORDER BY tpar.codigo, tcg.nombre, vcp.id_categoria_programatica, ttc.codigo asc  ';
 			--Devuelve la respuesta
             RAISE NOTICE 'v_consulta %',v_consulta;
@@ -1228,7 +1253,85 @@ BEGIN
 			return v_consulta;
 
 		end;
+    /*********************************
+ 	#TRANSACCION:  'TES_LIBAN_EXT_SEL'
+ 	#DESCRIPCION:	Listado libro de bancos exterior y observacion
+ 	#AUTOR:	 BVP
+ 	#FECHA:		
+	***********************************/
 
+	elsif(p_transaccion='TES_LIBAN_EXT_SEL')then
+
+		begin
+
+        select ges.gestion into v_gestion 
+        from param.tgestion ges
+        where ges.id_gestion = v_parametros.id_gestion;
+        
+        v_fecha_ini = ('01/01/'||v_gestion::varchar)::date;
+        v_fecha_fin = ('31/12/'||v_gestion::varchar)::date;
+        
+        
+			--Sentencia pagos con libro de bancos exterior y observacion
+			v_consulta:='select  
+                        plbex.id_obligacion_pago,
+                        plbex.num_tramite,
+                        plbex.fecha,
+                        plbex.nro_cuenta,
+                        plbex.nombre,
+                        plbex.codigo,
+                        plbex.nombre_estado,
+                        plbex.obs,
+                        plbex.desc_persona,
+                        plbex.usuario_ai,
+                        plbex.monto,
+                        mone.moneda,
+                        mone.codigo as cod_moneda
+                    from tes.v_pagos_libro_banco_exterior plbex
+                    inner join param.tmoneda mone on mone.id_moneda = plbex.id_moneda                    
+					where plbex.fecha between '''||v_fecha_ini||''' and '''||v_fecha_fin||'''
+                    and ' ;
+
+			--Definicion de la respuesta
+            v_consulta:=v_consulta||v_parametros.filtro;
+            v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+			raise notice '%',v_consulta;
+			--Devuelve la respuesta
+			return v_consulta;
+
+		end;
+    /*********************************
+ 	#TRANSACCION:  'TES_LIBAN_EXT_CONT'
+ 	#DESCRIPCION:	Conteo de registros
+ 	#AUTOR:	 BVP
+ 	#FECHA:		
+	***********************************/
+
+	elsif(p_transaccion='TES_LIBAN_EXT_CONT')then
+
+		begin
+
+        select ges.gestion into v_gestion 
+        from param.tgestion ges
+        where ges.id_gestion = v_parametros.id_gestion;
+        
+        v_fecha_ini = ('01/01/'||v_gestion::varchar)::date;
+        v_fecha_fin = ('31/12/'||v_gestion::varchar)::date;
+        
+        
+			--Sentencia de la consulta de conteo de registros
+			v_consulta:='select count(plbex.id_obligacion_pago)
+						from tes.v_pagos_libro_banco_exterior plbex
+                        inner join param.tmoneda mone on mone.id_moneda = plbex.id_moneda                                            
+                        where plbex.fecha between '''||v_fecha_ini||''' and '''||v_fecha_fin||'''
+                        and ';
+
+			--Definicion de la respuesta
+			v_consulta:=v_consulta||v_parametros.filtro;
+			--Devuelve la respuesta
+			return v_consulta;
+
+		end;
 
    else
 

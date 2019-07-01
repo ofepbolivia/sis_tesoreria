@@ -1868,16 +1868,66 @@ ALTER TABLE tes.tcuenta_bancaria
   ADD COLUMN forma_pago VARCHAR(30);
 /*****************************F-SCP-MAY-TES-0-18/02/2019*************/
 
-/*****************************I-SCP-MAY-TES-0-21/02/2019*************/
+/*****************************I-SCP-BVP-TES-0-15/03/2019*************/
+
+CREATE TABLE tes.tconciliacion_bancaria (
+  id_conciliacion_bancaria SERIAL,
+  id_cuenta_bancaria INTEGER NOT NULL,
+  id_gestion INTEGER NOT NULL,
+  id_periodo INTEGER NOT NULL,
+  id_funcionario_elabo INTEGER,
+  id_funcionario_vb INTEGER,
+  fecha DATE,
+  observaciones TEXT,
+  saldo_banco NUMERIC(18,2),
+  CONSTRAINT tconciliacion_bancaria_pkey PRIMARY KEY(id_conciliacion_bancaria),
+  CONSTRAINT tconciliacion_bancaria_fk FOREIGN KEY (id_gestion)
+    REFERENCES param.tgestion(id_gestion)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE,
+  CONSTRAINT tconciliacion_bancaria_fk1 FOREIGN KEY (id_periodo)
+    REFERENCES param.tperiodo(id_periodo)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE
+) INHERITS (pxp.tbase)
+
+WITH (oids = false);
+
+CREATE TABLE tes.tdetalle_conciliacion_bancaria (
+  id_detalle_conciliacion_bancaria SERIAL,
+  id_conciliacion_bancaria INTEGER NOT NULL,
+  fecha DATE,
+  concepto VARCHAR(255),
+  nro_comprobante VARCHAR(255),
+  importe NUMERIC(18,2),
+  tipo VARCHAR(255),
+  CONSTRAINT tdetalle_conciliacion_bancaria_pkey PRIMARY KEY(id_detalle_conciliacion_bancaria)
+) INHERITS (pxp.tbase)
+
+WITH (oids = false);  
+/*****************************F-SCP-BVP-TES-0-15/03/2019*************/
+
+/*****************************I-SCP-MAY-TES-0-20/03/2019*************/
+ALTER TABLE tes.tplan_pago
+  ADD COLUMN monto_establecido NUMERIC(19,2);
+
+COMMENT ON COLUMN tes.tplan_pago.monto_establecido
+IS 'monto establecido para facturas con el descuento del 13%';
+/*****************************F-SCP-MAY-TES-0-10/03/2019*************/
+
+/*****************************I-SCP-MAY-TES-0-19/06/2019*************/
+ALTER TABLE tes.tplan_pago
+  ADD COLUMN fecha_conclusion_pago DATE;
+/*****************************F-SCP-MAY-TES-0-19/06/2019*************/
+
+/*****************************I-SCP-MAY-TES-0-28/06/2019*************/
+
  -- object recreation
 ALTER TABLE tes.tobligacion_pago
   DROP CONSTRAINT chk_tobligacion_pago__tipo_obligacion RESTRICT;
 
 ALTER TABLE tes.tobligacion_pago
-  ADD CONSTRAINT chk_tobligacion_pago__tipo_obligacion CHECK ((tipo_obligacion)::text = ANY (ARRAY[('adquisiciones'::character varying)::text, ('pago_unico'::character varying)::text, ('pago_especial'::character varying)::text, ('caja_chica'::character varying)::text, ('viaticos'::character varying)::text, ('fondos_en_avance'::character varying)::text, ('pago_directo'::character varying)::text, ('rrhh'::character varying)::text, ('pga'::character varying)::text, ('ppm'::character varying)::text, ('pce'::character varying)::text, ('pbr'::character varying)::text, ('sp'::character varying)::text]));
-/*****************************F-SCP-MAY-TES-0-21/02/2019*************/
-
-/*****************************I-SCP-MAY-TES-0-25/02/2019*************/
-ALTER TABLE tes.tplan_pago
-  ADD COLUMN id_proveedor_cta_bancaria INTEGER;
-/*****************************F-SCP-MAY-TES-0-25/02/2019*************/
+  ADD CONSTRAINT chk_tobligacion_pago__tipo_obligacion CHECK ((tipo_obligacion)::text = ANY (ARRAY[('adquisiciones'::character varying)::text, ('pago_unico'::character varying)::text, ('pago_especial'::character varying)::text, ('caja_chica'::character varying)::text, ('viaticos'::character varying)::text, ('fondos_en_avance'::character varying)::text, ('pago_directo'::character varying)::text, ('rrhh'::character varying)::text, ('pga'::character varying)::text, ('ppm'::character varying)::text, ('pce'::character varying)::text, ('pbr'::character varying)::text, ('sp'::character varying)::text, ('spd'::character varying)::text, ('spi'::character varying)::text]));
+/*****************************F-SCP-MAY-TES-0-28/06/2019*************/

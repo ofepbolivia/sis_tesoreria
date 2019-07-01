@@ -317,7 +317,51 @@ Phx.vista.CuentaBancaria=Ext.extend(Phx.gridInterfaz,{
        			id_grupo:0,
        			grid:false,
        			form:true
-       	}
+       	},
+        {
+            config:{
+                name: 'forma_pago',
+                fieldLabel: 'Forma de Pago',
+                allowBlank: false,
+                emptyText:'Forma de Pago...',
+                store:new Ext.data.JsonStore(
+                    {
+                        url: '../../sis_parametros/control/FormaPago/listarFormaPago',
+                        id: 'id_forma_pago',
+                        root:'datos',
+                        sortInfo:{
+                            field:'desc_forma_pago',
+                            direction:'ASC'
+                        },
+                        totalProperty:'total',
+                        fields: ['id_forma_pago','desc_forma_pago','observaciones','cod_inter'],
+                        remoteSort: true,
+                        baseParams:{par_filtro:'desc_forma_pago'}
+                    }),
+                tpl:'<tpl for="."><div class="x-combo-list-item"><p>{desc_forma_pago}</p></div></tpl>',
+                valueField: 'desc_forma_pago',
+                hiddenValue: 'id_forma_pago',
+                displayField: 'desc_forma_pago',
+                gdisplayField:'desc_forma_pago',
+                listWidth:'280',
+                forceSelection:true,
+                typeAhead: false,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode:'remote',
+                pageSize:20,
+                queryDelay:500,
+
+                gwidth: 250,
+                minChars:2,
+                renderer:function (value, p, record){return String.format('{0}', record.data['forma_pago']);}
+            },
+            type:'ComboBox',
+            filters:{pfiltro:'ctaban.forma_pago',type:'string'},
+            id_grupo:1,
+            grid:false,
+            form:true
+        }
 	],
 	
 	title:'Cuenta Bancaria',
@@ -340,9 +384,11 @@ Phx.vista.CuentaBancaria=Ext.extend(Phx.gridInterfaz,{
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'id_usuario_mod', type: 'numeric'},
 		{name:'usr_reg', type: 'string'},
-		{name:'usr_mod', type: 'string'},'id_moneda','codigo_moneda','id_finalidads'
+		{name:'usr_mod', type: 'string'},'id_moneda','codigo_moneda','id_finalidads',
+        {name:'forma_pago', type: 'string'}
 		
 	],
+    arrayDefaultColumHidden:['forma_pago'],
 				
 	sortInfo:{
 		field: 'id_cuenta_bancaria',

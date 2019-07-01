@@ -79,7 +79,7 @@ header("content-type: text/javascript; charset=UTF-8");
             this.Atributos[this.getIndAtributo('forma_pago')].form = true;
             this.Atributos[this.getIndAtributo('nro_cheque')].form = true;
             this.Atributos[this.getIndAtributo('nro_cheque')].valorInicial = 0;
-            this.Atributos[this.getIndAtributo('nro_cuenta_bancaria')].form = true;
+            // this.Atributos[this.getIndAtributo('nro_cuenta_bancaria')].form = true;
             this.Atributos[this.getIndAtributo('id_depto_lb')].form = true;
             this.Atributos[this.getIndAtributo('id_cuenta_bancaria')].form = true;
             this.Atributos[this.getIndAtributo('id_cuenta_bancaria_mov')].form = true;
@@ -87,6 +87,8 @@ header("content-type: text/javascript; charset=UTF-8");
             this.Atributos[this.getIndAtributo('num_tramite')].bottom_filter = true;
             this.Atributos[this.getIndAtributo('nombre_pago')].bottom_filter = true;
             this.Atributos[this.getIndAtributo('desc_funcionario1')].bottom_filter = true;
+
+            this.Atributos[this.getIndAtributo('id_proveedor_cta_bancaria')].form=true;
 
             Phx.vista.PlanPagoConformidad.superclass.constructor.call(this, config);
             this.creaFormularioConformidad();

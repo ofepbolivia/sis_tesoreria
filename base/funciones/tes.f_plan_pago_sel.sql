@@ -244,6 +244,7 @@ BEGIN
                         plapa.monto_anticipo,
                         plapa.fecha_costo_ini,
                         plapa.fecha_costo_fin,
+                        plapa.fecha_conclusion_pago,
                         funwf.desc_funcionario1::text as funcionario_wf,
                         plapa.tiene_form500,
                         plapa.id_depto_lb,
@@ -261,7 +262,12 @@ BEGIN
                         tcon.c31,
                         op.id_gestion,
                         tcon.fecha_costo_ini as fecha_cbte_ini,
-                        tcon.fecha_costo_fin as fecha_cbte_fin
+                        tcon.fecha_costo_fin as fecha_cbte_fin,
+                        plapa.monto_establecido,
+                        pro.id_proveedor,
+                        pro.nit,
+                        plapa.id_proveedor_cta_bancaria
+
                         from tes.tplan_pago plapa
                         inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = plapa.id_proceso_wf
                         inner join tes.tobligacion_pago op on op.id_obligacion_pago = plapa.id_obligacion_pago
@@ -276,9 +282,11 @@ BEGIN
                         left join orga.vfuncionario fun on fun.id_funcionario = op.id_funcionario
                         left join orga.vfuncionario funwf on funwf.id_funcionario = ew.id_funcionario
                         left join param.tdepto depto on depto.id_depto = plapa.id_depto_lb
-                        left join tes.tts_libro_bancos lb on plapa.id_int_comprobante = lb.id_int_comprobante
+
                         left join param.tdepto depc on depc.id_depto = plapa.id_depto_conta
                         left join conta.tint_comprobante tcon on tcon.id_int_comprobante = plapa.id_int_comprobante
+
+
                        where  plapa.estado_reg=''activo''  and '||v_filtro;
 
 			--Definicion de la respuesta
@@ -379,6 +387,7 @@ BEGIN
                         left join param.tdepto depto on depto.id_depto = plapa.id_depto_lb
                         left join tes.tts_libro_bancos lb on plapa.id_int_comprobante = lb.id_int_comprobante
                         left join conta.tint_comprobante tcon on tcon.id_int_comprobante = plapa.id_int_comprobante
+
                       where  plapa.estado_reg=''activo''   and '||v_filtro;
 
 			--Definicion de la respuesta
@@ -1256,4 +1265,8 @@ LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
+PARALLEL UNSAFE
 COST 100;
+
+ALTER FUNCTION tes.f_plan_pago_sel (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
+  OWNER TO postgres;

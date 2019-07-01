@@ -407,17 +407,27 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.Cmp.nro_cheque.setValue('');
                 this.Cmp.nro_cheque.disable();
                 //Habilita nrocuenta bancaria destino
-                this.Cmp.nro_cuenta_bancaria.allowBlank=false;
-                this.Cmp.nro_cuenta_bancaria.enable();
+
+                // this.Cmp.nro_cuenta_bancaria.allowBlank=false;
+                // this.Cmp.nro_cuenta_bancaria.enable();
+                this.Cmp.id_proveedor_cta_bancaria.allowBlank=false;
+                this.Cmp.id_proveedor_cta_bancaria.enable();
+
+
             } else{
                 //cheque
                 //Habilita campo cheque
                 this.Cmp.nro_cheque.allowBlank=false;
                 this.Cmp.nro_cheque.enable();
                 //Habilita nrocuenta bancaria destino
-                this.Cmp.nro_cuenta_bancaria.allowBlank=true;
-                this.Cmp.nro_cuenta_bancaria.setValue('');
-                this.Cmp.nro_cuenta_bancaria.disable();
+
+                // this.Cmp.nro_cuenta_bancaria.allowBlank=true;
+                // this.Cmp.nro_cuenta_bancaria.setValue('');
+                // this.Cmp.nro_cuenta_bancaria.disable();
+                this.Cmp.id_proveedor_cta_bancaria.allowBlank=true;
+                this.Cmp.id_proveedor_cta_bancaria.setValue('');
+                this.Cmp.id_proveedor_cta_bancaria.disable();
+
             }
 
         },
