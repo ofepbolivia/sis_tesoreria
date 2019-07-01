@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION tes.f_plan_pago_ime (
+CREATE OR REPLACE FUNCTION tes.ft_solicitud_plan_pago_ime (
   p_administrador integer,
   p_id_usuario integer,
   p_tabla varchar,
@@ -8,10 +8,10 @@ RETURNS varchar AS
 $body$
 /**************************************************************************
  SISTEMA:		Sistema de Tesoreria
- FUNCION: 		tes.f_plan_pago_ime
+ FUNCION: 		tes.ft_solicitud_plan_pago_ime
  DESCRIPCION:   Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'tes.tplan_pago'
  AUTOR: 		 (admin)
- FECHA:	        10-04-2013 15:43:23
+ FECHA:	        12-12-2018 15:43:23
  COMENTARIOS:
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
@@ -172,47 +172,23 @@ DECLARE
     v_sum_total_pp				numeric;
     v_sum_monto_solo_pp			numeric;
 
-    v_forma_pago_cb				varchar;
-    v_nro_cuenta				varchar;
-
-    v_monto_establecido			numeric;
-    v_porcentaje13_monto		numeric;
-    v_codigo_tipo_relacion		varchar;
-
-    --variables para internacionales
-    v_res_cone  				varchar;
-    v_cadena_cnx 				varchar;
-    v_cadena_inter				varchar;
-    v_obligacion_pago_json  	json;
-    v_obligacion_det_json		json;
-    v_obligacion_pp_json		json;
-    v_obligacion_pago			integer;
-
-    v_documentos 				json;
-    v_pre_integrar_presupuestos	varchar;
-
-    v_id_depto_lb_pp			integer;
-    v_prorrateo_json			json;
     v_cuenta_bancaria_benef		varchar;
-    v_id_proveedor_cta_bancaria	integer;
-
-    v_estado					varchar;
+    v_plan_pago					integer;
 
 
 BEGIN
 
-    v_nombre_funcion = 'tes.f_plan_pago_ime';
+    v_nombre_funcion = 'tes.ft_solicitud_plan_pago_ime';
     v_parametros = pxp.f_get_record(p_tabla);
 
-
 	/*********************************
- 	#TRANSACCION:  'TES_PLAPA_INS'
+ 	#TRANSACCION:  'TES_SOPLAPA_INS'
  	#DESCRIPCION:	Insercion de cuotas de devengado en el plan de pago
- 	#AUTOR:		RAC KPLIAN
- 	#FECHA:		10-04-2013 15:43:23
+ 	#AUTOR:		admin
+ 	#FECHA:		12-12-2018 15:43:23
 	***********************************/
 
-	if(p_transaccion='TES_PLAPA_INS')then
+	if(p_transaccion='TES_SOPLAPA_INS')then
 
         begin
 
@@ -244,15 +220,6 @@ BEGIN
                raise exception 'LAS FECHAS NO CORRESPONDEN A LA GESTIÓN, NÚMERO DE TRÁMITE % gestión %', v_num_tramite, v_anio_ges;
             END IF;
 
-
-            IF v_parametros.fecha_costo_ini is Null THEN
-            	raise EXCEPTION 'Debe completar la fecha inicio';
-            END IF;
-
-            IF v_parametros.fecha_costo_fin is Null THEN
-            	raise EXCEPTION 'Debe completar la fecha fin';
-            END IF;
-
 			/*--validador de gestion
 			v_anio_gestion = ( select date_part('year',now()))::INTEGER;
 
@@ -260,7 +227,6 @@ BEGIN
                raise exception 'LAS FECHAS NO CORRESPONDEN A LA GESTION ACTUAL';
             END IF;
 			*/
-
 
              --si es un pago variable, controla que el total del plan de pago no sea mayor a lo comprometido
                        select
@@ -274,6 +240,7 @@ BEGIN
                           into v_registros
                            from tes.tobligacion_pago op
                            where op.id_obligacion_pago = v_parametros.id_obligacion_pago;
+
 
                         select
                             pp.monto,
@@ -290,50 +257,28 @@ BEGIN
                            where pp.estado_reg='activo'
                            and pp.id_obligacion_pago = v_parametros.id_obligacion_pago;
 
-                           SELECT pc.codigo_tipo_relacion
-                           INTO v_codigo_tipo_relacion
-                           FROM param.tplantilla p
-                           inner join conta.tplantilla_calculo pc on pc.id_plantilla = p.id_plantilla
-                           WHERE p.id_plantilla = v_parametros.id_plantilla;
+                      IF v_registros.pago_variable='si' or v_registros.pago_variable='no' THEN
 
-                           --SELECT sum(pp.monto)
-                            SELECT sum(pp.monto_establecido)
+                            SELECT sum(pp.monto)
                             INTO v_sum_monto_pp
                             FROM tes.tplan_pago pp
-                            WHERE pp.estado != 'anulado' and pp.estado != 'pago_exterior' and pp.estado != 'pagado'
+                            WHERE pp.estado != 'anulado'
                             and pp.id_obligacion_pago = v_parametros.id_obligacion_pago;
 
                             SELECT sum(pe.monto)
                             INTO v_sum_monto_pe
                             FROM pre.tpartida_ejecucion pe
                             join tes.tobligacion_pago opa on opa.num_tramite = pe.nro_tramite
-                            WHERE pe.tipo_movimiento = 'comprometido'
-                            and opa.id_obligacion_pago = v_parametros.id_obligacion_pago;
+                            WHERE opa.id_obligacion_pago = v_parametros.id_obligacion_pago;
 
-                      IF v_registros.pago_variable='si' or v_registros.pago_variable='no' THEN
-                      	--para los que se descuentan el IVA 13%
-						IF (v_codigo_tipo_relacion = 'IVA-CF') THEN
+                            v_sum_total_pp = v_sum_monto_pp + v_parametros.monto;
 
-                            v_porcentaje13_monto = COALESCE(v_parametros.monto * 0.13, 0);
-          					v_monto_establecido  = COALESCE(v_parametros.monto, 0) - v_porcentaje13_monto;
-
-                            v_sum_total_pp = COALESCE(v_sum_monto_pp,0) + COALESCE(v_monto_establecido, 0);
-
-                           --raise exception 'llegaaaa %>= %', v_sum_total_pp,v_sum_monto_pe ;
+                          -- raise exception 'llegaaaa %>= %', v_sum_monto_pp,v_sum_monto_pe ;
                             IF (v_sum_total_pp > v_sum_monto_pe) THEN
                               raise exception ' El monto total de las cuotas es de % y excede al monto total certificado de % para el trámite %. Comunicarse con la Unidad de Presupuestos. ',v_sum_total_pp, v_sum_monto_pe, v_registros.num_tramite ;
                             END IF;
 
-						ELSE
-
-                            v_sum_total_pp = COALESCE(v_sum_monto_pp, 0) + COALESCE(v_parametros.monto, 0);
-
-                           --raise exception 'llegaaaa %>= %', v_sum_total_pp,v_sum_monto_pe ;
-                            IF (v_sum_total_pp > v_sum_monto_pe) THEN
-                              raise exception ' El monto total de las cuotas es de % y excede al monto total certificado de % para el trámite %. Comunicarse con la Unidad de Presupuestos. ',v_sum_total_pp, v_sum_monto_pe, v_registros.num_tramite ;
-                            END IF;
-                      END IF;
-                            v_sum_total_pp = COALESCE(v_parametros.monto,0);
+                            v_sum_total_pp = v_parametros.monto;
 
                             IF (v_sum_total_pp > v_sum_monto_pe) THEN
                               raise exception ' El monto total de las cuotas es de % y excede al monto total certificado de % para el trámite %. Comunicarse con la Unidad de Presupuestos. ',v_sum_total_pp, v_sum_monto_pe, v_registros.num_tramite ;
@@ -352,7 +297,7 @@ BEGIN
             	raise exception 'No es posible insertar pagos de devengado a una obligacion de RRHH';
             end if;
 
-            v_resp = tes.f_inserta_plan_pago_dev(p_administrador, p_id_usuario,hstore(v_parametros));
+            v_resp = tes.ft_solicitud_inserta_plan_pago_dev(p_administrador, p_id_usuario,hstore(v_parametros));
 
             --Devuelve la respuesta
             return v_resp;
@@ -363,19 +308,36 @@ BEGIN
 
 			where id_int_comprobante = v_parametros.id_int_comprobante;
 
+             --actualiza el campo nro_cuenta_bancaria para los SP
+
+                /*    IF v_tipo_obligacion = 'sp' then
+                      select pcb.nro_cuenta ||'-'|| ins.nombre
+                      into v_cuenta_bancaria_benef
+                      from param.tproveedor_cta_bancaria pcb
+                      left join param.tinstitucion ins on ins.id_institucion=pcb.id_banco_beneficiario
+                      --left join tes.tplan_pago pp on pp.id_proveedor_cta_bancaria = pcb.id_proveedor_cta_bancaria
+                      where pcb.id_proveedor_cta_bancaria = v_parametros.id_proveedor_cta_bancaria;
+
+                        update tes.tplan_pago SET
+                        nro_cuenta_bancaria = v_cuenta_bancaria_benef
+                        where id_plan_pago= v_id_plan_pago;
+                    end IF;*/
+              ---
+
 
 		end;
 
    	/*********************************
- 	#TRANSACCION:  'TES_PLAPAPA_INS'
+ 	#TRANSACCION:  'TES_SOPLAPAPA_INS'
  	#DESCRIPCION:	Insercion de cuotas de CUOTAS DE SEGUNDO NIVEL,  PAGO o APLICAION DE ANTICIPO , en el plan de pago
- 	#AUTOR:		RAC KPLIAN
- 	#FECHA:	7062013   15:43:23
+ 	#AUTOR:		admin
+ 	#FECHA:	12-12-2018   15:43:23
 	***********************************/
 
-	elsif(p_transaccion='TES_PLAPAPA_INS')then
+	elsif(p_transaccion='TES_SOPLAPAPA_INS')then
 
         begin
+
         	select tipo_obligacion into v_tipo_obligacion
             from tes.tobligacion_pago
             where id_obligacion_pago = v_parametros.id_obligacion_pago;
@@ -392,16 +354,17 @@ BEGIN
 		end;
 
    /*********************************
- 	#TRANSACCION:  'TES_PPANTPAR_INS'
+ 	#TRANSACCION:  'TES_SOPPANTPAR_INS'
  	#DESCRIPCION:	Inserta cuotas del tipo anticipo parcial , o
                     anticipo total  o dev_garantia (todas no  tienen prorrateo por que no ejecutan presupuesto)
- 	#AUTOR:		RAC KPLIAN
- 	#FECHA: 17/07/2014   15:43:23
+ 	#AUTOR:		admin
+ 	#FECHA: 12-12-2018   15:43:23
 	***********************************/
 
-	elsif(p_transaccion='TES_PPANTPAR_INS')then
+	elsif(p_transaccion='TES_SOPPANTPAR_INS')then
 
         begin
+
         	select tipo_obligacion into v_tipo_obligacion
             from tes.tobligacion_pago
             where id_obligacion_pago = v_parametros.id_obligacion_pago;
@@ -416,16 +379,16 @@ BEGIN
 		end;
 
     /*********************************
- 	#TRANSACCION:  'TES_PLAPA_MOD'
+ 	#TRANSACCION:  'TES_SOPLAPA_MOD'
  	#DESCRIPCION:	Modificacion de cuotas de devegando y pago
  	#AUTOR:		admin
- 	#FECHA:		10-04-2013 15:43:23
+ 	#FECHA:		12-12-2018 15:43:23
 	***********************************/
 
-	elsif(p_transaccion='TES_PLAPA_MOD')then
+	elsif(p_transaccion='TES_SOPLAPA_MOD')then
 
 		begin
---raise exception 'llega ini';
+
            --determinar exixtencia de parametros dinamicos para registro
            -- (Interface de obligacions de adquisocines o interface de obligaciones tesoeria)
            -- la adquisiciones tiene menos parametros presentes
@@ -441,9 +404,9 @@ BEGIN
                v_id_depto_lb =  v_parametros.id_depto_lb;
              END IF;
 
-             IF  pxp.f_existe_parametro(p_tabla,'id_cuenta_bancaria_mov') THEN
+             /*IF  pxp.f_existe_parametro(p_tabla,'id_cuenta_bancaria_mov') THEN
                v_id_cuenta_bancaria_mov =  v_parametros.id_cuenta_bancaria_mov;
-             END IF;
+             END IF;*/
 
              IF  pxp.f_existe_parametro(p_tabla,'forma_pago') THEN
                v_forma_pago =  v_parametros.forma_pago;
@@ -453,26 +416,33 @@ BEGIN
                v_nro_cheque =  v_parametros.nro_cheque;
              END IF;
 
-  			--modificacion para v_nro_cuenta_bancaria
-            /* IF  pxp.f_existe_parametro(p_tabla,'nro_cuenta_bancaria') THEN
-                v_nro_cuenta_bancaria =  v_parametros.nro_cuenta_bancaria;
-             END IF;
-			*/
-            	/*	select pcb.id_proveedor_cta_bancaria
-                    into v_id_proveedor_cta_bancaria
-                    from param.tproveedor_cta_bancaria pcb
-                    where pcb.nro_cuenta = v_parametros.id_proveedor_cta_bancaria::varchar;
-            */
+			--SI ES SP y SPD
+            select tipo_obligacion
+            into v_tipo_obligacion
+            from tes.tobligacion_pago
+            where id_obligacion_pago = v_parametros.id_obligacion_pago;
 
-            		  select ins.nombre||'-'|| pcb.nro_cuenta
+            IF v_tipo_obligacion = 'sp' or v_tipo_obligacion = 'spd' or v_tipo_obligacion = 'spi'then
+
+            		  select pcb.nro_cuenta ||'-'|| ins.nombre
                       into v_cuenta_bancaria_benef
                       from param.tproveedor_cta_bancaria pcb
                       left join param.tinstitucion ins on ins.id_institucion=pcb.id_banco_beneficiario
+                      --left join tes.tplan_pago pp on pp.id_proveedor_cta_bancaria = pcb.id_proveedor_cta_bancaria
                       where pcb.id_proveedor_cta_bancaria = v_parametros.id_proveedor_cta_bancaria;
 
              		v_nro_cuenta_bancaria = v_cuenta_bancaria_benef::varchar;
 
+             ELSE
+             	   IF  pxp.f_existe_parametro(p_tabla,'nro_cuenta_bancaria') THEN
+                	v_nro_cuenta_bancaria =  v_parametros.nro_cuenta_bancaria;
+             	   END IF;
+             end IF;
              --
+
+             IF  pxp.f_existe_parametro(p_tabla,'nro_cuenta_bancaria') THEN
+                v_nro_cuenta_bancaria =  v_parametros.nro_cuenta_bancaria;
+             END IF;
 
              IF  pxp.f_existe_parametro(p_tabla,'porc_monto_excento_var') THEN
                 v_porc_monto_excento_var =  v_parametros.porc_monto_excento_var;
@@ -625,15 +595,15 @@ BEGIN
 
 
                       --si es un pago variable, controla que el total del plan de pago no sea mayor a lo comprometido
-                      		--SELECT sum(pp.monto_ejecutar_total_mo)
-                            SELECT sum(pp.monto_establecido)
+                      IF v_registros.pago_variable='si' or v_registros.pago_variable='no' THEN
+
+                            SELECT sum(pp.monto)
                             INTO v_sum_monto_pp
                             FROM tes.tplan_pago pp
-                            WHERE pp.estado != 'anulado' and pp.estado != 'pago_exterior' and pp.estado != 'pagado'
+                            WHERE pp.estado != 'anulado'
                             and pp.id_obligacion_pago = v_parametros.id_obligacion_pago;
 
-                            --SELECT pp.monto_ejecutar_total_mo
-                            SELECT pp.monto_establecido
+                            SELECT pp.monto
                             INTO v_sum_monto_solo_pp
                             FROM tes.tplan_pago pp
                             WHERE pp.id_plan_pago= v_parametros.id_plan_pago;
@@ -642,64 +612,20 @@ BEGIN
                             INTO v_sum_monto_pe
                             FROM pre.tpartida_ejecucion pe
                             join tes.tobligacion_pago opa on opa.num_tramite = pe.nro_tramite
-                            WHERE pe.tipo_movimiento = 'comprometido'
-                            and opa.id_obligacion_pago = v_parametros.id_obligacion_pago;
+                            WHERE opa.id_obligacion_pago = v_parametros.id_obligacion_pago;
 
-
-
-
-                      IF v_registros.pago_variable='si' or v_registros.pago_variable='no' THEN
-
-                        SELECT pc.codigo_tipo_relacion
-                        INTO v_codigo_tipo_relacion
-                        FROM param.tplantilla p
-                        inner join conta.tplantilla_calculo pc on pc.id_plantilla = p.id_plantilla
-                        WHERE  pc.codigo_tipo_relacion = 'IVA-CF'
-                        and p.id_plantilla = v_parametros.id_plantilla;
-
-
-                      	--para los que se descuentan el IVA 13%
-						IF (v_codigo_tipo_relacion = 'IVA-CF') THEN
-
-                            v_porcentaje13_monto = COALESCE(v_parametros.monto * 0.13, 0);
-          					v_monto_establecido  = COALESCE(v_parametros.monto, 0) - v_porcentaje13_monto;
-
-                            --v_sum_total_pp = (v_sum_monto_pp - v_sum_monto_solo_pp) + v_parametros.monto;
-                            v_sum_total_pp = (v_sum_monto_pp - v_sum_monto_solo_pp) + v_monto_establecido;
-                         --raise exception '% = % - % + %',v_sum_total_pp,  v_sum_monto_pp, v_sum_monto_solo_pp, v_parametros.monto;
+                            v_sum_total_pp = (v_sum_monto_pp - v_sum_monto_solo_pp) + v_parametros.monto;
+                             -- raise exception '% = % - % + %',v_sum_total_pp,  v_sum_monto_pp, v_sum_monto_solo_pp, v_parametros.monto;
 
                            IF ((v_sum_total_pp) > v_sum_monto_pe) THEN
                               raise exception ' El monto total de las cuotas es de % y excede al monto total certificado de % para el trámite %. Comunicarse con la Unidad de Presupuestos. ',v_sum_total_pp, v_sum_monto_pe, v_registros.num_tramite ;
-                           END IF;
+                            END IF;
 
-                       ELSE
-
-                      	 v_monto_establecido  = COALESCE(v_parametros.monto);
-                         v_sum_total_pp = (COALESCE(v_sum_monto_pp,0) - COALESCE(v_sum_monto_solo_pp, 0)) + COALESCE(v_parametros.monto, 0);
-                         --raise exception '% = % - % + %',v_sum_total_pp,  v_sum_monto_pp, v_sum_monto_solo_pp, v_parametros.monto;
-
-                           IF ((v_sum_total_pp) > v_sum_monto_pe) THEN
-                              raise exception ' El monto total de las cuotas es de % y excede al monto total certificado de % para el trámite %. Comunicarse con la Unidad de Presupuestos. ',v_sum_total_pp, v_sum_monto_pe, v_registros.num_tramite ;
-                           END IF;
-                       END IF;
-
-
-                     END IF;
-                   --
-                    --valida si forma_pago es igual a forma_pago cuenta bancaria
-                   	  IF v_id_cuenta_bancaria is Not NULL THEN
-                        select cb.forma_pago, cb.nro_cuenta
-                        into v_forma_pago_cb, v_nro_cuenta
-                        from tes.tcuenta_bancaria cb
-                        where cb.id_cuenta_bancaria = v_parametros.id_cuenta_bancaria;
-
-                        IF (v_forma_pago_cb != v_parametros.forma_pago) then
-                              raise exception 'Modificar la Forma de Pago, este pertenece como  %  para la Cuenta Bancaria %', UPPER(v_forma_pago_cb), v_nro_cuenta;
                         END IF;
-                      END IF;
-                    --
+                   --
 
                END IF;
+
 
 
            -------------------------------------------------------------
@@ -897,7 +823,7 @@ BEGIN
                 v_porc_monto_excento_var = 0;
            END IF;
 
---raise exception 'llegaaa %, %',v_parametros.id_proveedor_cta_bancaria,v_nro_cuenta_bancaria ;
+
 
 --RAISE EXCEPTION 'v_parametros.es_ultima_cuota : %', v_parametros.es_ultima_cuota;
 
@@ -929,7 +855,8 @@ BEGIN
             nro_cheque =  COALESCE(v_nro_cheque,0),
             fecha_tentativa = v_parametros.fecha_tentativa,
             nro_cuenta_bancaria = v_nro_cuenta_bancaria,
-            id_cuenta_bancaria_mov = v_id_cuenta_bancaria_mov,
+            --id_cuenta_bancaria_mov = v_parametros.id_cuenta_bancaria_mov,
+            --id_cuenta_bancaria_mov = v_id_cuenta_bancaria_mov,
             porc_monto_excento_var =  v_porc_monto_excento_var,
             monto_excento = COALESCE(v_monto_excento,0),
             id_usuario_ai = v_parametros._id_usuario_ai,
@@ -939,9 +866,7 @@ BEGIN
             monto_anticipo = v_monto_anticipo,
             fecha_costo_ini = v_parametros.fecha_costo_ini,
             fecha_costo_fin = v_parametros.fecha_costo_fin,
-            fecha_conclusion_pago = v_parametros.fecha_conclusion_pago,
-            /*es_ultima_cuota = v_parametros.es_ultima_cuota*/
-            monto_establecido =v_monto_establecido,
+            --es_ultima_cuota = v_parametros.es_ultima_cuota
             id_proveedor_cta_bancaria = v_parametros.id_proveedor_cta_bancaria
 
             where id_plan_pago = v_parametros.id_plan_pago;
@@ -957,74 +882,6 @@ BEGIN
                raise exception 'LAS FECHAS NO CORRESPONDEN A LA GESTIÓN, NÚMERO DE TRÁMITE % TIENE COMO FECHA %', v_num_tramite,v_fecha_op;
             END IF;
 			*/
-
-            /*------------------------------------------------------------------
-            --conexion a BUE
-            si elige  Libro de bancos destino a BUE copia su obligacion,
-            detalle y plan de pago al servidor BUE con un nuevo proceso
-
-            --conexion para MIAMI falta desarrollar conexion
-            --------------------------------------------------------------------*/
-
-           /* v_obligacion_pago_json=(select json_agg(top.*)
-            						from tes.tobligacion_pago top
-            						inner join tes.tplan_pago tp on tp.id_obligacion_pago = top.id_obligacion_pago
-            						where tp.id_plan_pago = v_parametros.id_plan_pago );
-
-            v_obligacion_pago=(select top.id_obligacion_pago
-                                  from tes.tobligacion_pago top
-                                  inner join tes.tplan_pago tp on tp.id_obligacion_pago = top.id_obligacion_pago
-                                  where tp.id_plan_pago = v_parametros.id_plan_pago);
-
-            v_obligacion_det_json=(select json_agg(tod.*)
-            						from tes.tobligacion_det tod
-                                    inner join tes.tobligacion_pago top on top.id_obligacion_pago = tod.id_obligacion_pago
-                                    where tod.id_obligacion_pago = v_obligacion_pago );
-
-             v_obligacion_pp_json=(select json_agg(pp.*)
-            				      from tes.tplan_pago pp
-                                  inner join tes.tobligacion_pago top on top.id_obligacion_pago = pp.id_obligacion_pago
-                                  where top.id_obligacion_pago = v_obligacion_pago );
-
-             v_documentos=(select json_agg(dw.*)
-            				      from wf.tdocumento_wf dw
-                                  inner join tes.tplan_pago pp on pp.id_proceso_wf = dw.id_proceso_wf
-                                  --inner join tes.tobligacion_pago op on op.id_proceso_wf = dw.id_proceso_wf
-                                  --where op.id_obligacion_pago = v_obligacion_pago );
-                                  where pp.id_plan_pago = v_parametros.id_plan_pago);
-
-           --registra op para una internacional
-           IF (v_registros_pp.estado = 'vbfin') THEN
-
-             IF (v_parametros.id_depto_lb = 27 )THEN
-
-                v_cadena_cnx =  tes.f_obtener_cadena_conexion_argentina();
-           --raise exception 'llega ip %',v_cadena_cnx;
-                --Se realizara la creacion de la funcion de insertando datos en BUE
-                v_cadena_inter = 'select tes.ft_obligacion_pago_inter_bue_ime('''||p_administrador::integer||''','''||p_id_usuario::integer||''','''||v_obligacion_pago_json::json||''','''||v_obligacion_det_json::json||''','''||v_obligacion_pp_json::json||''','''||v_documentos::json||''')';
-
-
-               v_resp =  (SELECT dblink_connect(v_cadena_cnx));
-
-			             IF(v_resp!='OK') THEN
-			            --raise exception 'FALLA1111';
-			             	--modificar bandera de fallo
-			                 raise exception 'FALLA CONEXION A LA BASE DE DATOS CON DBLINK';
-
-			             ELSE
-
-                        --raise exception 'FALLA %',v_obligacion_pago_json;
-
-                            PERFORM * FROM dblink(v_cadena_inter,true)AS ( xx varchar);
-                            --raise exception 'llega9999';
-                            --v_res_cone=(select dblink_disconnect());
-
-			   			 END IF;
-              END IF;
-            END IF;*/
-
-           -- raise exception 'llegafuera';
-
             --control de fechas inicio y fin que esten en el rango del la gestion del tramite
             select date_part('year',op.fecha), to_char(op.fecha,'DD/MM/YYYY')::varchar as fecha, op.num_tramite, ges.gestion
             into v_anio_op, v_fecha_op, v_num_tramite, v_anio_ges
@@ -1037,13 +894,29 @@ BEGIN
                raise exception 'LAS FECHAS NO CORRESPONDEN A LA GESTIÓN, NÚMERO DE TRÁMITE % gestión %', v_num_tramite, v_anio_ges;
             END IF;
 
-            --control fecha de conclusion del pago
-            /*IF (v_parametros.fecha_conclusion_pago<now()) THEN
-                raise exception 'LA FECHA CONCLUSION ES MENOR A LA FECHA %',to_char(now(), 'DD-MM-YYYY');
-            END IF;*/
-
             -- chequea fechas de costos inicio y fin
             v_resp_doc =  tes.f_validar_periodo_costo(v_parametros.id_plan_pago);
+
+            --modifica el campo nro_cuenta_bancaria para los SP
+                      select tipo_obligacion
+                      into v_tipo_obligacion
+                      from tes.tobligacion_pago
+                      where id_obligacion_pago = v_parametros.id_obligacion_pago;
+
+                    IF v_tipo_obligacion = 'sp' or v_tipo_obligacion = 'spd' or v_tipo_obligacion = 'spi' then
+                      select pcb.nro_cuenta ||'-'|| ins.nombre
+                      into v_cuenta_bancaria_benef
+                      from param.tproveedor_cta_bancaria pcb
+                      left join param.tinstitucion ins on ins.id_institucion=pcb.id_banco_beneficiario
+                      --left join tes.tplan_pago pp on pp.id_proveedor_cta_bancaria = pcb.id_proveedor_cta_bancaria
+                      where pcb.id_proveedor_cta_bancaria = v_parametros.id_proveedor_cta_bancaria;
+
+
+                        update tes.tplan_pago SET
+                        nro_cuenta_bancaria = v_cuenta_bancaria_benef
+                        where id_plan_pago= v_parametros.id_plan_pago;
+                    end IF;
+                    ---
 
 
 
@@ -1098,13 +971,13 @@ BEGIN
 		end;
 
 	/*********************************
- 	#TRANSACCION:  'TES_PLAPA_ELI'
+ 	#TRANSACCION:  'TES_SOPLAPA_ELI'
  	#DESCRIPCION:	Eliminacion de registros de plan de pagos
  	#AUTOR:		admin
- 	#FECHA:		10-04-2013 15:43:23
+ 	#FECHA:		12-12-2018 15:43:23
 	***********************************/
 
-	elsif(p_transaccion='TES_PLAPA_ELI')then
+	elsif(p_transaccion='TES_SOPLAPA_ELI')then
 
 		begin
 
@@ -1310,345 +1183,14 @@ BEGIN
 
 		end;
 
-	/*********************************
- 	#TRANSACCION:  'TES_SOLDEVPAG_IME'
- 	#DESCRIPCION:	Solicitud de devengado o pago
- 	#AUTOR:		RAC
- 	#FECHA:		10-04-2013 15:43:23
-	***********************************/
-
-	elsif(p_transaccion='TES_SOLDEVPAG_IME')then
-
-		begin
-
-           --validacion de la cuota
-
-           select
-             pp.*,op.total_pago,op.comprometido, op.id_contrato
-           into
-             v_registros
-           from tes.tplan_pago pp
-           inner join tes.tobligacion_pago op on op.id_obligacion_pago = pp.id_obligacion_pago
-           where pp.id_plan_pago = v_parametros.id_plan_pago;
-
-v_pre_integrar_presupuestos = pxp.f_get_variable_global('pre_integrar_presupuestos');
-	IF v_pre_integrar_presupuestos = 'true' THEN
-           /*jrr:29/10/2014
-           1) si el presupuesto no esta comprometido*/
-           if (v_registros.comprometido = 'no') then
-
-         		/*1.1)Validar que la suma de los detalles igualen al total de la obligacion*/
-               if ((select sum(od.monto_pago_mo)
-                    from tes.tobligacion_det od
-                    where id_obligacion_pago = v_registros.id_obligacion_pago and estado_reg = 'activo') != v_registros.total_pago) THEN
-           			raise exception 'La suma de todos los detalles no iguala con el total de la obligacion. La diferencia se genero al modificar la apropiacion';
-                end if;
-
-                /*1.2 Comprometer*/
-                select * into v_nombre_conexion from migra.f_crear_conexion();
-
-                select tes.f_gestionar_presupuesto_tesoreria(v_registros.id_obligacion_pago, p_id_usuario, 'comprometer',NULL,v_nombre_conexion) into v_res;
-
-                if v_res = false then
-                    raise exception 'Error al comprometer el presupuesto';
-                end if;
-
-                update tes.tobligacion_pago
-                set comprometido = 'si'
-                where id_obligacion_pago = v_registros.id_obligacion_pago;
-
-          end if;
-	  END IF;
-
-          IF  v_registros.tipo  in ('pagado' ,'devengado_pagado','devengado_pagado_1c','anticipo','ant_parcial') THEN
-
-                  IF v_registros.forma_pago = 'cheque' THEN
-
-                      IF  v_registros.nro_cheque is NULL THEN
-
-                         raise exception  'Tiene que especificar el  nro de cheque';
-
-                      END IF;
-                   ELSE
-
-                 		IF  v_registros.nro_cuenta_bancaria  = '' or  v_registros.nro_cuenta_bancaria is NULL THEN
-
-                         raise exception  'Tiene que especificar el nro de cuenta destino, para la transferencia bancaria';
-
-                      END IF;
-
-
-                  END IF;
-
-
-                  IF v_registros.id_cuenta_bancaria is NULL THEN
-                     raise exception  'Tiene que especificar la cuenta bancaria origen de los fondos';
-                  END IF ;
-
-
-
-                   --validacion de deposito, (solo BOA, puede retirarse)
-                   IF v_registros.id_cuenta_bancaria_mov is NULL THEN
-
-                        --TODO verificar si la cuenta es de centro
-
-                       select
-                           cb.centro
-                       into
-                           v_centro
-                       from tes.tcuenta_bancaria cb
-                       where cb.id_cuenta_bancaria = v_registros.id_cuenta_bancaria;
-
-
-
-                        IF  v_registros.nro_cuenta_bancaria  = '' or  v_registros.nro_cuenta_bancaria is NULL THEN
-
-                             IF  v_centro = 'no' THEN
-
-                              raise exception  'Tiene que especificar el deposito  origen de los fondos';
-
-                             END IF;
-
-
-                        END IF;
-
-                   END IF ;
-
-           END IF;
-
-
-           --si es un pago de vengado , revisar si tiene contrato
-           --si tiene contrato con renteciones de garantia validar que la rentecion de garantia sea mayor a cero
-           IF  v_registros.tipo in ('devengado','devengado_pagado','devengado_pagado_1c') THEN
-               IF v_registros.id_contrato is not null THEN
-
-                   v_sw_retenciones = 'no';
-                   select
-                     c.tiene_retencion
-                   into
-                     v_sw_retenciones
-                   from leg.tcontrato c
-                   where c.id_contrato = v_registros.id_contrato;
-
-                   IF v_sw_retenciones = 'si' and  v_registros.monto_retgar_mo = 0 THEN
-                      IF v_registros.monto != v_registros.descuento_inter_serv THEN
-                        raise exception 'Según contrato este pago debe tener retenciones de garantia';
-                      END IF;
-                   END IF;
-
-               END IF;
-
-           END IF;
-
-
-           v_verficacion = tes.f_generar_comprobante(
-                                                      p_id_usuario,
-                                                      v_parametros._id_usuario_ai,
-                                                      v_parametros._nombre_usuario_ai,
-                                                      v_parametros.id_plan_pago,
-                                                      v_parametros.id_depto_conta,
-                                                      v_nombre_conexion);
-
-          --select * into v_resp from migra.f_cerrar_conexion(v_nombre_conexion,'exito');
-
-          v_resp = '';
-
-          IF  v_verficacion[1]= 'TRUE'   THEN
-
-                  --Definicion de la respuesta
-                v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Solitud de generacion de comprobante desde interface de plan de pagos');
-                v_resp = pxp.f_agrega_clave(v_resp,'id_plan_pago',v_parametros.id_plan_pago::varchar);
-
-                --Devuelve la respuesta
-                return v_resp;
-
-            ELSE
-
-                --Definicion de la respuesta
-
-
-                v_resp = pxp.f_agrega_clave(v_resp,'id_plan_pago',v_parametros.id_plan_pago::varchar);
-                v_resp = pxp.f_agrega_clave(v_resp,'resultado','falla');
-                v_resp = pxp.f_agrega_clave(v_resp,'qwe','123');
-                v_resp = pxp.f_agrega_clave(v_resp,'mensaje',v_verficacion[2]);
-
-                --Devuelve la respuesta
-                return v_resp;
-
-
-            END IF;
-        end;
-
-
-    /*********************************
- 	#TRANSACCION:  'TES_ANTEPP_IME'
- 	#DESCRIPCION:	Trasaacion utilizada  pasar a  estados anterior en el plan de pagos
-                    segun la operacion definida
- 	#AUTOR:		RAC
- 	#FECHA:		19-02-2013 12:12:51
-	***********************************/
-
-	elseif(p_transaccion='TES_ANTEPP_IME')then
-        begin
-
-        v_operacion = 'anterior';
-
-        IF  pxp.f_existe_parametro(p_tabla , 'estado_destino')  THEN
-           v_operacion = v_parametros.estado_destino;
-        END IF;
-
-        --recueprar datos del plan de pagos
-
-        --obtenermos datos basicos
-        select
-            pp.id_plan_pago,
-            pp.id_proceso_wf,
-            pp.estado,
-            pp.fecha_tentativa,
-            pp.total_prorrateado ,
-            pp.monto_ejecutar_total_mo,
-            pp.estado,
-            pwf.id_tipo_proceso
-        into
-            v_registros_pp
-
-        from tes.tplan_pago  pp
-        inner  join wf.tproceso_wf pwf  on  pwf.id_proceso_wf = pp.id_proceso_wf
-        where pp.id_proceso_wf  = v_parametros.id_proceso_wf;
-
-        v_id_proceso_wf = v_registros_pp.id_proceso_wf;
-
-        IF  v_operacion = 'anterior' THEN
-            --------------------------------------------------
-            --Retrocede al estado inmediatamente anterior
-            -------------------------------------------------
-           --recuperaq estado anterior segun Log del WF
-              SELECT
-
-                 ps_id_tipo_estado,
-                 ps_id_funcionario,
-                 ps_id_usuario_reg,
-                 ps_id_depto,
-                 ps_codigo_estado,
-                 ps_id_estado_wf_ant
-              into
-                 v_id_tipo_estado,
-                 v_id_funcionario,
-                 v_id_usuario_reg,
-                 v_id_depto,
-                 v_codigo_estado,
-                 v_id_estado_wf_ant
-              FROM wf.f_obtener_estado_ant_log_wf(v_parametros.id_estado_wf);
-
-
-
-
-
-        ELSE
-           --recupera el estado inicial
-           -- recuperamos el estado inicial segun tipo_proceso
-
-             SELECT
-               ps_id_tipo_estado,
-               ps_codigo_estado
-             into
-               v_id_tipo_estado,
-               v_codigo_estado
-             FROM wf.f_obtener_tipo_estado_inicial_del_tipo_proceso(v_registros_pp.id_tipo_proceso);
-
-
-
-             --busca en log e estado de wf que identificamos como el inicial
-             SELECT
-               ps_id_funcionario,
-              ps_id_depto
-             into
-              v_id_funcionario,
-             v_id_depto
-
-
-             FROM wf.f_obtener_estado_segun_log_wf(v_id_estado_wf, v_id_tipo_estado);
-
-
-
-
-        END IF;
-
-
-
-         --configurar acceso directo para la alarma
-             v_acceso_directo = '';
-             v_clase = '';
-             v_parametros_ad = '';
-             v_tipo_noti = 'notificacion';
-             v_titulo  = 'Visto Bueno';
-
-
-           IF   v_codigo_estado_siguiente not in('borrador','pendiente','pagado','devengado','anulado')   THEN
-                  v_acceso_directo = '../../../sis_tesoreria/vista/plan_pago/PlanPagoVb.php';
-                 v_clase = 'PlanPagoVb';
-                 v_parametros_ad = '{filtro_directo:{campo:"plapa.id_proceso_wf",valor:"'||v_id_proceso_wf::varchar||'"}}';
-                 v_tipo_noti = 'notificacion';
-                 v_titulo  = 'Visto Bueno';
-
-           END IF;
-
-
-          -- registra nuevo estado
-
-          v_id_estado_actual = wf.f_registra_estado_wf(
-              v_id_tipo_estado,                --  id_tipo_estado al que retrocede
-              v_id_funcionario,                --  funcionario del estado anterior
-              v_parametros.id_estado_wf,       --  estado actual ...
-              v_id_proceso_wf,                 --  id del proceso actual
-              p_id_usuario,                    -- usuario que registra
-              v_parametros._id_usuario_ai,
-              v_parametros._nombre_usuario_ai,
-              v_id_depto,                       --depto del estado anterior
-              '[RETROCESO] '|| v_parametros.obs,
-              v_acceso_directo,
-              v_clase,
-              v_parametros_ad,
-              v_tipo_noti,
-              v_titulo);
-
-
-
-
-            IF  not tes.f_fun_regreso_plan_pago_wf(p_id_usuario,
-                                                   v_parametros._id_usuario_ai,
-                                                   v_parametros._nombre_usuario_ai,
-                                                   v_id_estado_actual,
-                                                   v_parametros.id_proceso_wf,
-                                                   v_codigo_estado) THEN
-
-               raise exception 'Error al retroceder estado';
-
-            END IF;
-
-
-         -- si hay mas de un estado disponible  preguntamos al usuario
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Se realizo el cambio de estado)');
-            v_resp = pxp.f_agrega_clave(v_resp,'operacion','cambio_exitoso');
-
-
-          --Devuelve la respuesta
-            return v_resp;
-
-
-
-
-
-        end;
-
-     /*********************************
- 	#TRANSACCION:  'TES_SIGEPP_IME'
+         /*********************************
+ 	#TRANSACCION:  'TES_SOSIGEPP_IME'
  	#DESCRIPCION:	funcion que controla el cambio al Siguiente estado de los planes de pago, integrado  con el EF
- 	#AUTOR:		RAC
- 	#FECHA:		17-12-2013 12:12:51
+ 	#AUTOR:		ADMIN
+ 	#FECHA:		12-12-2018 12:12:51
 	***********************************/
 
-	elseif(p_transaccion='TES_SIGEPP_IME')then
+	elseif(p_transaccion='TES_SOSIGEPP_IME')then
         begin
 
          /*   PARAMETROS
@@ -1672,8 +1214,7 @@ v_pre_integrar_presupuestos = pxp.f_get_variable_global('pre_integrar_presupuest
             pp.monto_ejecutar_total_mo,
             pp.estado,
             pp.id_estado_wf,
-            op.tipo_obligacion,
-            pp.id_depto_lb
+            op.tipo_obligacion
         into
             v_id_plan_pago,
             v_id_proceso_wf,
@@ -1684,8 +1225,7 @@ v_pre_integrar_presupuestos = pxp.f_get_variable_global('pre_integrar_presupuest
             v_monto_ejecutar_total_mo,
             v_estado_aux,
             v_id_estado_actual,
-            v_tipo_obligacion,
-            v_id_depto_lb_pp
+            v_tipo_obligacion
 
         from tes.tplan_pago  pp
         inner  join tes.tobligacion_pago op on op.id_obligacion_pago = pp.id_obligacion_pago
@@ -1857,84 +1397,6 @@ v_pre_integrar_presupuestos = pxp.f_get_variable_global('pre_integrar_presupuest
 
           END IF;
 
-          ---
-          /*------------------------------------------------------------------
-            CONEXION A BUE
-            si elige  Libro de bancos destino a BUE copia su obligacion,
-            detalle y plan de pago al servidor BUE con un nuevo proceso
-
-            --conexion para MIAMI falta desarrollar conexion
-            --------------------------------------------------------------------*/
-
-            v_obligacion_pago_json=(select json_agg(top.*)
-            						from tes.tobligacion_pago top
-            						inner join tes.tplan_pago tp on tp.id_obligacion_pago = top.id_obligacion_pago
-                                    where tp.id_plan_pago = v_id_plan_pago );
-            						--where tp.id_plan_pago = v_parametros.id_plan_pago );
-
-            v_obligacion_pago=(select top.id_obligacion_pago
-                                  from tes.tobligacion_pago top
-                                  inner join tes.tplan_pago tp on tp.id_obligacion_pago = top.id_obligacion_pago
-                                  where tp.id_plan_pago = v_id_plan_pago);
-                                  --where tp.id_plan_pago = v_parametros.id_plan_pago);
-
-            v_obligacion_det_json=(select json_agg(tod.*)
-            						from tes.tobligacion_det tod
-                                    inner join tes.tobligacion_pago top on top.id_obligacion_pago = tod.id_obligacion_pago
-                                    where tod.id_obligacion_pago = v_obligacion_pago );
-
-             v_obligacion_pp_json=(select json_agg(pp.*)
-            				      from tes.tplan_pago pp
-                                  inner join tes.tobligacion_pago top on top.id_obligacion_pago = pp.id_obligacion_pago
-                                  where top.id_obligacion_pago = v_obligacion_pago );
-
-             v_documentos=(select json_agg(dw.*)
-            				      from wf.tdocumento_wf dw
-                                  inner join tes.tplan_pago pp on pp.id_proceso_wf = dw.id_proceso_wf
-                                  --inner join tes.tobligacion_pago op on op.id_proceso_wf = dw.id_proceso_wf
-                                  --where op.id_obligacion_pago = v_obligacion_pago );
-                                  where pp.id_plan_pago = v_id_plan_pago);
-                                  --where pp.id_plan_pago = v_parametros.id_plan_pago);
-
-             v_prorrateo_json=(select json_agg(pro.*)
-            						from tes.tprorrateo pro
-            						inner join tes.tplan_pago tp on tp.id_plan_pago = pro.id_plan_pago
-                                      where tp.id_plan_pago = v_id_plan_pago );
-         --raise exception 'llge %',v_prorrateo_json;
-           --registra op para una internacional
-           --IF (v_registros_pp.estado = 'vbfin') THEN
-         IF pxp.f_get_variable_global('ESTACION_inicio') ='BOL' THEN
-           IF (v_estado_aux = 'vbfin') THEN
-
-             --IF (v_parametros.id_depto_lb = 27 )THEN
-             IF (v_id_depto_lb_pp = 27 )THEN
-                --conexion BUE
-                v_cadena_cnx =  tes.f_obtener_cadena_conexion_argentina();
-
-                --Se realizara la creacion de la funcion de insertando datos en buenos aires
-                v_cadena_inter = 'select tes.ft_obligacion_pago_inter_bue_ime('''||p_administrador::integer||''','''||p_id_usuario::integer||''','''||v_obligacion_pago_json::json||''','''||v_obligacion_det_json::json||''','''||v_obligacion_pp_json::json||''','''||v_documentos::json||''','''||v_prorrateo_json::json||''')';
-
-
-               v_resp =  (SELECT dblink_connect(v_cadena_cnx));
-
-			             IF(v_resp!='OK') THEN
-
-			             	--modificar bandera de fallo
-			                 raise exception 'FALLA CONEXION A LA BASE DE DATOS CON DBLINK';
-
-			             ELSE
-
-                        --raise exception 'FALLA %',v_obligacion_pago_json;
-
-                            PERFORM * FROM dblink(v_cadena_inter,true)AS ( xx varchar);
-
-
-			   			 END IF;
-              END IF;
-            END IF;
-         END IF;
-          ---
-
 
           -- si hay mas de un estado disponible  preguntamos al usuario
           v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Se realizo el cambio de estado del plan de pagos)');
@@ -1947,273 +1409,6 @@ v_pre_integrar_presupuestos = pxp.f_get_variable_global('pre_integrar_presupuest
      end;
 
 
-    /*********************************
- 	#TRANSACCION:  'TES_SINPRE_IME'
- 	#DESCRIPCION:	Incremeta el  presupuesto faltante para la cuota indicada del plan de pagos
- 	#AUTOR:		rac
- 	#FECHA:		08-07-2013 15:43:23
-	***********************************/
-
-	elsif(p_transaccion='TES_SINPRE_IME')then
-
-		begin
-
-           -- verficar presupuesto y comprometer
-           IF not tes.f_gestionar_presupuesto_tesoreria(NULL, p_id_usuario, 'sincronizar_presupuesto',v_parametros.id_plan_pago)  THEN
-
-                 raise exception 'Error al comprometer el presupeusto';
-
-           END IF;
-            --Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','El presupuesto de la cuota del plan de pago fue incrementado exitosamente');
-            v_resp = pxp.f_agrega_clave(v_resp,'id_plan_pago',v_parametros.id_plan_pago::varchar);
-
-            --Devuelve la respuesta
-            return v_resp;
-        end;
-
-    /*********************************
- 	#TRANSACCION:  'TES_GENCONF_IME'
- 	#DESCRIPCION:	Actualiza los Datos del Acta de Conformidad
- 	#AUTOR:		jrr
- 	#FECHA:		26-09-2014
-	***********************************/
-
-	elsif(p_transaccion='TES_GENCONF_IME')then
-
-		begin --raise exception 'v_parametros.id_plan_pago: %', v_parametros.id_plan_pago;
-        	--verificar si el plan de pagos fue realizado por el empleado solicitante o el usuario de registro
-            --de la obligacion de pago
-            select usu.id_persona into v_id_persona
-            from segu.vusuario usu
-            where usu.id_usuario = p_id_usuario;
-
-
-
-            select ce.id_uo into v_id_uo
-            from tes.tconcepto_excepcion ce
-            inner join tes.tobligacion_det od on ce.id_concepto_ingas = od.id_concepto_ingas
-            inner join tes.tobligacion_pago op on od.id_obligacion_pago = op.id_obligacion_pago
-            inner join tes.tplan_pago pp  on pp.id_obligacion_pago = op.id_obligacion_pago
-            where pp.id_plan_pago = v_parametros.id_plan_pago
-            limit 1 offset 0;
-
-            if (v_id_uo is not null) then
-            	raise exception 'Este pago tiene definida una excepción y solo el gerente aprobador de la obligacion firmara el acta de conformidad';
-            end if;
-
-            if(not exists (select 1
-                from tes.tplan_pago pp
-                inner join tes.tobligacion_pago op on op.id_obligacion_pago = pp.id_obligacion_pago
-                inner join orga.tfuncionario fun on op.id_funcionario = op.id_funcionario
-                inner join segu.vusuario usu on usu.id_usuario = op.id_usuario_reg
-                where pp.id_plan_pago = v_parametros.id_plan_pago and
-                (v_id_persona = fun.id_persona or v_id_persona = usu.id_persona or p_administrador = 1))) then
-            	raise exception 'Solo el solicitante y el usuario que registro la obligacion pueden generar la conformidad';
-            end if;
-
-
-        	select usu.id_usuario into v_id_usuario_firma
-            from tes.tplan_pago pp
-            inner join tes.tobligacion_pago op on op.id_obligacion_pago = pp.id_obligacion_pago
-            inner join orga.tfuncionario fun on op.id_funcionario = fun.id_funcionario
-            inner join segu.tusuario usu on fun.id_persona = usu.id_persona
-            where pp.id_plan_pago = v_parametros.id_plan_pago;
-
-            if v_id_usuario_firma is null then
-            	raise exception 'El funcionario del proceso no tiene usuario en el sistema para firmar el acta de conformidad';
-            end if;
-
-           update tes.tplan_pago
-           set conformidad = v_parametros.conformidad,
-           fecha_conformidad = v_parametros.fecha_conformidad
-           where id_plan_pago = v_parametros.id_plan_pago;
-
-           select pp.id_estado_wf,pp.id_proceso_wf into
-           v_id_estado_actual,v_id_proceso_wf
-           from tes.tplan_pago pp
-           where pp.id_plan_pago =  v_parametros.id_plan_pago;
-
-           --para eliminar la firma si existiera
-           update wf.tdocumento_wf
-           set fecha_firma = NULL
-           from wf.ttipo_documento td
-           where td.id_tipo_documento = wf.tdocumento_wf.id_tipo_documento and td.codigo = 'ACTCONF' and
-           wf.tdocumento_wf .estado_reg = 'activo' and td.estado_reg = 'activo' and
-           wf.tdocumento_wf .id_proceso_wf = v_id_proceso_wf;
-
-           select tpp.conformidad, tpp.es_ultima_cuota
-           into v_record
-           from tes.tplan_pago tpp
-           where tpp.id_plan_pago = v_parametros.id_plan_pago;
-
-           if(v_record.es_ultima_cuota = true and (v_record.conformidad != '' or v_record.conformidad is not null))then
-             --Enviar correo a las auxiliares de adquisicones indicando que se dio conformidad al pago.
-              v_correo_conformidad_pago = tes.f_correo_conformidad_pago(v_parametros.id_plan_pago, p_id_usuario);
-           end if;
-
-           v_resp_doc = wf.f_verifica_documento(v_id_usuario_firma, v_id_estado_actual);
-            --Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Se modificaron los datos de la conformidad exitosamente');
-            v_resp = pxp.f_agrega_clave(v_resp,'id_plan_pago',v_parametros.id_plan_pago::varchar);
-
-            --Devuelve la respuesta
-            return v_resp;
-        end;
-
-    /*********************************
- 	#TRANSACCION:  'TES_REVPP_IME'
- 	#DESCRIPCION:	Sirve cpara marcar como revisado o no revisado, sirve como un indicador  de que la documentacion fue revisada por el asistente
- 	#AUTOR:		rac
- 	#FECHA:		23-09-2014 15:43:23
-	***********************************/
-
-	elsif(p_transaccion='TES_REVPP_IME')then
-
-		begin
-
-            select
-              pp.revisado_asistente,
-              pp.id_proceso_wf
-            into
-              v_registros_tpp
-            from tes.tplan_pago pp
-            where pp.id_plan_pago = v_parametros.id_plan_pago;
-
-            IF v_registros_tpp.revisado_asistente = 'si' THEN
-               v_revisado = 'no';
-            ELSE
-               v_revisado = 'si';
-            END IF;
-
-            update tes.tplan_pago  pp set
-               revisado_asistente = v_revisado,
-               id_usuario_mod=p_id_usuario,
-               fecha_mod=now(),
-               id_usuario_ai = v_parametros._id_usuario_ai,
-               usuario_ai = v_parametros._nombre_usuario_ai
-             where pp.id_plan_pago  = v_parametros.id_plan_pago;
-
-            --modifica el proeso wf para actulizar el mismo campo
-             update wf.tproceso_wf  set
-               revisado_asistente = v_revisado
-             where id_proceso_wf  = v_registros_tpp.id_proceso_wf;
-
-
-            --Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','el plan de pago fue marcado como revisado');
-            v_resp = pxp.f_agrega_clave(v_resp,'id_plan_pago',v_parametros.id_plan_pago::varchar);
-
-            --Devuelve la respuesta
-            return v_resp;
-        end;
-
-
-    /*********************************
- 	#TRANSACCION:  'TES_CBFRM500_IME'
- 	#DESCRIPCION:	CAmbio el estado de requiere fromr 500 para no generar mas alarmas de correo
- 	#AUTOR:		RAC KPLIAN
- 	#FECHA:		02-03-2015
-	***********************************/
-
-	elsif(p_transaccion='TES_CBFRM500_IME')then
-
-		begin
-
-           update tes.tplan_pago  set
-            tiene_form500 = 'si'
-           where id_plan_pago = v_parametros.id_plan_pago;
-
-            --Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Se cambio el estado de tiene formulario 500 ');
-            v_resp = pxp.f_agrega_clave(v_resp,'id_plan_pago',v_parametros.id_plan_pago::varchar);
-
-            --Devuelve la respuesta
-            return v_resp;
-        end;
-
-     /*********************************
- 	#TRANSACCION:  'TES_GETCFGPAGO_IME'
- 	#DESCRIPCION:	Recupera la configuracion de apgos habilitados en la estación
- 	#AUTOR:		RAC KPLIAN
- 	#FECHA:		22-11-2015
-	***********************************/
-
-	elsif(p_transaccion='TES_GETCFGPAGO_IME')then
-
-		begin
-         --raise exception 'llega'
-
-            --Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Se cambio el estado de tiene formulario 500 ');
-            v_resp = pxp.f_agrega_clave(v_resp,'tes_tipo_pago_deshabilitado', pxp.f_get_variable_global('tes_tipo_pago_deshabilitado'));
-
-            --Devuelve la respuesta
-            return v_resp;
-        end;
-    /*********************************
- 	#TRANSACCION:  'TES_ULTIMA_CUOTA_SET'
- 	#DESCRIPCION:	Fijamos el el campo es_ultimo_pago a true, si fuese el ultimo cuota de pago
- 	#AUTOR:		Franklin E.
- 	#FECHA:		31-05-2016
-	***********************************/
-
-	elsif(p_transaccion='TES_ULTIMA_CUOTA_SET')then
-
-		begin
-        	--raise exception 'id_obligacion_pago: %, es_ultima_cuota: %, id_plan_pago: %', v_parametros.id_obligacion_pago, v_parametros.es_ultima_cuota, v_parametros.id_plan_pago;
-        	IF(v_parametros.accion = 'grid')THEN
-                SELECT count(tpp.id_plan_pago) AS cont, tpp.id_plan_pago
-                INTO v_reg_plan_pago
-                FROM tes.tobligacion_pago top
-                INNER JOIN tes.tplan_pago tpp ON tpp.id_obligacion_pago = top.id_obligacion_pago
-                WHERE  top.id_obligacion_pago = v_parametros.id_obligacion_pago AND tpp.es_ultima_cuota = true
-                GROUP BY tpp.id_plan_pago;
-
-                IF(v_reg_plan_pago.cont IS NULL)THEN
-                    v_bandera = true;
-                END IF;
-
-                IF(v_reg_plan_pago.cont =1 AND v_reg_plan_pago.id_plan_pago = v_parametros.id_plan_pago)THEN
-                    UPDATE tes.tplan_pago SET
-                      es_ultima_cuota =  CASE WHEN (v_parametros.es_ultima_cuota=FALSE OR v_parametros.es_ultima_cuota IS NULL)  THEN TRUE ELSE FALSE END
-                    WHERE id_plan_pago = v_parametros.id_plan_pago;
-                ELSIF v_bandera THEN
-                    UPDATE tes.tplan_pago SET
-                      es_ultima_cuota =  CASE WHEN (v_parametros.es_ultima_cuota=FALSE OR v_parametros.es_ultima_cuota IS NULL)  THEN TRUE ELSE FALSE END
-                    WHERE id_plan_pago = v_parametros.id_plan_pago;
-                END IF;
-            ELSE
-            	SELECT count(tpp.id_plan_pago)
-                INTO v_cont_plan_pago
-				FROM tes.tplan_pago tpp
-				WHERE tpp.id_obligacion_pago = v_parametros.id_obligacion_pago AND tpp.estado_reg = 'activo';
-
-                UPDATE tes.tobligacion_pago SET
-                	total_nro_cuota = v_cont_plan_pago
-                WHERE id_obligacion_pago = v_parametros.id_obligacion_pago;
-
-            	FOR v_reg_plan_pago IN (SELECT tpp.id_plan_pago, tpp.es_ultima_cuota
-                						FROM tes.tplan_pago tpp
-                                        WHERE tpp.id_obligacion_pago = v_parametros.id_obligacion_pago AND tpp.estado_reg = 'activo'
-                                        ORDER BY tpp.fecha_reg ASC)LOOP
-
-                	UPDATE tes.tplan_pago SET
-                		es_ultima_cuota = CASE WHEN v_cont_plan_pago = 1 THEN TRUE ELSE FALSE END
-                	WHERE id_plan_pago = v_reg_plan_pago.id_plan_pago;
-
-                    v_cont_plan_pago = v_cont_plan_pago - 1;
-                END LOOP;
-            END IF;
-
-
-            --Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Se cambio el estado de la ultima cuota con Exito');
-            v_resp = pxp.f_agrega_clave(v_resp,'id_obligacion_pago',v_parametros.id_obligacion_pago::VARCHAR);
-            --Devuelve la respuesta
-            return v_resp;
-        end;
-
 
 
     else
@@ -2225,7 +1420,7 @@ v_pre_integrar_presupuestos = pxp.f_get_variable_global('pre_integrar_presupuest
 EXCEPTION
 
 	WHEN OTHERS THEN
-		--v_res_cone=(select dblink_disconnect());
+
 		v_resp='';
         v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
 		v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
@@ -2239,4 +1434,3 @@ VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
 COST 100;
-

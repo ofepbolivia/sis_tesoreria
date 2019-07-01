@@ -2648,6 +2648,8 @@ header("content-type: text/javascript; charset=UTF-8");
             Phx.vista.PlanPago.superclass.onButtonNew.call(this);
             this.ocultarGrupo(2); //ocultar el grupo de ajustes
             this.ocultarGrupo(3); //ocultar el grupo de ajustes
+
+            
         },
 
         successAplicarDesc: function (resp) {
