@@ -2054,7 +2054,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.tmp_porc_monto_excento_var = undefined;
             }
 
-
+            this.ocultarComponente(this.Cmp.id_proveedor_cta_bancaria);
 
             Phx.vista.PlanPago.superclass.onButtonEdit.call(this);
             if (this.Cmp.id_plantilla.getValue()) {
@@ -2649,7 +2649,9 @@ header("content-type: text/javascript; charset=UTF-8");
             this.ocultarGrupo(2); //ocultar el grupo de ajustes
             this.ocultarGrupo(3); //ocultar el grupo de ajustes
 
-            
+            this.ocultarComponente(this.Cmp.id_proveedor_cta_bancaria);
+
+
         },
 
         successAplicarDesc: function (resp) {
