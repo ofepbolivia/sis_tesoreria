@@ -1168,6 +1168,27 @@ header("content-type: text/javascript; charset=UTF-8");
             },
             {
                 config: {
+                    name: 'obs_monto_no_pagado',
+                    // fieldLabel: 'Obs. Pago',
+                    //04-07-2019 cambiar
+                    fieldLabel: 'Glosa',
+                    qtip: 'Estas observaciones van a la glosa del comprobante que se genera',
+                    allowBlank: false,
+
+                    // anchor: '80%',
+                    width: 280,
+                    gwidth: 250,
+                    maxLength: 300
+                },
+                type: 'TextArea',
+                filters: {pfiltro: 'plapa.obs_monto_no_pagado', type: 'string'},
+
+                id_grupo: 4,
+                grid: true,
+                form: true
+            },
+            {
+                config: {
                     name: 'obs_descuentos_anticipo',
                     fieldLabel: 'Obs. Desc. Antic.',
                     allowBlank: true,
@@ -1184,25 +1205,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 grid: true,
                 form: true
             },
-            {
-                config: {
-                    name: 'obs_monto_no_pagado',
-                    fieldLabel: 'Obs. Pago',
-                    qtip: 'Estas observaciones van a la glosa del comprobante que se genere',
-                    allowBlank: true,
 
-                    // anchor: '80%',
-                    width: 280,
-                    gwidth: 250,
-                    maxLength: 300
-                },
-                type: 'TextArea',
-                filters: {pfiltro: 'plapa.obs_monto_no_pagado', type: 'string'},
-
-                id_grupo: 4,
-                grid: true,
-                form: true
-            },
             {
                 config: {
                     name: 'obs_otros_descuentos',
@@ -1336,6 +1339,23 @@ header("content-type: text/javascript; charset=UTF-8");
                 },
                 type: 'DateField',
                 filters: {pfiltro: 'plapa.fecha_costo_fin', type: 'date'},
+                id_grupo: 3,
+                grid: true,
+                form: true
+            },
+            {
+                config: {
+                    name: 'fecha_conclusion_pago',
+                    fieldLabel: 'Fecha Vencimiento de Pago',
+                    allowBlank: true,
+                    gwidth: 100,
+                    format: 'd/m/Y',
+                    renderer: function (value, p, record) {
+                        return value ? value.dateFormat('d/m/Y') : ''
+                    }
+                },
+                type: 'DateField',
+                filters: {pfiltro: 'plapa.fecha_conclusion_pago', type: 'date'},
                 id_grupo: 3,
                 grid: true,
                 form: true
@@ -1567,6 +1587,7 @@ header("content-type: text/javascript; charset=UTF-8");
             'monto_ajuste_siguiente_pag', 'pago_variable', 'monto_anticipo', 'contador_estados',
             {name: 'fecha_costo_ini', type: 'date', dateFormat: 'Y-m-d'},
             {name: 'fecha_costo_fin', type: 'date', dateFormat: 'Y-m-d'},
+            {name: 'fecha_conclusion_pago', type: 'date', dateFormat: 'Y-m-d'},
             'id_depto_conta_pp', 'desc_depto_conta_pp', 'funcionario_wf', 'tiene_form500',
             'id_depto_lb', 'desc_depto_lb', 'prioridad_lp', {name: 'ultima_cuota_dev', type: 'numeric'},
             'nro_cbte',

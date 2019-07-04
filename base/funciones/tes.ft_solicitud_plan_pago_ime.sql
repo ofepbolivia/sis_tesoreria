@@ -422,24 +422,22 @@ BEGIN
             from tes.tobligacion_pago
             where id_obligacion_pago = v_parametros.id_obligacion_pago;
 
+            --IF v_tipo_obligacion = 'sp' or v_tipo_obligacion = 'spd' or v_tipo_obligacion = 'spi'then
 
-            IF v_tipo_obligacion = 'sp' or v_tipo_obligacion = 'spd' or v_tipo_obligacion = 'spi'then
 
-
-            		  select pcb.nro_cuenta ||'-'|| ins.nombre
+                     select ins.nombre||'-'|| pcb.nro_cuenta
                       into v_cuenta_bancaria_benef
                       from param.tproveedor_cta_bancaria pcb
                       left join param.tinstitucion ins on ins.id_institucion=pcb.id_banco_beneficiario
-                      --left join tes.tplan_pago pp on pp.id_proveedor_cta_bancaria = pcb.id_proveedor_cta_bancaria
                       where pcb.id_proveedor_cta_bancaria = v_parametros.id_proveedor_cta_bancaria;
 
              		v_nro_cuenta_bancaria = v_cuenta_bancaria_benef::varchar;
 
-             ELSE
-             	   IF  pxp.f_existe_parametro(p_tabla,'nro_cuenta_bancaria') THEN
-                	v_nro_cuenta_bancaria =  v_parametros.nro_cuenta_bancaria;
-             	   END IF;
-             end IF;
+             --ELSE
+             --	   IF  pxp.f_existe_parametro(p_tabla,'nro_cuenta_bancaria') THEN
+             --   	v_nro_cuenta_bancaria =  v_parametros.nro_cuenta_bancaria;
+             --	   END IF;
+             --end IF;
              --
 
              IF  pxp.f_existe_parametro(p_tabla,'nro_cuenta_bancaria') THEN
@@ -868,6 +866,7 @@ BEGIN
             monto_anticipo = v_monto_anticipo,
             fecha_costo_ini = v_parametros.fecha_costo_ini,
             fecha_costo_fin = v_parametros.fecha_costo_fin,
+            fecha_conclusion_pago = v_parametros.fecha_conclusion_pago,
             --es_ultima_cuota = v_parametros.es_ultima_cuota
             id_proveedor_cta_bancaria = v_parametros.id_proveedor_cta_bancaria
 
@@ -904,7 +903,6 @@ BEGIN
                       into v_tipo_obligacion
                       from tes.tobligacion_pago
                       where id_obligacion_pago = v_parametros.id_obligacion_pago;
-
 
                     IF v_tipo_obligacion = 'sp' or v_tipo_obligacion = 'spd' or v_tipo_obligacion = 'spi' then
                       select pcb.nro_cuenta ||'-'|| ins.nombre

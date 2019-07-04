@@ -96,6 +96,7 @@ class MODSolicitudPlanPago extends MODbase{
         $this->captura('monto_anticipo','numeric');
         $this->captura('fecha_costo_ini','date');
         $this->captura('fecha_costo_fin','date');
+        $this->captura('fecha_conclusion_pago','date');
         $this->captura('funcionario_wf','text');
         $this->captura('tiene_form500','varchar');
         $this->captura('id_depto_lb','integer');
@@ -202,6 +203,7 @@ class MODSolicitudPlanPago extends MODbase{
         $this->setParametro('monto_anticipo','monto_anticipo','numeric');
         $this->setParametro('fecha_costo_ini','fecha_costo_ini','date');
         $this->setParametro('fecha_costo_fin','fecha_costo_fin','date');
+        $this->setParametro('fecha_conclusion_pago','fecha_conclusion_pago','date');
         $this->setParametro('es_ultima_cuota','es_ultima_cuota','boolean');
 
 
@@ -262,6 +264,7 @@ class MODSolicitudPlanPago extends MODbase{
         $this->setParametro('monto_anticipo','monto_anticipo','numeric');
         $this->setParametro('fecha_costo_ini','fecha_costo_ini','date');
         $this->setParametro('fecha_costo_fin','fecha_costo_fin','date');
+        $this->setParametro('fecha_conclusion_pago','fecha_conclusion_pago','date');
         $this->setParametro('id_depto_lb','id_depto_lb','int4');
         $this->setParametro('es_ultima_cuota','es_ultima_cuota','boolean');
 

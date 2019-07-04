@@ -1203,6 +1203,25 @@ header("content-type: text/javascript; charset=UTF-8");
             },
             {
                 config: {
+                    name: 'obs_monto_no_pagado',
+                    //04-07-2019 cambiar
+                    // fieldLabel: 'Obs. Pago',
+                    fieldLabel: 'Glosa',
+                    qtip: 'Estas observaciones van a la glosa del comprobante que se genera',
+                    allowBlank: false,
+                    // anchor: '80%',
+                    width: 280,
+                    gwidth: 300,
+                    maxLength: 300
+                },
+                type: 'TextArea',
+                filters: {pfiltro: 'plapa.obs_monto_no_pagado', type: 'string'},
+                id_grupo: 4,
+                grid: true,
+                form: true
+            },
+            {
+                config: {
                     name: 'obs_descuentos_anticipo',
                     fieldLabel: 'Obs. Desc. Antic.',
                     allowBlank: true,
@@ -1217,23 +1236,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 grid: true,
                 form: true
             },
-            {
-                config: {
-                    name: 'obs_monto_no_pagado',
-                    fieldLabel: 'Obs. Pago',
-                    qtip: 'Estas observaciones van a la glosa del comprobante que se genere',
-                    allowBlank: true,
-                    // anchor: '80%',
-                    width: 280,
-                    gwidth: 300,
-                    maxLength: 300
-                },
-                type: 'TextArea',
-                filters: {pfiltro: 'plapa.obs_monto_no_pagado', type: 'string'},
-                id_grupo: 4,
-                grid: true,
-                form: true
-            },
+
             {
                 config: {
                     name: 'obs_otros_descuentos',
@@ -2054,7 +2057,6 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.tmp_porc_monto_excento_var = undefined;
             }
 
-            this.ocultarComponente(this.Cmp.id_proveedor_cta_bancaria);
 
             Phx.vista.PlanPago.superclass.onButtonEdit.call(this);
             if (this.Cmp.id_plantilla.getValue()) {
@@ -2650,6 +2652,12 @@ header("content-type: text/javascript; charset=UTF-8");
             this.ocultarGrupo(3); //ocultar el grupo de ajustes
 
             this.ocultarComponente(this.Cmp.id_proveedor_cta_bancaria);
+
+            if (data.estado == 'borrador') {
+
+                this.Cmp.id_proveedor_cta_bancaria.allowBlank = true;
+                this.ocultarComponente(this.Cmp.id_proveedor_cta_bancaria);
+            }
 
 
         },

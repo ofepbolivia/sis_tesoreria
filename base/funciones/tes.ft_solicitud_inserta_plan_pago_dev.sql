@@ -559,6 +559,7 @@ BEGIN
             monto_anticipo,
             fecha_costo_ini,
             fecha_costo_fin,
+            fecha_conclusion_pago,
             es_ultima_cuota,
             id_depto_lb,
             id_proveedor_cta_bancaria
@@ -611,6 +612,7 @@ BEGIN
             v_monto_anticipo,
             (p_hstore->'fecha_costo_ini')::date,
             (p_hstore->'fecha_costo_fin')::date,
+            (p_hstore->'fecha_conclusion_pago')::date,
             true,
             (p_hstore->'id_depto_lb')::integer,
             (p_hstore->'id_proveedor_cta_bancaria')::integer
@@ -693,4 +695,3 @@ VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
 COST 100;
-
