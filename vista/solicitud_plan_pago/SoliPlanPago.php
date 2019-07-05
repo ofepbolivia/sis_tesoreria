@@ -12,7 +12,7 @@ header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
     Phx.vista.SoliPlanPago = Ext.extend(Phx.gridInterfaz, {
-        fheight: '80%',
+        fheight: '95%',
         fwidth: '95%',
         accionFormulario: undefined, //define la accion que se ejcuta en formulario new o edit
         porc_ret_gar: 0,//valor por defecto de retencion de garantia
@@ -219,6 +219,11 @@ header("content-type: text/javascript; charset=UTF-8");
         tam_pag: 50,
 
         arrayStore: {
+            'INT': [
+
+                ['devengado_pagado_1c', 'Devengar y pagar (1 comprobante)'],
+
+            ],
             'TODOS': [
                 ['devengado_pagado', 'Devengar y pagar (2 comprobantes)'],
                 ['devengado_pagado_1c', 'Caso especial'],
@@ -515,20 +520,19 @@ header("content-type: text/javascript; charset=UTF-8");
                     emptyText: 'Tipo de Cuota',
                     renderer: function (value, p, record) {
                         var dato = '';
-                        dato = (dato == '' && value == 'devengado') ? 'Devengar' : dato;
-                        dato = (dato == '' && value == 'devengado_rrhh') ? 'Devengar' : dato;
-                        dato = (dato == '' && value == 'devengado_pagado') ? 'Devengar y pagar (2 cbte)' : dato;
+                        //dato = (dato == '' && value == 'devengado_rrhh') ? 'Devengar' : dato;
+                        //dato = (dato == '' && value == 'devengado_pagado') ? 'Devengar y pagar (2 cbte)' : dato;
                         dato = (dato == '' && value == 'devengado_pagado_1c') ? 'Devengar y pagar (1 cbte)' : dato;
-                        dato = (dato == '' && value == 'pagado') ? 'Pagar' : dato;
-                        dato = (dato == '' && value == 'pagado_rrhh') ? 'Pagar' : dato;
-                        dato = (dato == '' && value == 'anticipo') ? 'Anticipo Fact/Rec' : dato;
-                        dato = (dato == '' && value == 'ant_parcial') ? 'Anticipo Parcial' : dato;
-                        dato = (dato == '' && value == 'ant_rendicion') ? 'Ant. por Rendir' : dato;
-                        dato = (dato == '' && value == 'dev_garantia') ? 'Devolucion de Garantia' : dato;
-                        dato = (dato == '' && value == 'ant_aplicado') ? 'Aplicacion de Anticipo' : dato;
-                        dato = (dato == '' && value == 'rendicion') ? 'Rendicion Ant.' : dato;
-                        dato = (dato == '' && value == 'ret_rendicion') ? 'Detalle de Rendicion' : dato;
-                        dato = (dato == '' && value == 'especial') ? 'Pago simple (s/p)' : dato;
+                        // dato = (dato == '' && value == 'pagado') ? 'Pagar' : dato;
+                        //dato = (dato == '' && value == 'pagado_rrhh') ? 'Pagar' : dato;
+                        //dato = (dato == '' && value == 'anticipo') ? 'Anticipo Fact/Rec' : dato;
+                        //dato = (dato == '' && value == 'ant_parcial') ? 'Anticipo Parcial' : dato;
+                        //dato = (dato == '' && value == 'ant_rendicion') ? 'Ant. por Rendir' : dato;
+                        //dato = (dato == '' && value == 'dev_garantia') ? 'Devolucion de Garantia' : dato;
+                        //dato = (dato == '' && value == 'ant_aplicado') ? 'Aplicacion de Anticipo' : dato;
+                        //dato = (dato == '' && value == 'rendicion') ? 'Rendicion Ant.' : dato;
+                        //dato = (dato == '' && value == 'ret_rendicion') ? 'Detalle de Rendicion' : dato;
+                        //dato = (dato == '' && value == 'especial') ? 'Pago simple (s/p)' : dato;
                         return String.format('{0}', dato);
                     },
 
@@ -543,7 +547,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     triggerAction: 'all',
                     lazyRender: true,
                     resizable: true,
-                    listWidth: '500',
+                    listWidth: '300',
                     mode: 'local',
                     wisth: 420,
                     gwidth: 150,
@@ -559,8 +563,9 @@ header("content-type: text/javascript; charset=UTF-8");
                     name: 'nombre_pago',
                     fieldLabel: 'Nombre Pago',
                     allowBlank: true,
-                    anchor: '80%',
-                    gwidth: 250,
+                    gwidth: 100,
+                    // anchor: '80%',
+                    // gwidth: 250,
                     maxLength: 255
                 },
                 type: 'TextField',
@@ -573,11 +578,12 @@ header("content-type: text/javascript; charset=UTF-8");
                 config: {
 
                     name: 'nit',
-                    fieldLabel: 'Nit',
+                    fieldLabel: 'Identificación Tributaria(Prov.)',
                     allowBlank: true,
                     disabled: true,
-                    anchor: '80%',
-                    gwidth: 250,
+                    gwidth: 100,
+                    // anchor: '80%',
+                    // gwidth: 250,
                     maxLength: 100
                 },
                 type: 'TextField',
@@ -1006,7 +1012,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     currencyChar: ' ',
                     fieldLabel: 'Decuentos de Ley',
                     allowBlank: true,
-                    readOnly: true,
+                    // readOnly: true,
                     allowNegative: false,
                     gwidth: 100,
                     maxLength: 1245186
@@ -1622,7 +1628,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Monto Excento:&nbsp;&nbsp;</b> {monto_excento}</p>',
                 '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Anticipo:&nbsp;&nbsp;</b> {monto_anticipo}</p>',
                 '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Descuento Anticipo:&nbsp;&nbsp;</b> {descuento_anticipo}</p>',
-                '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Retención de garantia:&nbsp;&nbsp;</b> {monto_retgar_mo}</p>',
+                // '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Retención de garantia:&nbsp;&nbsp;</b> {monto_retgar_mo}</p>',
                 '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Monto que no se pagara:&nbsp;&nbsp;</b> {monto_no_pagado}</p>',
                 '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Multas:&nbsp;&nbsp;</b> {otros_descuentos}</p>',
                 '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Descuento por intercambio de servicios:&nbsp;&nbsp;</b> {descuento_inter_serv}</p>',
@@ -1909,13 +1915,13 @@ header("content-type: text/javascript; charset=UTF-8");
         habilitarDescuentos: function (me) {
 
             me.mostrarComponente(me.Cmp.otros_descuentos);
-            me.mostrarComponente(me.Cmp.descuento_inter_serv);
+            // me.mostrarComponente(me.Cmp.descuento_inter_serv);
             me.mostrarComponente(me.Cmp.descuento_anticipo);
             //me.mostrarComponente(me.Cmp.monto_retgar_mo);
             //me.mostrarComponente(me.Cmp.descuento_ley);
 
 
-            me.mostrarComponente(me.Cmp.obs_descuento_inter_serv);
+            // me.mostrarComponente(me.Cmp.obs_descuento_inter_serv);
             me.mostrarComponente(me.Cmp.obs_descuentos_anticipo);
             me.mostrarComponente(me.Cmp.obs_otros_descuentos);
             //me.mostrarComponente(me.Cmp.obs_descuentos_ley);
@@ -1975,21 +1981,21 @@ header("content-type: text/javascript; charset=UTF-8");
 
             }
 
-            if (this.Cmp.monto_excento.getValue() == 0) {
-                descuento_ley = this.Cmp.monto.getValue() * this.Cmp.porc_descuento_ley.getValue() * 1.00;
-                this.Cmp.descuento_ley.setValue(descuento_ley);
-            }
-            else {
-                if (this.Cmp.monto_excento.getValue() > 0) {
-                    descuento_ley = (this.Cmp.monto.getValue() * 1.00 - this.Cmp.monto_excento.getValue() * 1.00) * this.Cmp.porc_descuento_ley.getValue();
-                    this.Cmp.descuento_ley.setValue(descuento_ley);
-                }
-                else {
-                    alert('El monto exento no puede ser menor que cero');
-                    return;
-                }
-
-            }
+            // if (this.Cmp.monto_excento.getValue() == 0) {
+            //     descuento_ley = this.Cmp.monto.getValue() * this.Cmp.porc_descuento_ley.getValue() * 1.00;
+            //     this.Cmp.descuento_ley.setValue(descuento_ley);
+            // }
+            // else {
+            //     if (this.Cmp.monto_excento.getValue() > 0) {
+            //         descuento_ley = (this.Cmp.monto.getValue() * 1.00 - this.Cmp.monto_excento.getValue() * 1.00) * this.Cmp.porc_descuento_ley.getValue();
+            //         this.Cmp.descuento_ley.setValue(descuento_ley);
+            //     }
+            //     else {
+            //         alert('El monto exento no puede ser menor que cero');
+            //         return;
+            //     }
+            //
+            // }
 
 
             var monto_ret_gar = 0;
@@ -2012,7 +2018,9 @@ header("content-type: text/javascript; charset=UTF-8");
             //deshabilita el cambio del tipo de pago
             this.Cmp.tipo.disable();
             this.Cmp.fecha_tentativa.enable();
-            this.Cmp.tipo.store.loadData(this.arrayStore.TODOS);
+            //modificacion para las internacionales muestren solo genere un comprobante
+            // this.Cmp.tipo.store.loadData(this.arrayStore.TODOS);
+            this.Cmp.tipo.store.loadData(this.arrayStore.INT);
             this.ocultarGrupo(2); //ocultar el grupo de ajustes
             //segun el tipo define los campo visibles y no visibles
 
@@ -2029,6 +2037,11 @@ header("content-type: text/javascript; charset=UTF-8");
             }
             else {
                 this.tmp_porc_monto_excento_var = undefined;
+            }
+
+            if (data.estado == 'vbconta') {
+
+                this.Cmp.obs_monto_no_pagado.allowBlank = false;
             }
 
             Phx.vista.SoliPlanPago.superclass.onButtonEdit.call(this);
@@ -2355,10 +2368,14 @@ header("content-type: text/javascript; charset=UTF-8");
                 me.mostrarComponente(me.Cmp.monto_no_pagado);
                 me.mostrarComponente(me.Cmp.obs_monto_no_pagado);
                 me.mostrarComponente(me.Cmp.liquido_pagable);
-                me.mostrarComponente(me.Cmp.monto_retgar_mo);
+                // me.mostrarComponente(me.Cmp.monto_retgar_mo);
                 me.mostrarComponente(me.Cmp.obs_descuentos_ley);
                 me.mostrarComponente(me.Cmp.descuento_ley);
                 me.mostrarComponente(me.Cmp.monto_anticipo);
+
+                me.ocultarComponente(me.Cmp.monto_retgar_mo);
+                me.ocultarComponente(me.Cmp.descuento_inter_serv);
+                me.ocultarComponente(me.Cmp.obs_descuento_inter_serv);
 
                 me.habilitarDescuentos(me);
                 me.mostrarComponentesPago(me);

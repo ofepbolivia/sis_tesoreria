@@ -1208,7 +1208,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     // fieldLabel: 'Obs. Pago',
                     fieldLabel: 'Glosa',
                     qtip: 'Estas observaciones van a la glosa del comprobante que se genera',
-                    allowBlank: false,
+                    allowBlank: true,
                     // anchor: '80%',
                     width: 280,
                     gwidth: 300,
@@ -2057,6 +2057,10 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.tmp_porc_monto_excento_var = undefined;
             }
 
+            if (data.estado == 'vbconta') {
+
+                this.Cmp.obs_monto_no_pagado.allowBlank = false;
+            }
 
             Phx.vista.PlanPago.superclass.onButtonEdit.call(this);
             if (this.Cmp.id_plantilla.getValue()) {
@@ -2653,13 +2657,7 @@ header("content-type: text/javascript; charset=UTF-8");
 
             this.ocultarComponente(this.Cmp.id_proveedor_cta_bancaria);
 
-            if (data.estado == 'borrador') {
-
-                this.Cmp.id_proveedor_cta_bancaria.allowBlank = true;
-                this.ocultarComponente(this.Cmp.id_proveedor_cta_bancaria);
-            }
-
-
+         
         },
 
         successAplicarDesc: function (resp) {

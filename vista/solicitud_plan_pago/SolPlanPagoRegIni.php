@@ -510,7 +510,9 @@ header("content-type: text/javascript; charset=UTF-8");
                     else{
 
                         //prepara pagos iniciales
-                        this.Cmp.tipo.store.loadData(this.arrayStore.INICIAL)
+                        //modificacion para las internacionales muestren solo genere un comprobante
+                        // this.Cmp.tipo.store.loadData(this.arrayStore.INICIAL)
+                        this.Cmp.tipo.store.loadData(this.arrayStore.INT)
 
                     }
                 }

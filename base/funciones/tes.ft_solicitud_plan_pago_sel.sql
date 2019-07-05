@@ -243,7 +243,7 @@ BEGIN
                         op.pago_variable,
                         plapa.monto_anticipo,
                         plapa.fecha_costo_ini,
-                        plapa.fecha_costo_fin,,
+                        plapa.fecha_costo_fin,
                         plapa.fecha_conclusion_pago,
                         funwf.desc_funcionario1::text as funcionario_wf,
                         plapa.tiene_form500,
