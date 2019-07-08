@@ -1054,7 +1054,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 config: {
                     name: 'otros_descuentos',
                     currencyChar: ' ',
-                    fieldLabel: 'Multas',
+                    fieldLabel: 'Multas o Impuestos Retenidos',
                     allowBlank: true,
                     allowNegative: false,
                     gwidth: 100,
@@ -2006,11 +2006,7 @@ header("content-type: text/javascript; charset=UTF-8");
 
 
           //may
-            if (data.estado == 'borrador') {
 
-                this.Cmp.id_proveedor_cta_bancaria.allowBlank = true;
-                this.ocultarComponente(this.Cmp.id_proveedor_cta_bancaria);
-            }
             if (data.estado == 'vbsolicitante') {
 
                 this.ocultarComponente(this.Cmp.id_cuenta_bancaria);
@@ -2059,6 +2055,8 @@ header("content-type: text/javascript; charset=UTF-8");
 
             if (data.estado == 'vbconta') {
 
+                this.Cmp.id_proveedor_cta_bancaria.allowBlank = false;
+                this.mostrarComponente(this.Cmp.id_proveedor_cta_bancaria);
                 this.Cmp.obs_monto_no_pagado.allowBlank = false;
             }
 
@@ -2386,6 +2384,8 @@ header("content-type: text/javascript; charset=UTF-8");
                 me.mostrarGrupo(3); //mostra el grupo rango de costo
                 me.ocultarGrupo(2); //ocultar el grupo de ajustes
 
+                me.ocultarComponente(me.Cmp.id_proveedor_cta_bancaria);
+
 
             },
 
@@ -2405,6 +2405,8 @@ header("content-type: text/javascript; charset=UTF-8");
                 me.Cmp.monto_retgar_mo.setReadOnly(false);
                 me.ocultarGrupo(2); //ocultar el grupo de ajustes
                 me.ocultarGrupo(3); //ocultar el grupo de periodo del costo
+
+                me.ocultarComponente(me.Cmp.id_proveedor_cta_bancaria);
 
 
             },
@@ -2427,12 +2429,16 @@ header("content-type: text/javascript; charset=UTF-8");
                 me.mostrarGrupo(3); //mostra el grupo rango de costo
                 me.ocultarGrupo(2); //ocultar el grupo de ajustes
 
+                me.ocultarComponente(me.Cmp.id_proveedor_cta_bancaria);
+
 
             },
 
             'devengado_pagado_1c': function (me) {
                 //plantilla (TIPO DOCUMENTO)
                 me.setTipoPago['devengado_pagado'](me);
+
+                me.ocultarComponente(me.Cmp.id_proveedor_cta_bancaria);
 
             },
 
@@ -2446,6 +2452,8 @@ header("content-type: text/javascript; charset=UTF-8");
                 me.habilitarDescuentos(me);
                 me.ocultarGrupo(2); //ocultar el grupo de ajustes
                 me.ocultarGrupo(3); //ocultar el grupo de periodo del costo
+
+                me.ocultarComponente(me.Cmp.id_proveedor_cta_bancaria);
 
             },
             'dev_garantia': function (me) {
@@ -2461,6 +2469,8 @@ header("content-type: text/javascript; charset=UTF-8");
                 me.ocultarComponente(me.Cmp.monto_anticipo);
                 me.ocultarGrupo(2); //ocultar el grupo de ajustes
                 me.ocultarGrupo(3); //ocultar el grupo de periodo del costo
+
+                me.ocultarComponente(me.Cmp.id_proveedor_cta_bancaria);
 
 
             },
@@ -2479,7 +2489,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 me.ocultarGrupo(2); //ocultar el grupo de ajustes
                 me.ocultarGrupo(3); //ocultar el grupo de periodo del costo
 
-
+                me.ocultarComponente(me.Cmp.id_proveedor_cta_bancaria);
             },
 
             'pagado': function (me) {
@@ -2492,6 +2502,8 @@ header("content-type: text/javascript; charset=UTF-8");
                 me.ocultarGrupo(2); //ocultar el grupo de ajustes
                 me.ocultarGrupo(3); //ocultar el grupo de periodo del costo
 
+                me.ocultarComponente(me.Cmp.id_proveedor_cta_bancaria);
+
             },
             'pagado_rrhh': function (me) {
                 me.Cmp.id_plantilla.disable();
@@ -2502,6 +2514,8 @@ header("content-type: text/javascript; charset=UTF-8");
                 me.Cmp.monto_retgar_mo.setReadOnly(true);
                 me.ocultarGrupo(2); //ocultar el grupo de ajustes
                 me.ocultarGrupo(3); //ocultar el grupo de periodo del costo
+
+                me.ocultarComponente(me.Cmp.id_proveedor_cta_bancaria);
 
             },
             'ant_parcial': function (me) {
@@ -2524,6 +2538,8 @@ header("content-type: text/javascript; charset=UTF-8");
                 me.ocultarComponente(me.Cmp.monto_anticipo);
                 me.ocultarGrupo(2); //ocultar el grupo de ajustes
                 me.ocultarGrupo(3); //ocultar el grupo de periodo del costo
+
+                me.ocultarComponente(me.Cmp.id_proveedor_cta_bancaria);
 
             },
 
@@ -2548,6 +2564,8 @@ header("content-type: text/javascript; charset=UTF-8");
                 me.ocultarGrupo(2); //ocultar el grupo de ajustes
                 me.mostrarGrupo(3); //ocultar el grupo de periodo del costo
 
+                me.ocultarComponente(me.Cmp.id_proveedor_cta_bancaria);
+
             },
             'ant_aplicado': function (me, data) {
                 me.Cmp.id_plantilla.disable();
@@ -2570,6 +2588,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 }
 
                 me.mostrarGrupo(3);
+                me.ocultarComponente(me.Cmp.id_proveedor_cta_bancaria);
             }
         },
 
