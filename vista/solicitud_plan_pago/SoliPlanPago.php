@@ -978,7 +978,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 config: {
                     name: 'otros_descuentos',
                     currencyChar: ' ',
-                    fieldLabel: 'Multas',
+                    fieldLabel: 'Multas o Impuestos Retenidos',
                     allowBlank: true,
                     allowNegative: false,
                     gwidth: 100,

@@ -498,7 +498,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                         frame: true,
                                         border: false,
                                         layout: 'form',
-                                        title: 'Datos de la Solicitud',
+                                        title: 'DATOS DE LA SOLICITUD',
                                         width: '33%',
 
                                         //margins: '0 0 0 5',
@@ -517,13 +517,32 @@ header("content-type: text/javascript; charset=UTF-8");
                                     xtype: 'fieldset',
                                     frame: true,
                                     layout: 'form',
-                                    title: ' Datos del Pago ',
+                                    title: ' DATOS DEL PAGO ',
                                     width: '33%',
                                     border: false,
                                     //margins: '0 0 0 5',
                                     padding: '0 0 0 10',
                                     bodyStyle: 'padding-left:5px;',
                                     id_grupo: 1,
+                                    items: [],
+                                }]
+                            },
+                            {
+                                bodyStyle: 'padding-right:5px;',
+
+                                border: false,
+                                autoHeight: true,
+                                items: [{
+                                    xtype: 'fieldset',
+                                    frame: true,
+                                    layout: 'form',
+                                    title: ' PERIODO AL QUE CORRESPONDE EL GASTO ',
+                                    width: '33%',
+                                    border: false,
+                                    //margins: '0 0 0 5',
+                                    padding: '0 0 0 10',
+                                    bodyStyle: 'padding-left:5px;',
+                                    id_grupo: 2,
                                     items: [],
                                 }]
                             }
@@ -696,18 +715,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 id_grupo:1,
                 form:true
             },
-            {
-                config:{
-                    name: 'fecha_pp_ini',
-                    fieldLabel: 'Fecha pago',
-                    qtip: 'Fecha tentativa para el pago',
-                    allowBlank: false,
-                    format: 'd/m/Y'
-                },
-                type:'DateField',
-                id_grupo:1,
-                form:true
-            },
+
             {
                 config:{
                     name: 'fecha_costo_ini_pp',
@@ -716,7 +724,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     format: 'd/m/Y'
                 },
                 type:'DateField',
-                id_grupo:1,
+                id_grupo:2,
                 form:true
             },
             {
@@ -727,7 +735,19 @@ header("content-type: text/javascript; charset=UTF-8");
                     format: 'd/m/Y'
                 },
                 type:'DateField',
-                id_grupo:1,
+                id_grupo:2,
+                form:true
+            },
+            {
+                config:{
+                    name: 'fecha_pp_ini',
+                    fieldLabel: 'Fecha pago',
+                    qtip: 'Fecha tentativa para el pago',
+                    allowBlank: false,
+                    format: 'd/m/Y'
+                },
+                type:'DateField',
+                id_grupo:2,
                 form:true
             },
             {

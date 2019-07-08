@@ -526,7 +526,26 @@ Phx.vista.FormObligacion=Ext.extend(Phx.frmInterfaz,{
 			                            id_grupo: 1,
 			                            items: [],
 			                         }]
-		                         }
+		                         },
+                                {
+                                    bodyStyle: 'padding-right:5px;',
+
+                                    border: false,
+                                    autoHeight: true,
+                                    items: [{
+                                        xtype: 'fieldset',
+                                        frame: true,
+                                        layout: 'form',
+                                        title: ' Periodo al que corresponde el Gasto ',
+                                        width: '33%',
+                                        border: false,
+                                        //margins: '0 0 0 5',
+                                        padding: '0 0 0 10',
+                                        bodyStyle: 'padding-left:5px;',
+                                        id_grupo: 2,
+                                        items: [],
+                                    }]
+                                }
     	                      ]
     	                  },
     	                    this.megrid
@@ -705,7 +724,7 @@ Phx.vista.FormObligacion=Ext.extend(Phx.frmInterfaz,{
                 format: 'd/m/Y' 
             },
             type:'DateField',
-            id_grupo:1,
+            id_grupo:2,
             form:true
         },
         {
@@ -716,7 +735,7 @@ Phx.vista.FormObligacion=Ext.extend(Phx.frmInterfaz,{
                 format: 'd/m/Y'
             },
             type:'DateField',
-            id_grupo:1,
+            id_grupo:2,
             form:true
         },
         {
@@ -727,7 +746,7 @@ Phx.vista.FormObligacion=Ext.extend(Phx.frmInterfaz,{
                 format: 'd/m/Y'
             },
             type:'DateField',
-            id_grupo:1,
+            id_grupo:2,
             form:true
         },
         {
