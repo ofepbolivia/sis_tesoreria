@@ -332,7 +332,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 {
                     config:{
                         name: 'monto_pago_mb',
-                        fieldLabel: 'Monto Pago Bs.',
+                        fieldLabel: 'Monto Pago (M.B.)',
                         currencyChar:'Bs. ',
                         allowBlank: true,
                         anchor: '80%',
