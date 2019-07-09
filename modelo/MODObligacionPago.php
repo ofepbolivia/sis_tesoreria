@@ -177,7 +177,7 @@ class MODObligacionPago extends MODbase
         //Ejecuta la instruccion
         $this->armarConsulta();
         $this->ejecutarConsulta();
-
+//var_dump('llega maaaaayyyy', $this->respuesta);
         //Devuelve la respuesta
         return $this->respuesta;
     }

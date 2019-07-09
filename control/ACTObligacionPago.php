@@ -161,6 +161,8 @@ class ACTObligacionPago extends ACTbase
         if ($this->objParam->getParametro('tipo_interfaz') == 'obligacionPagoInterS') {
             $this->objParam->addFiltro("obpg.tipo_obligacion in (''spi'')");
         }
+
+
         //
         
         if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
