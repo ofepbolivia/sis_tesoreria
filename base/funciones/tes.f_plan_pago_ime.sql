@@ -686,6 +686,13 @@ BEGIN
 
                      END IF;
                    --
+                    select tipo_obligacion
+                    into v_tipo_obligacion
+                    from tes.tobligacion_pago
+                    where id_obligacion_pago = v_parametros.id_obligacion_pago;
+
+                   IF (v_tipo_obligacion != 'sp' and v_tipo_obligacion != 'spd' and v_tipo_obligacion != 'spi' and v_tipo_obligacion != 'pago_especial_spi' )THEN
+
                     --valida si forma_pago es igual a forma_pago cuenta bancaria
                    	  IF v_id_cuenta_bancaria is Not NULL THEN
                         select cb.forma_pago, cb.nro_cuenta
@@ -697,7 +704,8 @@ BEGIN
                               raise exception 'Modificar la Forma de Pago, este pertenece como  %  para la Cuenta Bancaria %', UPPER(v_forma_pago_cb), v_nro_cuenta;
                         END IF;
                       END IF;
-                    --
+                   END IF;
+              --
 
                END IF;
 
@@ -1371,7 +1379,8 @@ v_pre_integrar_presupuestos = pxp.f_get_variable_global('pre_integrar_presupuest
                       END IF;
                    ELSE
 
-                 		IF  v_registros.nro_cuenta_bancaria  = '' or  v_registros.nro_cuenta_bancaria is NULL THEN
+                 	  --IF  v_registros.nro_cuenta_bancaria  = '' or  v_registros.nro_cuenta_bancaria is NULL THEN
+                      IF  v_registros.id_proveedor_cta_bancaria  = '' or  v_registros.id_proveedor_cta_bancaria is NULL THEN
 
                          raise exception  'Tiene que especificar el nro de cuenta destino, para la transferencia bancaria';
 
@@ -2239,4 +2248,3 @@ VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
 COST 100;
-
