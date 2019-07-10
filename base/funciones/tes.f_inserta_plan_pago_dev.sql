@@ -433,7 +433,7 @@ BEGIN
                                v_id_estado_actual,
                                NULL,
                                v_registros.id_depto,
-                              ('Solicutd de devengado para la OP:'|| COALESCE(v_registros.numero,'s/n')||' cuota nro'||v_nro_cuota::varchar),
+                              ('Solicitud de devengado para la OP:'|| COALESCE(v_registros.numero,'s/n')||' cuota nro'||v_nro_cuota::varchar),
                                v_registros_tpp.codigo_proceso_llave_wf,
                                COALESCE(v_registros.numero,'s/n')||'-N# '||v_nro_cuota::varchar
                            );
@@ -467,7 +467,7 @@ BEGIN
                            v_registros.id_estado_wf,
                            NULL,
                            v_registros.id_depto,
-                           ('Solicutd de devengado para la OP:'|| v_registros.numero||' cuota nro'||v_nro_cuota::varchar),
+                           ('Solicitud de devengado para la OP:'|| v_registros.numero||' cuota nro'||v_nro_cuota::varchar),
                            v_registros_tpp.codigo_proceso_llave_wf,
                            v_registros.numero||'-N# '||v_nro_cuota::varchar
                          );
@@ -696,5 +696,4 @@ $body$
 LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
-SECURITY INVOKER
 COST 100;

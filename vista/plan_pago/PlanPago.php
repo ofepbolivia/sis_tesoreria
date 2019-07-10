@@ -459,7 +459,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     name: 'tipo',
                     fieldLabel: 'Tipo de Cuota',
                     allowBlank: false,
-                    emptyText: 'Tipo de Cuoata',
+                    emptyText: 'Tipo de Cuota',
                     renderer: function (value, p, record) {
                         var dato = '';
                         dato = (dato == '' && value == 'devengado') ? 'Devengar' : dato;
