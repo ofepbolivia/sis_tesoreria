@@ -1380,7 +1380,7 @@ v_pre_integrar_presupuestos = pxp.f_get_variable_global('pre_integrar_presupuest
                    ELSE
 
                  	  --IF  v_registros.nro_cuenta_bancaria  = '' or  v_registros.nro_cuenta_bancaria is NULL THEN
-                      IF  v_registros.id_proveedor_cta_bancaria  = '' or  v_registros.id_proveedor_cta_bancaria is NULL THEN
+                      IF v_registros.id_proveedor_cta_bancaria is NULL THEN
 
                          raise exception  'Tiene que especificar el nro de cuenta destino, para la transferencia bancaria';
 
@@ -2248,3 +2248,6 @@ VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
 COST 100;
+
+ALTER FUNCTION tes.f_plan_pago_ime (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
+  OWNER TO postgres;
