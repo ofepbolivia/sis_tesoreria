@@ -685,7 +685,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     emptyText:'Elija una plantilla...',
                     store:new Ext.data.JsonStore(
                         {
-                            url: '../../sis_parametros/control/Plantilla/listarPlantilla',
+                            url: '../../sis_parametros/control/Plantilla/listarPlantillaFil',
                             id: 'id_plantilla',
                             root:'datos',
                             sortInfo:{
@@ -741,7 +741,7 @@ header("content-type: text/javascript; charset=UTF-8");
             {
                 config:{
                     name: 'fecha_pp_ini',
-                    fieldLabel: 'Fecha pago',
+                    fieldLabel: 'Fecha Tentativa',
                     qtip: 'Fecha tentativa para el pago',
                     allowBlank: false,
                     format: 'd/m/Y'

@@ -816,7 +816,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 config: {
                     name: 'id_proveedor_cta_bancaria',
                     fieldLabel: 'Cuenta Bancaria(Prov.)',
-                    allowBlank: false,
+                    allowBlank: true,
                     resizable:true,
                     emptyText: 'Elija una Cuenta...',
                     store: new Ext.data.JsonStore(
@@ -1655,6 +1655,7 @@ header("content-type: text/javascript; charset=UTF-8");
         //         me.Cmp.forma_pago.setValue('transferencia');
         //     }
         //
+
         // },
 
 
@@ -2044,6 +2045,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.Cmp.obs_monto_no_pagado.allowBlank = false;
             }
 
+
             Phx.vista.SoliPlanPago.superclass.onButtonEdit.call(this);
             if (this.Cmp.id_plantilla.getValue()) {
                 this.getPlantilla(this.Cmp.id_plantilla.getValue());
@@ -2282,32 +2284,30 @@ header("content-type: text/javascript; charset=UTF-8");
 
         ocultarCheCue: function (me, pFormaPago) {
 
-            if (pFormaPago == 'transferencia') {
+            if (pFormaPago == 'Transferencia') {
 
 
                 //Habilita nrocuenta bancaria destino
                 // me.Cmp.nro_cuenta_bancaria.allowBlank = false;
                 // me.Cmp.nro_cuenta_bancaria.enable()
                 //
-
-                // me.Cmp.nro_cuenta_bancaria.allowBlank = false;
-                // me.Cmp.nro_cuenta_bancaria.enable();
+                me.ocultarComponente(me.Cmp.id_proveedor_cta_bancaria);
                 me.Cmp.id_proveedor_cta_bancaria.allowBlank = false;
-                me.Cmp.id_proveedor_cta_bancaria.enable();
+                // me.Cmp.id_proveedor_cta_bancaria.enable();
 
             }
-            // else {
+            else {
             //
             //     //Habilita nrocuenta bancaria destino
             //     me.Cmp.nro_cuenta_bancaria.allowBlank = true;
             //     me.Cmp.nro_cuenta_bancaria.setValue('');
             //     me.Cmp.nro_cuenta_bancaria.disable();
 
-
-            // me.Cmp.id_proveedor_cta_bancaria.allowBlank = true;
-            // me.Cmp.id_proveedor_cta_bancaria.setValue('');
-            // me.Cmp.id_proveedor_cta_bancaria.disable();
-            // }
+                me.mostrarComponente(me.Cmp.id_proveedor_cta_bancaria);
+                me.Cmp.id_proveedor_cta_bancaria.allowBlank = true;
+                me.Cmp.id_proveedor_cta_bancaria.setValue('');
+                // me.Cmp.id_proveedor_cta_bancaria.disable();
+            }
 
         },
 
@@ -2620,6 +2620,7 @@ header("content-type: text/javascript; charset=UTF-8");
             }
 
             this.Cmp.forma_pago.disable();
+
 
             //para listar las cuentas de banco de un proveedor
             this.Cmp.id_proveedor_cta_bancaria.store.baseParams.id_proveedor = this.maestro.id_proveedor;
