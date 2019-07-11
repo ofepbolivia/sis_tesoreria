@@ -26,7 +26,6 @@ LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
-PARALLEL UNSAFE
 COST 100;
 
 ALTER FUNCTION tes.f_dif_debe_haber_libro (p_id_cuenta_bancaria integer)
