@@ -1940,3 +1940,11 @@ ALTER TABLE tes.tobligacion_pago
 ALTER TABLE tes.tobligacion_pago
   ADD CONSTRAINT chk_tobligacion_pago__tipo_obligacion CHECK ((tipo_obligacion)::text = ANY (ARRAY[('adquisiciones'::character varying)::text, ('pago_unico'::character varying)::text, ('pago_especial'::character varying)::text, ('caja_chica'::character varying)::text, ('viaticos'::character varying)::text, ('fondos_en_avance'::character varying)::text, ('pago_directo'::character varying)::text, ('rrhh'::character varying)::text, ('pga'::character varying)::text, ('ppm'::character varying)::text, ('pce'::character varying)::text, ('pbr'::character varying)::text, ('sp'::character varying)::text, ('spd'::character varying)::text, ('spi'::character varying)::text, ('pago_especial_spi'::character varying)::text]));
 /*****************************F-SCP-MAY-TES-0-09/07/2019*************/
+
+/*****************************I-SCP-MAY-TES-0-11/07/2019*************/
+ALTER TABLE tes.tobligacion_pago
+  ADD COLUMN fecha_conclusion_pago DATE;
+
+COMMENT ON COLUMN tes.tobligacion_pago.fecha_conclusion_pago
+IS 'fecha vencimiento para reflejar en plan de pago';
+/*****************************F-SCP-MAY-TES-0-111/07/2019*************/

@@ -303,7 +303,8 @@ $body$
                 id_funcionario_gerente,
                 id_contrato,
                 fecha_costo_ini_pp,
-                fecha_costo_fin_pp
+                fecha_costo_fin_pp,
+                fecha_conclusion_pago
 
                 ) values(
                 (p_hstore->'id_proveedor')::integer,
@@ -339,7 +340,8 @@ $body$
                  va_id_funcionario_gerente[1],
                 (p_hstore->'id_contrato')::integer,
                 (p_hstore->'fecha_costo_ini_pp')::date,
-                (p_hstore->'fecha_costo_fin_pp')::date
+                (p_hstore->'fecha_costo_fin_pp')::date,
+                (p_hstore->'fecha_conclusion_pago')::date
 
                 )RETURNING id_obligacion_pago into v_id_obligacion_pago;
 
@@ -446,5 +448,4 @@ $body$
 LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
-SECURITY INVOKER
 COST 100;

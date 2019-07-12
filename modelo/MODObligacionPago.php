@@ -708,6 +708,7 @@ class MODObligacionPago extends MODbase
 
             $this->setParametro('fecha_costo_ini_pp', 'fecha_costo_ini_pp', 'date');
             $this->setParametro('fecha_costo_fin_pp', 'fecha_costo_fin_pp', 'date');
+            $this->setParametro('fecha_conclusion_pago', 'fecha_conclusion_pago', 'date');
 
             //Ejecuta la instruccion
             $this->armarConsulta();

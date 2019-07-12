@@ -78,6 +78,7 @@ DECLARE
     v_codigo_tipo_relacion			varchar;
 
 	v_cuenta_bancaria_benef			varchar;
+    v_fecha_conclusion				date;
 
 BEGIN
 
@@ -438,8 +439,8 @@ BEGIN
                                COALESCE(v_registros.numero,'s/n')||'-N# '||v_nro_cuota::varchar
                            );
 
-                 select op.fecha_costo_ini_pp, op.fecha_costo_fin_pp
-                 into v_fecha_ini_pp, v_fecha_fin_pp
+                 select op.fecha_costo_ini_pp, op.fecha_costo_fin_pp, op.fecha_conclusion_pago
+                 into v_fecha_ini_pp, v_fecha_fin_pp, v_fecha_conclusion
                  from tes.tobligacion_pago op
                  where op.id_obligacion_pago = (p_hstore->'id_obligacion_pago')::integer;
 
@@ -622,10 +623,11 @@ BEGIN
             (p_hstore->'id_proveedor_cta_bancaria')::integer
            )RETURNING id_plan_pago into v_id_plan_pago;
 
-           IF (v_fecha_ini_pp is not Null or v_fecha_fin_pp is not Null) THEN
+           IF (v_fecha_ini_pp is not Null or v_fecha_fin_pp is not Null or v_fecha_conclusion is not Null) THEN
            update tes.tplan_pago set
            fecha_costo_ini = v_fecha_ini_pp,
-           fecha_costo_fin = v_fecha_fin_pp
+           fecha_costo_fin = v_fecha_fin_pp,
+           fecha_conclusion_pago = v_fecha_conclusion
            where id_obligacion_pago = (p_hstore->'id_obligacion_pago')::integer;
            END IF;
 

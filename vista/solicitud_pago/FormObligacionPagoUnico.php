@@ -585,7 +585,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     qtip: 'Según esta fecha se escoje el formulario de solicitud',
                     readOnly : false,
                     allowBlank: false,
-                    gwidth: 100,
+                    anchor:'95%',
                     format: 'd/m/Y'
                 },
                 type: 'DateField',
@@ -599,7 +599,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     origen:'FUNCIONARIOCAR',
                     fieldLabel:'Funcionario',
                     allowBlank:false,
-                    gwidth:200,
+                    anchor: '95%',
                     valueField: 'id_funcionario',
                     gdisplayField: 'desc_funcionario',
                     baseParams: { es_combo_solicitud : 'si' } },
@@ -613,7 +613,8 @@ header("content-type: text/javascript; charset=UTF-8");
                     url: '../../sis_parametros/control/Depto/listarDeptoFiltradoXUsuario',
                     fieldLabel: 'Depto',
                     allowBlank: false,
-                    anchor: '80%',
+                    anchor: '95%',
+                    //gwidth:200,
                     origen: 'DEPTO',
                     tinit: false,
                     baseParams:{estado:'activo',codigo_subsistema:'TES',modulo:'OP'}//parametros adicionales que se le pasan al store
@@ -628,7 +629,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 config: {
                     name: 'id_moneda',
                     fieldLabel: 'Moneda',
-                    anchor: '80%',
+                    anchor: '100%',
                     tinit: false,
                     allowBlank: false,
                     origen: 'MONEDA'
@@ -642,7 +643,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     name: 'tipo_cambio_conv',
                     fieldLabel: 'Tipo Cambio',
                     allowBlank: false,
-                    anchor: '80%',
+                    anchor: '100%%',
                     maxLength:131074
                 },
                 type:'NumberField',
@@ -654,7 +655,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 config: {
                     name: 'id_proveedor',
                     fieldLabel: 'Proveedor',
-                    anchor: '80%',
+                    anchor: '100%',
                     tinit: false,
                     allowBlank: false,
                     origen: 'PROVEEDOR',
@@ -671,7 +672,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     fieldLabel: 'Desc',
                     allowBlank: false,
                     qtip: 'Descripcion del objetivo del pago, o Si el proveedor es PASAJEROS PERJUDICADOS aqui va el nombre del pasajero',
-                    anchor: '90%',
+                    anchor: '95%',
                     maxLength:1000
                 },
                 type:'TextArea',
@@ -702,6 +703,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     hiddenValue: 'id_plantilla',
                     displayField: 'desc_plantilla',
                     listWidth:'280',
+                    anchor:'100%',
                     forceSelection:true,
                     typeAhead: false,
                     triggerAction: 'all',
@@ -715,12 +717,25 @@ header("content-type: text/javascript; charset=UTF-8");
                 id_grupo:1,
                 form:true
             },
-
+            {
+                config:{
+                    name: 'fecha_pp_ini',
+                    fieldLabel: 'Fecha Tentativa',
+                    qtip: 'Fecha tentativa para el pago',
+                    allowBlank: false,
+                    gwidth: 100,
+                    format: 'd/m/Y'
+                },
+                type:'DateField',
+                id_grupo:2,
+                form:true
+            },
             {
                 config:{
                     name: 'fecha_costo_ini_pp',
                     fieldLabel: 'Fecha Inicio',
                     allowBlank: false,
+                    gwidth: 100,
                     format: 'd/m/Y'
                 },
                 type:'DateField',
@@ -732,6 +747,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     name: 'fecha_costo_fin_pp',
                     fieldLabel: 'Fecha Fin',
                     allowBlank: false,
+                    gwidth: 100,
                     format: 'd/m/Y'
                 },
                 type:'DateField',
@@ -739,17 +755,19 @@ header("content-type: text/javascript; charset=UTF-8");
                 form:true
             },
             {
-                config:{
-                    name: 'fecha_pp_ini',
-                    fieldLabel: 'Fecha Tentativa',
-                    qtip: 'Fecha tentativa para el pago',
-                    allowBlank: false,
+                config: {
+                    name: 'fecha_conclusion_pago',
+                    fieldLabel: 'Fecha Vencimiento de Pago',
+                    allowBlank: true,
+                    gwidth: 100,
                     format: 'd/m/Y'
                 },
-                type:'DateField',
-                id_grupo:2,
-                form:true
+                type: 'DateField',
+                //filters: {pfiltro: 'plapa.fecha_conclusion_pago', type: 'date'},
+                id_grupo: 2,
+                form: true
             },
+
             {
                 //configuracion del componente
                 config:{
