@@ -1947,4 +1947,4 @@ ALTER TABLE tes.tobligacion_pago
 
 COMMENT ON COLUMN tes.tobligacion_pago.fecha_conclusion_pago
 IS 'fecha vencimiento para reflejar en plan de pago';
-/*****************************F-SCP-MAY-TES-0-111/07/2019*************/
+/*****************************F-SCP-MAY-TES-0-11/07/2019*************/

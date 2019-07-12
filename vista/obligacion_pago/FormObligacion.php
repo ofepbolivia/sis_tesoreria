@@ -585,7 +585,7 @@ Phx.vista.FormObligacion=Ext.extend(Phx.frmInterfaz,{
                 qtip: 'Según esta fecha se escoje el formulario de solicitud', 
                 readOnly : false,
                 allowBlank: false,
-                anchor:'93%',
+                anchor:'95%',
                 format: 'd/m/Y'
             },
             type: 'DateField',
@@ -599,7 +599,7 @@ Phx.vista.FormObligacion=Ext.extend(Phx.frmInterfaz,{
                 origen:'FUNCIONARIOCAR',
                 fieldLabel:'Funcionario',
                 allowBlank:false,
-                gwidth:200,
+                anchor: '95%',
                 valueField: 'id_funcionario',
                 gdisplayField: 'desc_funcionario',
                 baseParams: { es_combo_solicitud : 'si' } },
@@ -613,7 +613,7 @@ Phx.vista.FormObligacion=Ext.extend(Phx.frmInterfaz,{
                 url: '../../sis_parametros/control/Depto/listarDeptoFiltradoXUsuario',
                 fieldLabel: 'Depto',
                 allowBlank: false,
-                gwidth:200,
+                anchor: '95%',
                 origen: 'DEPTO',
                 tinit: false,
                 baseParams:{estado:'activo',codigo_subsistema:'TES',modulo:'OP'}//parametros adicionales que se le pasan al store
@@ -671,7 +671,7 @@ Phx.vista.FormObligacion=Ext.extend(Phx.frmInterfaz,{
 				fieldLabel: 'Desc',
 				allowBlank: false,
 				qtip: 'Descripcion del objetivo del pago, o Si el proveedor es PASAJEROS PERJUDICADOS aqui va el nombre del pasajero',
-                anchor: '93%',
+                anchor: '95%',
 				maxLength:1000
 			},
 			type:'TextArea',
