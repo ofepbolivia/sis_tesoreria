@@ -142,7 +142,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 {
                     config:{
                         name: 'descripcion',
-                        fieldLabel: 'Descripión',
+                        fieldLabel: 'Descripción',
                         allowBlank: false,
                         anchor: '80%',
                         gwidth: 200,
