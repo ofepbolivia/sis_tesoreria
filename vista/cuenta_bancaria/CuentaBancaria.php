@@ -88,7 +88,8 @@ Phx.vista.CuentaBancaria=Ext.extend(Phx.gridInterfaz,{
 				origen: 'INSTITUCION',
 				baseParams:{es_banco:'si'},
 				gdisplayField: 'nombre_institucion',
-				gwidth: 200,
+                anchor: '80%',
+                gwidth: 250,
 				renderer:function (value, p, record){return String.format('{0}', record.data['nombre_institucion']);}
 			},
 			type: 'ComboRec',
@@ -135,8 +136,8 @@ Phx.vista.CuentaBancaria=Ext.extend(Phx.gridInterfaz,{
 				name: 'centro',
 				fieldLabel: 'Central',
 				allowBlank: false,
-				anchor: '60%',
-				gwidth: 100,
+				anchor: '80%',
+				gwidth: 250,
 				maxLength:25,
 				typeAhead:true,
 				triggerAction:'all',
@@ -156,7 +157,7 @@ Phx.vista.CuentaBancaria=Ext.extend(Phx.gridInterfaz,{
 				fieldLabel: 'Fecha Alta',
 				allowBlank: true,
 				anchor: '80%',
-				gwidth: 100,
+				gwidth: 250,
 						format: 'd/m/Y', 
 						renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
 			},
@@ -172,7 +173,7 @@ Phx.vista.CuentaBancaria=Ext.extend(Phx.gridInterfaz,{
 				fieldLabel: 'Debe - Haber',
 				allowBlank: false,
 				anchor: '80%',
-				gwidth: 100				
+				gwidth: 250
 			},
 				type:'NumberField',				
 				bottom_filter: true,
@@ -180,32 +181,77 @@ Phx.vista.CuentaBancaria=Ext.extend(Phx.gridInterfaz,{
 				grid:true,
 				form:false
 		},        
-		{
+		// {
+         //    config:{
+         //        name:'id_moneda',
+         //        origen:'MONEDA',
+         //        allowBlank:true,
+         //        fieldLabel:'Moneda',
+         //        gdisplayField:'codigo_moneda',//mapea al store del grid
+         //        gwidth:50,
+         //      //   renderer:function (value, p, record){return String.format('{0}', record.data['codigo_moenda']);}
+         //     },
+         //    type:'ComboRec',
+         //    id_grupo:1,
+         //    filters:{
+         //        pfiltro:'mon.codigo',
+         //        type:'string'
+         //    },
+         //    grid:true,
+         //    form:true
+         //  },
+        {
             config:{
                 name:'id_moneda',
-                origen:'MONEDA',
-                allowBlank:true,
                 fieldLabel:'Moneda',
-                gdisplayField:'codigo_moneda',//mapea al store del grid
-                gwidth:50,
-              //   renderer:function (value, p, record){return String.format('{0}', record.data['codigo_moenda']);}
-             },
-            type:'ComboRec',
-            id_grupo:1,
-            filters:{   
-                pfiltro:'mon.codigo',
+                allowBlank:false,
+                anchor: '80%',
+                gwidth: 250,
+                emptyText:'Moneda...',
+                store: new Ext.data.JsonStore({
+
+                    url: '../../sis_parametros/control/Moneda/listarMoneda',
+                    id: 'id_moneda',
+                    root: 'datos',
+                    sortInfo:{
+                        field: 'prioridad',
+                        direction: 'ASC'
+                    },
+                    totalProperty: 'total',
+                    fields: ['id_moneda','codigo','moneda'],
+                    // turn on remote sorting
+                    remoteSort: true,
+                    baseParams:{par_filtro:'codigo#moneda'}
+                }),
+                valueField: 'id_moneda',
+                displayField: 'moneda',
+                gdisplayField:'codigo_moneda',
+                hiddenName: 'id_moneda',
+                forceSelection:true,
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode:'remote',
+                pageSize:10,
+                queryDelay:1000,
+                width:300,
+                minChars:2
+            },
+            type:'ComboBox',
+            id_grupo:0,
+            filters:{   pfiltro:'mon.codigo',
                 type:'string'
             },
             grid:true,
             form:true
-          },
+        },
 		{
 			config:{
 				name: 'fecha_baja',
 				fieldLabel: 'Fecha Baja',
 				allowBlank: true,
 				anchor: '80%',
-				gwidth: 100,
+				gwidth: 250,
 						format: 'd/m/Y', 
 						renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
 			},
@@ -297,6 +343,8 @@ Phx.vista.CuentaBancaria=Ext.extend(Phx.gridInterfaz,{
        				name:'id_finalidads',
        				fieldLabel:'Finalidades',
        				allowBlank:true,
+                    anchor: '80%',
+                    gwidth: 250,
        				emptyText:'Roles...',
        				store: new Ext.data.JsonStore({
               			url: '../../sis_tesoreria/control/Finalidad/listarFinalidad',
@@ -337,6 +385,8 @@ Phx.vista.CuentaBancaria=Ext.extend(Phx.gridInterfaz,{
                 name: 'forma_pago',
                 fieldLabel: 'Forma de Pago',
                 allowBlank: false,
+                anchor: '80%',
+                gwidth: 250,
                 emptyText:'Forma de Pago...',
                 store:new Ext.data.JsonStore(
                     {
