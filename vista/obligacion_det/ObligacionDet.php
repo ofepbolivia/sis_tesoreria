@@ -101,7 +101,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 {
                     config:{
                         name:'id_concepto_ingas',
-                        fieldLabel:'Concepto Ingreso Gasto',
+                        fieldLabel:'Concepto Ingreso Gastooo',
                         allowBlank:false,
                         emptyText:'Concepto Ingreso Gasto...',
                         store: new Ext.data.JsonStore({
