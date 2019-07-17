@@ -142,7 +142,7 @@ BEGIN
                 END IF;
             END IF;
 
-            IF(v_parametros.tipo in ('cheque','debito_automatico','transferencia_carta','transf_interna_debe','transf_interna_haber'))Then
+            IF(v_parametros.tipo in ('cheque','debito_automatico','transferencia_carta', 'transferencia_fondos', 'transf_interna_debe','transf_interna_haber'))Then
 
               IF g_centro != 'otro' THEN
                   --Comparamos el saldo de la cuenta bancaria con el importe del cheque
@@ -444,7 +444,8 @@ BEGIN
 		fecha_mod=now(),
 		id_usuario_mod = p_id_usuario,
         id_finalidad = v_parametros.id_finalidad,
-        comprobante_sigma = v_parametros.comprobante_sigma
+        comprobante_sigma = v_parametros.comprobante_sigma,
+        fecha_pago = v_parametros.fecha_pago
 		WHERE tes.tts_libro_bancos.id_libro_bancos = v_parametros.id_libro_bancos;
 
         if(g_verifica_documento = 'si')then

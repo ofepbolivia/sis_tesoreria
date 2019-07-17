@@ -61,6 +61,7 @@ class MODTsLibroBancos extends MODbase{
 		$this->captura('fondo_devolucion_retencion','varchar');
 		$this->captura('tramite','varchar');
 		$this->captura('comprobante_sigep','varchar');
+		$this->captura('fecha_pago','date');
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		//var_dump($this->consulta);exit;
@@ -84,7 +85,8 @@ class MODTsLibroBancos extends MODbase{
 		$this->captura('observaciones','text');
 		$this->captura('importe_deposito','numeric');
 		$this->captura('saldo','numeric');
-		
+		//$this->captura('fecha_pago','date');
+
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
@@ -158,6 +160,7 @@ class MODTsLibroBancos extends MODbase{
 		$this->setParametro('estado_reg','estado_reg','varchar');
 		$this->setParametro('tipo','tipo','varchar');
 		$this->setParametro('id_finalidad','id_finalidad','int4');
+		$this->setParametro('fecha_pago','fecha_pago','date');
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
@@ -193,6 +196,7 @@ class MODTsLibroBancos extends MODbase{
 		$this->setParametro('tipo','tipo','varchar');
 		$this->setParametro('id_finalidad','id_finalidad','int4');
 		$this->setParametro('nro_deposito','nro_deposito','int4');
+		$this->setParametro('fecha_pago','fecha_pago','date');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

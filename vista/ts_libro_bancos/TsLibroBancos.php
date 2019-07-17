@@ -11,7 +11,8 @@ header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
 Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
-	
+
+
 	constructor:function(config){
 		this.maestro=config.maestro;
     	//llama al constructor de la clase padre
@@ -168,7 +169,8 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
 				name: 'fecha',
 				fieldLabel: 'Fecha',
 				allowBlank: false,
-				anchor: '80%',
+				//anchor: '80%',
+                width: 177,
 				gwidth: 90,
 				format: 'd/m/Y', 
 				renderer:function (value,p,record){
@@ -259,7 +261,7 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'nro_comprobante',
-				fieldLabel: 'Nro Comprobante',
+				fieldLabel: 'N° de Pago(Sigep)',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
@@ -274,7 +276,7 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'comprobante_sigma',
-				fieldLabel: 'Comprobante Sigma',
+				fieldLabel: 'N° de C31',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 125,
@@ -286,6 +288,24 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
 				grid:true,
 				form:true
 		},
+
+        {
+            config:{
+                name: 'fecha_pago',
+                fieldLabel: 'Fecha de Pago',
+                allowBlank: true,
+                //anchor: '80%',
+                width: 177,
+                gwidth: 100,
+                format: 'd/m/Y',
+                renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
+            },
+            type:'DateField',
+            filters:{pfiltro:'lban.fecha_pago',type:'date'},
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
 		{
 			config:{
 				name:'tipo',
@@ -303,7 +323,8 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
                             data : [ ['cheque','Cheque'],
 									 ['deposito','Depósito'],
 									 ['debito_automatico','Débito Automativo'],
-									 ['transferencia_carta','Transferencia con Carta']
+									 ['transferencia_carta','Transferencia con Carta'],
+                                     ['transferencia_fondos','Transferencia de Fondos']
                                     ]
                                     }),
 				valueField: 'variable',
@@ -314,7 +335,7 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
 			filters:{	
 					 type: 'list',
 					  pfiltro:'lban.tipo',
-					 options: ['cheque','deposito','debito_automatico','transferencia_carta'],	
+					 options: ['cheque','deposito','debito_automatico','transferencia_carta', 'transferencia_fondos'],
 				},
 			grid:true,
 			form:true
@@ -666,7 +687,8 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
 		{name:'color', type: 'string'},
 		{name:'saldo_deposito', type: 'numeric'},
 		{name:'nombre_regional', type: 'string'},
-		{name:'sistema_origen', type: 'string'}
+		{name:'sistema_origen', type: 'string'},
+		{name:'fecha_pago', type: 'string'},
 	],
 	sortInfo:{
 		field: 'fecha',
@@ -676,7 +698,7 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
 	bsave:false,
 	bnew:true,
 	bedit:true,
-	fheight:'80%',
+	fheight:'90%',
 	
 	loadValoresIniciales:function(){
 		Phx.vista.TsLibroBancos.superclass.loadValoresIniciales.call(this);

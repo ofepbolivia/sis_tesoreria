@@ -87,7 +87,8 @@ BEGIN
                              lban.notificado,
                              lban.fondo_devolucion_retencion,
                              tc.nro_tramite as tramite,
-                             com.c31 as comprobante_sigep
+                             com.c31 as comprobante_sigep,
+                             lban.fecha_pago
                              from tes.vlibro_bancos lban  
                              left join cd.tdeposito_cd td on td.id_libro_bancos = lban.id_libro_bancos
                              left join cd.tcuenta_doc tc on tc.id_cuenta_doc = td.id_cuenta_doc 

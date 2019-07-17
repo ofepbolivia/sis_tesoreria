@@ -283,7 +283,8 @@ BEGIN
                 sistema_origen,
                 comprobante_sigma,
                 id_int_comprobante,
-                nro_deposito
+                nro_deposito,
+                fecha_pago
                 ) values(            
                 (p_hstore->'id_cuenta_bancaria')::integer,
                 upper(translate ((p_hstore->'a_favor')::varchar, 'áéíóúÁÉÍÓÚäëïöüÄËÏÖÜñ', 'aeiouAEIOUaeiouAEIOUÑ')),
@@ -311,7 +312,8 @@ BEGIN
                 (p_hstore->'sistema_origen')::varchar,
                 (p_hstore->'comprobante_sigma')::varchar,
                 (p_hstore->'id_int_comprobante')::integer,				
-                (p_hstore->'nro_deposito')::integer
+                (p_hstore->'nro_deposito')::integer,
+                (p_hstore->'fecha_pago')::date
                 )RETURNING id_libro_bancos into v_id_libro_bancos;    		
             
             ELSE
@@ -344,7 +346,8 @@ BEGIN
                   sistema_origen,
                   comprobante_sigma,
                   id_int_comprobante,
-                  nro_deposito
+                  nro_deposito,
+                  fecha_pago
                   ) values(            
                   (p_hstore->'id_cuenta_bancaria')::integer,
                   (p_hstore->'fecha')::date,
@@ -373,7 +376,8 @@ BEGIN
                   (p_hstore->'sistema_origen')::varchar,
                   (p_hstore->'comprobante_sigma')::varchar,
                   (p_hstore->'id_int_comprobante')::integer,
-                  (p_hstore->'nro_deposito')::integer				
+                  (p_hstore->'nro_deposito')::integer,
+                  (p_hstore->'fecha_pago')::date
                   )RETURNING id_libro_bancos into v_id_libro_bancos;
     		
             END IF;
