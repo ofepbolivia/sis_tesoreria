@@ -416,7 +416,7 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
 				mode: 'local',
 				valueField: 'estilo',
 				gwidth: 60,
-				store:['CBB','SRZ','LPB','TJA','SRE','CIJ','TDD','UYU','MIA','MAD']
+				store:['BUE','SLA','CBB','SRZ','LPB','TJA','SRE','CIJ','TDD','MIA','MAD','SAO']
 			},
 			type:'ComboBox',
 			id_grupo:1,
@@ -706,8 +706,11 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
 	},
 	
 	onButtonNew:function(){
+        console.log('fecha ',this);
 		Phx.vista.TsLibroBancos.superclass.onButtonNew.call(this); 	    
 		this.cmpIdLibroBancosFk.setValue(this.maestro.id_libro_bancos);
+        var date = new Date();
+        this.cmpFecha.setValue(date.dateFormat('d/m/Y'));
 		this.cmpDepto.enable();
 		this.cmpFecha.enable();
 		this.cmpTipo.enable();

@@ -123,6 +123,9 @@ class MODPlanPago extends MODbase{
 
         $this->captura('monto_establecido','numeric');
         $this->captura('id_proveedor','int4');
+        $this->captura('nit','varchar');
+
+        $this->captura('id_proveedor_cta_bancaria','integer');
 
         //Ejecuta la instruccion
         $this->armarConsulta();
@@ -209,7 +212,7 @@ class MODPlanPago extends MODbase{
         $this->setParametro('es_ultima_cuota','es_ultima_cuota','boolean');
 
         $this->setParametro('monto_establecido','monto_establecido','numeric');
-
+        $this->setParametro('id_proveedor_cta_bancaria','id_proveedor_cta_bancaria','int4');
 
 
 
@@ -270,6 +273,7 @@ class MODPlanPago extends MODbase{
         $this->setParametro('es_ultima_cuota','es_ultima_cuota','boolean');
 
         $this->setParametro('monto_establecido','monto_establecido','numeric');
+        $this->setParametro('id_proveedor_cta_bancaria','id_proveedor_cta_bancaria','int4');
 
 
 

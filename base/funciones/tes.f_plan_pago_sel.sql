@@ -264,7 +264,10 @@ BEGIN
                         tcon.fecha_costo_ini as fecha_cbte_ini,
                         tcon.fecha_costo_fin as fecha_cbte_fin,
                         plapa.monto_establecido,
-                        pro.id_proveedor
+                        pro.id_proveedor,
+                        pro.nit,
+                        plapa.id_proveedor_cta_bancaria
+
                         from tes.tplan_pago plapa
                         inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = plapa.id_proceso_wf
                         inner join tes.tobligacion_pago op on op.id_obligacion_pago = plapa.id_obligacion_pago
@@ -1261,8 +1264,4 @@ $body$
 LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
-SECURITY INVOKER
 COST 100;
-
-ALTER FUNCTION tes.f_plan_pago_sel (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
-  OWNER TO postgres;

@@ -135,6 +135,7 @@ BEGIN
             --if(v_id_usuario!=1)then
 				v_consulta:='select DISTINCT
                                 ctaban.id_cuenta_bancaria,
+                                tes.f_dif_debe_haber_libro(ctaban.id_cuenta_bancaria) as d_deb_hab,
                                 ctaban.estado_reg,
                                 ctaban.fecha_baja,
                                 ctaban.nro_cuenta,

@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION tes.f_inserta_plan_pago_dev (
+CREATE OR REPLACE FUNCTION tes.ft_solicitud_inserta_plan_pago_dev (
   p_administrador integer,
   p_id_usuario integer,
   p_hstore public.hstore,
@@ -8,10 +8,10 @@ RETURNS varchar AS
 $body$
 /**************************************************************************
  SISTEMA:		Adquisiciones
- FUNCION: 		tes.f_inserta_plan_pago_dev
+ FUNCION: 		tes.ft_solicitud_inserta_plan_pago_dev
  DESCRIPCION:   Inserta registro de cotizacion
- AUTOR: 		Rensi Arteaga COpar
- FECHA:	        26-1-2014
+ AUTOR: 		admin
+ FECHA:	        12-12-2018
  COMENTARIOS:
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
@@ -23,9 +23,9 @@ $body$
 
 DECLARE
 
-    v_resp		           			varchar;
-	v_nombre_funcion       			text;
-	v_mensaje_error         		text;
+    v_resp		            varchar;
+	v_nombre_funcion        text;
+	v_mensaje_error         text;
 
     v_id_cuenta_bancaria 			integer;
     v_id_cuenta_bancaria_mov 		integer;
@@ -61,24 +61,23 @@ DECLARE
     v_porc_monto_retgar             numeric;
 
     v_monto_ant_parcial_descontado  numeric;
-    v_saldo_x_pagar  				numeric;
-    v_saldo_x_descontar   			numeric;
+    v_saldo_x_pagar  numeric;
+    v_saldo_x_descontar   numeric;
 
-    v_resp_doc   					boolean;
-    v_obligacion					record;
+    v_resp_doc   boolean;
+    v_obligacion	record;
 
-    v_monto_anticipo  				numeric;
-    v_check_ant_mixto 				numeric;
+    v_monto_anticipo  numeric;
+    v_check_ant_mixto numeric;
 
-    v_fecha_ini_pp					date;
-    v_fecha_fin_pp 					date;
+    v_fecha_ini_pp		date;
+    v_fecha_fin_pp 		date;
 
-    v_monto_establecido				numeric;
-    v_porcentaje13_monto			numeric;
-    v_codigo_tipo_relacion			varchar;
 
-	v_cuenta_bancaria_benef			varchar;
-    v_fecha_conclusion				date;
+
+v_cuenta_bancaria_benef		varchar;
+v_tipo_obligacion			varchar;
+
 
 BEGIN
 
@@ -125,7 +124,7 @@ BEGIN
     */
 
 
-          v_nombre_funcion = 'tes.f_inserta_plan_pago_dev';
+          v_nombre_funcion = 'tes.ft_solicitud_inserta_plan_pago_dev';
 
           select * into v_obligacion
           from tes.tobligacion_pago op
@@ -134,26 +133,38 @@ BEGIN
          --determinar exixtencia de parametros dinamicos para registro
          -- (Interface de obligacions de adquisocines o interface de obligaciones tesoeria)
          -- la adquisiciones tiene menos parametros presentes
-
+			select tipo_obligacion
+            into v_tipo_obligacion
+            from tes.tobligacion_pago
+            where id_obligacion_pago = (p_hstore->'id_obligacion_pago')::integer;
 
              v_id_cuenta_bancaria =  (p_hstore->'id_cuenta_bancaria')::integer;
              v_id_cuenta_bancaria_mov =  (p_hstore->'id_cuenta_bancaria_mov')::integer;
              v_forma_pago =  (p_hstore->'forma_pago')::varchar;
              v_nro_cheque =  (p_hstore->'nro_cheque')::integer;
+
+             IF v_tipo_obligacion = 'sp' or v_tipo_obligacion = 'spd' then
+
+            		  select pcb.nro_cuenta ||'-'|| ins.nombre
+                      into v_cuenta_bancaria_benef
+                      from param.tproveedor_cta_bancaria pcb
+                      left join param.tinstitucion ins on ins.id_institucion=pcb.id_banco_beneficiario
+                      --left join tes.tplan_pago pp on pp.id_proveedor_cta_bancaria = pcb.id_proveedor_cta_bancaria
+                      where pcb.id_proveedor_cta_bancaria = (p_hstore->'id_proveedor_cta_bancaria')::integer;
+
+             		v_nro_cuenta_bancaria = v_cuenta_bancaria_benef::varchar;
+
+             ELSE
+
+                    v_nro_cuenta_bancaria =  (p_hstore->'nro_cuenta_bancaria')::varchar;
+             end IF;
+
              --v_nro_cuenta_bancaria =  (p_hstore->'nro_cuenta_bancaria')::varchar;
              v_porc_monto_excento_var = (p_hstore->'porc_monto_excento_var')::numeric;
              v_monto_excento = (p_hstore->'monto_excento')::numeric;
              v_monto_anticipo = COALESCE((p_hstore->'monto_anticipo')::numeric, 0);
 
-            --modificacion para v_nro_cuenta_bancaria
-				select ins.nombre||'-'|| pcb.nro_cuenta
-                into v_cuenta_bancaria_benef
-                from param.tproveedor_cta_bancaria pcb
-                left join param.tinstitucion ins on ins.id_institucion=pcb.id_banco_beneficiario
-                where pcb.id_proveedor_cta_bancaria = (p_hstore->'id_proveedor_cta_bancaria')::integer;
 
-             v_nro_cuenta_bancaria = v_cuenta_bancaria_benef::varchar;
-			--
            -- segun el tipo  recuepramos el tipo_plan_pago, determinamos el flujos para el WF
            select
             tpp.id_tipo_plan_pago,
@@ -260,7 +271,7 @@ BEGIN
 
           v_monto_ant_parcial_descontado = tes.f_determinar_total_faltante((p_hstore->'id_obligacion_pago')::integer, 'ant_parcial_descontado' );
           IF v_monto_ant_parcial_descontado <  COALESCE((p_hstore->'descuento_anticipo')::numeric,0)  THEN
-              raise exception 'El descuento por anticipo no puede exceder el faltante por descontar que es  %',v_monto_ant_parcial_descontado;
+              raise exception 'El decuento por anticipo no puede exceder el faltante por descontar que es  %',v_monto_ant_parcial_descontado;
           END IF;
 
 
@@ -273,21 +284,6 @@ BEGIN
 
           v_liquido_pagable = COALESCE((p_hstore->'monto')::numeric,0)  - COALESCE((p_hstore->'monto_no_pagado')::numeric,0) - COALESCE((p_hstore->'otros_descuentos')::numeric,0) - COALESCE((p_hstore->'monto_retgar_mo')::numeric,0) - COALESCE((p_hstore->'descuento_ley')::numeric,0) - COALESCE((p_hstore->'descuento_anticipo')::numeric,0) - COALESCE((p_hstore->'descuento_inter_serv')::numeric,0);
           v_monto_ejecutar_total_mo  = COALESCE((p_hstore->'monto')::numeric,0) -  COALESCE((p_hstore->'monto_no_pagado')::numeric,0) - v_monto_anticipo;
-
-		  -- calcula el monto_establecido
-          SELECT pc.codigo_tipo_relacion
-          INTO v_codigo_tipo_relacion
-          FROM param.tplantilla p
-          inner join conta.tplantilla_calculo pc on pc.id_plantilla = p.id_plantilla
-          WHERE p.id_plantilla = (p_hstore->'id_plantilla')::numeric;
-
-          --para los que se descuentan el IVA 13%
-		  IF (v_codigo_tipo_relacion = 'IVA-CF') THEN
-          v_porcentaje13_monto = COALESCE((p_hstore->'monto')::numeric,0) * 0.13;
-          v_monto_establecido  = COALESCE((p_hstore->'monto')::numeric,0) - v_porcentaje13_monto;
-          ELSE
-          v_monto_establecido  = COALESCE((p_hstore->'monto')::numeric,0);
-          END IF;
 
           --revision de anticipo
           IF (p_hstore->'tipo') in('devengado','devengado_pagado','devengado_pagado_1c') THEN
@@ -358,7 +354,7 @@ BEGIN
           --cambia de estado al obligacion
           IF  v_registros.estado = 'registrado' THEN
 
-
+--raise exception 'llega2';
 
                SELECT
                      ps_id_tipo_estado,
@@ -418,7 +414,6 @@ BEGIN
                      --dispara estado para plan de pagos
 
 
-
                      SELECT
                                ps_id_proceso_wf,
                                ps_id_estado_wf,
@@ -434,22 +429,20 @@ BEGIN
                                v_id_estado_actual,
                                NULL,
                                v_registros.id_depto,
-                              ('Solicitud de devengado para la OP:'|| COALESCE(v_registros.numero,'s/n')||' cuota nro'||v_nro_cuota::varchar),
+                              ('Solicutd de devengado para la OP:'|| COALESCE(v_registros.numero,'s/n')||' cuota nro'||v_nro_cuota::varchar),
                                v_registros_tpp.codigo_proceso_llave_wf,
                                COALESCE(v_registros.numero,'s/n')||'-N# '||v_nro_cuota::varchar
                            );
 
-                 select op.fecha_costo_ini_pp, op.fecha_costo_fin_pp, op.fecha_conclusion_pago
-                 into v_fecha_ini_pp, v_fecha_fin_pp, v_fecha_conclusion
-                 from tes.tobligacion_pago op
-                 where op.id_obligacion_pago = (p_hstore->'id_obligacion_pago')::integer;
+					select op.fecha_costo_ini_pp, op.fecha_costo_fin_pp
+                    into v_fecha_ini_pp, v_fecha_fin_pp
+                    from tes.tobligacion_pago op
+                    where op.id_obligacion_pago = (p_hstore->'id_obligacion_pago')::integer;
 
 
 
 
           ELSEIF   v_registros.estado = 'en_pago' THEN
-
-
 
                  --registra estado de cotizacion
 
@@ -468,7 +461,7 @@ BEGIN
                            v_registros.id_estado_wf,
                            NULL,
                            v_registros.id_depto,
-                           ('Solicitud de devengado para la OP:'|| v_registros.numero||' cuota nro'||v_nro_cuota::varchar),
+                           ('Solicutd de devengado para la OP:'|| v_registros.numero||' cuota nro'||v_nro_cuota::varchar),
                            v_registros_tpp.codigo_proceso_llave_wf,
                            v_registros.numero||'-N# '||v_nro_cuota::varchar
                          );
@@ -568,7 +561,7 @@ BEGIN
             fecha_costo_fin,
             fecha_conclusion_pago,
             es_ultima_cuota,
-            monto_establecido,
+            id_depto_lb,
             id_proveedor_cta_bancaria
           	) values(
 			'activo',
@@ -590,7 +583,8 @@ BEGIN
 			(p_hstore->'monto')::numeric,
 			(p_hstore->'nombre_pago')::varchar,
 		    v_id_estado_wf,
-			v_id_cuenta_bancaria,
+            (p_hstore->'id_cuenta_bancaria')::integer,
+			--v_id_cuenta_bancaria,
 			v_forma_pago,
 			(p_hstore->'monto_no_pagado')::numeric,
 			now(),
@@ -606,7 +600,8 @@ BEGIN
             (p_hstore->'porc_descuento_ley')::numeric,
 			COALESCE(v_nro_cheque,0),
 			v_nro_cuenta_bancaria,
-            v_id_cuenta_bancaria_mov,
+            (p_hstore->'id_cuenta_bancaria_mov')::integer,
+            --v_id_cuenta_bancaria_mov,
             v_porc_monto_excento_var,
             COALESCE(v_monto_excento,0)	,
             (p_hstore->'_id_usuario_ai')::integer,
@@ -619,15 +614,15 @@ BEGIN
             (p_hstore->'fecha_costo_fin')::date,
             (p_hstore->'fecha_conclusion_pago')::date,
             true,
-            v_monto_establecido,
+            (p_hstore->'id_depto_lb')::integer,
             (p_hstore->'id_proveedor_cta_bancaria')::integer
            )RETURNING id_plan_pago into v_id_plan_pago;
 
-           IF (v_fecha_ini_pp is not Null or v_fecha_fin_pp is not Null or v_fecha_conclusion is not Null) THEN
+
+ 		   IF (v_fecha_ini_pp is not Null or v_fecha_fin_pp is not Null) THEN
            update tes.tplan_pago set
            fecha_costo_ini = v_fecha_ini_pp,
-           fecha_costo_fin = v_fecha_fin_pp,
-           fecha_conclusion_pago = v_fecha_conclusion
+           fecha_costo_fin = v_fecha_fin_pp
            where id_obligacion_pago = (p_hstore->'id_obligacion_pago')::integer;
            END IF;
 
@@ -698,4 +693,5 @@ $body$
 LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
+SECURITY INVOKER
 COST 100;

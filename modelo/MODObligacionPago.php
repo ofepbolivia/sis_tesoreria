@@ -177,7 +177,7 @@ class MODObligacionPago extends MODbase
         //Ejecuta la instruccion
         $this->armarConsulta();
         $this->ejecutarConsulta();
-
+//var_dump('llega maaaaayyyy', $this->respuesta);
         //Devuelve la respuesta
         return $this->respuesta;
     }
@@ -708,6 +708,7 @@ class MODObligacionPago extends MODbase
 
             $this->setParametro('fecha_costo_ini_pp', 'fecha_costo_ini_pp', 'date');
             $this->setParametro('fecha_costo_fin_pp', 'fecha_costo_fin_pp', 'date');
+            $this->setParametro('fecha_conclusion_pago', 'fecha_conclusion_pago', 'date');
 
             //Ejecuta la instruccion
             $this->armarConsulta();
@@ -1027,11 +1028,13 @@ class MODObligacionPago extends MODbase
         $this->captura('nombre_estado','varchar');
         $this->captura('obs','text');
         $this->captura('desc_persona','text');
-        $this->captura('usuario_ai','text');
+        $this->captura('fun_usuario_ai','text');
         $this->captura('monto','numeric');
+        $this->captura('moneda','varchar');
+        $this->captura('cod_moneda','varchar');
 		
 		//Ejecuta la instruccion
-        $this->armarConsulta();     
+        $this->armarConsulta();        
         $this->ejecutarConsulta();        
 		
 		//Devuelve la respuesta

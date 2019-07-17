@@ -526,7 +526,26 @@ Phx.vista.FormObligacion=Ext.extend(Phx.frmInterfaz,{
 			                            id_grupo: 1,
 			                            items: [],
 			                         }]
-		                         }
+		                         },
+                                {
+                                    bodyStyle: 'padding-right:5px;',
+
+                                    border: false,
+                                    autoHeight: true,
+                                    items: [{
+                                        xtype: 'fieldset',
+                                        frame: true,
+                                        layout: 'form',
+                                        title: ' Periodo al que corresponde el Gasto ',
+                                        width: '33%',
+                                        border: false,
+                                        //margins: '0 0 0 5',
+                                        padding: '0 0 0 10',
+                                        bodyStyle: 'padding-left:5px;',
+                                        id_grupo: 2,
+                                        items: [],
+                                    }]
+                                }
     	                      ]
     	                  },
     	                    this.megrid
@@ -566,7 +585,7 @@ Phx.vista.FormObligacion=Ext.extend(Phx.frmInterfaz,{
                 qtip: 'Según esta fecha se escoje el formulario de solicitud', 
                 readOnly : false,
                 allowBlank: false,
-                gwidth: 100,
+                anchor:'95%',
                 format: 'd/m/Y'
             },
             type: 'DateField',
@@ -580,7 +599,7 @@ Phx.vista.FormObligacion=Ext.extend(Phx.frmInterfaz,{
                 origen:'FUNCIONARIOCAR',
                 fieldLabel:'Funcionario',
                 allowBlank:false,
-                gwidth:200,
+                anchor: '95%',
                 valueField: 'id_funcionario',
                 gdisplayField: 'desc_funcionario',
                 baseParams: { es_combo_solicitud : 'si' } },
@@ -594,7 +613,7 @@ Phx.vista.FormObligacion=Ext.extend(Phx.frmInterfaz,{
                 url: '../../sis_parametros/control/Depto/listarDeptoFiltradoXUsuario',
                 fieldLabel: 'Depto',
                 allowBlank: false,
-                anchor: '80%',
+                anchor: '95%',
                 origen: 'DEPTO',
                 tinit: false,
                 baseParams:{estado:'activo',codigo_subsistema:'TES',modulo:'OP'}//parametros adicionales que se le pasan al store
@@ -609,7 +628,7 @@ Phx.vista.FormObligacion=Ext.extend(Phx.frmInterfaz,{
 			config: {
 				name: 'id_moneda',
 				fieldLabel: 'Moneda',
-				anchor: '80%',
+                anchor: '100%',
 				tinit: false,
 				allowBlank: false,
 				origen: 'MONEDA'
@@ -623,7 +642,7 @@ Phx.vista.FormObligacion=Ext.extend(Phx.frmInterfaz,{
                 name: 'tipo_cambio_conv',
                 fieldLabel: 'Tipo Cambio',
                 allowBlank: false,
-                anchor: '80%',
+                anchor: '100%',
                 maxLength:131074
             },
             type:'NumberField',
@@ -635,7 +654,7 @@ Phx.vista.FormObligacion=Ext.extend(Phx.frmInterfaz,{
 			config: {
 				name: 'id_proveedor',
 				fieldLabel: 'Proveedor',
-				anchor: '80%',
+                anchor: '100%',
 				tinit: false,
 				allowBlank: false,
 				origen: 'PROVEEDOR',
@@ -652,7 +671,7 @@ Phx.vista.FormObligacion=Ext.extend(Phx.frmInterfaz,{
 				fieldLabel: 'Desc',
 				allowBlank: false,
 				qtip: 'Descripcion del objetivo del pago, o Si el proveedor es PASAJEROS PERJUDICADOS aqui va el nombre del pasajero',
-				anchor: '90%',
+                anchor: '95%',
 				maxLength:1000
 			},
 			type:'TextArea',
@@ -666,7 +685,7 @@ Phx.vista.FormObligacion=Ext.extend(Phx.frmInterfaz,{
                 emptyText:'Elija una plantilla...',
                 store:new Ext.data.JsonStore(
                 {
-                    url: '../../sis_parametros/control/Plantilla/listarPlantilla',
+                    url: '../../sis_parametros/control/Plantilla/listarPlantillaFil',
                     id: 'id_plantilla',
                     root:'datos',
                     sortInfo:{
@@ -674,7 +693,10 @@ Phx.vista.FormObligacion=Ext.extend(Phx.frmInterfaz,{
                         direction:'ASC'
                     },
                     totalProperty:'total',
-                    fields: ['id_plantilla','nro_linea','desc_plantilla','tipo','sw_tesoro', 'sw_compro'],
+                    fields: ['id_plantilla',
+                        'nro_linea',
+                        'desc_plantilla',
+                        'tipo','sw_tesoro', 'sw_compro','sw_monto_excento','tipo_excento','valor_excento' ],
                     remoteSort: true,
                     baseParams:{par_filtro:'plt.desc_plantilla',sw_compro:'si',sw_tesoro:'si' }
                 }),
@@ -683,6 +705,7 @@ Phx.vista.FormObligacion=Ext.extend(Phx.frmInterfaz,{
                 hiddenValue: 'id_plantilla',
                 displayField: 'desc_plantilla',
                 listWidth:'280',
+                anchor:'100%',
                 forceSelection:true,
                 typeAhead: false,
                 triggerAction: 'all',
@@ -699,13 +722,14 @@ Phx.vista.FormObligacion=Ext.extend(Phx.frmInterfaz,{
         {
             config:{
                 name: 'fecha_pp_ini',
-                fieldLabel: 'Fecha pago',
+                fieldLabel: 'Fecha Tentativa',
                 qtip: 'Fecha tentativa para el pago',
                 allowBlank: false,
+                gwidth: 100,
                 format: 'd/m/Y' 
             },
             type:'DateField',
-            id_grupo:1,
+            id_grupo:2,
             form:true
         },
         {
@@ -713,10 +737,11 @@ Phx.vista.FormObligacion=Ext.extend(Phx.frmInterfaz,{
                 name: 'fecha_costo_ini_pp',
                 fieldLabel: 'Fecha Inicio',
                 allowBlank: false,
+                gwidth: 100,
                 format: 'd/m/Y'
             },
             type:'DateField',
-            id_grupo:1,
+            id_grupo:2,
             form:true
         },
         {
@@ -727,9 +752,23 @@ Phx.vista.FormObligacion=Ext.extend(Phx.frmInterfaz,{
                 format: 'd/m/Y'
             },
             type:'DateField',
-            id_grupo:1,
+            id_grupo:2,
             form:true
         },
+        {
+            config: {
+                name: 'fecha_conclusion_pago',
+                fieldLabel: 'Fecha Vencimiento de Pago',
+                allowBlank: true,
+                gwidth: 100,
+                format: 'd/m/Y'
+            },
+            type: 'DateField',
+            //filters: {pfiltro: 'plapa.fecha_conclusion_pago', type: 'date'},
+            id_grupo: 2,
+            form: true
+        },
+
         {
 			//configuracion del componente
 			config:{

@@ -1030,6 +1030,8 @@ BEGIN
                          IF v_tipo_obligacion in  ('pago_especial') THEN
                             v_tipo_plan_pago = 'especial';
                          ELSE
+
+
                            --verifica que tipo de apgo estan deshabilitados
 
                            va_tipo_pago = regexp_split_to_array(pxp.f_get_variable_global('tes_tipo_pago_deshabilitado'), E'\\s+');
@@ -1040,6 +1042,11 @@ BEGIN
                                   v_tipo_plan_pago = 'devengado_pagado_1c';
                            END IF;
 
+                           -- para los pagos internacionales que solo es devengado_pagado_1c
+                           IF v_tipo_obligacion in  ('spd', 'pago_especial_spi') THEN
+                           	v_tipo_plan_pago = 'devengado_pagado_1c';
+                           END IF;
+						   --
                          END IF;
 
 
@@ -2082,5 +2089,4 @@ $body$
 LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
-SECURITY INVOKER
 COST 100;

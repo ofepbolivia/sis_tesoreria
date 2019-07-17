@@ -459,7 +459,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     name: 'tipo',
                     fieldLabel: 'Tipo de Cuota',
                     allowBlank: false,
-                    emptyText: 'Tipo de Cuoata',
+                    emptyText: 'Tipo de Cuota',
                     renderer: function (value, p, record) {
                         var dato = '';
                         dato = (dato == '' && value == 'devengado') ? 'Devengar' : dato;
@@ -512,6 +512,22 @@ header("content-type: text/javascript; charset=UTF-8");
                 },
                 type: 'TextField',
                 filters: {pfiltro: 'plapa.nombre_pago', type: 'string'},
+                id_grupo: 1,
+                grid: true,
+                form: true
+            },
+            {
+                config: {
+                    name: 'nit',
+                    fieldLabel: 'Nit',
+                    allowBlank: true,
+                    disabled: true,
+                    anchor: '80%',
+                    gwidth: 250,
+                    maxLength: 100
+                },
+                type: 'TextField',
+                filters: {pfiltro: 'pro.nit', type: 'string'},
                 id_grupo: 1,
                 grid: true,
                 form: true
@@ -816,34 +832,92 @@ header("content-type: text/javascript; charset=UTF-8");
                 form: true
             },
 
-            {
-                config:{
+            // {
+            //     config:{
+            //
+            //         name:'nro_cuenta_bancaria',
+            //         fieldLabel:'Cuenta Bancaria(Prov.)',
+            //         allowBlank:true,
+            //         emptyText:'Elija una opción...',
+            //         resizable:true,
+            //         // dato: 'reclamo',
+            //         qtip:'Ingrese la Cuenta Bancaria Dest.,si no se encuentra la opción deseada registre Nuevo con el botón de Lupa.',
+            //         store: new Ext.data.JsonStore({
+            //             url: '../../sis_parametros/control/ProveedorCtaBancaria/listarProveedorCtaBancariaActivo',
+            //             id: 'id_proveedor_cta_bancaria',
+            //             root: 'datos',
+            //             sortInfo:{
+            //                 field: 'nro_cuenta',
+            //                 direction: 'ASC'
+            //             },
+            //             totalProperty: 'total',
+            //             fields: ['id_proveedor_cta_bancaria','nro_cuenta', 'id_proveedor'],
+            //             // turn on remote sorting
+            //             remoteSort: true,
+            //             baseParams:{par_filtro:'nro_cuenta'}
+            //         }),
+            //         valueField: 'nro_cuenta',
+            //         displayField: 'nro_cuenta',
+            //         gdisplayField:'nro_cuenta',//mapea al store del grid
+            //         tpl:'<tpl for="."><div class="x-combo-list-item"><p>{nro_cuenta}</p></div></tpl>',
+            //         hiddenName: 'id_proveedor_cta_bancaria',
+            //         forceSelection:true,
+            //         typeAhead: false,
+            //         triggerAction: 'all',
+            //         lazyRender:true,
+            //         mode:'remote',
+            //         pageSize:10,
+            //         queryDelay:1000,
+            //         // width:250,
+            //         gwidth: 250,
+            //         minChars:1,
+            //         turl:'../../../sis_parametros/vista/proveedor_cta_bancaria/FormProvCta.php',
+            //         ttitle:'Banco y Cuenta Bancaria Dest.',
+            //         tconfig:{width: '35%' ,height:'50%'},
+            //         tdata:{},
+            //         tcls:'FormProvCta',
+            //         pid:this.idContenedor,
+            //
+            //         renderer:function (value, p, record){return String.format('{0}', record.data['nro_cuenta_bancaria']);}
+            //     },
+            //     type:'TrigguerCombo',
+            //     bottom_filter:true,
+            //     id_grupo:1,
+            //     filters:{
+            //         pfiltro:'plapa.nro_cuenta_bancaria',
+            //         type:'string'
+            //     },
+            //     grid:true,
+            //     form:false
+            // },
 
-                    name:'nro_cuenta_bancaria',
-                    fieldLabel:'Cuenta Bancaria(Prov.)',
-                    allowBlank:false,
-                    emptyText:'Elija una opción...',
+            {
+                config: {
+                    name: 'id_proveedor_cta_bancaria',
+                    fieldLabel: 'Cuenta Bancaria(Prov.)',
+                    allowBlank: true,
                     resizable:true,
-                    // dato: 'reclamo',
-                    qtip:'Ingrese la Cuenta Bancaria Dest.,si no se encuentra la opción deseada registre Nuevo con el botón de Lupa.',
-                    store: new Ext.data.JsonStore({
-                        url: '../../sis_parametros/control/ProveedorCtaBancaria/listarProveedorCtaBancariaActivo',
-                        id: 'id_proveedor_cta_bancaria',
-                        root: 'datos',
-                        sortInfo:{
-                            field: 'nro_cuenta',
-                            direction: 'ASC'
-                        },
-                        totalProperty: 'total',
-                        fields: ['id_proveedor_cta_bancaria','nro_cuenta', 'id_proveedor'],
-                        // turn on remote sorting
-                        remoteSort: true,
-                        baseParams:{par_filtro:'nro_cuenta'}
-                    }),
-                    valueField: 'nro_cuenta',
+                    emptyText: 'Elija una Cuenta...',
+                    store: new Ext.data.JsonStore(
+                        {
+                            url: '../../sis_parametros/control/ProveedorCtaBancaria/listarProveedorCtaBancariaActivo',
+                            id: 'id_proveedor_cta_bancaria',
+                            root: 'datos',
+                            sortInfo: {
+                                field: 'prioridad',
+                                direction: 'ASC'
+                            },
+                            totalProperty: 'total',
+                            fields: ['id_proveedor_cta_bancaria', 'nro_cuenta', 'banco_beneficiario','prioridad'],
+                            remoteSort: true,
+                            baseParams: {
+                                par_filtro: 'id_proveedor#nro_cuenta'
+                            }
+                        }),
+                    tpl: '<tpl for="."><div class="x-combo-list-item"><b>Nro Cuenta: {nro_cuenta}</b></p><p><b>Banco Beneficiario:</b> {banco_beneficiario}</p><p><b>Prioridad:</b>{prioridad}</p><p></div></tpl>',
+                    valueField: 'id_proveedor_cta_bancaria',
                     displayField: 'nro_cuenta',
-                    gdisplayField:'nro_cuenta',//mapea al store del grid
-                    tpl:'<tpl for="."><div class="x-combo-list-item"><p>{nro_cuenta}</p></div></tpl>',
+                    gdisplayField: 'nro_cuenta_bancaria',
                     hiddenName: 'id_proveedor_cta_bancaria',
                     forceSelection:true,
                     typeAhead: false,
@@ -854,27 +928,28 @@ header("content-type: text/javascript; charset=UTF-8");
                     queryDelay:1000,
                     // width:250,
                     gwidth: 250,
-                    minChars:1,
+                    listWidth: '290',
+                    // minChars:2,
+                    lazyRender:true,
+                    // tinit: true,
+                    // tname:'id_proveedor_cta_bancaria',
+                    // tasignacion:true,
                     turl:'../../../sis_parametros/vista/proveedor_cta_bancaria/FormProvCta.php',
                     ttitle:'Banco y Cuenta Bancaria Dest.',
                     tconfig:{width: '35%' ,height:'50%'},
                     tdata:{},
                     tcls:'FormProvCta',
                     pid:this.idContenedor,
-
-                    renderer:function (value, p, record){return String.format('{0}', record.data['nro_cuenta_bancaria']);}
+                    renderer: function (value, p, record) {
+                        return String.format('{0}', record.data['nro_cuenta_bancaria']);
+                    }
                 },
-                type:'TrigguerCombo',
-                bottom_filter:true,
-                id_grupo:1,
-                filters:{
-                    pfiltro:'plapa.nro_cuenta_bancaria',
-                    type:'string'
-                },
-                grid:true,
-                form:false
+                type: 'TrigguerCombo',
+                filters: {pfiltro: 'plapa.nro_cuenta_bancaria', type: 'string'},
+                id_grupo: 1,
+                grid: true,
+                form: true
             },
-
             {
                 config: {
                     name: 'desc_moneda',
@@ -979,7 +1054,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 config: {
                     name: 'otros_descuentos',
                     currencyChar: ' ',
-                    fieldLabel: 'Multas',
+                    fieldLabel: 'Multas o Impuestos Retenidos',
                     allowBlank: true,
                     allowNegative: false,
                     gwidth: 100,
@@ -1128,6 +1203,25 @@ header("content-type: text/javascript; charset=UTF-8");
             },
             {
                 config: {
+                    name: 'obs_monto_no_pagado',
+                    //04-07-2019 cambiar
+                    // fieldLabel: 'Obs. Pago',
+                    fieldLabel: 'Glosa',
+                    qtip: 'Estas observaciones van a la glosa del comprobante que se genera',
+                    allowBlank: true,
+                    // anchor: '80%',
+                    width: 280,
+                    gwidth: 300,
+                    maxLength: 300
+                },
+                type: 'TextArea',
+                filters: {pfiltro: 'plapa.obs_monto_no_pagado', type: 'string'},
+                id_grupo: 4,
+                grid: true,
+                form: true
+            },
+            {
+                config: {
                     name: 'obs_descuentos_anticipo',
                     fieldLabel: 'Obs. Desc. Antic.',
                     allowBlank: true,
@@ -1142,23 +1236,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 grid: true,
                 form: true
             },
-            {
-                config: {
-                    name: 'obs_monto_no_pagado',
-                    fieldLabel: 'Obs. Pago',
-                    qtip: 'Estas observaciones van a la glosa del comprobante que se genere',
-                    allowBlank: true,
-                    // anchor: '80%',
-                    width: 280,
-                    gwidth: 300,
-                    maxLength: 300
-                },
-                type: 'TextArea',
-                filters: {pfiltro: 'plapa.obs_monto_no_pagado', type: 'string'},
-                id_grupo: 4,
-                grid: true,
-                form: true
-            },
+
             {
                 config: {
                     name: 'obs_otros_descuentos',
@@ -1294,7 +1372,7 @@ header("content-type: text/javascript; charset=UTF-8");
             {
                 config: {
                     name: 'fecha_conclusion_pago',
-                    fieldLabel: 'Fecha Conclusión Pago',
+                    fieldLabel: 'Fecha Vencimiento de Pago',
                     allowBlank: true,
                     gwidth: 100,
                     format: 'd/m/Y',
@@ -1544,7 +1622,9 @@ header("content-type: text/javascript; charset=UTF-8");
             {name: 'fecha_cbte_ini', type: 'date', dateFormat: 'Y-m-d'},
             {name: 'fecha_cbte_fin', type: 'date', dateFormat: 'Y-m-d'},
             {name: 'monto_establecido', type: 'numeric'},
-            {name: 'id_proveedor', type: 'numeric'}
+            {name: 'id_proveedor', type: 'numeric'},
+            {name: 'nit', type: 'string'},
+            'id_proveedor_cta_bancaria'
         ],
 
         arrayDefaultColumHidden: ['id_fecha_reg', 'id_fecha_mod',
@@ -1552,7 +1632,7 @@ header("content-type: text/javascript; charset=UTF-8");
             'descuento_anticipo', 'monto_retgar_mo', 'monto_no_pagado', 'otros_descuentos', 'descuento_inter_serv', 'descuento_ley', 'id_depto_lb',
             'id_depto_lb', 'id_cuenta_bancaria', 'obs_wf', 'fecha_dev', 'fecha_pag', 'obs_descuentos_anticipo', 'obs_monto_no_pagado',
             'obs_otros_descuentos', 'obs_descuentos_ley', 'obs_descuento_inter_serv', 'monto_ajuste_ag', 'monto_ajuste_siguiente_pag', 'fecha_costo_ini',
-            'fecha_costo_fin', 'funcionario_wf', 'monto_anticipo', 'monto', 'monto_ejecutar_total_mo', 'monto_establecido'],
+            'fecha_costo_fin', 'funcionario_wf', 'monto_anticipo', 'monto', 'monto_ejecutar_total_mo', 'monto_establecido','nit'],
 
 
         rowExpander: new Ext.ux.grid.RowExpander({
@@ -1926,23 +2006,28 @@ header("content-type: text/javascript; charset=UTF-8");
 
 
           //may
+
             if (data.estado == 'vbsolicitante') {
 
                 this.ocultarComponente(this.Cmp.id_cuenta_bancaria);
                 this.ocultarComponente(this.Cmp.id_depto_lb);
-                this.Cmp.nro_cuenta_bancaria.allowBlank = true;
-                this.ocultarComponente(this.Cmp.nro_cuenta_bancaria);
+                // this.Cmp.nro_cuenta_bancaria.allowBlank = true;
+                // this.ocultarComponente(this.Cmp.nro_cuenta_bancaria);
+                this.Cmp.id_proveedor_cta_bancaria.allowBlank = true;
+                this.ocultarComponente(this.Cmp.id_proveedor_cta_bancaria);
                 this.ocultarComponente(this.Cmp.forma_pago);
             }
             if (data.estado == 'vbfin') {
                 this.ocultarComponente(this.Cmp.id_cuenta_bancaria);
-                this.ocultarComponente(this.Cmp.nro_cuenta_bancaria);
+                // this.ocultarComponente(this.Cmp.nro_cuenta_bancaria);
+                this.ocultarComponente(this.Cmp.id_proveedor_cta_bancaria);
                 this.ocultarComponente(this.Cmp.forma_pago);
 
             }
             if (data.estado == 'vbcostos') {
                 this.ocultarComponente(this.Cmp.id_cuenta_bancaria);
-                this.ocultarComponente(this.Cmp.nro_cuenta_bancaria);
+                // this.ocultarComponente(this.Cmp.nro_cuenta_bancaria);
+                this.ocultarComponente(this.Cmp.id_proveedor_cta_bancaria);
                 // this.ocultarComponente(this.Cmp.id_depto_lb);
                 this.Cmp.id_depto_lb.disable();
                 this.ocultarComponente(this.Cmp.forma_pago);
@@ -1950,7 +2035,8 @@ header("content-type: text/javascript; charset=UTF-8");
             }
             if (data.estado == 'vbdeposito') {
                 this.ocultarComponente(this.Cmp.id_cuenta_bancaria);
-                this.ocultarComponente(this.Cmp.nro_cuenta_bancaria);
+                // this.ocultarComponente(this.Cmp.nro_cuenta_bancaria);
+                this.ocultarComponente(this.Cmp.id_proveedor_cta_bancaria);
                 this.ocultarComponente(this.Cmp.forma_pago);
 
             }
@@ -1967,13 +2053,24 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.tmp_porc_monto_excento_var = undefined;
             }
 
+            if (data.estado == 'vbconta') {
+
+                this.Cmp.id_proveedor_cta_bancaria.allowBlank = false;
+                this.mostrarComponente(this.Cmp.id_proveedor_cta_bancaria);
+                this.Cmp.obs_monto_no_pagado.allowBlank = false;
+            }
+
             Phx.vista.PlanPago.superclass.onButtonEdit.call(this);
             if (this.Cmp.id_plantilla.getValue()) {
                 this.getPlantilla(this.Cmp.id_plantilla.getValue());
             }
 
-            this.Cmp.nro_cuenta_bancaria.store.baseParams.id_proveedor = data.id_proveedor;
-            this.Cmp.nro_cuenta_bancaria.tdata.id_padre = this.idContenedor;
+            // this.Cmp.nro_cuenta_bancaria.store.baseParams.id_proveedor = data.id_proveedor;
+            // this.Cmp.nro_cuenta_bancaria.tdata.id_padre = this.idContenedor;
+            this.Cmp.id_proveedor_cta_bancaria.store.baseParams.id_proveedor = data.id_proveedor;
+            this.Cmp.id_proveedor_cta_bancaria.tdata.id_padre = this.idContenedor;
+
+
 
         },
 
@@ -2204,10 +2301,20 @@ header("content-type: text/javascript; charset=UTF-8");
                 me.Cmp.forma_pago.disable();
                 me.Cmp.forma_pago.setValue('transferencia');
 
+                me.Cmp.id_proveedor_cta_bancaria.enable();
+                me.Cmp.id_proveedor_cta_bancaria.allowBlank = false;
+
             } else {
                 me.Cmp.forma_pago.disable();
                 me.Cmp.forma_pago.setValue('cheque');
+
+                me.Cmp.id_proveedor_cta_bancaria.disable();
+                me.Cmp.id_proveedor_cta_bancaria.allowBlank = true;
+                me.Cmp.id_proveedor_cta_bancaria.setValue('');
             }
+
+
+
 
         },
 
@@ -2221,8 +2328,13 @@ header("content-type: text/javascript; charset=UTF-8");
                 // me.Cmp.nro_cheque.disable();
 
                 //Habilita nrocuenta bancaria destino
-                me.Cmp.nro_cuenta_bancaria.allowBlank = false;
-                me.Cmp.nro_cuenta_bancaria.enable();
+                // me.Cmp.nro_cuenta_bancaria.allowBlank = false;
+                // me.Cmp.nro_cuenta_bancaria.enable();
+                me.Cmp.id_proveedor_cta_bancaria.allowBlank = false;
+                me.Cmp.id_proveedor_cta_bancaria.enable();
+
+                // me.Cmp.id_proveedor_cta_bancaria.allowBlank = false;
+                // me.Cmp.id_proveedor_cta_bancaria.enable();
 
             }
             else {
@@ -2232,9 +2344,16 @@ header("content-type: text/javascript; charset=UTF-8");
                 // me.Cmp.nro_cheque.allowBlank=false;
                 // me.Cmp.nro_cheque.enable();
                 //Habilita nrocuenta bancaria destino
-                me.Cmp.nro_cuenta_bancaria.allowBlank = true;
-                me.Cmp.nro_cuenta_bancaria.setValue('');
-                me.Cmp.nro_cuenta_bancaria.disable();
+                // me.Cmp.nro_cuenta_bancaria.allowBlank = true;
+                // me.Cmp.nro_cuenta_bancaria.setValue('');
+                // me.Cmp.nro_cuenta_bancaria.disable();
+                me.Cmp.id_proveedor_cta_bancaria.allowBlank = true;
+                me.Cmp.id_proveedor_cta_bancaria.setValue('');
+                me.Cmp.id_proveedor_cta_bancaria.disable();
+
+                // me.Cmp.id_proveedor_cta_bancaria.allowBlank = true;
+                // me.Cmp.id_proveedor_cta_bancaria.setValue('');
+                // me.Cmp.id_proveedor_cta_bancaria.disable();
             }
 
         },
@@ -2265,6 +2384,8 @@ header("content-type: text/javascript; charset=UTF-8");
                 me.mostrarGrupo(3); //mostra el grupo rango de costo
                 me.ocultarGrupo(2); //ocultar el grupo de ajustes
 
+                me.ocultarComponente(me.Cmp.id_proveedor_cta_bancaria);
+
 
             },
 
@@ -2284,6 +2405,8 @@ header("content-type: text/javascript; charset=UTF-8");
                 me.Cmp.monto_retgar_mo.setReadOnly(false);
                 me.ocultarGrupo(2); //ocultar el grupo de ajustes
                 me.ocultarGrupo(3); //ocultar el grupo de periodo del costo
+
+                me.ocultarComponente(me.Cmp.id_proveedor_cta_bancaria);
 
 
             },
@@ -2306,12 +2429,16 @@ header("content-type: text/javascript; charset=UTF-8");
                 me.mostrarGrupo(3); //mostra el grupo rango de costo
                 me.ocultarGrupo(2); //ocultar el grupo de ajustes
 
+                me.ocultarComponente(me.Cmp.id_proveedor_cta_bancaria);
+
 
             },
 
             'devengado_pagado_1c': function (me) {
                 //plantilla (TIPO DOCUMENTO)
                 me.setTipoPago['devengado_pagado'](me);
+
+                me.ocultarComponente(me.Cmp.id_proveedor_cta_bancaria);
 
             },
 
@@ -2325,6 +2452,8 @@ header("content-type: text/javascript; charset=UTF-8");
                 me.habilitarDescuentos(me);
                 me.ocultarGrupo(2); //ocultar el grupo de ajustes
                 me.ocultarGrupo(3); //ocultar el grupo de periodo del costo
+
+                me.ocultarComponente(me.Cmp.id_proveedor_cta_bancaria);
 
             },
             'dev_garantia': function (me) {
@@ -2340,6 +2469,8 @@ header("content-type: text/javascript; charset=UTF-8");
                 me.ocultarComponente(me.Cmp.monto_anticipo);
                 me.ocultarGrupo(2); //ocultar el grupo de ajustes
                 me.ocultarGrupo(3); //ocultar el grupo de periodo del costo
+
+                me.ocultarComponente(me.Cmp.id_proveedor_cta_bancaria);
 
 
             },
@@ -2358,7 +2489,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 me.ocultarGrupo(2); //ocultar el grupo de ajustes
                 me.ocultarGrupo(3); //ocultar el grupo de periodo del costo
 
-
+                me.ocultarComponente(me.Cmp.id_proveedor_cta_bancaria);
             },
 
             'pagado': function (me) {
@@ -2371,6 +2502,8 @@ header("content-type: text/javascript; charset=UTF-8");
                 me.ocultarGrupo(2); //ocultar el grupo de ajustes
                 me.ocultarGrupo(3); //ocultar el grupo de periodo del costo
 
+                me.ocultarComponente(me.Cmp.id_proveedor_cta_bancaria);
+
             },
             'pagado_rrhh': function (me) {
                 me.Cmp.id_plantilla.disable();
@@ -2381,6 +2514,8 @@ header("content-type: text/javascript; charset=UTF-8");
                 me.Cmp.monto_retgar_mo.setReadOnly(true);
                 me.ocultarGrupo(2); //ocultar el grupo de ajustes
                 me.ocultarGrupo(3); //ocultar el grupo de periodo del costo
+
+                me.ocultarComponente(me.Cmp.id_proveedor_cta_bancaria);
 
             },
             'ant_parcial': function (me) {
@@ -2403,6 +2538,8 @@ header("content-type: text/javascript; charset=UTF-8");
                 me.ocultarComponente(me.Cmp.monto_anticipo);
                 me.ocultarGrupo(2); //ocultar el grupo de ajustes
                 me.ocultarGrupo(3); //ocultar el grupo de periodo del costo
+
+                me.ocultarComponente(me.Cmp.id_proveedor_cta_bancaria);
 
             },
 
@@ -2427,6 +2564,8 @@ header("content-type: text/javascript; charset=UTF-8");
                 me.ocultarGrupo(2); //ocultar el grupo de ajustes
                 me.mostrarGrupo(3); //ocultar el grupo de periodo del costo
 
+                me.ocultarComponente(me.Cmp.id_proveedor_cta_bancaria);
+
             },
             'ant_aplicado': function (me, data) {
                 me.Cmp.id_plantilla.disable();
@@ -2449,6 +2588,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 }
 
                 me.mostrarGrupo(3);
+                me.ocultarComponente(me.Cmp.id_proveedor_cta_bancaria);
             }
         },
 
@@ -2463,8 +2603,11 @@ header("content-type: text/javascript; charset=UTF-8");
             if (me.Cmp.forma_pago) {
                 me.mostrarComponente(me.Cmp.forma_pago);
             }
-            if (me.Cmp.nro_cuenta_bancaria) {
-                me.mostrarComponente(me.Cmp.nro_cuenta_bancaria);
+            // if (me.Cmp.nro_cuenta_bancaria) {
+            //     me.mostrarComponente(me.Cmp.nro_cuenta_bancaria);
+            // }
+            if (me.Cmp.id_proveedor_cta_bancaria) {
+                me.mostrarComponente(me.Cmp.id_proveedor_cta_bancaria);
             }
             if (me.Cmp.nro_cheque) {
                 // me.mostrarComponente(me.Cmp.nro_cheque);
@@ -2483,8 +2626,11 @@ header("content-type: text/javascript; charset=UTF-8");
             if (me.Cmp.forma_pago) {
                 me.ocultarComponente(me.Cmp.forma_pago);
             }
-            if (me.Cmp.nro_cuenta_bancaria) {
-                me.ocultarComponente(me.Cmp.nro_cuenta_bancaria);
+            // if (me.Cmp.nro_cuenta_bancaria) {
+            //     me.ocultarComponente(me.Cmp.nro_cuenta_bancaria);
+            // }
+            if (me.Cmp.id_proveedor_cta_bancaria) {
+                me.ocultarComponente(me.Cmp.id_proveedor_cta_bancaria);
             }
             if (me.Cmp.nro_cheque) {
                 me.ocultarComponente(me.Cmp.nro_cheque);
@@ -2527,6 +2673,13 @@ header("content-type: text/javascript; charset=UTF-8");
             Phx.vista.PlanPago.superclass.onButtonNew.call(this);
             this.ocultarGrupo(2); //ocultar el grupo de ajustes
             this.ocultarGrupo(3); //ocultar el grupo de ajustes
+
+
+            this.ocultarComponente(this.Cmp.id_proveedor_cta_bancaria);
+
+            this.Cmp.id_proveedor_cta_bancaria.store.baseParams.id_proveedor = this.Cmp.id_proveedor.getValue();
+            
+
         },
 
         successAplicarDesc: function (resp) {
@@ -2655,11 +2808,18 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.idContenedor,
                 'Obs'
             )
-        },
-        cargarCuenta : function (nro_cuenta_bancaria,nro_cuenta_bancaria ) {
-            this.Cmp.nro_cuenta_bancaria.setValue(nro_cuenta_bancaria);
-            this.Cmp.nro_cuenta_bancaria.setRawValue(nro_cuenta_bancaria.toUpperCase());
         }
+        ,
+        // cargarCuenta : function (nro_cuenta_bancaria,nro_cuenta_bancaria ) {
+        //     this.Cmp.nro_cuenta_bancaria.setValue(nro_cuenta_bancaria);
+        //     this.Cmp.nro_cuenta_bancaria.setRawValue(nro_cuenta_bancaria.toUpperCase());
+        // }
+
+        cargarCuenta : function (id_proveedor_cta_bancaria,nro_cuenta_bancaria ) {
+            this.Cmp.id_proveedor_cta_bancaria.setValue(id_proveedor_cta_bancaria);
+            this.Cmp.id_proveedor_cta_bancaria.setRawValue(id_proveedor_cta_bancaria);
+        }
+
 
     })
 </script>

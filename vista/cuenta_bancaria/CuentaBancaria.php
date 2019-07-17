@@ -167,6 +167,20 @@ Phx.vista.CuentaBancaria=Ext.extend(Phx.gridInterfaz,{
 			form:true
 		},
 		{
+			config:{
+				name: 'd_deb_hab',
+				fieldLabel: 'Debe - Haber',
+				allowBlank: false,
+				anchor: '80%',
+				gwidth: 100				
+			},
+				type:'NumberField',				
+				bottom_filter: true,
+				id_grupo:1,
+				grid:true,
+				form:false
+		},        
+		{
             config:{
                 name:'id_moneda',
                 origen:'MONEDA',
@@ -385,7 +399,8 @@ Phx.vista.CuentaBancaria=Ext.extend(Phx.gridInterfaz,{
 		{name:'id_usuario_mod', type: 'numeric'},
 		{name:'usr_reg', type: 'string'},
 		{name:'usr_mod', type: 'string'},'id_moneda','codigo_moneda','id_finalidads',
-        {name:'forma_pago', type: 'string'}
+        {name:'forma_pago', type: 'string'},
+        {name:'d_deb_hab', type: 'numeric'}
 		
 	],
     arrayDefaultColumHidden:['forma_pago'],

@@ -1,52 +1,20 @@
 <?php
-/**
- * @package pXP
- * @file gen-SistemaDist.phpt
- * @author  (fprudencio)
- * @date 20-09-2011 10:22:05
- * @description Archivo con la interfaz de usuario que permite
- *dar el visto a solicitudes de compra
- *
- */
+
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
-    Phx.vista.PlanPagoVbCostos = {
+    Phx.vista.SoliPlanPagoVb = {
         bedit: true,
         bnew: false,
         bsave: false,
         bdel: false,
-        require: '../../../sis_tesoreria/vista/plan_pago/PlanPago.php',
-        requireclase: 'Phx.vista.PlanPago',
+        require: '../../../sis_tesoreria/vista/solicitud_plan_pago/SoliPlanPago.php',
+        requireclase: 'Phx.vista.SoliPlanPago',
         title: 'Plan de Pagos',
-        nombreVista: 'planpagoVbCostos',
+        nombreVista: 'soliplanpagoVb',
 
-        gruposBarraTareas: [{
-            name: 'nacional',
-            title: '<H1 align="center"><i class="fa fa-paper-plane"></i> Nacionales</h1>',
-            grupo: 0,
-            height: 0
-        },
-            {
-                name: 'internacional',
-                title: '<H1 align="center"><i class="fa fa-paper-plane-o"></i> Internacionales</h1>',
-                grupo: 1,
-                height: 0
-            }],
-
-
-        actualizarSegunTab: function (name, indice) {
-            if (this.finCons) {
-                this.store.baseParams.pes_estado = name;
-                this.load({params: {start: 0, limit: this.tam_pag}});
-            }
-        },
-        beditGroups: [0, 1],
-        bdelGroups: [0, 1],
-        bactGroups: [0, 1],
-        btestGroups: [0, 1],
-        bexcelGroups: [0, 1],
         constructor: function (config) {
+
 
             this.Atributos[this.getIndAtributo('num_tramite')].grid = true;
             this.Atributos[this.getIndAtributo('desc_moneda')].grid = true;
@@ -55,18 +23,18 @@ header("content-type: text/javascript; charset=UTF-8");
             this.Atributos[this.getIndAtributo('numero_op')].grid = true;
             this.Atributos[this.getIndAtributo('nro_cuota')].form = false;
             this.Atributos[this.getIndAtributo('forma_pago')].form = true;
-            this.Atributos[this.getIndAtributo('nro_cheque')].form = false;
+            this.Atributos[this.getIndAtributo('nro_cheque')].form = true;
             this.Atributos[this.getIndAtributo('nro_cheque')].valorInicial = 0;
             // this.Atributos[this.getIndAtributo('nro_cuenta_bancaria')].form = true;
-            this.Atributos[this.getIndAtributo('id_depto_lb')].form = true;
-            this.Atributos[this.getIndAtributo('id_cuenta_bancaria')].form = true;
-            this.Atributos[this.getIndAtributo('id_cuenta_bancaria_mov')].form = false;
+            // this.Atributos[this.getIndAtributo('id_depto_lb')].form = true;
+            // this.Atributos[this.getIndAtributo('id_cuenta_bancaria')].form = true;
+            this.Atributos[this.getIndAtributo('id_cuenta_bancaria_mov')].form = true;
 
             this.Atributos[this.getIndAtributo('num_tramite')].bottom_filter = true;
             this.Atributos[this.getIndAtributo('nombre_pago')].bottom_filter = true;
             this.Atributos[this.getIndAtributo('desc_funcionario1')].bottom_filter = true;
 
-            this.Atributos[this.getIndAtributo('id_proveedor_cta_bancaria')].form=true;
+            this.Atributos[this.getIndAtributo('id_proveedor_cta_bancaria')].form = true;
 
 
             //funcionalidad para listado de historicos
@@ -112,11 +80,11 @@ header("content-type: text/javascript; charset=UTF-8");
             });
 
 
-            Phx.vista.PlanPagoVbCostos.superclass.constructor.call(this, config);
+            Phx.vista.SoliPlanPagoVb.superclass.constructor.call(this, config);
             this.creaFormularioConformidad();
             this.iniciarEventos();
+            this.grid.addListener('cellclick', this.oncellclick, this);
             this.addButton('btnConformidad', {
-                grupo: [0, 1],
                 text: 'Conformidad',
                 iconCls: 'bok',
                 disabled: true,
@@ -124,7 +92,6 @@ header("content-type: text/javascript; charset=UTF-8");
                 tooltip: 'Generar conformidad para el pago (Firma acta de conformidad)'
             });
             this.addButton('SolDevPag', {
-                grupo: [0, 1],
                 text: 'Generar Cbte',
                 iconCls: 'bpagar',
                 disabled: true,
@@ -132,7 +99,6 @@ header("content-type: text/javascript; charset=UTF-8");
                 tooltip: '<b>Solicitar Devengado/Pago</b><br/>Genera en cotabilidad el comprobante Correspondiente'
             });
             this.addButton('ModAprop', {
-                grupo: [0, 1],
                 text: 'Modificar Apropiación',
                 iconCls: 'bengine',
                 disabled: true,
@@ -140,13 +106,14 @@ header("content-type: text/javascript; charset=UTF-8");
                 tooltip: 'Modificar la apropiación (solo cuando es el primer pago de un pago directo y el estado es vbconta)'
             });
             this.addButton('diagrama_gantt', {
-                grupo: [0, 1],
                 text: 'Gantt',
                 iconCls: 'bgantt',
                 disabled: true,
                 handler: diagramGantt,
                 tooltip: '<b>Diagrama Gantt de proceso macro</b>'
             });
+
+
             this.cmbGestion.on('select', this.capturarEventos, this);
 
             function diagramGantt() {
@@ -172,15 +139,13 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.store.baseParams.filtro_valor = config.filtro_directo.valor;
                 this.store.baseParams.filtro_campo = config.filtro_directo.campo;
             }
-            this.store.baseParams.pes_estado = 'nacional';
+
             this.load({
                 params: {
                     start: 0,
                     limit: this.tam_pag
                 }
             });
-
-            this.finCons = true;
 
         },
 
@@ -221,7 +186,6 @@ header("content-type: text/javascript; charset=UTF-8");
 
             this.load({params: {start: 0, limit: this.tam_pag}});
         },
-
         //deshabilitas botones para informacion historica
         desBotoneshistorico: function () {
             this.getBoton('ant_estado').disable();
@@ -229,7 +193,7 @@ header("content-type: text/javascript; charset=UTF-8");
             this.getBoton('sig_estado').disable();
             this.getBoton('SolDevPag').disable();
             this.getBoton('edit').disable();
-            // this.getBoton('SincPresu').disable();
+            this.getBoton('SincPresu').disable();
 
         },
 
@@ -248,10 +212,9 @@ header("content-type: text/javascript; charset=UTF-8");
                 'ObligacionPagoApropiacion');
         },
         onButtonEdit: function () {
-
-            // this.Cmp.fecha_costo_ini.on('select', function (value, date) {
+            // this.Cmp.fecha_tentativa.on('select', function (value, anio) {
             //
-            //     var anio = date.getFullYear();
+            //     var anio = anio.getFullYear();
             //
             //     var fecha_inicio = new Date(anio + '/01/1');
             //     var fecha_fin = new Date(anio + '/12/31');
@@ -261,18 +224,36 @@ header("content-type: text/javascript; charset=UTF-8");
             //     this.Cmp.fecha_costo_ini.setMaxValue(fecha_fin);
             //     this.Cmp.fecha_costo_fin.setMinValue(fecha_inicio);
             //     this.Cmp.fecha_costo_fin.setMaxValue(fecha_fin);
-            // }, this);
+            // } );
+
+            // var anio = new Date();
+            // anio = anio.getFullYear();
+            // var fecha_inicio = new Date(anio+'/01/1');
+            // var fecha_fin = new Date(anio+'/12/31');
+            // this.Cmp.fecha_costo_ini.setMinValue(fecha_inicio);
+            // this.Cmp.fecha_costo_ini.setMaxValue(fecha_fin);
+            // this.Cmp.fecha_costo_fin.setMinValue(fecha_inicio);
+            // this.Cmp.fecha_costo_fin.setMaxValue(fecha_fin);
 
 
             var data = this.getSelectedData();
-            if (data.estado == 'vbfin') {
+            if (data.estado == 'vbfin' || data.estado == 'vbcostos') {
                 this.Cmp.id_cuenta_bancaria.allowBlank = true;
             } else {
-                this.Cmp.id_cuenta_bancaria.allowBlank = true;
+                this.Cmp.id_cuenta_bancaria.allowBlank = false;
             }
 
-            Phx.vista.PlanPagoVbCostos.superclass.onButtonEdit.call(this);
+            Phx.vista.SoliPlanPagoVb.superclass.onButtonEdit.call(this);
 
+            /* var anio = this.fecha;
+             //var anio = this.maestro.fecha;
+             anio = anio.getFullYear();
+             var fecha_inicio = new Date(anio+'/01/1');
+             //fecha_inicio = null;
+             var fecha_fin = new Date(anio+'/12/31');
+             this.Cmp.fecha_costo_ini.setMinValue(fecha_inicio);
+             this.Cmp.fecha_costo_fin.setMaxValue(fecha_fin);
+ */
             if (this.Cmp.id_depto_lb.getValue() > 0) {
                 this.Cmp.id_cuenta_bancaria.store.baseParams = Ext.apply(this.Cmp.id_cuenta_bancaria.store.baseParams, {
                     id_depto_lb: this.Cmp.id_depto_lb.getValue(),
@@ -282,19 +263,19 @@ header("content-type: text/javascript; charset=UTF-8");
             }
 
             //RCM, resetea store del deposito para no mostrar datos al hacer nuevo
-            // if (this.Cmp.id_cuenta_bancaria.getValue() > 0) {
-            //     this.Cmp.id_cuenta_bancaria_mov.store.baseParams = Ext.apply(this.Cmp.id_cuenta_bancaria_mov.store.baseParams, {
-            //         id_cuenta_bancaria: -1,
-            //         fecha: this.Cmp.fecha_tentativa.getValue()
-            //     });
-            // }
-            // else {
-            //     //RCM, resetea store del deposito para no mostrar datos al hacer nuevo
-            //     this.Cmp.id_cuenta_bancaria_mov.store.baseParams = Ext.apply(this.Cmp.id_cuenta_bancaria_mov.store.baseParams, {
-            //         id_cuenta_bancaria: -1,
-            //         fecha: this.Cmp.fecha_tentativa.getValue()
-            //     });
-            // }
+            if (this.Cmp.id_cuenta_bancaria.getValue() > 0) {
+                this.Cmp.id_cuenta_bancaria_mov.store.baseParams = Ext.apply(this.Cmp.id_cuenta_bancaria_mov.store.baseParams, {
+                    id_cuenta_bancaria: -1,
+                    fecha: this.Cmp.fecha_tentativa.getValue()
+                });
+            }
+            else {
+                //RCM, resetea store del deposito para no mostrar datos al hacer nuevo
+                this.Cmp.id_cuenta_bancaria_mov.store.baseParams = Ext.apply(this.Cmp.id_cuenta_bancaria_mov.store.baseParams, {
+                    id_cuenta_bancaria: -1,
+                    fecha: this.Cmp.fecha_tentativa.getValue()
+                });
+            }
 
             if (data.estado == 'vbsolicitante' || data.estado == 'vbfin' || data.estado == 'vbdeposito' || (data.estado == 'vbcostos' && data['prioridad_lp'] != 3)) {
                 this.Cmp.fecha_tentativa.disable();
@@ -317,8 +298,8 @@ header("content-type: text/javascript; charset=UTF-8");
                 }
 
                 this.Cmp.id_cuenta_bancaria.disable();
-                // this.Cmp.id_cuenta_bancaria_mov.disable();
-                this.Cmp.obs_monto_no_pagado.disable();
+                this.Cmp.id_cuenta_bancaria_mov.disable();
+                this.Cmp.obs_monto_no_pagado.enable();
                 this.Cmp.obs_descuentos_ley.disable();
             }
 
@@ -419,11 +400,11 @@ header("content-type: text/javascript; charset=UTF-8");
              },this);
             */
 
-            // this.Cmp.fecha_tentativa.on('blur', function (a) {
-            //     this.Cmp.id_cuenta_bancaria_mov.setValue('');
-            //     Ext.apply(this.Cmp.id_cuenta_bancaria_mov.store.baseParams, {fecha: this.Cmp.fecha_tentativa.getValue()})
-            //     this.Cmp.id_cuenta_bancaria_mov.modificado = true;
-            // }, this);
+            this.Cmp.fecha_tentativa.on('blur', function (a) {
+                this.Cmp.id_cuenta_bancaria_mov.setValue('');
+                Ext.apply(this.Cmp.id_cuenta_bancaria_mov.store.baseParams, {fecha: this.Cmp.fecha_tentativa.getValue()})
+                this.Cmp.id_cuenta_bancaria_mov.modificado = true;
+            }, this);
 
 
             this.Cmp.id_depto_lb.on('select', function (a, b, c) {
@@ -434,24 +415,20 @@ header("content-type: text/javascript; charset=UTF-8");
             }, this);
 
             //Evento para filtrar los depósitos a partir de la cuenta bancaria
-            // this.Cmp.id_cuenta_bancaria.on('select', function (data, rec, ind) {
-            //
-            //     if (rec.data.centro == 'no') {
-            //         this.Cmp.id_cuenta_bancaria_mov.allowBlank = false;
-            //
-            //     }
-            //     else {
-            //         this.Cmp.id_cuenta_bancaria_mov.allowBlank = true;
-            //     }
-            //     this.Cmp.id_cuenta_bancaria_mov.setValue('');
-            //     this.Cmp.id_cuenta_bancaria_mov.modificado = true;
-            //     Ext.apply(this.Cmp.id_cuenta_bancaria_mov.store.baseParams, {id_cuenta_bancaria: rec.id});
-            // }, this);
+            this.Cmp.id_cuenta_bancaria.on('select', function (data, rec, ind) {
 
-            //(may)para controlar que id de estas cuentas bancarias sean desactivados los campos en forma de pago (61,78,79)
-            this.Cmp.id_cuenta_bancaria.on('select', function (groupRadio,radio) {
-                this.ocultarFP(this,radio.inputValue);
-
+                if (rec.data.centro == 'no') {
+                    this.Cmp.id_cuenta_bancaria_mov.allowBlank = false;
+                    if (this.Cmp.desc_depto_conta_pp.value == 'CON-CBB') {
+                        this.Cmp.id_cuenta_bancaria_mov.allowBlank = true;
+                    }
+                }
+                else {
+                    this.Cmp.id_cuenta_bancaria_mov.allowBlank = true;
+                }
+                this.Cmp.id_cuenta_bancaria_mov.setValue('');
+                this.Cmp.id_cuenta_bancaria_mov.modificado = true;
+                Ext.apply(this.Cmp.id_cuenta_bancaria_mov.store.baseParams, {id_cuenta_bancaria: rec.id});
             }, this);
 
             //Evento para ocultar/motrar componentes por cheque o transferencia
@@ -464,12 +441,27 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.Cmp.fecha_costo_fin.setMinValue(newValue);
                 this.Cmp.fecha_costo_fin.reset();
 
-            }, this)
+            }, this);
 
             //eventos de fechas de costo
             this.Cmp.fecha_costo_fin.on('change', function (o, newValue, oldValue) {
                 this.Cmp.fecha_costo_ini.setMaxValue(newValue);
-            }, this)
+            }, this);
+
+            this.Cmp.fecha_costo_ini.on('select', function (value, date) {
+
+                var anio = date.getFullYear();
+
+                var fecha_inicio = new Date(anio + '/01/1');
+                var fecha_fin = new Date(anio + '/12/31');
+                //control de fechas de inicio y fin de costos
+
+                this.Cmp.fecha_costo_ini.setMinValue(fecha_inicio);
+                this.Cmp.fecha_costo_ini.setMaxValue(fecha_fin);
+                this.Cmp.fecha_costo_fin.setMinValue(fecha_inicio);
+                this.Cmp.fecha_costo_fin.setMaxValue(fecha_fin);
+            }, this);
+
 
 
         },
@@ -478,7 +470,7 @@ header("content-type: text/javascript; charset=UTF-8");
         preparaMenu: function (n) {
             var data = this.getSelectedData();
             var tb = this.tbar;
-            Phx.vista.PlanPagoVbCostos.superclass.preparaMenu.call(this, n);
+            Phx.vista.SoliPlanPagoVb.superclass.preparaMenu.call(this, n);
             if (this.historico == 'no') {
 
                 if (data['estado'] == 'borrador' || data['estado'] == 'pendiente' || data['estado'] == 'devengado' || data['estado'] == 'pagado' || data['estado'] == 'anticipado' || data['estado'] == 'aplicado' || data['estado'] == 'devuelto') {
@@ -496,10 +488,7 @@ header("content-type: text/javascript; charset=UTF-8");
                         this.getBoton('sig_estado').disable();
                         this.getBoton('SolDevPag').enable();
                         this.getBoton('edit').enable();
-                        /*if ((data['nro_cuota']== 1.00 && data['tipo_obligacion']== 'pago_directo') || data['tipo_obligacion']== 'pago_unico') {
-                                this.getBoton('ModAprop').enable();
-                        }*/
-                        if (data['nro_cuota'] == 1.00 && data['tipo_obligacion'] != 'adquisiciones') {
+                        if (data['nro_cuota'] == 1.00 && (data['tipo_obligacion'] == 'pago_directo' || data['tipo_obligacion'] == 'pago_unico')) {
                             this.getBoton('ModAprop').enable();
                         } else {
                             this.getBoton('ModAprop').disable();
@@ -513,7 +502,7 @@ header("content-type: text/javascript; charset=UTF-8");
                             this.getBoton('ini_estado').enable();
                             //si la prioridad de lb es internacional ...  3 interancional, 2 nacional 0 central
                             if (data['prioridad_lp'] == 3) {
-                                this.getBoton('sig_estado').enable();
+                                this.getBoton('sig_estado').disable();
                                 this.getBoton('SolDevPag').enable();
                             }
                             else {
@@ -521,10 +510,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                 this.getBoton('SolDevPag').disable();
                             }
                             this.getBoton('edit').enable();
-                            /*if ((data['nro_cuota']== 1.00 && data['tipo_obligacion']== 'pago_directo') || data['tipo_obligacion']=='pago_unico') {
-                                    this.getBoton('ModAprop').enable();
-                            }*/
-                            if (data['nro_cuota'] == 1.00 && data['tipo_obligacion'] != 'adquisiciones') {
+                            if (data['nro_cuota'] == 1.00 && (data['tipo_obligacion'] == 'pago_directo' || data['tipo_obligacion'] == 'pago_unico')) {
                                 this.getBoton('ModAprop').enable();
                             } else {
                                 this.getBoton('ModAprop').disable();
@@ -549,13 +535,12 @@ header("content-type: text/javascript; charset=UTF-8");
                     }
                 }
                 this.getBoton('SolPlanPago').enable();
-
-                // if (data['sinc_presupuesto'] == 'si' && (data['estado'] == 'vbconta' || data['estado'] == 'vbcostos')) {
-                //     this.getBoton('SincPresu').enable();
-                // }
-                // else {
-                //     this.getBoton('SincPresu').disable();
-                // }
+                if (data['sinc_presupuesto'] == 'si' && data['estado'] == 'vbconta') {
+                    this.getBoton('SincPresu').enable();
+                }
+                else {
+                    this.getBoton('SincPresu').disable();
+                }
 
             }
             else {
@@ -572,12 +557,13 @@ header("content-type: text/javascript; charset=UTF-8");
             }
             this.getBoton('btnChequeoDocumentosWf').enable();
             this.getBoton('btnPagoRel').enable();
+
             this.getBoton('btnObs').enable();
 
         },
 
         liberaMenu: function () {
-            var tb = Phx.vista.PlanPagoVbCostos.superclass.liberaMenu.call(this);
+            var tb = Phx.vista.SoliPlanPagoVb.superclass.liberaMenu.call(this);
 
             if (tb) {
                 this.getBoton('ant_estado').disable();
@@ -588,7 +574,8 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.getBoton('diagrama_gantt').disable();
                 this.getBoton('btnChequeoDocumentosWf').disable();
                 this.getBoton('btnPagoRel').disable();
-                // this.getBoton('SincPresu').disable();
+
+                this.getBoton('SincPresu').disable();
                 this.getBoton('ModAprop').disable();
                 this.getBoton('btnObs').disable();
                 this.getBoton('btnConformidad').disable();
@@ -810,6 +797,37 @@ header("content-type: text/javascript; charset=UTF-8");
 
         },
 
+        oncellclick: function (grid, rowIndex, columnIndex, e) {
+
+            var record = this.store.getAt(rowIndex),
+                fieldName = grid.getColumnModel().getDataIndex(columnIndex); // Get field name
+
+            if (fieldName == 'revisado_asistente') {
+                this.loadPagosRelacionados()
+
+            }
+
+        },
+        onButtonNew: function () {
+
+
+            Ext.Ajax.request({
+
+                success: function (resp) {
+                    var reg = Ext.decode(Ext.util.Format.trim(resp.responseText));
+                    this.Cmp.id_gestion.setValue(reg.ROOT.datos.id_gestion);
+                    this.Cmp.id_gestion.setRawValue(reg.ROOT.datos.gestion);
+                    //this.store.baseParams.id_gestion=this.cmbGestion.getValue();
+                    this.Cmp.id_gestion.setValue(this.cmbGestion.getValue());
+                    this.Cmp.id_gestion.setRawValue(this.cmbGestion.getRawValue());
+                },
+                failure: this.conexionFailure,
+                timeout: this.timeout,
+                scope: this
+            });
+
+            Phx.vista.SoliPlanPagoVb.superclass.onButtonNew.call(this);
+        },
         sistema: 'ADQ',
         id_cotizacion: 0,
         id_proceso_compra: 0,

@@ -56,7 +56,7 @@ DECLARE
     v_add_filtro				varchar;
     v_gestion 					integer;
     v_fecha_ini					date;
-    v_fecha_fin					date;    
+    v_fecha_fin					date;
 
 BEGIN
 
@@ -499,21 +499,24 @@ BEGIN
             END IF;
           END IF;
 
-         IF  v_parametros.tipo_interfaz in ('obligacionPagoSol', 'obligacionPagoUnico','obligacionPagoEspecial') THEN
+         IF  v_parametros.tipo_interfaz in ('obligacionPagoSol', 'obligacionPagoUnico','obligacionPagoEspecial', 'solicitudSinImputacionPresupuestaria') THEN
 
                 IF   v_parametros.tipo_interfaz  = 'obligacionPagoUnico' THEN
                    v_filadd=v_filadd ||' obpg.tipo_obligacion = ''pago_unico'' and ';
 
                 ELSIF   v_parametros.tipo_interfaz  = 'obligacionPagoEspecial' THEN
                    v_filadd=v_filadd ||' obpg.tipo_obligacion = ''pago_especial'' and ';
+
+                ELSIF   v_parametros.tipo_interfaz  = 'solicitudSinImputacionPresupuestaria' THEN
+                   v_filadd= ' obpg.tipo_obligacion = ''pago_especial_spi'' and ';
                 ELSE
                    v_filadd=v_filadd ||' obpg.tipo_obligacion in (''pago_directo'',''rrhh'') and';
+
                 END IF;
 
 
 
          END IF;
-
          -- raise exception '(%),... %', v_parametros.tipo_interfaz, v_filadd;
 
                   --Sentencia de la consulta
@@ -1257,23 +1260,23 @@ BEGIN
  	#TRANSACCION:  'TES_LIBAN_EXT_SEL'
  	#DESCRIPCION:	Listado libro de bancos exterior y observacion
  	#AUTOR:	 BVP
- 	#FECHA:		
+ 	#FECHA:
 	***********************************/
 
 	elsif(p_transaccion='TES_LIBAN_EXT_SEL')then
 
 		begin
 
-        select ges.gestion into v_gestion 
+        select ges.gestion into v_gestion
         from param.tgestion ges
         where ges.id_gestion = v_parametros.id_gestion;
-        
+
         v_fecha_ini = ('01/01/'||v_gestion::varchar)::date;
         v_fecha_fin = ('31/12/'||v_gestion::varchar)::date;
-        
-        
+
+
 			--Sentencia pagos con libro de bancos exterior y observacion
-			v_consulta:='select  
+			v_consulta:='select
                         plbex.id_obligacion_pago,
                         plbex.num_tramite,
                         plbex.fecha,
@@ -1284,8 +1287,11 @@ BEGIN
                         plbex.obs,
                         plbex.desc_persona,
                         plbex.usuario_ai,
-                        plbex.monto
+                        plbex.monto,
+                        mone.moneda,
+                        mone.codigo as cod_moneda
                     from tes.v_pagos_libro_banco_exterior plbex
+                    inner join param.tmoneda mone on mone.id_moneda = plbex.id_moneda
 					where plbex.fecha between '''||v_fecha_ini||''' and '''||v_fecha_fin||'''
                     and ' ;
 
@@ -1301,24 +1307,25 @@ BEGIN
  	#TRANSACCION:  'TES_LIBAN_EXT_CONT'
  	#DESCRIPCION:	Conteo de registros
  	#AUTOR:	 BVP
- 	#FECHA:		
+ 	#FECHA:
 	***********************************/
 
 	elsif(p_transaccion='TES_LIBAN_EXT_CONT')then
 
 		begin
 
-        select ges.gestion into v_gestion 
+        select ges.gestion into v_gestion
         from param.tgestion ges
         where ges.id_gestion = v_parametros.id_gestion;
-        
+
         v_fecha_ini = ('01/01/'||v_gestion::varchar)::date;
         v_fecha_fin = ('31/12/'||v_gestion::varchar)::date;
-        
-        
+
+
 			--Sentencia de la consulta de conteo de registros
 			v_consulta:='select count(plbex.id_obligacion_pago)
 						from tes.v_pagos_libro_banco_exterior plbex
+                        inner join param.tmoneda mone on mone.id_moneda = plbex.id_moneda
                         where plbex.fecha between '''||v_fecha_ini||''' and '''||v_fecha_fin||'''
                         and ';
 
