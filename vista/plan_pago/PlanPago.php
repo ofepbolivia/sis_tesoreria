@@ -2674,9 +2674,12 @@ header("content-type: text/javascript; charset=UTF-8");
             this.ocultarGrupo(2); //ocultar el grupo de ajustes
             this.ocultarGrupo(3); //ocultar el grupo de ajustes
 
+
             this.ocultarComponente(this.Cmp.id_proveedor_cta_bancaria);
 
-         
+            this.Cmp.id_proveedor_cta_bancaria.store.baseParams.id_proveedor = this.Cmp.id_proveedor.getValue();
+            
+
         },
 
         successAplicarDesc: function (resp) {
@@ -2816,6 +2819,7 @@ header("content-type: text/javascript; charset=UTF-8");
             this.Cmp.id_proveedor_cta_bancaria.setValue(id_proveedor_cta_bancaria);
             this.Cmp.id_proveedor_cta_bancaria.setRawValue(id_proveedor_cta_bancaria);
         }
+
 
     })
 </script>

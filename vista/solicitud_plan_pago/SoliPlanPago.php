@@ -2621,11 +2621,14 @@ header("content-type: text/javascript; charset=UTF-8");
 
             this.Cmp.forma_pago.disable();
 
-
+            //console.log('acaaa5',this.Cmp.id_proveedor.getValue());
             //para listar las cuentas de banco de un proveedor
-            this.Cmp.id_proveedor_cta_bancaria.store.baseParams.id_proveedor = this.maestro.id_proveedor;
-            this.Cmp.id_proveedor_cta_bancaria.tdata.id_padre = this.idContenedor;
-            //console.log('acaaa',this.maestro.id_proveedor)
+            //this.Cmp.id_proveedor_cta_bancaria.store.baseParams.id_proveedor = this.maestro.id_proveedor;
+            //this.Cmp.id_proveedor_cta_bancaria.tdata.id_padre = this.idContenedor;
+
+
+            //this.Cmp.id_proveedor_cta_bancaria.store.baseParams.id_proveedor = this.Cmp.id_proveedor.getValue();
+            console.log('acaaa',this.maestro.id_proveedor)
 
 
 

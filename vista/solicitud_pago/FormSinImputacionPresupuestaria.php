@@ -72,7 +72,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     pageSize: 10,
                     queryDelay: 1000,
                     minChars: 2,
-                    qtip: 'Si el conceto de gasto que necesita no existe por favor  comuniquese con el área de presupuestos para solictar la creación',
+                    qtip: 'Si el concepto de gasto que necesita no existe por favor  comuniquese con el área de presupuestos para solicitar la creación',
                     tpl: '<tpl for="."><div class="x-combo-list-item"><p><b>{desc_ingas}</b></p><strong>{tipo}</strong><p>PARTIDA: {desc_partida}</p></div></tpl>',
                 }),
                 'id_centro_costo': new Ext.form.ComboRec({
@@ -97,7 +97,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 'descripcion': new Ext.form.TextField({
                     name: 'descripcion',
                     msgTarget: 'title',
-                    fieldLabel: 'descripcion',
+                    fieldLabel: 'Descripción',
                     allowBlank: false,
                     anchor: '80%',
                     maxLength: 1200
@@ -107,7 +107,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     name: 'monto_pago_mo',
                     msgTarget: 'title',
                     currencyChar: ' ',
-                    fieldLabel: 'Precio.',
+                    fieldLabel: 'Precio',
                     minValue: 0.0001,
                     allowBlank: false,
                     allowDecimals: true,
@@ -375,7 +375,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     },
                     {
 
-                        header: 'Description',
+                        header: 'Descripción',
                         dataIndex: 'descripcion',
                         align: 'center',
                         width: 280,

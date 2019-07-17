@@ -148,7 +148,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 {
                     config:{
                         name: 'descripcion',
-                        fieldLabel: 'Descripión',
+                        fieldLabel: 'Descripción',
                         allowBlank: false,
                         anchor: '80%',
                         gwidth: 200,
@@ -363,7 +363,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 {
                     config:{
                         name: 'id_partida_ejecucion_com',
-                        fieldLabel: 'Partida Ejecucion Com',
+                        fieldLabel: 'Partida Ejecución Com',
                         allowBlank: true,
                         inputType:'hidden',
                         anchor: '80%',

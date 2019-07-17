@@ -175,7 +175,8 @@ header("content-type: text/javascript; charset=UTF-8");
         onSaveForm: function (form, objRes) {
             var me = this;
             //muestra la ventana de documentos para este proceso wf
-            Phx.CP.loadWindows('../../../sis_workflow/vista/documento_wf/DocumentoWf.php',
+            //16-07-2019se quita paradisminuir pasos al registro
+           /* Phx.CP.loadWindows('../../../sis_workflow/vista/documento_wf/DocumentoWf.php',
                 'Documentos del pago especial',
                 {
                     width: '90%',
@@ -201,7 +202,7 @@ header("content-type: text/javascript; charset=UTF-8");
 
                     scope: this
                 }
-            )
+            )*/
 
             form.panel.destroy();
             me.reload();
