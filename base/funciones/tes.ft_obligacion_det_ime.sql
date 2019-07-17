@@ -112,8 +112,8 @@ BEGIN
           from param.tconcepto_ingas cig
           where cig.id_concepto_ingas =  v_parametros.id_concepto_ingas;
 
-
-          IF v_tipo_obligacion = 'pago_especial' THEN
+          --(may) el tipo de obligacion pago_especial_spi son para las estaciones internacionales SIP
+          IF v_tipo_obligacion = 'pago_especial' or v_tipo_obligacion = 'pago_especial_spi' THEN
               v_relacion = 'PAGOES';
           ELSE
               v_relacion = 'CUECOMP';
@@ -126,7 +126,6 @@ BEGIN
           into
             v_id_partida
           FROM conta.f_get_config_relacion_contable(v_relacion, v_id_gestion, v_parametros.id_concepto_ingas, v_parametros.id_centro_costo, 'No se encontro relación contable para el concepto de gasto: '||v_registros_cig.desc_ingas||'. <br> Mensaje: ');
-
 
 
           IF v_id_partida is NULL THEN
@@ -221,14 +220,27 @@ BEGIN
             from param.tconcepto_ingas cig
             where cig.id_concepto_ingas =  v_parametros.id_concepto_ingas;
 
+		--17-07-2019 (may) modificacion para los pagos especiales
+           select op.tipo_obligacion
+           into v_tipo_obligacion
+           from tes.tobligacion_pago op
+           where op.id_obligacion_pago = v_parametros.id_obligacion_pago;
+
+		  IF v_tipo_obligacion = 'pago_especial' or v_tipo_obligacion = 'pago_especial_spi' THEN
+              v_relacion = 'PAGOES';
+          ELSE
+              v_relacion = 'CUECOMP';
+          END IF;
+
+
           SELECT
               ps_id_partida
             into
               v_id_partida
-          FROM conta.f_get_config_relacion_contable('CUECOMP', v_id_gestion, v_parametros.id_concepto_ingas, v_parametros.id_centro_costo, 'No se encontró relación contable para el concepto de gasto: '||v_registros_cig.desc_ingas||'. <br> Mensaje: ');
+          FROM conta.f_get_config_relacion_contable(v_relacion, v_id_gestion, v_parametros.id_concepto_ingas, v_parametros.id_centro_costo, 'No se encontró relación contable para el concepto de gasto: '||v_registros_cig.desc_ingas||'. <br> Mensaje: ');
+		  --FROM conta.f_get_config_relacion_contable('CUECOMP', v_id_gestion, v_parametros.id_concepto_ingas, v_parametros.id_centro_costo, 'No se encontró relación contable para el concepto de gasto: '||v_registros_cig.desc_ingas||'. <br> Mensaje: ');
 
-
-
+        ---
 
            IF v_id_partida is NULL THEN
           	 raise exception 'no se tiene una parametrización de partida  para este concepto de gasto en la relación contable de código CUECOMP  (%,%,%,%)','CUECOMP', v_id_gestion, v_parametros.id_concepto_ingas, v_parametros.id_centro_costo;
