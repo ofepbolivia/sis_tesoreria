@@ -145,6 +145,12 @@ header("content-type: text/javascript; charset=UTF-8");
 
 
             }, this);
+            //may
+            this.detCmp.id_centro_costo.on('select',function(cmp,rec,ind){
+                this.detCmp.id_orden_trabajo.reset();
+                this.detCmp.id_orden_trabajo.store.baseParams.id_centro_costo = rec.data.id_centro_costo;
+                this.detCmp.id_orden_trabajo.modificado = true;
+            }, this);
         },
 
         onInitAdd: function () {
