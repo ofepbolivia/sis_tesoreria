@@ -1026,9 +1026,12 @@ BEGIN
 
 
 
+						--tipo de obligacion SIP para  internacionales pago_especial_spi
 
                          IF v_tipo_obligacion in  ('pago_especial') THEN
                             v_tipo_plan_pago = 'especial';
+                         ELSIF v_tipo_obligacion in  ('pago_especial_spi') THEN
+                            v_tipo_plan_pago = 'especial_spi';
                          ELSE
 
 
@@ -1043,7 +1046,7 @@ BEGIN
                            END IF;
 
                            -- para los pagos internacionales que solo es devengado_pagado_1c
-                           IF v_tipo_obligacion in  ('spd', 'pago_especial_spi') THEN
+                           IF v_tipo_obligacion in  ('spd') THEN
                            	v_tipo_plan_pago = 'devengado_pagado_1c';
                            END IF;
 						   --
@@ -1096,8 +1099,8 @@ BEGIN
                      END LOOP;
           END IF;
 
-
-           IF  v_codigo_estado = 'borrador'   and v_tipo_obligacion != 'adquisiciones' and v_tipo_obligacion != 'pago_especial' and   v_pre_integrar_presupuestos = 'true'  THEN
+		--tipo de obligacion SIP para  internacionales pago_especial_spi
+           IF  v_codigo_estado = 'borrador'   and v_tipo_obligacion != 'adquisiciones' and v_tipo_obligacion != 'pago_especial' and v_tipo_obligacion != 'pago_especial_spi' and   v_pre_integrar_presupuestos = 'true'  THEN
 
                --si es borrador verificamos que el presupeusto sea suficiente para proseguir con la ordenç
                IF not tes.f_gestionar_presupuesto_tesoreria(v_parametros.id_obligacion_pago, p_id_usuario, 'verificar')  THEN
@@ -1105,7 +1108,6 @@ BEGIN
                END IF;
 
            END IF;
-
 
           -----------------------------------------------------------------------------
           -- COMPROMISO PRESUPUESTARIO
@@ -1117,6 +1119,8 @@ BEGIN
               and  v_comprometido = 'no'
               and v_tipo_obligacion != 'adquisiciones'
               and  v_tipo_obligacion != 'pago_especial'
+              --tipo de obligacion SIP para  internacionales pago_especial_spi
+              and  v_tipo_obligacion != 'pago_especial_spi'
               and  v_pre_integrar_presupuestos = 'true'  THEN
 
                       --jrr: llamamos a la funcion que revierte de planillas en caso de que sea de recursos humanos
@@ -1169,7 +1173,8 @@ BEGIN
 
            -- cuando viene de adquisiciones no es necesario comprometer pero dejamos la bancera de compromiso barcada
            --  ya que los montos se comprometiron en la solicitud de compra
-           IF v_codigo_estado_siguiente = 'registrado'  and  v_comprometido = 'no' and v_tipo_obligacion in  ('adquisiciones','pago_especial') THEN
+           --tipo de obligacion SIP para  internacionales pago_especial_spi
+           IF v_codigo_estado_siguiente = 'registrado'  and  v_comprometido = 'no' and v_tipo_obligacion in  ('adquisiciones','pago_especial', 'pago_especial_spi') THEN
                v_comprometido = 'si';
                --cambia la bandera del comprometido
                update tes.tobligacion_pago  set
@@ -1335,7 +1340,8 @@ BEGIN
 
 
                         -- cuando el estado al que regresa es  borrador o presupeustos esta comprometido y no viene de adquisiciones se revierte el repsupuesto
-                         IF (v_codigo_estado = 'borrador' or v_codigo_estado = 'vbpresupuestos') and v_comprometido = 'si' and   v_tipo_obligacion !='adquisiciones' and   v_tipo_obligacion !='pago_especial' and   v_pre_integrar_presupuestos = 'true'  THEN
+                        --tipo de obligacion SIP para  internacionales pago_especial_spi
+         			     IF (v_codigo_estado = 'borrador' or v_codigo_estado = 'vbpresupuestos') and v_comprometido = 'si' and   v_tipo_obligacion !='adquisiciones' and   v_tipo_obligacion !='pago_especial' and v_tipo_obligacion !='pago_especial_spi' and  v_pre_integrar_presupuestos = 'true'  THEN
 
                              --se revierte el presupeusto
                              IF not tes.f_gestionar_presupuesto_tesoreria(v_parametros.id_obligacion_pago, p_id_usuario, 'revertir')  THEN

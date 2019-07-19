@@ -518,14 +518,15 @@ BEGIN
            -- EDICION DE CUOTAS QUE TIENEN DEVENGADO   ('devengado_pagado','devengado','devengado_pagado_1c')
            --------------------------------------------------------------------------------------------------
 
-           IF v_registros_pp.tipo in ('devengado_pagado','devengado','devengado_pagado_1c','especial') THEN
+			--tipo de obligacion SIP para  internacionales pago_especial_spi con tipo de plan de pago especial_spi
+           IF v_registros_pp.tipo in ('devengado_pagado','devengado','devengado_pagado_1c','especial', 'especial_spi') THEN
 
 
-                 IF v_registros_pp.tipo in  ('especial') THEN
+                 IF v_registros_pp.tipo in  ('especial_spi') THEN
 
                        IF v_registros.pago_variable = 'no' THEN
                            v_monto_total = tes.f_determinar_total_faltante(v_parametros.id_obligacion_pago, 'especial_total');
-                           v_especial = tes.f_determinar_total_faltante(v_parametros.id_obligacion_pago, 'especial');
+                           v_especial = tes.f_determinar_total_faltante(v_parametros.id_obligacion_pago, 'especial_spi');
                            IF v_especial + v_registros_pp.monto <  v_parametros.monto  THEN
                               raise exception 'No puede exceder el total determinado: %', v_monto_total;
                            END IF;
@@ -812,7 +813,7 @@ BEGIN
               raise exception  'Este documento necesita especificar un monto excento no negativo';
            END IF;
 
-           IF COALESCE(v_monto_excento,0) > COALESCE(v_monto_ejecutar_total_mo,0) and v_registros_pp.tipo not in ('ant_parcial','anticipo','dev_garantia','especial') THEN
+           IF COALESCE(v_monto_excento,0) > COALESCE(v_monto_ejecutar_total_mo,0) and v_registros_pp.tipo not in ('ant_parcial','anticipo','dev_garantia','especial_spi') THEN
              raise exception 'El monto excento (%) debe ser menor que el total a ejecutar(%)',v_monto_excento, v_monto_ejecutar_total_mo  ;
            END IF;
 
@@ -1017,7 +1018,7 @@ BEGIN
            -------------------------------------------------
            --  Eliminacion de cuentas de primer nivel
            ------------------------------------------------
-           IF  v_registros.tipo in  ('devengado_pagado','devengado','devengado_pagado_1c','ant_parcial','anticipo','dev_garantia','especial')   THEN
+           IF  v_registros.tipo in  ('devengado_pagado','devengado','devengado_pagado_1c','ant_parcial','anticipo','dev_garantia','especial_spi')   THEN
                      select
                       max(pp.nro_cuota)
                      into
@@ -1036,7 +1037,7 @@ BEGIN
                      END IF;
 
                      --recuperamos el id_tipo_proceso en el WF para el estado anulado
-                     --ya que este es un estado especial que no tiene padres definidos
+                     --ya que este es un estado especial_spi que no tiene padres definidos
 
 
                      select
@@ -1433,5 +1434,4 @@ $body$
 LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
-SECURITY INVOKER
 COST 100;
