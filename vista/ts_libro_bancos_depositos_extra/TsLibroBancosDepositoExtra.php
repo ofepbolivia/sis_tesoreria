@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  *@package pXP
  *@file TsLibroBancosDepositoExtra.php
@@ -581,7 +581,25 @@ header("content-type: text/javascript; charset=UTF-8");
 				id_grupo:1,
 				grid:true,
 				form:false
-		}
+		},
+            {
+                config:{
+                    name: 'fecha_pago',
+                    fieldLabel: 'Fecha de Pago',
+                    allowBlank: true,
+                    //anchor: '80%',
+                    width: 177,
+                    gwidth: 100,
+                    format: 'd/m/Y',
+                    hidden: true,
+                    renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
+                },
+                type:'DateField',
+                filters:{pfiltro:'lban.fecha_pago',type:'date'},
+                id_grupo:1,
+                grid:false,
+                form:true
+            }
 	],
         title : 'Depositos Extra',
         ActSave:'../../sis_tesoreria/control/TsLibroBancos/insertarTsLibroBancos',
