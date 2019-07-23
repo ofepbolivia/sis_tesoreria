@@ -218,8 +218,8 @@ BEGIN
           -------------------------------------------------------------------
           --  VALIDACION DE MONTO FALTANTE, SEGUN TIPO DE CUOTA
           ------------------------------------------------------------
-
-          IF (p_hstore->'tipo') in('devengado_rrhh','devengado','devengado_pagado','devengado_pagado_1c','especial') THEN
+--tipo de obligacion SIP para  internacionales especial_spi
+          IF (p_hstore->'tipo') in('devengado_rrhh','devengado','devengado_pagado','devengado_pagado_1c','especial','especial_spi') THEN
 
                 --si es un proceso variable, verifica que el registro no sobrepase el total a pagar
                 IF v_registros.pago_variable='no' THEN
@@ -242,7 +242,7 @@ BEGIN
 
                             -- saldo_x_descontar - descuento_anticipo >  sando_x_pagar
                             IF (v_saldo_x_descontar -  COALESCE((p_hstore->'descuento_anticipo')::numeric,0))  > (v_saldo_x_pagar  - COALESCE((p_hstore->'monto')::numeric,0)) THEN
-                                raise exception 'El saldo a pagar no es sufuciente para recuperar el anticipo (%)',v_saldo_x_descontar;
+                                raise exception 'El saldo a pagar no es suficiente para recuperar el anticipo (%)',v_saldo_x_descontar;
                             END IF;
 
                          END IF;

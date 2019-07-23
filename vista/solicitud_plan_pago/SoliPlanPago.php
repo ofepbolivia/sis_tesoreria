@@ -237,7 +237,8 @@ header("content-type: text/javascript; charset=UTF-8");
                 ['ant_aplicado', 'Aplicacion de Anticipo'],
                 ['dev_garantia', 'Devolucion de Garantia'],
                 ['det_rendicion', 'Rendicion Ant'],
-                ['especial', 'Pago simple (sin efecto presupuestario)']
+                // ['especial', 'Pago simple (sin efecto presupuestario)']
+                ['especial_spi', 'Pago simple (sin efecto presupuestario)']
             ],
 
             'INICIAL': [
@@ -262,7 +263,8 @@ header("content-type: text/javascript; charset=UTF-8");
 
             'RENDICION': [['det_rendicion', 'Rendicion Ant']],
 
-            'ESPECIAL': [['especial', 'Pago simple (sin efecto presupuestario)']]
+            // 'ESPECIAL': [['especial', 'Pago simple (sin efecto presupuestario)']]
+            'ESPECIALSIP': [['especial_spi', 'Pago simple (sin efecto presupuestario)']]
 
         },
 
@@ -532,7 +534,8 @@ header("content-type: text/javascript; charset=UTF-8");
                         //dato = (dato == '' && value == 'ant_aplicado') ? 'Aplicacion de Anticipo' : dato;
                         //dato = (dato == '' && value == 'rendicion') ? 'Rendicion Ant.' : dato;
                         //dato = (dato == '' && value == 'ret_rendicion') ? 'Detalle de Rendicion' : dato;
-                        //dato = (dato == '' && value == 'especial') ? 'Pago simple (s/p)' : dato;
+                        // dato = (dato == '' && value == 'especial') ? 'Pago simple (s/p)' : dato;
+                        dato = (dato == '' && value == 'especial_spi') ? 'Pago simple (s/p)' : dato;
                         return String.format('{0}', dato);
                     },
 
@@ -2436,6 +2439,22 @@ header("content-type: text/javascript; charset=UTF-8");
                 me.ocultarGrupo(3); //ocultar el grupo de periodo del costo
 
 
+            },
+
+            //para las internacionales procesos SIP
+            'especial_spi': function (me) {
+                me.ocultarComponente(me.Cmp.id_plantilla);
+                me.mostrarComponente(me.Cmp.liquido_pagable);
+                me.mostrarComponentesPago(me);
+                me.deshabilitarDescuentos(me);
+                me.ocultarComponente(me.Cmp.descuento_ley);
+                me.ocultarComponente(me.Cmp.obs_descuentos_ley);
+                me.ocultarComponente(me.Cmp.monto_ejecutar_total_mo);
+                me.ocultarComponente(me.Cmp.monto_no_pagado);
+                me.ocultarComponente(me.Cmp.monto_retgar_mo);
+                me.ocultarComponente(me.Cmp.monto_anticipo);
+                me.ocultarGrupo(2); //ocultar el grupo de ajustes
+                me.ocultarGrupo(3); //ocultar el grupo de periodo del costo
             },
 
             'pagado': function (me) {
