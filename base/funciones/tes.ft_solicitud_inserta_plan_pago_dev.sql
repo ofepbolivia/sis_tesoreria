@@ -143,7 +143,7 @@ BEGIN
              v_forma_pago =  (p_hstore->'forma_pago')::varchar;
              v_nro_cheque =  (p_hstore->'nro_cheque')::integer;
 
-             IF v_tipo_obligacion = 'sp' or v_tipo_obligacion = 'spd' then
+             IF v_tipo_obligacion = 'sp' or v_tipo_obligacion = 'spd' or v_tipo_obligacion = 'spi' then
 
             		  select pcb.nro_cuenta ||'-'|| ins.nombre
                       into v_cuenta_bancaria_benef
@@ -230,7 +230,7 @@ BEGIN
           --  VALIDACION DE MONTO FALTANTE, SEGUN TIPO DE CUOTA
           ------------------------------------------------------------
 
-          IF (p_hstore->'tipo') in('devengado_rrhh','devengado','devengado_pagado','devengado_pagado_1c','especial') THEN
+          IF (p_hstore->'tipo') in('devengado_rrhh','devengado','devengado_pagado','devengado_pagado_1c_sp','especial_spi') THEN
 
                 --si es un proceso variable, verifica que el registro no sobrepase el total a pagar
                 IF v_registros.pago_variable='no' THEN
@@ -244,7 +244,7 @@ BEGIN
                         --   si es  un pago no variable  (si es una cuota de devengao_pagado, devegando_pagado_1c, pagado)
                         --  validar que no se haga el ultimo pago sin  terminar de descontar el anticipo,
 
-                        IF   (p_hstore->'tipo') in('devengado_pagado','devengado_pagado_1c')  THEN
+                        IF   (p_hstore->'tipo') in('devengado_pagado','devengado_pagado_1c_sp')  THEN
                             -- saldo_x_pagar = determinar cuanto falta por pagar (sin considerar el devengado)
                             v_saldo_x_pagar = tes.f_determinar_total_faltante((p_hstore->'id_obligacion_pago')::integer,'total_registrado_pagado');
 
@@ -286,7 +286,7 @@ BEGIN
           v_monto_ejecutar_total_mo  = COALESCE((p_hstore->'monto')::numeric,0) -  COALESCE((p_hstore->'monto_no_pagado')::numeric,0) - v_monto_anticipo;
 
           --revision de anticipo
-          IF (p_hstore->'tipo') in('devengado','devengado_pagado','devengado_pagado_1c') THEN
+          IF (p_hstore->'tipo') in('devengado','devengado_pagado','devengado_pagado_1c_sp') THEN
                --si es un proceso variable, verifica que el registro no sobrepase el total a pagar
                IF v_registros.pago_variable='no' THEN
                         -- Validamos anticipos mistos

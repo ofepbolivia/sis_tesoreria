@@ -47,8 +47,9 @@ BEGIN
 
 	v_nombre_funcion = 'tes.f_determinar_total_faltante';
 
- 			--(may) 18-07-2019 los tipo pp especial_spi son para las internacionales -tramites SIP
-            IF p_filtro not in ('registrado','registrado_pagado','registrado_monto_ejecutar','especial_total','anticipo_sin_aplicar','total_registrado_pagado','devengado','pagado','ant_parcial','ant_parcial_descontado','ant_aplicado_descontado','dev_garantia','ant_aplicado_descontado_op_variable','especial', 'especial_spi') THEN
+--raise exception 'llega2 %',p_filtro;
+			--(may) 18-07-2019 los tipo pp especial_spi son para las internacionales -tramites SIP
+            IF p_filtro not in ('registrado','registrado_pagado','registrado_monto_ejecutar','especial_total','anticipo_sin_aplicar','total_registrado_pagado','devengado','pagado','ant_parcial','ant_parcial_descontado','ant_aplicado_descontado','dev_garantia','ant_aplicado_descontado_op_variable','especial','especial_spi') THEN
 
               		raise exception 'filtro no reconocido (%) para determinar el total faltante ', p_filtro;
 
@@ -78,7 +79,7 @@ BEGIN
                        v_monto_total_registrado
                       from tes.tplan_pago pp
                       where  pp.estado_reg='activo'
-                            and pp.tipo in('devengado','devengado_pagado','rendicion','anticipo','devengado_pagado_1c')
+                            and pp.tipo in('devengado','devengado_pagado','rendicion','anticipo','devengado_pagado_1c', 'devengado_pagado_1c_sp')
                             and pp.id_obligacion_pago = p_id_obligacion_pago;
 
 
@@ -113,7 +114,7 @@ BEGIN
                        v_total_anticipo_mix
                       from tes.tplan_pago pp
                       where  pp.estado_reg='activo'
-                            and pp.tipo in('devengado','devengado_pagado','rendicion','anticipo','devengado_pagado_1c')
+                            and pp.tipo in('devengado','devengado_pagado','rendicion','anticipo','devengado_pagado_1c', 'devengado_pagado_1c_sp')
                             and pp.id_obligacion_pago = p_id_obligacion_pago;
 
 
@@ -180,7 +181,7 @@ BEGIN
                      into
                         v_total_anticipo
                      from tes.tplan_pago pp
-                     where  pp.tipo in ('devengado','devengado_pagado','devengado_pagado_1c')
+                     where  pp.tipo in ('devengado','devengado_pagado','devengado_pagado_1c','devengado_pagado_1c_sp')
                             and pp.id_plan_pago = p_id_plan_pago;
 
 
@@ -233,7 +234,7 @@ BEGIN
                      into
                         v_total_anticipo
                      from tes.tplan_pago pp
-                     where      pp.tipo in ('devengado','devengado_pagado','devengado_pagado_1c')
+                     where      pp.tipo in ('devengado','devengado_pagado','devengado_pagado_1c','devengado_pagado_1c_sp')
                             and pp.id_obligacion_pago = p_id_obligacion_pago;
 
                      -- determina el total registrado  con antticipo faltante
@@ -289,7 +290,7 @@ BEGIN
                        v_total_devengado
                      from tes.tplan_pago pp
                      where pp.estado_reg='activo'
-                              and pp.tipo in('devengado','devengado_pagado','devengado_pagado_1c')
+                              and pp.tipo in('devengado','devengado_pagado','devengado_pagado_1c','devengado_pagado_1c_sp')
                               and pp.estado in ( 'devengado')
                               and pp.id_obligacion_pago = p_id_obligacion_pago;
 
@@ -395,7 +396,7 @@ BEGIN
                          v_monto_ant_descontado
                         from tes.tplan_pago pp
                         where  pp.estado_reg='activo'
-                              and pp.tipo in('pagado','devengado_pagado_1c')          --un supeusto es que los descuentos de anticipo solo se hacen en el comprobante de pago
+                              and pp.tipo in('pagado','devengado_pagado_1c','devengado_pagado_1c_sp')          --un supeusto es que los descuentos de anticipo solo se hacen en el comprobante de pago
                               and pp.id_obligacion_pago = p_id_obligacion_pago;
 
 
@@ -442,7 +443,7 @@ BEGIN
                          v_monto_total_registrado
                         from tes.tplan_pago pp
                         where  pp.estado_reg='activo'
-                              and pp.tipo in('devengado','devengado_pagado','devengado_pagado_1c')
+                              and pp.tipo in('devengado','devengado_pagado','devengado_pagado_1c','devengado_pagado_1c_sp')
                               and pp.id_obligacion_pago = p_id_obligacion_pago;
 
                        --  recuperar los montos de garantia devueltos
@@ -544,7 +545,7 @@ BEGIN
                          v_monto_total_registrado
                         from tes.tplan_pago pp
                         where  pp.estado_reg='activo'
-                              and pp.tipo in('pagado','devengado_pagado_1c','anticipo')
+                              and pp.tipo in('pagado','devengado_pagado_1c','anticipo','devengado_pagado_1c_sp')
                               and pp.id_obligacion_pago = p_id_obligacion_pago;
 
 
@@ -570,7 +571,8 @@ BEGIN
 
                         return v_monto_total;
 
-             --(may) 18-07-2019 para las internacionales tramites SIP
+
+            --(may) 18-07-2019 para las internacionales tramites SIP
              ----------------------------------------------
              --  Pagos especiales para las internacionales
              ----------------------------------------------
@@ -602,6 +604,9 @@ BEGIN
 
 
                        return COALESCE(v_monto_ajuste,0) - COALESCE(v_monto_total_registrado,0);
+
+
+
             ELSE
 
                      raise exception 'Los otros filtros no fueron implementados %',p_filtro;
@@ -624,4 +629,5 @@ $body$
 LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
+SECURITY INVOKER
 COST 100;

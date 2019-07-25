@@ -12,6 +12,7 @@ header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
     Phx.vista.SoliPlanPago = Ext.extend(Phx.gridInterfaz, {
+        bedit:true,
         fheight: '95%',
         fwidth: '95%',
         accionFormulario: undefined, //define la accion que se ejcuta en formulario new o edit
@@ -221,12 +222,14 @@ header("content-type: text/javascript; charset=UTF-8");
         arrayStore: {
             'INT': [
 
-                ['devengado_pagado_1c', 'Devengar y pagar (1 comprobante)'],
+                // ['devengado_pagado_1c', 'Devengar y pagar (1 comprobante)'],
+                ['devengado_pagado_1c_sp', 'Devengar y pagar (1 comprobante)'],
 
             ],
             'TODOS': [
                 ['devengado_pagado', 'Devengar y pagar (2 comprobantes)'],
                 ['devengado_pagado_1c', 'Caso especial'],
+                ['devengado_pagado_1c_sp', 'Caso especial sp'],
                 ['devengado', 'Devengar'],
                 ['devengado_rrhh', 'Devengar RH'],
                 ['rendicion', 'Agrupar Dev y Pagar (Agrupa varios documentos)'], //es similr a un devengar y pagar pero no genera prorrateo directamente
@@ -524,9 +527,11 @@ header("content-type: text/javascript; charset=UTF-8");
                         var dato = '';
                         //dato = (dato == '' && value == 'devengado_rrhh') ? 'Devengar' : dato;
                         //dato = (dato == '' && value == 'devengado_pagado') ? 'Devengar y pagar (2 cbte)' : dato;
-                        dato = (dato == '' && value == 'devengado_pagado_1c') ? 'Devengar y pagar (1 cbte)' : dato;
+                        // dato = (dato == '' && value == 'devengado_pagado_1c') ? 'Devengar y pagar (1 cbte)' : dato;
+                        // dato = (dato == '' && value == 'devengado_pagado_1c') ? 'Devengar y pagar (1 cbte)' : dato;
+                        dato = (dato == '' && value == 'devengado_pagado_1c_sp') ? 'Devengar y pagar (1 cbte)' : dato;
                         // dato = (dato == '' && value == 'pagado') ? 'Pagar' : dato;
-                        //dato = (dato == '' && value == 'pagado_rrhh') ? 'Pagar' : dato;
+                        //dato = (dato == '' && vWF_DWF_SELalue == 'pagado_rrhh') ? 'Pagar' : dato;
                         //dato = (dato == '' && value == 'anticipo') ? 'Anticipo Fact/Rec' : dato;
                         //dato = (dato == '' && value == 'ant_parcial') ? 'Anticipo Parcial' : dato;
                         //dato = (dato == '' && value == 'ant_rendicion') ? 'Ant. por Rendir' : dato;
@@ -2046,6 +2051,7 @@ header("content-type: text/javascript; charset=UTF-8");
             if (data.estado == 'vbconta') {
 
                 this.Cmp.obs_monto_no_pagado.allowBlank = false;
+                this.getBoton('bedit').disable();
             }
 
 
@@ -2282,6 +2288,8 @@ header("content-type: text/javascript; charset=UTF-8");
             this.Cmp.monto_ajuste_siguiente_pag.setValue(0);
             this.Cmp.monto_anticipo.setValue(0);
 
+            this.Cmp.tipo.setValue('devengado_pagado_1c_sp');
+
 
         },
 
@@ -2389,7 +2397,8 @@ header("content-type: text/javascript; charset=UTF-8");
 
             },
 
-            'devengado_pagado_1c': function (me) {
+            // 'devengado_pagado_1c': function (me) {
+            'devengado_pagado_1c_sp': function (me) {
                 //plantilla (TIPO DOCUMENTO)
                 me.setTipoPago['devengado_pagado'](me);
 
@@ -2627,7 +2636,7 @@ header("content-type: text/javascript; charset=UTF-8");
             this.accionFormulario = 'NEW';
             Phx.vista.SoliPlanPago.superclass.onButtonNew.call(this);
             this.ocultarGrupo(2); //ocultar el grupo de ajustes
-            this.ocultarGrupo(3); //ocultar el grupo de ajustes
+            // this.ocultarGrupo(3); //ocultar el grupo de ajustes
 
             if (this.Cmp.id_depto_lb.getValue() > 0) {
                 this.Cmp.id_cuenta_bancaria.store.baseParams = Ext.apply(this.Cmp.id_cuenta_bancaria.store.baseParams, {
@@ -2638,7 +2647,7 @@ header("content-type: text/javascript; charset=UTF-8");
 
             }
 
-            this.Cmp.forma_pago.disable();
+            this.Cmp.forma_pago.enable();
 
             //console.log('acaaa5',this.Cmp.id_proveedor.getValue());
             //para listar las cuentas de banco de un proveedor

@@ -1368,7 +1368,8 @@ v_pre_integrar_presupuestos = pxp.f_get_variable_global('pre_integrar_presupuest
           end if;
 	  END IF;
 
-          IF  v_registros.tipo  in ('pagado' ,'devengado_pagado','devengado_pagado_1c','anticipo','ant_parcial') THEN
+          --(may) 20-07-2019 los tipo plan de pago devengado_pagado_1c_sp son para las internacionales -tramites sp con contato
+          IF  v_registros.tipo  in ('pagado' ,'devengado_pagado','devengado_pagado_1c','anticipo','ant_parcial','devengado_pagado_1c_sp') THEN
 
                   IF v_registros.forma_pago = 'cheque' THEN
 
@@ -1428,7 +1429,8 @@ v_pre_integrar_presupuestos = pxp.f_get_variable_global('pre_integrar_presupuest
 
            --si es un pago de vengado , revisar si tiene contrato
            --si tiene contrato con renteciones de garantia validar que la rentecion de garantia sea mayor a cero
-           IF  v_registros.tipo in ('devengado','devengado_pagado','devengado_pagado_1c') THEN
+           --(may) 20-07-2019 los tipo plan de pago devengado_pagado_1c_sp son para las internacionales -tramites sp con contato
+           IF  v_registros.tipo in ('devengado','devengado_pagado','devengado_pagado_1c', 'devengado_pagado_1c_sp') THEN
                IF v_registros.id_contrato is not null THEN
 
                    v_sw_retenciones = 'no';
@@ -2248,6 +2250,3 @@ VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
 COST 100;
-
-ALTER FUNCTION tes.f_plan_pago_ime (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
-  OWNER TO postgres;

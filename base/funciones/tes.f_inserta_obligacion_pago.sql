@@ -395,23 +395,46 @@ $body$
                         inner  join  wf.ttipo_documento td on td.id_tipo_documento = dwf.id_tipo_documento
                         where td.codigo = 'CONTRATO'  and dwf.id_proceso_wf = v_id_proceso_wf;
 
-                        UPDATE
-                          wf.tdocumento_wf
-                        SET
-                           id_usuario_mod = p_id_usuario,
-                           fecha_mod = now(),
-                           chequeado = v_registros_documento.chequeado,
-                           url = v_registros_documento.url,
-                           extension = v_registros_documento.extension,
-                           obs = v_registros_documento.obs,
-                           chequeado_fisico = v_registros_documento.chequeado_fisico,
-                           id_usuario_upload = v_registros_documento.id_usuario_upload,
-                           fecha_upload = v_registros_documento.fecha_upload,
-                           id_proceso_wf_ori = v_registros_documento.id_proceso_wf,
-                           id_documento_wf_ori = v_registros_documento.id_documento_wf,
-                           nro_tramite_ori = v_registros_con.nro_tramite
-                        WHERE
-                          id_documento_wf = v_id_documento_wf_op;
+                        --modificacion de doc chequeado_fisico que no obligue para los internacionales sp
+						IF ((p_hstore->'tipo_obligacion') in ('sp', 'spd', 'spi')) THEN
+
+                            UPDATE
+                                wf.tdocumento_wf
+                              SET
+                                 id_usuario_mod = p_id_usuario,
+                                 fecha_mod = now(),
+                                 chequeado = v_registros_documento.chequeado,
+                                 url = v_registros_documento.url,
+                                 extension = v_registros_documento.extension,
+                                 obs = v_registros_documento.obs,
+                                 --chequeado_fisico = v_registros_documento.chequeado_fisico,
+                                 id_usuario_upload = v_registros_documento.id_usuario_upload,
+                                 fecha_upload = v_registros_documento.fecha_upload,
+                                 id_proceso_wf_ori = v_registros_documento.id_proceso_wf,
+                                 id_documento_wf_ori = v_registros_documento.id_documento_wf,
+                                 nro_tramite_ori = v_registros_con.nro_tramite
+                              WHERE
+                                id_documento_wf = v_id_documento_wf_op;
+
+                        ELSE
+                               UPDATE
+                                wf.tdocumento_wf
+                              SET
+                                 id_usuario_mod = p_id_usuario,
+                                 fecha_mod = now(),
+                                 chequeado = v_registros_documento.chequeado,
+                                 url = v_registros_documento.url,
+                                 extension = v_registros_documento.extension,
+                                 obs = v_registros_documento.obs,
+                                 chequeado_fisico = v_registros_documento.chequeado_fisico,
+                                 id_usuario_upload = v_registros_documento.id_usuario_upload,
+                                 fecha_upload = v_registros_documento.fecha_upload,
+                                 id_proceso_wf_ori = v_registros_documento.id_proceso_wf,
+                                 id_documento_wf_ori = v_registros_documento.id_documento_wf,
+                                 nro_tramite_ori = v_registros_con.nro_tramite
+                               WHERE
+                                id_documento_wf = v_id_documento_wf_op;
+                        END IF;
 
 
                 END IF;
