@@ -40,7 +40,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 iconCls: 'batras',
                 disabled: true,
                 handler: this.antEstado,
-                tooltip: '<b>Retorna la Obligacion al estado Borrador</b>'
+                tooltip: '<b>Retorna la Obligación al estado Borrador</b>'
             });
 
             this.addButton('ant_estado', {
@@ -59,7 +59,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 iconCls: 'badelante',
                 disabled: true,
                 handler: this.fin_registro,
-                tooltip: '<b>Siguiente</b><p>Pasa al siguiente estado, si esta en borrador comprometera presupuesto</p>'
+                tooltip: '<b>Siguiente</b><p>Pasa al siguiente estado, si esta en borrador comprometerá presupuesto</p>'
             });
             this.addButton('reporte_com_ejec_pag', {
                 grupo: [0, 1, 2],
@@ -67,7 +67,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 iconCls: 'bpdf32',
                 disabled: true,
                 handler: this.repComEjePag,
-                tooltip: '<b>Reporte</b><p>Reporte Obligacion de Pago</p>'
+                tooltip: '<b>Reporte</b><p>Reporte Obligación de Pago</p>'
             });
             this.addButton('reporte_plan_pago', {
                 grupo: [0, 1, 2],
@@ -134,7 +134,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 iconCls: 'blist',
                 disabled: true,
                 handler: this.showAnticipo,
-                tooltip: '<b>Define el monto de ampliación util cuando necesitamos hacer pagos anticipados para la siguiente gestión</b>'
+                tooltip: '<b>Define el monto de ampliación útil cuando necesitamos hacer pagos anticipados para la siguiente gestión</b>'
             });
             //this.addButton('extenderop',{grupo:[0,1,2],text:'Ext.', iconCls: 'blist', disabled: true, handler: this.extenederOp,tooltip: '<b>Extender la obligación de pago para la siguiente gestión</b>'});
             this.addButton('btnExtender',
@@ -142,7 +142,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     iconCls: 'brenew',
                     xtype: 'splitbutton',
                     grupo: [0, 4],
-                    tooltip: '<b>Ext. Pagos</b><br>Nos permite elegir extender un pago recurrente, unico <br> o pago de una gestion anterior.',
+                    tooltip: '<b>Ext. Pagos</b><br>Nos permite elegir extender un pago recurrente, único <br> o pago de una gestión anterior.',
                     text: 'Ext. Pagos',
                     /*argument: {
                         'news': true,
@@ -152,7 +152,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     menu: [{
                         text: 'Pago Recurrente (TES)',
                         //iconCls: 'btag_accept',
-                        tooltip: '<b>Permite Extender un Pago Unico, o Recurrente</b>',
+                        tooltip: '<b>Permite Extender un Pago Único, o Recurrente</b>',
                         /*argument: {
                             'news': true,
                             def: 'csv'
@@ -166,7 +166,7 @@ header("content-type: text/javascript; charset=UTF-8");
                             'news': true,
                             def: 'pdf'
                         },*/
-                        tooltip: '<b>Permite Extender un Pago Gestion Anterior</b>',
+                        tooltip: '<b>Permite Extender un Pago Gestión Anterior</b>',
                         handler: this.extenderPGA,
                         scope: this
                     }]
@@ -202,7 +202,7 @@ header("content-type: text/javascript; charset=UTF-8");
             {
                 config: {
                     name: 'num_tramite',
-                    fieldLabel: 'Num. Tramite',
+                    fieldLabel: 'Núm. Trámite',
                     allowBlank: true,
                     anchor: '80%',
                     gwidth: 150,
@@ -237,7 +237,7 @@ header("content-type: text/javascript; charset=UTF-8");
             {
                 config: {
                     name: 'estado',
-                    fieldLabel: 'estado',
+                    fieldLabel: 'Estado',
                     allowBlank: true,
                     anchor: '80%',
                     gwidth: 100,
@@ -252,7 +252,7 @@ header("content-type: text/javascript; charset=UTF-8");
             {
                 config: {
                     name: 'numero',
-                    fieldLabel: 'Numero',
+                    fieldLabel: 'Número',
                     allowBlank: true,
                     anchor: '80%',
                     gwidth: 180,
@@ -275,7 +275,7 @@ header("content-type: text/javascript; charset=UTF-8");
             {
                 config: {
                     name: 'ultima_cuota_pp',
-                    fieldLabel: 'Ult PP',
+                    fieldLabel: 'Ult. PP',
                     allowBlank: true,
                     anchor: '80%',
                     gwidth: 100,
@@ -306,7 +306,7 @@ header("content-type: text/javascript; charset=UTF-8");
             {
                 config: {
                     name: 'tipo_obligacion',
-                    fieldLabel: 'Tipo Obligacion',
+                    fieldLabel: 'Tipo Obligación',
                     allowBlank: false,
                     anchor: '80%',
                     emptyText: 'Tipo Obligacion',
@@ -683,7 +683,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     name: 'obs',
                     fieldLabel: 'Justificación',
                     allowBlank: false,
-                    qtip: 'Descripcion del objetivo del pago, o Si el proveedor es PASAJEROS PERJUDICADOS aqui va el nombre del pasajero',
+                    qtip: 'Descripción del objetivo del pago, o Si el proveedor es PASAJEROS PERJUDICADOS aqui va el nombre del pasajero',
                     anchor: '80%',
                     gwidth: 250,
                     maxLength: 1000
@@ -698,7 +698,7 @@ header("content-type: text/javascript; charset=UTF-8");
             {
                 config: {
                     name: 'total_nro_cuota',
-                    fieldLabel: 'Nro Cuotas',
+                    fieldLabel: 'Nro. Cuotas',
                     allowBlank: false,
                     allowDecimals: false,
                     anchor: '80%',
@@ -831,7 +831,7 @@ header("content-type: text/javascript; charset=UTF-8");
             },
             {
                 config: {
-                    fieldLabel: 'Obs Presupuestos',
+                    fieldLabel: 'Obs. Presupuestos',
                     gwidth: 180,
                     name: 'obs_presupuestos'
                 },

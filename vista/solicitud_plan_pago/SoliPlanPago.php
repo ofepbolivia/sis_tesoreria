@@ -12,7 +12,6 @@ header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
     Phx.vista.SoliPlanPago = Ext.extend(Phx.gridInterfaz, {
-        bedit:true,
         fheight: '95%',
         fwidth: '95%',
         accionFormulario: undefined, //define la accion que se ejcuta en formulario new o edit
@@ -37,7 +36,7 @@ header("content-type: text/javascript; charset=UTF-8");
                             items: [
                                 {
                                     xtype: 'fieldset',
-                                    title: 'Tipo de Pago',
+                                    title: 'TIPO DE PAGO',
                                     autoHeight: true,
                                     //layout:'hbox',
                                     items: [],
@@ -46,7 +45,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                 },
                                 {
                                     xtype: 'fieldset',
-                                    title: 'Periodo al que corresponde el gasto',
+                                    title: 'PERIODO AL QUE CORRESPONDE EL GASTO',
                                     autoHeight: true,
                                     hiden: true,
                                     //layout:'hbox',
@@ -70,7 +69,7 @@ header("content-type: text/javascript; charset=UTF-8");
                             items: [
                                 {
                                     xtype: 'fieldset',
-                                    title: 'Detalle de Pago',
+                                    title: 'DETALLE DE PAGO',
                                     autoHeight: true,
                                     // layout:'hbox',
                                     items: [],
@@ -79,7 +78,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                 },
                                 {
                                     xtype: 'fieldset',
-                                    title: 'Ajustes',
+                                    title: 'AJUSTES',
                                     autoHeight: true,
                                     hiden: true,
                                     // layout:'hbox',
@@ -94,7 +93,7 @@ header("content-type: text/javascript; charset=UTF-8");
                             items: [
                                 {
                                     xtype: 'fieldset',
-                                    title: 'Observaciones',
+                                    title: 'OBSERVACIONES',
                                     autoHeight: true,
                                     hiden: true,
                                     // layout:'hbox',
@@ -118,11 +117,11 @@ header("content-type: text/javascript; charset=UTF-8");
             this.addButton('ini_estado', {
                 grupo: [0, 1],
                 argument: {estado: 'inicio'},
-                text: 'Dev. a borrador',
+                text: 'Dev. a Borrador',
                 iconCls: 'batras',
                 disabled: true,
                 handler: this.antEstado,
-                tooltip: '<b>Retorna el plan de pagos al estado borrador</b>'
+                tooltip: '<b>Retorna el Plan de Pagos al Estado Borrador</b>'
             });
             this.addButton('ant_estado', {
                 grupo: [0, 1],
@@ -139,7 +138,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 iconCls: 'badelante',
                 disabled: true,
                 handler: this.sigEstado,
-                tooltip: '<b>Apueba y pasar al Siguiente Estado</b>'
+                tooltip: '<b>Apueba y Pasa al Siguiente Estado</b>'
             });
             // this.addButton('SolDevPag', {
             //   text: 'Generar Cbte',
@@ -150,11 +149,11 @@ header("content-type: text/javascript; charset=UTF-8");
             //});
 
             this.addButton('btnDocCmpVnt', {
-                text: 'Doc Cmp/Vnt',
+                text: 'Doc. Cmp/Vnt',
                 iconCls: 'brenew',
                 disabled: true,
                 handler: this.loadDocCmpVnt,
-                tooltip: '<b>Documentos de compra/venta</b><br/>Muestra los docuemntos relacionados con el comprobante'
+                tooltip: '<b>Documentos de Compra/Venta</b><br/>Muestra los documentos relacionados con el comprobante'
             });
 
             this.addButton('btnImportePP', {
@@ -174,7 +173,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     iconCls: 'bchecklist',
                     disabled: true,
                     handler: this.loadCheckDocumentosSolWf,
-                    tooltip: '<b>Documentos de la Solicitud</b><br/>Subir los documetos requeridos en la solicitud seleccionada.'
+                    tooltip: '<b>Documentos de la Solicitud</b><br/>Subir los documetos requeridos en la Solicitud seleccionada.'
                 }
             );
 
@@ -204,7 +203,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 iconCls: 'balert',
                 disabled: true,
                 handler: this.onBtnSincPresu,
-                tooltip: '<b>Incrementar Presupuesto</b><br/> Incremeta el presupuesto exacto para proceder con el pago'
+                tooltip: '<b>Incrementar Presupuesto</b><br/> Incrementa el presupuesto exacto para proceder con el pago'
             });
             this.addButton('SolPlanPago', {
                 grupo: [0, 1],
@@ -212,7 +211,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 iconCls: 'bpdf32',
                 disabled: true,
                 handler: this.onBtnSolPlanPago,
-                tooltip: '<b>Solicitud Plan Pago</b><br/> Incremeta el presupuesto exacto para proceder con el pago'
+                tooltip: '<b>Solicitud Plan Pago</b><br/> Incrementa el presupuesto exacto para proceder con el pago'
             });
 
 
@@ -370,7 +369,7 @@ header("content-type: text/javascript; charset=UTF-8");
             {
                 config: {
                     name: 'revisado_asistente',
-                    fieldLabel: 'Rev',
+                    fieldLabel: 'Rev.',
                     allowBlank: true,
                     anchor: '80%',
                     gwidth: 50,
@@ -390,7 +389,7 @@ header("content-type: text/javascript; charset=UTF-8");
             {
                 config: {
                     name: 'num_tramite',
-                    fieldLabel: 'Num. Trámite',
+                    fieldLabel: 'Núm. Trámite',
                     allowBlank: true,
                     anchor: '80%',
                     gwidth: 150,
@@ -431,7 +430,7 @@ header("content-type: text/javascript; charset=UTF-8");
             {
                 config: {
                     name: 'tiene_form500',
-                    fieldLabel: 'Form 500',
+                    fieldLabel: 'Form. 500',
                     allowBlank: true,
                     anchor: '80%',
                     gwidth: 70,
@@ -448,7 +447,7 @@ header("content-type: text/javascript; charset=UTF-8");
             {
                 config: {
                     name: 'nro_cuota',
-                    fieldLabel: 'Cuo. N#',
+                    fieldLabel: 'Nro. Cuota',
                     allowBlank: true,
                     gwidth: 70,
                     renderer: function (value, p, record) {
@@ -531,7 +530,7 @@ header("content-type: text/javascript; charset=UTF-8");
                         // dato = (dato == '' && value == 'devengado_pagado_1c') ? 'Devengar y pagar (1 cbte)' : dato;
                         dato = (dato == '' && value == 'devengado_pagado_1c_sp') ? 'Devengar y pagar (1 cbte)' : dato;
                         // dato = (dato == '' && value == 'pagado') ? 'Pagar' : dato;
-                        //dato = (dato == '' && vWF_DWF_SELalue == 'pagado_rrhh') ? 'Pagar' : dato;
+                        //dato = (dato == '' && value == 'pagado_rrhh') ? 'Pagar' : dato;
                         //dato = (dato == '' && value == 'anticipo') ? 'Anticipo Fact/Rec' : dato;
                         //dato = (dato == '' && value == 'ant_parcial') ? 'Anticipo Parcial' : dato;
                         //dato = (dato == '' && value == 'ant_rendicion') ? 'Ant. por Rendir' : dato;
@@ -693,7 +692,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     name: 'monto_excento',
                     currencyChar: ' ',
                     allowNegative: false,
-                    fieldLabel: 'Monto exento',
+                    fieldLabel: 'Monto Exento',
                     allowBlank: false,
                     disabled: true,
                     gwidth: 100,
@@ -713,7 +712,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     //url: '../../sis_parametros/control/Depto/listarDepto',
                     origen: 'DEPTO',
                     allowBlank: false,
-                    fieldLabel: 'Libro de bancos destino',
+                    fieldLabel: 'Libro de Bancos Destino',
                     disabled: false,
                     width: '80%',
                     baseParams: {estado: 'activo', codigo_subsistema: 'TES', modulo: 'LB', tipo_filtro: 'DEPTO_UO'},
@@ -823,7 +822,7 @@ header("content-type: text/javascript; charset=UTF-8");
             {
                 config: {
                     name: 'id_proveedor_cta_bancaria',
-                    fieldLabel: 'Cuenta Bancaria(Prov.)',
+                    fieldLabel: 'Cuenta Bancaria(Pov.)',
                     allowBlank: true,
                     resizable:true,
                     emptyText: 'Elija una Cuenta...',
@@ -920,7 +919,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     name: 'monto_anticipo',
                     currencyChar: ' ',
                     allowNegative: false,
-                    qtip: 'Este monto incrementa el liquido pagable y figura como un anticipo',
+                    qtip: 'Este monto incrementa el líquido pagable y figura como un anticipo',
                     fieldLabel: 'Monto anticipado',
                     allowBlank: false,
                     gwidth: 100,
@@ -935,7 +934,7 @@ header("content-type: text/javascript; charset=UTF-8");
             {
                 config: {
                     name: 'descuento_anticipo',
-                    qtip: 'Si anteriormente se le dio un anticipo parcial,  en este campo se colocan las retenciones para recuperar el anticipo',
+                    qtip: 'Si anteriormente se le dió un Anticipo Parcial,  en este campo se colocan las Retenciones para recuperar el Anticipo',
                     currencyChar: ' ',
                     fieldLabel: 'Desc. Anticipo',
                     allowBlank: true,
@@ -954,7 +953,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 config: {
                     name: 'monto_retgar_mo',
                     currencyChar: ' ',
-                    fieldLabel: 'Ret. Garantia',
+                    fieldLabel: 'Ret. Garantía',
                     allowBlank: true,
                     allowNegative: false,
                     gwidth: 100,
@@ -970,7 +969,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 config: {
                     name: 'monto_no_pagado',
                     currencyChar: ' ',
-                    fieldLabel: 'Monto no pagado',
+                    fieldLabel: 'Monto No Pagado',
                     allowBlank: true,
                     allowNegative: false,
                     gwidth: 100,
@@ -1002,7 +1001,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 config: {
                     name: 'descuento_inter_serv',
                     currencyChar: ' ',
-                    fieldLabel: 'Desc. Inter Servicio',
+                    fieldLabel: 'Desc. Inter. Servicio',
                     allowBlank: true,
                     allowNegative: false,
                     gwidth: 100,
@@ -1018,7 +1017,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 config: {
                     name: 'descuento_ley',
                     currencyChar: ' ',
-                    fieldLabel: 'Decuentos de Ley',
+                    fieldLabel: 'Descuentos de Ley',
                     allowBlank: true,
                     // readOnly: true,
                     allowNegative: false,
@@ -1069,7 +1068,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 config: {
                     name: 'liquido_pagable',
                     currencyChar: ' ',
-                    fieldLabel: 'Liquido Pagable',
+                    fieldLabel: 'Líquido Pagable',
                     allowBlank: true,
                     readOnly: true,
                     gwidth: 100,
@@ -1132,7 +1131,7 @@ header("content-type: text/javascript; charset=UTF-8");
             {
                 config: {
                     name: 'obs_wf',
-                    fieldLabel: 'Obs',
+                    fieldLabel: 'Obs.',
                     allowBlank: true,
                     anchor: '80%',
                     gwidth: 300,
@@ -1223,7 +1222,7 @@ header("content-type: text/javascript; charset=UTF-8");
             {
                 config: {
                     name: 'obs_otros_descuentos',
-                    fieldLabel: 'Obs. otros desc.',
+                    fieldLabel: 'Obs. Otros Desc.',
                     allowBlank: true,
 
                     // anchor: '80%',
@@ -1241,7 +1240,7 @@ header("content-type: text/javascript; charset=UTF-8");
             {
                 config: {
                     name: 'obs_descuentos_ley',
-                    fieldLabel: 'Obs. desc. ley',
+                    fieldLabel: 'Obs. Desc. Ley',
                     allowBlank: true,
 
                     // anchor: '80%',
@@ -1260,7 +1259,7 @@ header("content-type: text/javascript; charset=UTF-8");
             {
                 config: {
                     name: 'obs_descuento_inter_serv',
-                    fieldLabel: 'Obs. desc. inter. serv.',
+                    fieldLabel: 'Obs. Desc. Inter. Serv.',
                     allowBlank: true,
 
                     // anchor: '80%',
@@ -1277,7 +1276,7 @@ header("content-type: text/javascript; charset=UTF-8");
             {
                 config: {
                     name: 'desc_funcionario1',
-                    fieldLabel: 'Fun Solicitante',
+                    fieldLabel: 'Fun. Solicitante',
                     allowBlank: true,
                     anchor: '80%',
                     gwidth: 250,
@@ -1294,7 +1293,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     name: 'monto_ajuste_ag',
                     currencyChar: ' ',
                     fieldLabel: 'Ajuste Anterior Gestión',
-                    qtip: 'Si en la anterior gestión el proveedor quedo con anticipo a favor de nuestra empresa, acá colocamos el monto que queremos cubrir con dicho sobrante',
+                    qtip: 'Si en la anterior gestión el proveedor quedó con anticipo a favor de nuestra empresa, acá colocamos el monto que queremos cubrir con dicho sobrante',
                     allowBlank: true,
                     allowNegative: false,
                     gwidth: 100,
@@ -1310,7 +1309,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 config: {
                     name: 'monto_ajuste_siguiente_pag',
                     currencyChar: ' ',
-                    fieldLabel: 'Ajuste Anticipo siguiente',
+                    fieldLabel: 'Ajuste Anticipo Siguiente',
                     qtip: 'Si el anticipo no alcanza para cubrir, acá colocamos el monto a cubrir con el siguiente anticipo',
                     allowBlank: true,
                     allowNegative: false,
@@ -1326,7 +1325,7 @@ header("content-type: text/javascript; charset=UTF-8");
             {
                 config: {
                     name: 'fecha_costo_ini',
-                    fieldLabel: 'Fecha Inicio.',
+                    fieldLabel: 'Fecha Inicio',
                     allowBlank: false,
                     gwidth: 100,
                     format: 'd/m/Y',
@@ -1343,7 +1342,7 @@ header("content-type: text/javascript; charset=UTF-8");
             {
                 config: {
                     name: 'fecha_costo_fin',
-                    fieldLabel: 'Fecha Fin.',
+                    fieldLabel: 'Fecha Fin',
                     allowBlank: false,
                     gwidth: 100,
                     format: 'd/m/Y',
@@ -1377,7 +1376,7 @@ header("content-type: text/javascript; charset=UTF-8");
             {
                 config: {
                     name: 'fecha_cbte_ini',
-                    fieldLabel: 'Fecha Inicial(cbte)',
+                    fieldLabel: 'Fecha Inicial(Cbte)',
                     allowBlank: true,
                     width: 100,
                     gwidth: 120,
@@ -1398,7 +1397,7 @@ header("content-type: text/javascript; charset=UTF-8");
             }, {
                 config: {
                     name: 'fecha_cbte_fin',
-                    fieldLabel: 'Fecha Final(cbte)',
+                    fieldLabel: 'Fecha Final(Cbte)',
                     allowBlank: true,
                     width: 100,
                     gwidth: 120,
@@ -1422,7 +1421,7 @@ header("content-type: text/javascript; charset=UTF-8");
             {
                 config: {
                     name: 'funcionario_wf',
-                    fieldLabel: 'Funcionario Res WF',
+                    fieldLabel: 'Funcionario Res. WF',
                     anchor: '80%',
                     gwidth: 250
                 },
@@ -2049,9 +2048,7 @@ header("content-type: text/javascript; charset=UTF-8");
             }
 
             if (data.estado == 'vbconta') {
-
                 this.Cmp.obs_monto_no_pagado.allowBlank = false;
-                this.getBoton('bedit').disable();
             }
 
 
