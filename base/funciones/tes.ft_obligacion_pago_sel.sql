@@ -58,9 +58,6 @@ DECLARE
     v_fecha_ini					date;
     v_fecha_fin					date;
 
-    v_cargo						varchar;
-    v_funcionario_usu			integer;
-    v_fun_res					varchar;
 
 BEGIN
 
@@ -202,38 +199,24 @@ BEGIN
                      where depu.id_usuario =  p_id_usuario and depu.cargo in  ('responsable', 'auxiliar');
 
                --(may)
-                     select depu.cargo
-                     into v_cargo
-                         va_id_depto_aux
-                     from param.tdepto_usuario depu
-                     where depu.id_usuario = p_id_usuario;
+
+                        SELECT tf.id_funcionario
+                        INTO v_id_funcionario
+                        FROM segu.tusuario tu
+                        INNER JOIN orga.tfuncionario tf on tf.id_persona = tu.id_persona
+                        WHERE tu.id_usuario = p_id_usuario ;
 
 
-                     select fun.id_funcionario
-                     into v_fun_res
-                     from param.tdepto_usuario du
-                     inner join segu.tusuario us on us.id_usuario = du.id_usuario
-                     inner join orga.vfuncionario fun on fun.id_persona  = us.id_persona
-                     where du.id_depto = va_id_depto[1]::integer
-                     and du.cargo in ('responsable');
+                        v_filadd = ' (pc.id_depto  in ('|| COALESCE(array_to_string(va_id_depto,','),'0')||')  or obpg.id_funcionario = '||v_id_funcionario||' or obpg.id_usuario_reg = '||p_id_usuario||' or sol.id_usuario_reg = '||p_id_usuario||') and ';
 
-
-                     IF (v_cargo = 'auxiliar') THEN
-                     	v_funcionario_usu = 70;
-                     ELSE
-                        v_funcionario_usu = v_parametros.id_funcionario_usu;
-                     END IF;
-
-
-                     --v_filadd='( (pc.id_depto  in ('|| COALESCE(array_to_string(va_id_depto,','),'0')||'))   or   pc.id_usuario_auxiliar = '||p_id_usuario::varchar ||' or obpg.id_funcionario='||v_parametros.id_funcionario_usu::varchar||' ) and ';
-                     v_filadd='( (pc.id_depto  in ('|| COALESCE(array_to_string(va_id_depto,','),'0')||'))   or   pc.id_usuario_auxiliar = '||p_id_usuario::varchar ||' or obpg.id_funcionario='||v_funcionario_usu::varchar||' ) and ';
-                --
+				--
               END IF;
 
 
               v_inner = '
                             inner join adq.tcotizacion cot on cot.id_obligacion_pago = obpg.id_obligacion_pago
-                            inner join adq.tproceso_compra pc on pc.id_proceso_compra = cot.id_proceso_compra  ';
+                            inner join adq.tproceso_compra pc on pc.id_proceso_compra = cot.id_proceso_compra
+                            inner join adq.tsolicitud sol on sol.id_solicitud = pc.id_solicitud ';
         END IF;
 
 
