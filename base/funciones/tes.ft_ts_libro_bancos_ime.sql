@@ -77,6 +77,9 @@ DECLARE
 	g_origen				varchar;
     g_nro_tramite			varchar;
     g_id_int_comprobante	integer;
+    --variables forma pago
+    v_form_pago				record;
+    v_hstore_aux			hstore;
 BEGIN
     v_nombre_funcion = 'tes.ft_ts_libro_bancos_ime';
     v_parametros = pxp.f_get_record(p_tabla);
@@ -97,6 +100,12 @@ BEGIN
 	if(p_transaccion='TES_LBAN_INS')then
 
         begin
+          --(breydi.vasquez) informacion de forma de pago
+          select fo.id_forma_pago,fo.tipo
+          into v_form_pago
+          from param.tforma_pago fo
+          where fo.codigo = v_parametros.tipo;
+
         	select ctaban.centro into g_centro
             from tes.tcuenta_bancaria ctaban
             where ctaban.id_cuenta_bancaria = v_parametros.id_cuenta_bancaria;
@@ -212,7 +221,10 @@ BEGIN
                 g_nro_cheque=null;
             end if;
            raise notice 'antes de llamar a la funcion tes.f_inserta_libro_bancos';
-            v_id_libro_bancos = tes.f_inserta_libro_bancos(p_administrador,p_id_usuario,hstore(v_parametros));
+            --v_id_libro_bancos = tes.f_inserta_libro_bancos(p_administrador,p_id_usuario,hstore(v_parametros));
+            --se adiciona el campo id_forma_pago al hstore que se envia a la funcion tes.f_inserta_libro_bancos
+          	v_hstore_aux =  hstore(v_parametros) || ('id_forma_pago=>'||v_form_pago.id_forma_pago)::hstore;
+            v_id_libro_bancos = tes.f_inserta_libro_bancos(p_administrador,p_id_usuario,v_hstore_aux);
          --ALGORITMO DE ORDENACION DE REGISTROS
 
          --VERIFICAMOS SI ES UN DEPOSITO, transferencia o debito automatico

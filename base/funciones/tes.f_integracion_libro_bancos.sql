@@ -87,6 +87,14 @@ BEGIN
           v_resp= 'true';
       elseif(v_registros.prioridad_conta = 3 and v_registros.prioridad_libro =3 )then
           --v_respuesta_libro_bancos = tes.f_generar_cheque(p_id_usuario,p_id_int_comprobante, v_id_finalidad,NULL,'','internacional');
+          --(franklin.espinoza)generamos ligro de bancos mas deposito si corresponde
+          if pxp.f_get_variable_global('ESTACION_inicio') = 'BUE' then
+            IF(v_registros.centro!='si')THEN
+                  v_respuesta_libro_bancos = tes.f_generar_deposito_cheque(p_id_usuario,p_id_int_comprobante, v_id_finalidad,NULL,COALESCE(v_registros.c31,''),'internacional');
+            ELSE
+                  v_respuesta_libro_bancos = tes.f_generar_cheque(p_id_usuario,p_id_int_comprobante, v_id_finalidad,NULL,COALESCE(v_registros.c31,''),'internacional');
+            END IF;
+          end if;
           v_resp= 'true';
       elsif(v_registros.prioridad_conta in (0,1) and v_registros.prioridad_libro in (0,1))then
          
@@ -121,9 +129,17 @@ BEGIN
           					cuenta bancaria regional';
       elsif(v_registros.prioridad_conta = 3 and v_registros.prioridad_libro =3 )then
           --v_respuesta_libro_bancos = tes.f_generar_transferencia(p_id_usuario,p_id_int_comprobante, v_id_finalidad,NULL,'','internacional');
+          --(franklin.espinoza)generar transferencia en libro de bancos
+          if pxp.f_get_variable_global('ESTACION_inicio') = 'BUE' then
+            v_respuesta_libro_bancos = tes.f_generar_transferencia(p_id_usuario,p_id_int_comprobante, v_id_finalidad,NULL,'','internacional');
+          end if;
           v_resp= 'true';
       elsif(v_registros.prioridad_conta = 2 and v_registros.prioridad_libro =1 )then
           v_resp= 'true';
+      end if;
+    ELSE --(franklin.espinoza) otro tipo de forma de pago
+    	if pxp.f_get_variable_global('ESTACION_inicio') = 'BUE' then
+        	v_respuesta_libro_bancos = tes.f_generar_cheque(p_id_usuario,p_id_int_comprobante, v_id_finalidad,NULL,COALESCE(v_registros.c31,''),'internacional');
       end if;
     END IF;
 
