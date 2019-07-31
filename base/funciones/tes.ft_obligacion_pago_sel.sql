@@ -58,6 +58,7 @@ DECLARE
     v_fecha_ini					date;
     v_fecha_fin					date;
 
+
 BEGIN
 
 	v_nombre_funcion = 'tes.ft_obligacion_pago_sel';
@@ -171,7 +172,6 @@ BEGIN
               END IF;
 
 
-
          ELSIF  v_parametros.tipo_interfaz =  'ObligacionPagoVbPoa' THEN
 
               IF v_historico = 'no' THEN
@@ -188,24 +188,35 @@ BEGIN
             --no hay limitaciones ...
          ELSE
 
-              -- SI LA NTERFACE VIENE DE ADQUISIONES
+              -- SI LA INTERFACE VIENE DE ADQUISIONES
 
               IF   p_administrador != 1 THEN
-                   select
+                     select
                          pxp.aggarray(depu.id_depto)
                       into
                          va_id_depto
                      from param.tdepto_usuario depu
-                     where depu.id_usuario =  p_id_usuario and depu.cargo = 'responsable';
+                     where depu.id_usuario =  p_id_usuario and depu.cargo in  ('responsable', 'auxiliar');
+
+               --(may)
+
+                        SELECT tf.id_funcionario
+                        INTO v_id_funcionario
+                        FROM segu.tusuario tu
+                        INNER JOIN orga.tfuncionario tf on tf.id_persona = tu.id_persona
+                        WHERE tu.id_usuario = p_id_usuario ;
 
 
-                     v_filadd='( (pc.id_depto  in ('|| COALESCE(array_to_string(va_id_depto,','),'0')||'))   or   pc.id_usuario_auxiliar = '||p_id_usuario::varchar ||' or obpg.id_funcionario='||v_parametros.id_funcionario_usu::varchar||' ) and ';
+                        v_filadd = ' (pc.id_depto  in ('|| COALESCE(array_to_string(va_id_depto,','),'0')||')  or obpg.id_funcionario = '||v_id_funcionario||' or obpg.id_usuario_reg = '||p_id_usuario||' or sol.id_usuario_reg = '||p_id_usuario||') and ';
+
+				--
               END IF;
 
 
               v_inner = '
                             inner join adq.tcotizacion cot on cot.id_obligacion_pago = obpg.id_obligacion_pago
-                            inner join adq.tproceso_compra pc on pc.id_proceso_compra = cot.id_proceso_compra  ';
+                            inner join adq.tproceso_compra pc on pc.id_proceso_compra = cot.id_proceso_compra
+                            inner join adq.tsolicitud sol on sol.id_solicitud = pc.id_solicitud ';
         END IF;
 
 

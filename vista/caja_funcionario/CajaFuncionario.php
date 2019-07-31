@@ -61,6 +61,7 @@ Phx.vista.CajaFuncionario=Ext.extend(Phx.gridInterfaz,{
 				gwidth: 250,
 				anchor: '100%',
 				allowBlank:true,
+                baseParams: {estado_func:'todos'},
 				renderer: function (value, p, record){return String.format('{0}', record.data['desc_funcionario1']);}
 			},
 			type:'ComboRec',

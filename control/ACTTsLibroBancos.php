@@ -73,7 +73,13 @@ class ACTTsLibroBancos extends ACTbase{
                                                     order by lb.fecha_reg desc
                                                     limit 1 ) ");	
 		}		
-		
+
+
+		//(franklin.espinoza) filtro por  el numero de tramite gestion actual
+        /*if($this->objParam->getParametro('gestion') != ''){
+            $this->objParam->addFiltro("lban.num_tramite like ''%-".$this->objParam->getParametro('gestion')."''");
+        }*/
+
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODTsLibroBancos','listarTsLibroBancos');

@@ -143,7 +143,7 @@ BEGIN
              v_forma_pago =  (p_hstore->'forma_pago')::varchar;
              v_nro_cheque =  (p_hstore->'nro_cheque')::integer;
 
-             IF v_tipo_obligacion = 'sp' or v_tipo_obligacion = 'spd' then
+             IF v_tipo_obligacion = 'sp' or v_tipo_obligacion = 'spd' or v_tipo_obligacion = 'spi' then
 
             		  select pcb.nro_cuenta ||'-'|| ins.nombre
                       into v_cuenta_bancaria_benef
@@ -230,7 +230,7 @@ BEGIN
           --  VALIDACION DE MONTO FALTANTE, SEGUN TIPO DE CUOTA
           ------------------------------------------------------------
 
-          IF (p_hstore->'tipo') in('devengado_rrhh','devengado','devengado_pagado','devengado_pagado_1c','especial') THEN
+          IF (p_hstore->'tipo') in('devengado_rrhh','devengado','devengado_pagado','devengado_pagado_1c_sp','especial_spi') THEN
 
                 --si es un proceso variable, verifica que el registro no sobrepase el total a pagar
                 IF v_registros.pago_variable='no' THEN
@@ -244,7 +244,7 @@ BEGIN
                         --   si es  un pago no variable  (si es una cuota de devengao_pagado, devegando_pagado_1c, pagado)
                         --  validar que no se haga el ultimo pago sin  terminar de descontar el anticipo,
 
-                        IF   (p_hstore->'tipo') in('devengado_pagado','devengado_pagado_1c')  THEN
+                        IF   (p_hstore->'tipo') in('devengado_pagado','devengado_pagado_1c_sp')  THEN
                             -- saldo_x_pagar = determinar cuanto falta por pagar (sin considerar el devengado)
                             v_saldo_x_pagar = tes.f_determinar_total_faltante((p_hstore->'id_obligacion_pago')::integer,'total_registrado_pagado');
 
@@ -286,7 +286,7 @@ BEGIN
           v_monto_ejecutar_total_mo  = COALESCE((p_hstore->'monto')::numeric,0) -  COALESCE((p_hstore->'monto_no_pagado')::numeric,0) - v_monto_anticipo;
 
           --revision de anticipo
-          IF (p_hstore->'tipo') in('devengado','devengado_pagado','devengado_pagado_1c') THEN
+          IF (p_hstore->'tipo') in('devengado','devengado_pagado','devengado_pagado_1c_sp') THEN
                --si es un proceso variable, verifica que el registro no sobrepase el total a pagar
                IF v_registros.pago_variable='no' THEN
                         -- Validamos anticipos mistos
@@ -429,7 +429,7 @@ BEGIN
                                v_id_estado_actual,
                                NULL,
                                v_registros.id_depto,
-                              ('Solicutd de devengado para la OP:'|| COALESCE(v_registros.numero,'s/n')||' cuota nro'||v_nro_cuota::varchar),
+                              ('Solicitud de devengado para la OP:'|| COALESCE(v_registros.numero,'s/n')||' cuota nro'||v_nro_cuota::varchar),
                                v_registros_tpp.codigo_proceso_llave_wf,
                                COALESCE(v_registros.numero,'s/n')||'-N# '||v_nro_cuota::varchar
                            );
@@ -461,7 +461,7 @@ BEGIN
                            v_registros.id_estado_wf,
                            NULL,
                            v_registros.id_depto,
-                           ('Solicutd de devengado para la OP:'|| v_registros.numero||' cuota nro'||v_nro_cuota::varchar),
+                           ('Solicitud de devengado para la OP:'|| v_registros.numero||' cuota nro'||v_nro_cuota::varchar),
                            v_registros_tpp.codigo_proceso_llave_wf,
                            v_registros.numero||'-N# '||v_nro_cuota::varchar
                          );
@@ -504,7 +504,7 @@ BEGIN
 
                -- validamos que la obligacion tenga definido el  porceentaje por descuento de anticipo
                IF v_registros.porc_anticipo = 0 THEN
-                 raise exception 'para registrar una ciota de anticipo tiene que definir un porcentaje de retención en la boligación';
+                 raise exception 'para registrar una cuota de anticipo tiene que definir un porcentaje de retención en la obligación';
                END IF;
 
             END IF;
@@ -634,7 +634,7 @@ BEGIN
 
 
             -- inserta documentos en estado borrador si estan configurados
-            v_resp_doc =  wf.f_inserta_documento_wf(p_id_usuario, v_id_proceso_wf, v_id_estado_wf);
+            --v_resp_doc =  wf.f_inserta_documento_wf(p_id_usuario, v_id_proceso_wf, v_id_estado_wf);
 
             -- verificar documentos
             v_resp_doc = wf.f_verifica_documento(p_id_usuario, v_id_estado_wf);

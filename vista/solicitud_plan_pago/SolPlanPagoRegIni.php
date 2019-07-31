@@ -452,7 +452,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 //sobre los devengados
                 Phx.vista.SolPlanPagoRegIni.superclass.onButtonNew.call(this);
                 this.Cmp.tipo.enable();
-                this.blockGroup(1);//bloqueaos el grupo , detalle de pago
+                // this.blockGroup(1);//bloqueaos el grupo , detalle de pago
                 this.Cmp.id_obligacion_pago.setValue(this.maestro.id_obligacion_pago);
                 this.Cmp.id_plan_pago_fk.setValue(data.id_plan_pago);
 
@@ -494,7 +494,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 Phx.vista.SolPlanPagoRegIni.superclass.onButtonNew.call(this);
                 this.Cmp.tipo.enable();
                 this.Cmp.id_obligacion_pago.setValue(this.maestro.id_obligacion_pago);
-                this.blockGroup(1)//bloqueaos el grupo , detalle de pago
+                // this.blockGroup(1)//bloqueaos el grupo , detalle de pago
                 //tipo pago (OPERACION)
 
                 if(this.maestro.tipo_obligacion === 'pago_especial'){

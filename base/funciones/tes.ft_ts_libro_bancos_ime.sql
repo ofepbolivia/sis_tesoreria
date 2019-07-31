@@ -31,7 +31,7 @@ DECLARE
     g_saldo_cuenta_bancaria	numeric;
     g_saldo_deposito		numeric;
     g_nro_cuenta_banco		varchar;
-    g_nro_cheque			integer;
+    g_nro_cheque			varchar;
     g_indice				numeric;
     g_max_nro_cheque		integer;
     g_registros				record;
@@ -59,7 +59,7 @@ DECLARE
     v_parametros_ad 		varchar;
     v_tipo_noti 			varchar;
     v_titulo 				varchar;
-    v_nro_cheque			integer;
+    v_nro_cheque			varchar;
     v_tipo					varchar;
     g_id_libro_bancos_fk	integer;
     g_importe_deposito		numeric;
@@ -77,6 +77,9 @@ DECLARE
 	g_origen				varchar;
     g_nro_tramite			varchar;
     g_id_int_comprobante	integer;
+    --variables forma pago
+    v_form_pago				record;
+    v_hstore_aux			hstore;
 BEGIN
     v_nombre_funcion = 'tes.ft_ts_libro_bancos_ime';
     v_parametros = pxp.f_get_record(p_tabla);
@@ -97,11 +100,17 @@ BEGIN
 	if(p_transaccion='TES_LBAN_INS')then
 
         begin
+          --(breydi.vasquez) informacion de forma de pago
+          select fo.id_forma_pago,fo.tipo
+          into v_form_pago
+          from param.tforma_pago fo
+          where fo.codigo = v_parametros.tipo;
+
         	select ctaban.centro into g_centro
             from tes.tcuenta_bancaria ctaban
             where ctaban.id_cuenta_bancaria = v_parametros.id_cuenta_bancaria;
 
-            IF(v_parametros.id_libro_bancos_fk is null and g_centro in ('no','esp') and v_parametros.tipo!='deposito')THEN
+            IF(v_parametros.id_libro_bancos_fk is null and g_centro in ('no','esp') and v_form_pago.tipo!='Ingreso')THEN
                 raise exception
                   'Los datos a ingresar deben tener un deposito asociado. Ingrese los datos a traves de Depositos y Cheques.'
                   ;
@@ -142,7 +151,11 @@ BEGIN
                 END IF;
             END IF;
 
-            IF(v_parametros.tipo in ('cheque','debito_automatico','transferencia_carta', 'transferencia_fondos', 'transf_interna_debe','transf_interna_haber'))Then
+            		      if(v_parametros.tipo in ( select fp.codigo
+                                            from param.tforma_pago fp
+                                            where fp.tipo = 'Gasto'
+                                            and fp.codigo not in('transferencia_interna')
+                                        ))then
 
               IF g_centro != 'otro' THEN
                   --Comparamos el saldo de la cuenta bancaria con el importe del cheque
@@ -161,7 +174,7 @@ BEGIN
                END IF;
               --Comparamos el saldo del deposito con el importe del cheque
 
-              IF(v_parametros.tipo <> 'deposito' and v_parametros.id_libro_bancos_fk is not null) Then
+                IF(v_form_pago.tipo <> 'Ingreso' and v_parametros.id_libro_bancos_fk is not null) Then
                 --Obtenemos el importe del saldo del deposito
                 if((select lb.estado
 					from tes.tts_libro_bancos lb
@@ -212,7 +225,10 @@ BEGIN
                 g_nro_cheque=null;
             end if;
            raise notice 'antes de llamar a la funcion tes.f_inserta_libro_bancos';
-            v_id_libro_bancos = tes.f_inserta_libro_bancos(p_administrador,p_id_usuario,hstore(v_parametros));
+            --v_id_libro_bancos = tes.f_inserta_libro_bancos(p_administrador,p_id_usuario,hstore(v_parametros));
+            --se adiciona el campo id_forma_pago al hstore que se envia a la funcion tes.f_inserta_libro_bancos
+          	v_hstore_aux =  hstore(v_parametros) || ('id_forma_pago=>'||v_form_pago.id_forma_pago)::hstore;
+            v_id_libro_bancos = tes.f_inserta_libro_bancos(p_administrador,p_id_usuario,v_hstore_aux);
          --ALGORITMO DE ORDENACION DE REGISTROS
 
          --VERIFICAMOS SI ES UN DEPOSITO, transferencia o debito automatico
@@ -256,6 +272,11 @@ BEGIN
 
 		begin
 
+		select fo.id_forma_pago,fo.tipo
+             into v_form_pago
+            from param.tforma_pago fo
+            where fo.codigo = v_parametros.tipo;  
+
         	--VERIFICA EXISTENCIA DEL REGISTRO
             IF NOT EXISTS(SELECT 1 FROM tes.tts_libro_bancos LBRBAN
                           WHERE LBRBAN.id_libro_bancos=v_parametros.id_libro_bancos) THEN
@@ -274,7 +295,7 @@ BEGIN
         	    raise exception 'Registro no almacenado, no pertenece a la gestion de la cuenta bancaria, revise la fecha';
     		END IF;*/
 
-            IF(v_parametros.id_libro_bancos_fk is null and g_centro in ('no','esp') and v_parametros.tipo!='deposito')THEN
+            IF(v_parametros.id_libro_bancos_fk is null and g_centro in ('no','esp') and v_form_pago.tipo!='Ingreso')THEN
 				raise exception 'Los datos a ingresar deben tener un deposito asociado. Ingrese los datos a traves de Depositos y Cheques.';
 	        END IF;
 
@@ -311,7 +332,12 @@ BEGIN
             	raise exception 'El periodo % no se encuentra abierto',  pxp.f_obtener_literal_periodo(v_periodo,null);
             end if;
 
-        IF(v_parametros.tipo in ('cheque','debito_automatico','transferencia_carta'))Then
+        IF(v_parametros.tipo in (select fp.codigo
+                                  from param.tforma_pago fp
+                                  where fp.tipo = 'Gasto'
+                                  and fp.codigo not in('transferencia_interna',
+                                  'transf_interna_haber','transf_interna_debe'))
+                                  )Then
 
         	--Validamos que no se exceda el saldo general de la cuenta
             --Obtenemos el importe del saldo del deposito
@@ -452,7 +478,7 @@ BEGIN
 	        v_resp_doc = wf.f_verifica_documento(p_id_usuario,v_id_estado_wf);
     	end if;
 
-		IF(v_parametros.tipo = 'deposito' and g_origen='KERP')THEN
+		IF(v_form_pago.tipo = 'Ingreso'  and g_origen='KERP')THEN
         	UPDATE tes.tts_libro_bancos SET
             detalle = v_parametros.detalle,
             observaciones = v_parametros.observaciones
@@ -763,8 +789,8 @@ BEGIN
           end if;
 
           --VERIFICAMOS SI ES UN DEPOSITO, transferencia o debito automatico
-         	IF(v_tipo in ('deposito','debito_automatico','transferencia_carta')) Then
-				if(v_codigo_estado_siguiente in ('depositado','cobrado') AND g_indice IS NULL)then
+         	IF(v_tipo in (select fo.codigo from param.tforma_pago fo where fo.tipo  = 'Ingreso') or 
+               v_tipo in ('deposito','debito_automatico','transferencia_carta') ) Then
                     --Obtenemos el numero de indice que sera asignado al nuevo registro
                     Select max(lb.indice)
                     Into g_indice

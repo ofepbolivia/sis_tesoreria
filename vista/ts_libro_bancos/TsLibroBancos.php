@@ -15,6 +15,9 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
 
 	constructor:function(config){
 		this.maestro=config.maestro;
+        this.tbarItems = ['-','<b style="color: red;">Gestion:</b>','-','-',
+            this.cmbGestion,'-'
+        ];
     	//llama al constructor de la clase padre
 		Phx.vista.TsLibroBancos.superclass.constructor.call(this,config);
 		this.init();
@@ -123,8 +126,66 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
 			tooltip: '<b>Cheques Asociados</b><br/>Cheques Asociados'
 		}
 		);
+
+        /*Ext.Ajax.request({
+            url:'../../sis_reclamo/control/Reclamo/getDatosOficina',
+            params:{id_usuario:0},
+            success:function(resp){
+                var reg =  Ext.decode(Ext.util.Format.trim(resp.responseText));
+                this.cmbGestion.setValue(reg.ROOT.datos.id_gestion);
+                this.cmbGestion.setRawValue(reg.ROOT.datos.gestion);
+                this.store.baseParams.gestion = reg.ROOT.datos.gestion;
+            },
+            failure: this.conexionFailure,
+            timeout:this.timeout,
+            scope:this
+        });*/
+
+        /*this.cmbGestion.setValue(17);
+        this.cmbGestion.setRawValue(2019);*/
+
+		//this.cmbGestion.on('select',this.capturarGestion, this);
 	},
-			
+
+    /*capturarGestion: function () {
+        this.store.baseParams.gestion=this.cmbGestion.getRawValue();
+        this.load({params:{start:0, limit:this.tam_pag}});
+    },*/
+
+    cmbGestion: new Ext.form.ComboBox({
+        name: 'gestion',
+        id: 'gestion_reg',
+        fieldLabel: 'Gestion',
+        allowBlank: true,
+        emptyText:'Gestion...',
+        blankText: 'Año',
+        store:new Ext.data.JsonStore(
+            {
+                url: '../../sis_parametros/control/Gestion/listarGestion',
+                id: 'id_gestion',
+                root: 'datos',
+                sortInfo:{
+                    field: 'gestion',
+                    direction: 'DESC'
+                },
+                totalProperty: 'total',
+                fields: ['id_gestion','gestion'],
+                // turn on remote sorting
+                remoteSort: true,
+                baseParams:{par_filtro:'gestion'}
+            }),
+        valueField: 'id_gestion',
+        triggerAction: 'all',
+        displayField: 'gestion',
+        hiddenName: 'id_gestion',
+        mode:'remote',
+        pageSize:50,
+        queryDelay:500,
+        listWidth:'280',
+        hidden:false,
+        width:80
+    }),
+
 	Atributos:[
 		{
 			//configuracion del componente
@@ -207,7 +268,8 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
 			},
 				type:'TextField',
 				filters:{pfiltro:'lban.a_favor',type:'string'},
-				bottom_filter: true,
+				//bottom_filter: true,
+                bottom_filtro: true,
 				id_grupo:1,
 				grid:true,
 				form:true
@@ -239,7 +301,8 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
 				type:'TextArea',
 				filters:{pfiltro:'lban.observaciones',type:'string'},
 				id_grupo:1,				
-				bottom_filter: true,
+				//bottom_filter: true,
+                bottom_filtro: true,
 				grid:true,
 				form:true
 		},		
@@ -298,7 +361,7 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
                 width: 177,
                 gwidth: 100,
                 format: 'd/m/Y',
-                renderer:function (value,p,record){return value?value:''}
+                renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
             },
             type:'DateField',
             filters:{pfiltro:'lban.fecha_pago',type:'date'},
@@ -369,6 +432,7 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
 				type:'TextField',
 				filters:{pfiltro:'lban.nro_cheque',type:'string'},
 				bottom_filter: true,
+
 				id_grupo:1,
 				grid:true,
 				form:true
@@ -399,7 +463,8 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
 			},
 				type:'NumberField',
 				filters:{pfiltro:'lban.importe_deposito',type:'numeric'},
-				bottom_filter: true,
+				//bottom_filter: true,
+                bottom_filtro: true,
 				id_grupo:1,
 				grid:true,
 				form:true
@@ -415,7 +480,8 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
 			},
 				type:'NumberField',
 				filters:{pfiltro:'lban.importe_cheque',type:'numeric'},
-				bottom_filter: true,
+				//bottom_filter: true,
+                bottom_filtro: true,
 				id_grupo:1,
 				grid:true,
 				form:true
@@ -431,7 +497,8 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
 			},
 				type:'NumberField',
 				filters:{pfiltro:'lban.importe_cheque',type:'numeric'},
-				bottom_filter: true,
+				//bottom_filter: true,
+                bottom_filtro: true,
 				id_grupo:1,
 				grid:true,
 				form:false
@@ -723,6 +790,7 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
 		{name:'fecha_pago', type: 'string'},
         {name:'nro_deposito', type: 'string'},
         'id_forma_pago',
+
 	],
 	sortInfo:{
 		field: 'fecha',
@@ -1268,9 +1336,9 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
 	},	
 	
 	onReloadPage:function(m){
-		this.maestro=m;			
+		this.maestro=m;
 		this.cmpIdFinalidad.store.baseParams.id_cuenta_bancaria =this.maestro.id_cuenta_bancaria;		
-		this.store.baseParams={id_cuenta_bancaria:this.maestro.id_cuenta_bancaria, mycls:this.cls};
+		this.store.baseParams={id_cuenta_bancaria:this.maestro.id_cuenta_bancaria, mycls:this.cls/*, gestion: this.cmbGestion.getRawValue()*/};
 		this.load({params:{start:0, limit:this.tam_pag}});			
 	}
 })

@@ -515,11 +515,12 @@ BEGIN
            ------------------------------------
 
            -----------------------------------------------------------------------------------------------
-           -- EDICION DE CUOTAS QUE TIENEN DEVENGADO   ('devengado_pagado','devengado','devengado_pagado_1c')
+           -- EDICION DE CUOTAS QUE TIENEN DEVENGADO   ('devengado_pagado','devengado','devengado_pagado_1c'), 'devengado_pagado_1c_sp'
            --------------------------------------------------------------------------------------------------
 
-			--tipo de obligacion SIP para  internacionales pago_especial_spi con tipo de plan de pago especial_spi
-           IF v_registros_pp.tipo in ('devengado_pagado','devengado','devengado_pagado_1c','especial', 'especial_spi') THEN
+           --(may) 18-07-2019 los tipo pp especial_spi son para las internacionales -tramites SIP
+           --(may) 20-07-2019 los tipo plan de pago devengado_pagado_1c_sp son para las internacionales -tramites sp con contato
+           IF v_registros_pp.tipo in ('devengado_pagado','devengado','devengado_pagado_1c_sp','especial_spi', 'v_registros_pp.tipo','devengado_pagado_1c') THEN
 
 
                  IF v_registros_pp.tipo in  ('especial_spi') THEN
@@ -548,7 +549,7 @@ BEGIN
                         --   si es  un pago no variable  (si es una cuota de devengao_pagado, devegando_pagado_1c, pagado)
                         --  validar que no se haga el ultimo pago sin  terminar de descontar el anticipo,
 
-                        IF   v_registros_pp.tipo in('devengado_pagado','devengado_pagado_1c')  THEN
+                        IF   v_registros_pp.tipo in('devengado_pagado','devengado_pagado_1c_sp', 'devengado_pagado_1c')  THEN
                             -- saldo_x_pagar = determinar cuanto falta por pagar (sin considerar el devengado)
                             v_saldo_x_pagar = tes.f_determinar_total_faltante(v_parametros.id_obligacion_pago,'total_registrado_pagado');
 
@@ -1018,7 +1019,7 @@ BEGIN
            -------------------------------------------------
            --  Eliminacion de cuentas de primer nivel
            ------------------------------------------------
-           IF  v_registros.tipo in  ('devengado_pagado','devengado','devengado_pagado_1c','ant_parcial','anticipo','dev_garantia','especial_spi')   THEN
+           IF  v_registros.tipo in  ('devengado_pagado','devengado','devengado_pagado_1c','ant_parcial','anticipo','dev_garantia','especial', 'devengado_pagado_1c_sp', 'especial_spi')   THEN
                      select
                       max(pp.nro_cuota)
                      into
@@ -1037,7 +1038,7 @@ BEGIN
                      END IF;
 
                      --recuperamos el id_tipo_proceso en el WF para el estado anulado
-                     --ya que este es un estado especial_spi que no tiene padres definidos
+                     --ya que este es un estado especial que no tiene padres definidos
 
 
                      select
@@ -1434,4 +1435,5 @@ $body$
 LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
+SECURITY INVOKER
 COST 100;
