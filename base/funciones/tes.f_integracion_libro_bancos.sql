@@ -139,7 +139,7 @@ BEGIN
       end if;
     ELSE --(franklin.espinoza) otro tipo de forma de pago
     	if pxp.f_get_variable_global('ESTACION_inicio') = 'BUE' then
-        	v_respuesta_libro_bancos = tes.f_generar_cheque(p_id_usuario,p_id_int_comprobante, v_id_finalidad,NULL,COALESCE(v_registros.c31,''),'internacional');
+        	v_respuesta_libro_bancos = tes.f_generar_cheque_otras_fp(p_id_usuario,p_id_int_comprobante, v_id_finalidad,NULL,COALESCE(v_registros.c31,''),'internacional');
       end if;
     END IF;
 
