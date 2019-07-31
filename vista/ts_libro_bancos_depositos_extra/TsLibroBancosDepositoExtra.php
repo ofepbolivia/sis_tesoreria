@@ -261,8 +261,8 @@ header("content-type: text/javascript; charset=UTF-8");
 				gwidth: 90,
 				maxLength:4
 			},
-				type:'NumberField',
-				filters:{pfiltro:'lban.nro_cheque',type:'numeric'},
+				type:'TextField',
+				filters:{pfiltro:'lban.nro_cheque',type:'string'},
 				id_grupo:1,
 				grid:false,
 				form:true
@@ -276,7 +276,7 @@ header("content-type: text/javascript; charset=UTF-8");
 				gwidth: 125,
 				maxLength:50
 			},
-				type:'NumberField',
+				type:'TextField',
 				filters:{pfiltro:'lban.nro_deposito',type:'string'},
 				bottom_filter: true,
 				id_grupo:1,
@@ -616,9 +616,9 @@ header("content-type: text/javascript; charset=UTF-8");
 		{name:'id_estado_wf', type: 'numeric'},
 		{name:'id_depto', type: 'numeric'},
 		{name:'nombre', type: 'string'},
-		{name:'nro_cheque', type: 'numeric'},
+		{name:'nro_cheque', type: 'string'},
 		{name:'importe_deposito', type: 'numeric'},
-		{name:'nro_deposito', type: 'numeric'},
+		{name:'nro_deposito', type: 'string'},
 		{name:'nro_liquidacion', type: 'string'},
 		{name:'detalle', type: 'string'},
 		{name:'origen', type: 'string'},

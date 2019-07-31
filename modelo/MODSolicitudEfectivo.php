@@ -297,7 +297,7 @@ class MODSolicitudEfectivo extends MODbase{
 
 		//Definicion de la lista del resultado del query
 		$this->captura('fecha','date');
-		$this->captura('nro_cheque','int4');		
+		$this->captura('nro_cheque','varchar');		
 		$this->captura('codigo','varchar');
 		$this->captura('aprobador','text');
 		$this->captura('cargo_aprobador','varchar');		

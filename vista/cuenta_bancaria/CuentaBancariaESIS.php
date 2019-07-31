@@ -18,15 +18,15 @@ Phx.vista.CuentaBancariaESIS = {
 	requireclase:'Phx.vista.CuentaBancaria',
 	title:'Cuenta Bancaria ENDESIS',
 	nombreVista: 'cuentaBancariaESIS',
-	
+
 	constructor: function(config) {
 	    this.maestro=config.maestro;
-		
+
 		this.initButtons=[this.cmbDepto];
     	Phx.vista.CuentaBancariaESIS.superclass.constructor.call(this,config);
-		
+
 		this.cmbDepto.on('select',this.capturaFiltros,this);
-		
+
 		this.addButton('trans_cuenta',
 			{	text:'Transfer Cuenta',
 				iconCls: 'btransfer',
@@ -41,33 +41,33 @@ Phx.vista.CuentaBancariaESIS = {
 				disabled: true,
 				handler: this.onBtnConciliacionBancaria,
 				tooltip: '<b>Conciliacion Bancaria</b>'
-		});		
+		});
 	    //this.load({params:{start:0, limit:this.tam_pag, permiso : 'todos,libro_bancos'}});
 	},
-	
+
 	capturaFiltros:function(combo, record, index){
 		this.store.baseParams.id_depto_lb=this.cmbDepto.getValue();
-		this.store.load({params:{start:0, limit:this.tam_pag, permiso : 'libro_bancos'}});	
+		this.store.load({params:{start:0, limit:this.tam_pag, permiso : 'libro_bancos'}});
 	},
-      
+
 	preparaMenu:function(n){
       var data = this.getSelectedData();
-		if (data['id_moneda']==null){			
+		if (data['id_moneda']==null){
 			this.getBoton('btnConciliacionBancaria').disable();
-		  }else{			
+		  }else{
 			this.getBoton('btnConciliacionBancaria').enable();
-		  }            
+		  }
       var tb =this.tbar;
-      Phx.vista.CuentaBancariaESIS.superclass.preparaMenu.call(this,n);  
-      return tb 
-     }, 
+      Phx.vista.CuentaBancariaESIS.superclass.preparaMenu.call(this,n);
+      return tb
+     },
 
      liberaMenu:function(){
         var tb = Phx.vista.CuentaBancariaESIS.superclass.liberaMenu.call(this);
         return tb
     },
-    
-	
+
+
 	cmbDepto:new Ext.form.ComboBox({
 		fieldLabel: 'Departamento',
 		allowBlank: true,
@@ -97,13 +97,13 @@ Phx.vista.CuentaBancariaESIS = {
 		listWidth:'280',
 		width:250
 	}),
-	
-	transCuenta:function(){ 
+
+	transCuenta:function(){
 		var rec=this.sm.getSelected();
 		var NumSelect=this.sm.getCount();
-		
+
 		if(NumSelect != 0)
-		{						
+		{
 			Phx.CP.loadWindows('../../../sis_tesoreria/vista/transferencia_cuenta/FormTransferenciaCuenta.php',
 			'Transferencia Cuenta',
 			{
@@ -123,23 +123,23 @@ Phx.vista.CuentaBancariaESIS = {
 		else
 		{
 			Ext.MessageBox.alert('Alerta', 'Antes debe seleccionar un item.');
-		}							   
+		}
 	},
 	onBtnConciliacionBancaria: function () {
-		
-		var rec = this.sm.getSelected();				
+
+		var rec = this.sm.getSelected();
 		Phx.CP.loadWindows('../../../sis_tesoreria/vista/conciliacion_bancaria/ConciliacionBancaria.php', 'Conciliacion Bancaria', {
 			modal : true,
 			width : '60%',
 			height : '90%',
 		}, rec.data, this.idContenedor, 'ConciliacionBancaria');
-	},	
-	
+	},
+
 	transferir:function(wizard,resp){
 		Phx.CP.loadingShow();
 		Ext.Ajax.request({
 			url:'../../sis_tesoreria/control/TsLibroBancos/transferirCuenta',
-			params:{					
+			params:{
 				   id_cuenta_bancaria_origen:resp.id_cuenta_bancaria_origen,
                    id_depto_lb:resp.id_depto_lb,
 				   id_cuenta_bancaria:resp.id_cuenta_bancaria,
@@ -149,25 +149,25 @@ Phx.vista.CuentaBancariaESIS = {
 				   importe_transferencia:resp.importe_transferencia,
 				   id_finalidad:resp.id_finalidad
 			 },
-			argument:{wizard:wizard},  
+			argument:{wizard:wizard},
 			success:this.successWizard,
 			failure: this.conexionFailure,
 			timeout:this.timeout,
 			scope:this
 		});
-	   
+
 	},
-	
+
 	successWizard:function(resp){
 		Phx.CP.loadingHide();
 		resp.argument.wizard.panel.destroy()
 		this.reload();
 	 },
-		
+
     south:
-          { 
+          {
           url:'../../../sis_tesoreria/vista/ts_libro_bancos/TsLibroBancos.php',
-          title:'Detalle', 
+          title:'Detalle',
           height:'50%',
           cls:'TsLibroBancos'
          }

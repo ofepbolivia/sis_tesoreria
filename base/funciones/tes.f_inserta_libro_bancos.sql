@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION tes.f_inserta_libro_bancos (
   p_administrador integer,
   p_id_usuario integer,
@@ -25,39 +23,42 @@ $body$
 DECLARE
 
     
-    v_resp		            varchar;
-	v_nombre_funcion        text;
-	v_mensaje_error         text;
+    v_resp		        varchar;
+	v_nombre_funcion    text;
+	v_mensaje_error     text;
     
-    v_id_periodo integer;
-    v_tipo_documento  varchar;
+    v_id_periodo 		integer;
+    v_tipo_documento  	varchar;
     v_parametros record;
     v_codigo_proceso_macro varchar; 
-    v_num  varchar; 
-    v_resp_doc     boolean;
+    v_num  				varchar; 
+    v_resp_doc     		boolean;
     va_id_funcionario_gerente   INTEGER[]; 
-    v_id_proceso_macro integer;
+    v_id_proceso_macro 	integer;
     v_codigo_tipo_proceso varchar;
-    v_anho integer;
-    v_id_gestion integer;
-    v_id_subsistema integer; 
-    v_num_tramite  varchar;
-    v_id_proceso_wf integer;
-    v_id_estado_wf integer;
-    v_codigo_estado varchar;
+    v_anho 				integer;
+    v_id_gestion 		integer;
+    v_id_subsistema 	integer; 
+    v_num_tramite  		varchar;
+    v_id_proceso_wf 	integer;
+    v_id_estado_wf 		integer;
+    v_codigo_estado 	varchar;
     v_codigo_estado_ant varchar;   
-    v_id_libro_bancos integer;   
+    v_id_libro_bancos 	integer;   
  	v_id_funcionario	integer;
     v_id_estado_wf_anterior   integer; 
-	v_id_depto		integer;
+	v_id_depto			integer;
     v_codigo_tipo_pro	varchar;
     v_sistema_origen	varchar;
-    g_fecha			date;
+    g_fecha				date;
+    v_form_tipo			varchar;
+    v_tipo				varchar;
+    max_nro_document	varchar; 
     		    
 BEGIN
 
     v_nombre_funcion = 'f_inserta_libro_bancos';
-    
+
     /*
     HSTORE  PARAMETERS
             (p_hstore->'tipo')::varchar
@@ -85,13 +86,33 @@ BEGIN
             (p_hstore->'id_depto')::integer
     
     */
+    /*
+        	select desc_forma_pago
+            		into v_form_tipo
+            from param.tforma_pago 
+            where id_forma_pago = p_hstore->'id_forma_pago'; */
+                
     --determina la fecha del periodo
+    
+    select tipo into v_tipo from param.tforma_pago where id_forma_pago = (p_hstore->'id_fora_pago')::integer;
+    
+
+            
+            if ((p_hstore->'nro_cheque')::varchar in ( Select lb.nro_cheque 
+                                                              From tes.tts_libro_bancos lb
+                                                              Where lb.id_cuenta_bancaria = (p_hstore->'id_cuenta_bancaria')::integer
+                                                              and lb.tipo = (p_hstore->'tipo')::varchar
+                                                              and lb.nro_cheque is not null
+                                                              and lb.nro_cheque <>'' ) )then 
+            	raise exception 'El Nro. Documento ya existe';
+            end if;    
+
          IF(p_hstore ? 'fecha' = false)THEN
          	g_fecha = now();
          ELSE 
          	g_fecha = p_hstore->'fecha';
          END IF;
-         
+
          select id_periodo into v_id_periodo from
                         param.tperiodo per 
                        where per.fecha_ini <= g_fecha::date 
@@ -101,9 +122,17 @@ BEGIN
 		
 		if(v_id_periodo is null)then
         	raise exception 'No existe periodo para la fecha %', g_fecha;
-        end if;        
+        end if;
+                
+     /*   IF p_id_forma_pago is null then 
+        raise exception 'La Forma de pago no fue Seleccionada';
+		end if;        */
         
-        IF   (p_hstore->'tipo')::varchar not in ('cheque','debito_automatico','transferencia_carta','deposito','transf_interna_debe','transf_interna_haber') THEN
+--	    IF   (p_hstore->'tipo')::varchar not in ('cheque','debito_automatico','transferencia_carta','deposito','transf_interna_debe','transf_interna_haber') THEN                
+		if   (p_hstore->'tipo')::varchar not in (select fp.codigo
+                                                  from param.tforma_pago fp
+                                                  where fp.codigo not in ('transferencia_interna')) then 
+        
              raise exception 'Tipo de transaccion bancaria no valida';                
         ELSE              
         	
@@ -133,7 +162,12 @@ BEGIN
         --obtener id del proceso macro
         v_sistema_origen = COALESCE(p_hstore->'sistema_origen','PXP')::varchar;
 		--si es un ingreso independiente de otros sistemas
-		IF( v_sistema_origen != 'KERP' OR (v_sistema_origen = 'KERP' AND (p_hstore->'tipo') in ('deposito')))THEN
+        
+--		IF( v_sistema_origen != 'KERP' OR (v_sistema_origen = 'KERP' AND (p_hstore->'tipo') in ('deposito')))THEN
+
+		IF( v_sistema_origen != 'KERP' OR (v_sistema_origen = 'KERP' AND v_tipo in ('Ingreso')))THEN
+        
+
         
             select 
              pm.id_proceso_macro
@@ -154,7 +188,8 @@ BEGIN
                 into v_codigo_tipo_proceso
             from  wf.ttipo_proceso tp 
             where   tp.id_proceso_macro = v_id_proceso_macro
-                    and tp.estado_reg = 'activo' and tp.codigo_llave=(p_hstore->'tipo')::varchar;
+                   and tp.estado_reg = 'activo' and tp.codigo_llave=(p_hstore->'tipo')::varchar;
+
                 
             IF v_codigo_tipo_proceso is NULL THEN
             
@@ -284,11 +319,12 @@ BEGIN
                 comprobante_sigma,
                 id_int_comprobante,
                 nro_deposito,
-                fecha_pago
+                fecha_pago,
+                id_forma_pago
                 ) values(            
                 (p_hstore->'id_cuenta_bancaria')::integer,
                 upper(translate ((p_hstore->'a_favor')::varchar, 'áéíóúÁÉÍÓÚäëïöüÄËÏÖÜñ', 'aeiouAEIOUaeiouAEIOUÑ')),
-                (p_hstore->'nro_cheque')::integer,
+                (p_hstore->'nro_cheque')::varchar,
                 (p_hstore->'importe_deposito')::numeric,
                 upper(translate ((p_hstore->'nro_liquidacion')::varchar, 'áéíóúÁÉÍÓÚäëïöüÄËÏÖÜñ', 'aeiouAEIOUaeiouAEIOUÑ')),
                 upper(translate ((p_hstore->'detalle')::varchar, 'áéíóúÁÉÍÓÚäëïöüÄËÏÖÜñ', 'aeiouAEIOUaeiouAEIOUÑ')),
@@ -312,12 +348,13 @@ BEGIN
                 (p_hstore->'sistema_origen')::varchar,
                 (p_hstore->'comprobante_sigma')::varchar,
                 (p_hstore->'id_int_comprobante')::integer,				
-                (p_hstore->'nro_deposito')::integer,
-                (p_hstore->'fecha_pago')::date
+                (p_hstore->'nro_deposito')::varchar,
+                (p_hstore->'fecha_pago')::date,
+                (p_hstore->'id_forma_pago')::integer
                 )RETURNING id_libro_bancos into v_id_libro_bancos;    		
             
             ELSE
-              
+
               insert into tes.tts_libro_bancos(
                   id_cuenta_bancaria,
                   fecha,
@@ -347,12 +384,17 @@ BEGIN
                   comprobante_sigma,
                   id_int_comprobante,
                   nro_deposito,
-                  fecha_pago
+                  fecha_pago,
+                  id_forma_pago,
+                   /*Aumentando este campo para relacionar el libro de ventas con los depositos*/
+                  id_deposito
+                  /*-------------------------------------------------------------------------*/
+             
                   ) values(            
                   (p_hstore->'id_cuenta_bancaria')::integer,
                   (p_hstore->'fecha')::date,
                   upper(translate ((p_hstore->'a_favor')::varchar, 'áéíóúÁÉÍÓÚäëïöüÄËÏÖÜñ', 'aeiouAEIOUaeiouAEIOUÑ')),
-                  (p_hstore->'nro_cheque')::integer,
+                  (p_hstore->'nro_cheque')::varchar,
                   (p_hstore->'importe_deposito')::numeric,
                   upper(translate ((p_hstore->'nro_liquidacion')::varchar, 'áéíóúÁÉÍÓÚäëïöüÄËÏÖÜñ', 'aeiouAEIOUaeiouAEIOUÑ')),
                   upper(translate ((p_hstore->'detalle')::varchar, 'áéíóúÁÉÍÓÚäëïöüÄËÏÖÜñ', 'aeiouAEIOUaeiouAEIOUÑ')),
@@ -376,8 +418,12 @@ BEGIN
                   (p_hstore->'sistema_origen')::varchar,
                   (p_hstore->'comprobante_sigma')::varchar,
                   (p_hstore->'id_int_comprobante')::integer,
-                  (p_hstore->'nro_deposito')::integer,
-                  (p_hstore->'fecha_pago')::date
+                  (p_hstore->'nro_deposito')::varchar,
+                  (p_hstore->'fecha_pago')::date,
+	              (p_hstore->'id_forma_pago')::integer,
+                   /*Aumentando este campo para relacionar el libro de ventas con los depositos*/
+                  (p_hstore->'id_deposito')::integer
+                  /*--------------------------*/
                   )RETURNING id_libro_bancos into v_id_libro_bancos;
     		
             END IF;

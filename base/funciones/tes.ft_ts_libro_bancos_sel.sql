@@ -30,6 +30,10 @@ DECLARE
     v_filtro_saldo		varchar;
     v_fecha_anterior	date;
     v_cnx 				varchar;
+    v_form_tipo			varchar;    v_estacion			varchar;
+    v_filtro			varchar;    
+    v_transf_interna	varchar;
+    v_filtro_1			varchar;    
 BEGIN
 
 	v_nombre_funcion = 'tes.ft_ts_libro_bancos_sel';
@@ -45,6 +49,36 @@ BEGIN
 	if(p_transaccion='TES_LBAN_SEL')then
 
     	begin
+        	v_estacion = pxp.f_get_variable_global('ESTACION_inicio');
+
+            IF v_estacion = 'BOL' THEN
+    		  v_filtro =  'BOL';
+            ELSIF v_estacion = 'BUE' THEN
+    		  v_filtro =  'BUE';
+            ELSIF v_estacion = 'MIA' THEN
+    		  v_filtro =  'MIA';
+            ELSIF v_estacion = 'SAO' THEN
+    		  v_filtro =  'SAO';
+            ELSIF v_estacion = 'MAD' THEN
+    		  v_filtro =  'MAD';
+            END IF;
+            
+           if v_parametros.mycls = 'TsLibroBancosCheque' then
+             v_filtro_1 = ' lban.tipo in (select f.codigo
+              from param.tforma_pago f
+              where f.tipo =''Gasto''
+              and f.codigo not in (''transf_interna_haber'',
+              ''transferencia_interna'')
+              and ('''||v_filtro||'''=ANY(f.cod_inter)) ) and ';
+           elsif v_parametros.mycls = 'TsLibroBancosDeposito' then 
+                        v_filtro_1 = ' lban.tipo in (select f.codigo
+              from param.tforma_pago f
+              where f.tipo =''Ingreso''
+              and ('''||v_filtro||'''=ANY(f.cod_inter)) ) and ';
+           else 
+           v_filtro_1 = ' 0=0 and ';
+           end if;
+
     		--Sentencia de la consulta
 			v_consulta:=' select 
                              lban.id_libro_bancos,
@@ -93,7 +127,8 @@ BEGIN
                              left join cd.tdeposito_cd td on td.id_libro_bancos = lban.id_libro_bancos
                              left join cd.tcuenta_doc tc on tc.id_cuenta_doc = td.id_cuenta_doc 
                              left join conta.tint_comprobante com on com.id_int_comprobante=tc.id_int_comprobante
-                             where  ';
+                             left join param.tforma_pago fpa on fpa.codigo = lban.tipo
+                             where  '||v_filtro_1|| ' ';
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
@@ -137,13 +172,45 @@ BEGIN
 	elsif(p_transaccion='TES_LBAN_CONT')then
 
 		begin
+
+       	v_estacion = pxp.f_get_variable_global('ESTACION_inicio');
+
+            IF v_estacion = 'BOL' THEN
+    		  v_filtro =  'BOL';
+            ELSIF v_estacion = 'BUE' THEN
+    		  v_filtro =  'BUE';
+            ELSIF v_estacion = 'MIA' THEN
+    		  v_filtro =  'MIA';
+            ELSIF v_estacion = 'SAO' THEN
+    		  v_filtro =  'SAO';
+            ELSIF v_estacion = 'MAD' THEN
+    		  v_filtro =  'MAD';
+            END IF;
+            
+           if v_parametros.mycls = 'TsLibroBancosCheque' then
+             v_filtro_1 = ' lban.tipo in (select f.codigo
+              from param.tforma_pago f
+              where f.tipo =''Gasto''
+              and f.codigo not in (''transf_interna_haber'',
+              ''transferencia_interna'')
+              and ('''||v_filtro||'''=ANY(f.cod_inter)) ) and ';
+           elsif v_parametros.mycls = 'TsLibroBancosDeposito' then 
+                        v_filtro_1 = ' lban.tipo in (select f.codigo
+              from param.tforma_pago f
+              where f.tipo =''Ingreso''
+              and ('''||v_filtro||'''=ANY(f.cod_inter)) ) and ';
+           else 
+           v_filtro_1 = ' 0=0 and ';
+           end if;
+
 			--Sentencia de la consulta de conteo de registros
 			v_consulta:='select count(lban.id_libro_bancos)
 					   from tes.vlibro_bancos lban  
                              left join cd.tdeposito_cd td on td.id_libro_bancos = lban.id_libro_bancos
                              left join cd.tcuenta_doc tc on tc.id_cuenta_doc = td.id_cuenta_doc 
                              left join conta.tint_comprobante com on com.id_int_comprobante=tc.id_int_comprobante
-					    where ';
+                             left join param.tforma_pago fpa on fpa.codigo = lban.tipo
+                             where  '||v_filtro_1|| ' ';
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
@@ -335,9 +402,25 @@ BEGIN
        ELSEIF (p_transaccion = 'TES_RELIBA_SEL') THEN
        BEGIN
         --to_char(now(), ''dd/mm/yyyy'') as fecha,
-        raise notice 'fecha unio %', v_parametros.fecha_ini;
+
+        --raise exception 'fecha unio %', v_form_tipo;
+
+        	v_estacion = pxp.f_get_variable_global('ESTACION_inicio');
+
+            IF v_estacion = 'BOL' THEN
+    		  v_filtro =  'BOL';
+            ELSIF v_estacion = 'BUE' THEN
+    		  v_filtro =  'BUE';
+            ELSIF v_estacion = 'MIA' THEN
+    		  v_filtro =  'MIA';
+            ELSIF v_estacion = 'SAO' THEN
+    		  v_filtro =  'SAO';
+            ELSIF v_estacion = 'MAD' THEN
+    		  v_filtro =  'MAD';
+            END IF;
+                    
         v_fecha_anterior = to_char(v_parametros.fecha_ini-1, 'dd/mm/yyyy') ;
-        raise notice 'fecha anterior %', v_fecha_anterior;
+                 
           v_consulta := '(SELECT
               '''||v_fecha_anterior||''' as fecha_reporte,
               ''SALDO ANTERIOR'' as a_favor,
@@ -418,13 +501,17 @@ BEGIN
 
                                 and
 
-                                case when ('''||v_parametros.tipo||'''=''Todos'')
-                                then   lbr.tipo in   (''cheque'',
-                                                      ''deposito'',
-                                                      ''debito_automatico'',
-                                                      ''transferencia_carta'')
+                                case when ('''||v_parametros.tipo||'''=''todos'')
+                                then   lbr.tipo in (select  fpa.codigo
+                                                      from  param.tforma_pago fpa
+                                                      where fpa.codigo not in 
+                                                      (''transf_interna_debe'',''transf_interna_haber''
+                                                      ,''transferencia_interna'')
+					                                  and (''' ||v_filtro|| '''=ANY(fpa.cod_inter))                                                      
+                                                      )
 
-                                when ('''||v_parametros.tipo||'''=''transferencia_interna'')
+                                when ('''||v_parametros.tipo||''' = ''transferencia_interna'')
+                                                                
                                	then   lbr.tipo in (''transf_interna_debe'')
 
                                 else lbr.tipo in ('''||v_parametros.tipo||''')
@@ -432,7 +519,8 @@ BEGIN
 
                                 and
                                 case when ('||v_parametros.id_finalidad||'=0)
-                                then   lbr.id_finalidad in (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13)
+                                then   lbr.id_finalidad in (select fina.id_finalidad
+                                                            from tes.tfinalidad fina)
                                 else lbr.id_finalidad in ('||v_parametros.id_finalidad||')
                                 end
                                ),''999G999G999G999D99'') as total_debe,
@@ -448,7 +536,7 @@ BEGIN
                                                          ''depositado'',''transferido'',
                                                          ''sigep_swift'' )
 
-                                when ('''||v_parametros.estado||'''=''impreso y entregado'')
+                                when ('''||v_parametros.estado||''' = ''impreso y entregado'')
                                 then   lbr.estado in (''impreso'', ''entregado'' )
 
                                 else lbr.estado in ('''||v_parametros.estado||''')
@@ -456,20 +544,25 @@ BEGIN
 
                                 and
 
-                                case when ('''||v_parametros.tipo||'''=''Todos'')
-                                then   lbr.tipo in   (''cheque'',
-                                                                ''deposito'',
-                                                                ''debito_automatico'',
-                                                                ''transferencia_carta'')
+                                case when ('''||v_parametros.tipo||'''=''todos'')
+                                then   lbr.tipo in  (select  fpa.codigo
+                                                      from  param.tforma_pago fpa
+                                                      where fpa.codigo not in 
+                                                      (''transf_interna_debe'',''transf_interna_haber''
+                                                      ,''transferencia_interna'')
+					                                  and (''' ||v_filtro|| '''=ANY(fpa.cod_inter))                                                      
+                                                      )
 
-                                when ('''||v_parametros.tipo||'''=''transferencia_interna'')
+                                when ('''||v_parametros.tipo||'''= ''transferencia_interna'')
+                                                                
                                	then   lbr.tipo in (''transf_interna_haber'')
 
                                 else lbr.tipo in ('''||v_parametros.tipo||''')
                                 end
                                 and
                                 case when ('||v_parametros.id_finalidad||'=0)
-                                then   lbr.id_finalidad in (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13)
+                                then   lbr.id_finalidad in (select fina.id_finalidad
+                                                            from tes.tfinalidad fina)
                                 else lbr.id_finalidad in ('||v_parametros.id_finalidad||')
                                 end
                                 ),''999G999G999G999D99'') as total_haber,
@@ -500,20 +593,25 @@ BEGIN
 
               and
 
-              case when ('''||v_parametros.tipo||'''=''Todos'')
-              then   LB.tipo in   (''cheque'',
-                                              ''deposito'',
-                                              ''debito_automatico'',
-                                              ''transferencia_carta'')
+              case when ('''||v_parametros.tipo||'''=''todos'')
+              then   LB.tipo in   (select  fpa.codigo
+                                                      from  param.tforma_pago fpa
+                                                      where fpa.codigo not in 
+                                                      (''transf_interna_debe'',''transf_interna_haber''
+                                                      ,''transferencia_interna'')
+                                                      and (''' ||v_filtro|| '''=ANY(fpa.cod_inter))
+                                                      )
 
-              when ('''||v_parametros.tipo||'''=''transferencia_interna'')
+              when ('''||v_parametros.tipo||'''= ''transferencia_interna'')
+              
               then   lb.tipo in (''transf_interna_debe'',''transf_interna_haber'')
               else LB.tipo in ('''||v_parametros.tipo||''')
               end
 
               and
               case when ('||v_parametros.id_finalidad||'=0)
-              then   LB.id_finalidad in (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13)
+              then   LB.id_finalidad in (select fina.id_finalidad
+                                                            from tes.tfinalidad fina)
               else LB.id_finalidad in ('||v_parametros.id_finalidad||')
               end
 
@@ -524,6 +622,100 @@ BEGIN
 			 --Devuelve la respuesta
 		 	 return v_consulta;
        END;
+
+       
+	/*********************************
+ 	#TRANSACCION:  'TES_FORMPAGO_SEL'
+ 	#DESCRIPCION:	Consulta Formas de pago
+ 	#AUTOR:		BVP
+	***********************************/
+	elsif(p_transaccion='TES_FORMPAGO_SEL')then
+
+    	begin
+        
+        	v_estacion = pxp.f_get_variable_global('ESTACION_inicio');
+
+            IF v_estacion = 'BOL' THEN
+    		  v_filtro =  'BOL';
+            ELSIF v_estacion = 'BUE' THEN
+    		  v_filtro =  'BUE';
+            ELSIF v_estacion = 'MIA' THEN
+    		  v_filtro =  'MIA';
+            ELSIF v_estacion = 'SAO' THEN
+    		  v_filtro =  'SAO';
+            ELSIF v_estacion = 'MAD' THEN
+    		  v_filtro =  'MAD';
+            END IF;
+                    
+    		--Sentencia de la consulta
+			v_consulta:=' select  fpa.id_forma_pago,
+                                  fpa.desc_forma_pago,
+                                  fpa.codigo as variable,
+                                  fpa.tipo
+                                  from  param.tforma_pago fpa
+                                  where fpa.desc_forma_pago not in 
+                                  (''transf_interna_debe'',''transf_interna_haber'')
+                                  and (''' ||v_filtro|| '''=ANY(fpa.cod_inter))
+                                  and ';
+                                  
+			--Definicion de la respuesta
+			v_consulta:=v_consulta||v_parametros.filtro;
+        if(pxp.f_existe_parametro(p_tabla, 'vista'))then
+            if(v_parametros.vista = 'reporte')then
+              v_consulta:=v_consulta||'UNION
+                                      SELECT  0 as id_forma_pago,
+                                             ''Todos'' as desc_forma_pago,
+                                             ''todos'' as variable,
+                                             '''' as tipo ';
+        	end if;            
+        end if;
+			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+			raise notice '%',v_consulta;
+			--Devuelve la respuesta
+			return v_consulta;
+
+		end;
+
+	/*********************************
+ 	#TRANSACCION:  'TES_FORMPAGO_CONT'
+ 	#DESCRIPCION:	Conteo de registros de formas de pago
+ 	#AUTOR:		
+ 	#FECHA:		
+	***********************************/
+
+	elsif(p_transaccion='TES_FORMPAGO_CONT')then
+
+		begin
+
+        	v_estacion = pxp.f_get_variable_global('ESTACION_inicio');
+
+            IF v_estacion = 'BOL' THEN
+    		  v_filtro =  'BOL';
+            ELSIF v_estacion = 'BUE' THEN
+    		  v_filtro =  'BUE';
+            ELSIF v_estacion = 'MIA' THEN
+    		  v_filtro =  'MIA';
+            ELSIF v_estacion = 'SAO' THEN
+    		  v_filtro =  'SAO';
+            ELSIF v_estacion = 'MAD' THEN
+    		  v_filtro =  'MAD';
+            END IF;
+                    
+			--Sentencia de la consulta de conteo de registros
+			v_consulta:='select count(fpa.id_forma_pago)
+            			 from  param.tforma_pago fpa                         
+                         where fpa.desc_forma_pago not in 
+                        (''transf_interna_debe'',''transf_interna_haber'')
+                        and (''' ||v_filtro|| '''=ANY(fpa.cod_inter))
+                        and ';
+
+			--Definicion de la respuesta
+			v_consulta:=v_consulta||v_parametros.filtro;
+
+			--Devuelve la respuesta
+			return v_consulta;
+
+		end;        
 
 	else
 

@@ -18,14 +18,15 @@ class MODTsLibroBancos extends MODbase{
 		$this->procedimiento='tes.ft_ts_libro_bancos_sel';
 		$this->transaccion='TES_LBAN_SEL';
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
-				
+                
+        $this->setParametro('mycls','mycls','varchar');
 		//Definicion de la lista del resultado del query
 		$this->captura('id_libro_bancos','int4');
 		$this->captura('num_tramite','varchar');
 		$this->captura('id_cuenta_bancaria','int4');
 		$this->captura('fecha','date');
 		$this->captura('a_favor','varchar');
-		$this->captura('nro_cheque','int4');
+		$this->captura('nro_cheque','varchar');
 		$this->captura('importe_deposito','numeric');
 		$this->captura('nro_liquidacion','varchar');
 		$this->captura('detalle','text');
@@ -39,7 +40,7 @@ class MODTsLibroBancos extends MODbase{
 		$this->captura('indice','numeric');
 		$this->captura('estado_reg','varchar');
 		$this->captura('tipo','varchar');
-		$this->captura('nro_deposito','integer');
+		$this->captura('nro_deposito','varchar');
 		$this->captura('fecha_reg','timestamp');
 		$this->captura('id_usuario_reg','int4');
 		$this->captura('fecha_mod','timestamp');
@@ -61,7 +62,7 @@ class MODTsLibroBancos extends MODbase{
 		$this->captura('fondo_devolucion_retencion','varchar');
 		$this->captura('tramite','varchar');
 		$this->captura('comprobante_sigep','varchar');
-		$this->captura('fecha_pago','date');
+        $this->captura('fecha_pago','date');        
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		//var_dump($this->consulta);exit;
@@ -116,7 +117,7 @@ class MODTsLibroBancos extends MODbase{
 		$this->captura('nro_liquidacion','varchar');
 		$this->captura('nro_comprobante','varchar');
 		$this->captura('comprobante_sigma','varchar');
-		$this->captura('nro_cheque','integer');
+		$this->captura('nro_cheque','varchar');
 		$this->captura('importe_deposito','text');
 		$this->captura('importe_cheque','text');
 		$this->captura('saldo','text');
@@ -126,7 +127,8 @@ class MODTsLibroBancos extends MODbase{
 		$this->captura('fecha','date');
 		
 		//Ejecuta la instruccion
-		$this->armarConsulta();
+        $this->armarConsulta();
+        echo($this->consulta);exit;
 		$this->ejecutarConsulta();
 
 		//Devuelve la respuesta
@@ -138,14 +140,16 @@ class MODTsLibroBancos extends MODbase{
 		$this->procedimiento='tes.ft_ts_libro_bancos_ime';
 		$this->transaccion='TES_LBAN_INS';
 		$this->tipo_procedimiento='IME';
-				
+        
+        
+        
 		//Define los parametros para la funcion
 		$this->setParametro('id_cuenta_bancaria','id_cuenta_bancaria','int4');
 		$this->setParametro('id_depto','id_depto','int4');
 		$this->setParametro('fecha','fecha','date');
 		$this->setParametro('a_favor','a_favor','varchar');
-		$this->setParametro('nro_cheque','nro_cheque','int4');
-		$this->setParametro('nro_deposito','nro_deposito','int4');
+		$this->setParametro('nro_cheque','nro_cheque','varchar');
+		$this->setParametro('nro_deposito','nro_deposito','varchar');
 		$this->setParametro('importe_deposito','importe_deposito','numeric');
 		$this->setParametro('nro_liquidacion','nro_liquidacion','varchar');
 		$this->setParametro('detalle','detalle','text');
@@ -158,7 +162,7 @@ class MODTsLibroBancos extends MODbase{
 		$this->setParametro('comprobante_sigma','comprobante_sigma','varchar');
 		$this->setParametro('indice','indice','numeric');
 		$this->setParametro('estado_reg','estado_reg','varchar');
-		$this->setParametro('tipo','tipo','varchar');
+		$this->setParametro('tipo', 'tipo','varchar');
 		$this->setParametro('id_finalidad','id_finalidad','int4');
 		$this->setParametro('fecha_pago','fecha_pago','date');
 		//Ejecuta la instruccion
@@ -173,14 +177,14 @@ class MODTsLibroBancos extends MODbase{
 		//Definicion de variables para ejecucion del procedimiento
 		$this->procedimiento='tes.ft_ts_libro_bancos_ime';
 		$this->transaccion='TES_LBAN_MOD';
-		$this->tipo_procedimiento='IME';
-				
+        $this->tipo_procedimiento='IME';
+        				
 		//Define los parametros para la funcion
 		$this->setParametro('id_libro_bancos','id_libro_bancos','int4');
 		$this->setParametro('id_cuenta_bancaria','id_cuenta_bancaria','int4');
 		$this->setParametro('fecha','fecha','date');
 		$this->setParametro('a_favor','a_favor','varchar');
-		$this->setParametro('nro_cheque','nro_cheque','int4');
+		$this->setParametro('nro_cheque','nro_cheque','varchar');
 		$this->setParametro('importe_deposito','importe_deposito','numeric');
 		$this->setParametro('nro_liquidacion','nro_liquidacion','varchar');
 		$this->setParametro('detalle','detalle','text');
@@ -195,7 +199,7 @@ class MODTsLibroBancos extends MODbase{
 		$this->setParametro('estado_reg','estado_reg','varchar');
 		$this->setParametro('tipo','tipo','varchar');
 		$this->setParametro('id_finalidad','id_finalidad','int4');
-		$this->setParametro('nro_deposito','nro_deposito','int4');
+		$this->setParametro('nro_deposito','nro_deposito','varchar');
 		$this->setParametro('fecha_pago','fecha_pago','date');
 
 		//Ejecuta la instruccion
@@ -367,7 +371,7 @@ class MODTsLibroBancos extends MODbase{
 		$this->captura('observaciones','text');
 		$this->captura('nro_liquidacion','varchar');
 		$this->captura('nro_comprobante','varchar');
-		$this->captura('nro_cheque','int4');
+		$this->captura('nro_cheque','varchar');
 		$this->captura('tipo','varchar');
 		$this->captura('importe_deposito','numeric');
 		$this->captura('importe_cheque','numeric');
@@ -429,6 +433,26 @@ class MODTsLibroBancos extends MODbase{
 		
 		//Devuelve la respuesta
 		return $this->respuesta;				
-	}	
+    }
+    function consultaFormaPago() {
+		$this->procedimiento='tes.ft_ts_libro_bancos_sel';
+		$this->transaccion='TES_FORMPAGO_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+        
+        $this->setParametro('vista','vista','varchar');
+		//Definicion de la lista del resultado del query
+        $this->captura('id_forma_pago','int4');
+        $this->captura('desc_forma_pago', 'varchar');
+        $this->captura('variable','varchar');
+        $this->captura('tipo','varchar');
+		
+		//Ejecuta la instruccion
+        $this->armarConsulta();
+        //echo($this->consulta);exit;
+		$this->ejecutarConsulta();
+		
+		//Devuelve la respuesta
+		return $this->respuesta;        
+    }   	
 }
 ?>

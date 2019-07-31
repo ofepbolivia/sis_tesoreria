@@ -32,15 +32,21 @@ class ACTTsLibroBancos extends ACTbase{
 		
 		if($this->objParam->getParametro('mycls')=='TsLibroBancosDeposito'){
 			$this->objParam->addFiltro("id_libro_bancos_fk is null");	
-			$this->objParam->addFiltro("tipo=''deposito''");
+			//$this->objParam->addFiltro("fpa.tipo = ''Ingreso''");
 		}
 		if($this->objParam->getParametro('mycls')=='TsLibroBancosCheque'){
 			$this->objParam->addFiltro("id_libro_bancos_fk = ".$this->objParam->getParametro('id_libro_bancos'));
-			$this->objParam->addFiltro("tipo in (''cheque'',''debito_automatico'',''transferencia_carta'',''transf_interna_debe'')");
-		}
+            //$this->objParam->addFiltro("tipo in (''cheque'',''debito_automatico'',''transferencia_carta'',''transf_interna_debe'')");
+           /* $this->objParam->addFiltro("fpa.tipo in (select f.codigo
+            from param.tforma_pago f
+            where f.tipo =''Gasto''
+            and f.codigo not in (''transf_interna_haber'',
+            ''transferencia_interna'',''debito_automatico'')
+            and ('''||v_filtro||''=ANY(f.cod_inter)) )");*/
+        }
 		if($this->objParam->getParametro('mycls')=='TsLibroBancosDepositoExtra'){
 			$this->objParam->addFiltro("id_libro_bancos_fk = ".$this->objParam->getParametro('id_libro_bancos'));
-			$this->objParam->addFiltro("tipo in (''deposito'',''transf_interna_haber'')");
+			$this->objParam->addFiltro("lban.tipo in (''deposito'',''transf_interna_haber'')");
 		}
 		
 		if($this->objParam->getParametro('mycls')=='TsLibroBancos'){
@@ -49,18 +55,23 @@ class ACTTsLibroBancos extends ACTbase{
 		
 		if($this->objParam->getParametro('mycls')=='RelacionDeposito'){
 			$this->objParam->addFiltro("columna_pk is null");	
-			$this->objParam->addFiltro("tipo=''deposito''");
+			$this->objParam->addFiltro("lban.tipo=''deposito''");
 		}
 		
 		if($this->objParam->getParametro('mycls')=='RelacionarCheque'){
 			$this->objParam->addFiltro("lban.id_int_comprobante is null");	
-			$this->objParam->addFiltro("tipo=''cheque''");		
+			$this->objParam->addFiltro("lban.tipo=''cheque''");		
 		}
 		
 		if($this->objParam->getParametro('m_nro_cheque')!=''){
-			$this->objParam->addFiltro("lban.nro_cheque= (Select max (lb.nro_cheque)
+			$this->objParam->addFiltro("lban.nro_cheque= (Select lb.nro_cheque
 													From tes.tts_libro_bancos lb 
-													Where lb.id_cuenta_bancaria=".$this->objParam->getParametro('m_id_cuenta_bancaria').") ");	
+                                                    Where lb.id_cuenta_bancaria=".$this->objParam->getParametro('m_id_cuenta_bancaria')."
+                                                    and lb.nro_cheque is not null
+                                                    and lb.nro_cheque <> ''''
+                                                    and lb.tipo = ''cheque''
+                                                    order by lb.fecha_reg desc
+                                                    limit 1 ) ");	
 		}		
 		
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
@@ -341,7 +352,7 @@ class ACTTsLibroBancos extends ACTbase{
 		$nro_cuenta = $this->objParam->getParametro('nro_cuenta');
 		$fecha_ini = $this->objParam->getParametro('fecha_ini');
 		$fecha_fin = $this->objParam->getParametro('fecha_fin');
-		$tipo = $this->objParam->getParametro('tipo');
+        $tipo = strtolower($this->objParam->getParametro('tipo'));        
 		$estado = $this->objParam->getParametro('estado');
 		$finalidad = $this->objParam->getParametro('finalidad');
 		
@@ -541,8 +552,39 @@ class ACTTsLibroBancos extends ACTbase{
         $this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());	
 		
 	}
-    
-	
+    function consultaFormaPago(){          
+        $this->objParam->addFiltro("fpa.codigo <> ''transferencia_interna'' and fpa.codigo <>''todos''");
+        $this->objFunc=$this->create('MODTsLibroBancos');
+        $this->res=$this->objFunc->consultaFormaPago($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+
+    function consultaFormaPagoRepo(){                
+        if($this->objParam->getParametro('vista')!=''){
+			$this->objParam->addParametro('vista',$this->objParam->getParametro('vista'));
+		}
+        //$this->objParam->addFiltro("0=0 or fpa.tipo = ''todos''");        
+        $this->objFunc=$this->create('MODTsLibroBancos');
+        $this->res=$this->objFunc->consultaFormaPago($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());        
+    }
+          
+    function consultaFormaPagoIngreso(){        
+        
+        $this->objParam->addFiltro("fpa.tipo = ''Ingreso'' ");
+		       
+        $this->objFunc=$this->create('MODTsLibroBancos');
+        $this->res=$this->objFunc->consultaFormaPago($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+    function consultaFormaPagoEgreso() {
+        $this->objParam->addFiltro("fpa.tipo = ''Gasto'' and fpa.codigo <> ''transferencia_interna''");
+        //$this->objParam->addFiltro("fpa.codigo <> ''transferencia_interna''");
+		       
+        $this->objFunc=$this->create('MODTsLibroBancos');
+        $this->res=$this->objFunc->consultaFormaPago($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
 }
 
 ?>

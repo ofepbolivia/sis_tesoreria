@@ -169,18 +169,24 @@ Phx.vista.CuentaBancaria=Ext.extend(Phx.gridInterfaz,{
 		},
 		{
 			config:{
-				name: 'd_deb_hab',
-				fieldLabel: 'Debe - Haber',
+				name: 'saldo',
+				fieldLabel: 'Saldo',
 				allowBlank: false,
 				anchor: '80%',
-				gwidth: 250
+				gwidth: 100,
+				renderer:function (value,p,record){
+                    if(record.data.saldo == null){
+                        return '';
+                    }else{                        
+                        return  String.format('<div style="text-align:right;">{0}</div>', Ext.util.Format.number(record.data.saldo,'0.000,00/i'));					
+                        }
+                    }				                				
 			},
 				type:'NumberField',				
-				bottom_filter: true,
 				id_grupo:1,
 				grid:true,
 				form:false
-		},        
+		},                
 		// {
          //    config:{
          //        name:'id_moneda',
@@ -450,7 +456,7 @@ Phx.vista.CuentaBancaria=Ext.extend(Phx.gridInterfaz,{
 		{name:'usr_reg', type: 'string'},
 		{name:'usr_mod', type: 'string'},'id_moneda','codigo_moneda','id_finalidads',
         {name:'forma_pago', type: 'string'},
-        {name:'d_deb_hab', type: 'numeric'}
+        {name:'saldo', type: 'numeric'}
 		
 	],
     arrayDefaultColumHidden:['forma_pago'],

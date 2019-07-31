@@ -12,11 +12,11 @@ header("content-type: text/javascript; charset=UTF-8");
 	Phx.vista.TsLibroBancosDeposito = Ext.extend(Phx.gridInterfaz, {
 		
 		constructor : function(config) {			
-			this.maestro = config.maestro;
+			this.maestro = config.maestro;                        
 			this.tbarItems = ['-',this.cmbGestion,'-'];
 			Phx.vista.TsLibroBancosDeposito.superclass.constructor.call(this, config);	
 		    this.cmbGestion.on('select',this.capturarEventos, this);                                                                  
-            var date = new Date();            
+            var date = new Date();                        
 			this.init();
 			this.iniciarEventos();
 			this.store.baseParams={
@@ -89,17 +89,39 @@ header("content-type: text/javascript; charset=UTF-8");
 				}
 			);
 		},
-    cmbGestion : new Ext.form.ComboBox({
-        name:'gestion',
-        store:['2019','2018','2017','2016','2015','2014','2013'],
-        typeAhead: true,
-        value: '2019',
-        mode: 'local',
-        triggerAction: 'all',
-        emptyText:'Géstion...',
-        selectOnFocus:true,
-        width:135,
-    }),
+        cmbGestion: new Ext.form.ComboBox({
+                name: 'gestion',
+                fieldLabel: 'Gestion',
+                allowBlank: true,
+                emptyText: 'Gestion...',
+                blankText: 'Año',
+                editable: false,
+                store: new Ext.data.JsonStore(
+                    {
+                        url: '../../sis_parametros/control/Gestion/listarGestion',
+                        id: 'id_gestion',
+                        root: 'datos',
+                        sortInfo: {
+                            field: 'gestion',
+                            direction: 'DESC'
+                        },
+                        totalProperty: 'total',
+                        fields: ['gestion'],
+                        remoteSort: true,
+                        baseParams: {par_filtro: 'gestion'}
+                    }),
+                valueField: 'gestion',
+                value: new Date().getFullYear(),
+                triggerAction: 'all',
+                displayField: 'gestion',
+                hiddenName: 'gestion',
+                mode: 'remote',
+                pageSize: 50,
+                queryDelay: 500,
+                listWidth: '280',
+                hidden: false,
+                width: 80
+            }),
     capturarEventos: function () {         	
         this.store.baseParams.gestion=this.cmbGestion.getValue();     
         this.load({params:{start:0, limit:this.tam_pag}});
@@ -120,7 +142,7 @@ header("content-type: text/javascript; charset=UTF-8");
 			},
 			type : 'Field',
 			form : true
-		},
+		},                       
 		{
             config:{
                 name: 'id_depto',
@@ -276,6 +298,49 @@ header("content-type: text/javascript; charset=UTF-8");
 				fieldLabel:'Tipo',
 				allowBlank:false,
 				emptyText:'Tipo...',
+				typeAhead: true,								
+				mode: 'local',				
+				gwidth: 100,                
+                hiddenName: 'id_forma_pago',                
+                store: new Ext.data.JsonStore({
+                         url: '../../sis_tesoreria/control/TsLibroBancos/consultaFormaPagoIngreso',
+                         id: 'id_forma_pago',
+                         root: 'datos',                         
+                         sortInfo:{
+                            field: 'orden',
+                            direction: 'ASC'                            
+                    },
+                    totalProperty: 'total',
+                    fields: ['id_forma_pago','variable','desc_forma_pago'],
+                    // turn on remote sorting
+                    remoteSort: true,
+                    baseParams:{par_filtro:'fpa.desc_forma_pago'}                   
+                    }),
+                valueField: 'variable',
+                displayField: 'desc_forma_pago', 
+                forceSelection:true,
+                typeAhead: false,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode:'remote',
+                pageSize:10,
+                queryDelay:1000,
+                listWidth:250,
+                minChars: 1,
+                resizable:true,
+                anchor:'80%'
+			},
+			type:'ComboBox',
+			id_grupo:1,                  		
+			grid:true,
+			form:true
+		},
+/*		{
+			config:{
+				name:'tipo',
+				fieldLabel:'Tipo',
+				allowBlank:false,
+				emptyText:'Tipo...',
 				typeAhead: true,
 				triggerAction: 'all',
 				lazyRender:true,
@@ -300,7 +365,7 @@ header("content-type: text/javascript; charset=UTF-8");
 				},
 			grid:true,
 			form:true
-		},
+		},*/
 		{
 			config:{
 				name: 'nro_cheque',
@@ -308,10 +373,10 @@ header("content-type: text/javascript; charset=UTF-8");
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 90,
-				maxLength:4
+				maxLength:30
 			},
-				type:'NumberField',
-				filters:{pfiltro:'lban.nro_cheque',type:'numeric'},
+				type:'TextField',
+				filters:{pfiltro:'lban.nro_cheque',type:'string'},
 				id_grupo:1,
 				grid:false,
 				form:true
@@ -322,10 +387,9 @@ header("content-type: text/javascript; charset=UTF-8");
 				fieldLabel: 'Numero Deposito',
 				allowBlank: true,
 				anchor: '80%',
-				gwidth: 125,
-				maxLength:50
+				gwidth: 125				
 			},
-				type:'NumberField',
+				type:'TextField',
 				filters:{pfiltro:'lban.nro_deposito',type:'string'},
 				bottom_filter: true,
 				id_grupo:1,
@@ -637,7 +701,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 form:true
             }],
 		title : 'Depositos',
-		ActSave:'../../sis_tesoreria/control/TsLibroBancos/insertarTsLibroBancos',
+	ActSave:'../../sis_tesoreria/control/TsLibroBancos/insertarTsLibroBancos',
 	ActDel:'../../sis_tesoreria/control/TsLibroBancos/eliminarTsLibroBancos',
 	ActList:'../../sis_tesoreria/control/TsLibroBancos/listarTsLibroBancos',
 	id_store : 'id_libro_bancos',
@@ -651,7 +715,7 @@ header("content-type: text/javascript; charset=UTF-8");
 		{name:'id_depto', type: 'numeric'},
 		{name:'nombre', type: 'string'},
 		{name:'a_favor', type: 'string'},
-		{name:'nro_cheque', type: 'numeric'},
+		{name:'nro_cheque', type: 'string'},
 		{name:'importe_deposito', type: 'numeric'},
 		{name:'nro_liquidacion', type: 'string'},
 		{name:'detalle', type: 'string'},
@@ -665,7 +729,7 @@ header("content-type: text/javascript; charset=UTF-8");
 		{name:'indice', type: 'numeric'},
 		{name:'estado_reg', type: 'string'},
 		{name:'tipo', type: 'string'},
-		{name:'nro_deposito', type: 'numeric'},
+		{name:'nro_deposito', type: 'string'},
 		{name:'fecha_reg', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'id_usuario_reg', type: 'numeric'},
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
@@ -679,7 +743,8 @@ header("content-type: text/javascript; charset=UTF-8");
 		{name:'color', type: 'string'},
 		{name:'saldo_deposito', type: 'numeric'},
 		{name:'sistema_origen', type: 'string'},
-		{name:'fondo_devolucion_retencion', type: 'string'}
+		{name:'fondo_devolucion_retencion', type: 'string'},
+        'id_forma_pago'
 	],
 		sortInfo : {
 			//field : 'fecha',
@@ -692,8 +757,8 @@ header("content-type: text/javascript; charset=UTF-8");
 		fheight:'80%',
 		
 		iniciarEventos:function(){
-		
-			this.cmpTipo = this.getComponente('tipo');		
+                                                
+			this.cmpTipo = this.getComponente('id_forma_pago');            
 			this.cmpNroCheque = this.getComponente('nro_cheque');
 			this.cmpImporteCheque = this.getComponente('importe_cheque');
 			this.cmpImporteDeposito = this.getComponente('importe_deposito');
@@ -704,7 +769,7 @@ header("content-type: text/javascript; charset=UTF-8");
 			this.ocultarComponente(this.cmpNroCheque);
 			this.ocultarComponente(this.cmpImporteCheque);
 			this.ocultarComponente(this.cmpIdLibroBancosFk);
-			this.cmpTipo.disable();
+			//this.cmpTipo.disable();
 		},
 				
 		preparaMenu:function(n){
@@ -914,13 +979,12 @@ header("content-type: text/javascript; charset=UTF-8");
 		clonar:function(){
 			var data = this.getSelectedData();
 			this.onButtonNew();
-			
+
 			this.cmpAFavor = this.getComponente('a_favor');
 			this.cmpObservaciones = this.getComponente('observaciones');
 			this.cmpDetalle = this.getComponente('detalle');		
 			this.cmpNroLiquidacion = this.getComponente('nro_liquidacion');
-			this.cmpIdLibroBancosFk = this.getComponente('id_libro_bancos_fk');
-			
+			this.cmpIdLibroBancosFk = this.getComponente('id_libro_bancos_fk');			
 			this.cmpTipo.setValue(data.tipo);
 			this.cmpAFavor.setValue(data.a_favor);
 			this.cmpObservaciones.setValue(data.observaciones);
@@ -935,12 +999,16 @@ header("content-type: text/javascript; charset=UTF-8");
 			this.cmpDepto.enable();
 			this.cmpFecha.enable();
 			this.cmpImporteDeposito.enable();
+            var date = new Date();
+            this.cmpFecha.setValue(date.dateFormat('d/m/Y'));            
 		},
 		
 		onButtonEdit:function(){
 			Phx.vista.TsLibroBancosDeposito.superclass.onButtonEdit.call(this);
-			this.cmpTipo.disable();
+            console.log('recc=>',this.cmpTipo);
+			//this.cmpTipo.disable();
 			var data = this.getSelectedData();
+            
 			if(data.estado=='depositado'){
 				this.cmpDepto.disable();
 				this.cmpFecha.disable();
