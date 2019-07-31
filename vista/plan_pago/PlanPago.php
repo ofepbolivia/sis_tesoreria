@@ -788,12 +788,12 @@ header("content-type: text/javascript; charset=UTF-8");
                                 direction:'ASC'
                             },
                             totalProperty:'total',
-                            fields: ['id_forma_pago','desc_forma_pago','observaciones','cod_inter'],
+                            fields: ['id_forma_pago','desc_forma_pago','observaciones','cod_inter','codigo'],
                             remoteSort: true,
                             baseParams:{par_filtro:'desc_forma_pago'}
                         }),
                     tpl:'<tpl for="."><div class="x-combo-list-item"><p>{desc_forma_pago}</p></div></tpl>',
-                    valueField: 'desc_forma_pago',
+                    valueField: 'codigo',
                     hiddenValue: 'id_forma_pago',
                     displayField: 'desc_forma_pago',
                     gdisplayField:'desc_forma_pago',

@@ -429,7 +429,7 @@ BEGIN
                                v_id_estado_actual,
                                NULL,
                                v_registros.id_depto,
-                              ('Solicutd de devengado para la OP:'|| COALESCE(v_registros.numero,'s/n')||' cuota nro'||v_nro_cuota::varchar),
+                              ('Solicitud de devengado para la OP:'|| COALESCE(v_registros.numero,'s/n')||' cuota nro'||v_nro_cuota::varchar),
                                v_registros_tpp.codigo_proceso_llave_wf,
                                COALESCE(v_registros.numero,'s/n')||'-N# '||v_nro_cuota::varchar
                            );
@@ -461,7 +461,7 @@ BEGIN
                            v_registros.id_estado_wf,
                            NULL,
                            v_registros.id_depto,
-                           ('Solicutd de devengado para la OP:'|| v_registros.numero||' cuota nro'||v_nro_cuota::varchar),
+                           ('Solicitud de devengado para la OP:'|| v_registros.numero||' cuota nro'||v_nro_cuota::varchar),
                            v_registros_tpp.codigo_proceso_llave_wf,
                            v_registros.numero||'-N# '||v_nro_cuota::varchar
                          );
@@ -504,7 +504,7 @@ BEGIN
 
                -- validamos que la obligacion tenga definido el  porceentaje por descuento de anticipo
                IF v_registros.porc_anticipo = 0 THEN
-                 raise exception 'para registrar una ciota de anticipo tiene que definir un porcentaje de retención en la boligación';
+                 raise exception 'para registrar una cuota de anticipo tiene que definir un porcentaje de retención en la obligación';
                END IF;
 
             END IF;
@@ -633,11 +633,8 @@ BEGIN
             -- v_resp_doc =  tes.f_validar_periodo_costo(v_id_plan_pago);
 
 
-            --IF  (p_hstore->'tipo_pago')::varchar not in ('devengado_pagado_1c_sp','especial_spi')THEN
             -- inserta documentos en estado borrador si estan configurados
-
-           		--v_resp_doc =  wf.f_inserta_documento_wf(p_id_usuario, v_id_proceso_wf, v_id_estado_wf);
-            --END IF;
+            --v_resp_doc =  wf.f_inserta_documento_wf(p_id_usuario, v_id_proceso_wf, v_id_estado_wf);
 
             -- verificar documentos
             v_resp_doc = wf.f_verifica_documento(p_id_usuario, v_id_estado_wf);
