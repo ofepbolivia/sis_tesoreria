@@ -633,8 +633,11 @@ BEGIN
             -- v_resp_doc =  tes.f_validar_periodo_costo(v_id_plan_pago);
 
 
+            --IF  (p_hstore->'tipo_pago')::varchar not in ('devengado_pagado_1c_sp','especial_spi')THEN
             -- inserta documentos en estado borrador si estan configurados
-            v_resp_doc =  wf.f_inserta_documento_wf(p_id_usuario, v_id_proceso_wf, v_id_estado_wf);
+
+           		--v_resp_doc =  wf.f_inserta_documento_wf(p_id_usuario, v_id_proceso_wf, v_id_estado_wf);
+            --END IF;
 
             -- verificar documentos
             v_resp_doc = wf.f_verifica_documento(p_id_usuario, v_id_estado_wf);

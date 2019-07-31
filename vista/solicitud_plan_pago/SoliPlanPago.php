@@ -1638,7 +1638,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 // '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Retención de garantia:&nbsp;&nbsp;</b> {monto_retgar_mo}</p>',
                 '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Monto que no se pagara:&nbsp;&nbsp;</b> {monto_no_pagado}</p>',
                 '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Multas:&nbsp;&nbsp;</b> {otros_descuentos}</p>',
-                '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Descuento por intercambio de servicios:&nbsp;&nbsp;</b> {descuento_inter_serv}</p>',
+                // '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Descuento por intercambio de servicios:&nbsp;&nbsp;</b> {descuento_inter_serv}</p>',
                 '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Descuentos de Ley:&nbsp;&nbsp;</b> {descuento_ley}</p>',
                 '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Total a ejecutar presupeustariamente:&nbsp;&nbsp;</b> {monto_ejecutar_total_mo}</p>',
                 '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Liquido pagable:&nbsp;&nbsp;</b> {liquido_pagable}</p>',
@@ -1923,7 +1923,7 @@ header("content-type: text/javascript; charset=UTF-8");
         habilitarDescuentos: function (me) {
 
             me.mostrarComponente(me.Cmp.otros_descuentos);
-            // me.mostrarComponente(me.Cmp.descuento_inter_serv);
+            // me.ocultarComponente(me.Cmp.descuento_inter_serv);
             me.mostrarComponente(me.Cmp.descuento_anticipo);
             //me.mostrarComponente(me.Cmp.monto_retgar_mo);
             //me.mostrarComponente(me.Cmp.descuento_ley);
@@ -1942,7 +1942,7 @@ header("content-type: text/javascript; charset=UTF-8");
             me.ocultarComponente(me.Cmp.descuento_anticipo);
             //me.ocultarComponente(me.Cmp.monto_retgar_mo);
             //me.ocultarComponente(me.Cmp.descuento_ley);
-            me.ocultarComponente(me.Cmp.obs_descuento_inter_serv);
+            // me.ocultarComponente(me.Cmp.obs_descuento_inter_serv);
             me.ocultarComponente(me.Cmp.obs_descuentos_anticipo);
             me.ocultarComponente(me.Cmp.obs_otros_descuentos);
             //me.ocultarComponente(me.Cmp.obs_descuentos_ley);
@@ -2026,13 +2026,19 @@ header("content-type: text/javascript; charset=UTF-8");
             //deshabilita el cambio del tipo de pago
             this.Cmp.tipo.disable();
             this.Cmp.fecha_tentativa.enable();
+
+            this.ocultarComponente(this.Cmp.obs_descuento_inter_serv);
+            this.ocultarComponente(this.Cmp.descuento_inter_serv);
+            this.ocultarComponente(this.Cmp.monto_retgar_mo);
+            this.mostrarComponente(this.Cmp.otros_descuentos);
+
             //modificacion para las internacionales muestren solo genere un comprobante
             // this.Cmp.tipo.store.loadData(this.arrayStore.TODOS);
             this.Cmp.tipo.store.loadData(this.arrayStore.INT);
             this.ocultarGrupo(2); //ocultar el grupo de ajustes
             //segun el tipo define los campo visibles y no visibles
 
-            this.setTipoPago[data.tipo](this, data);
+            // this.setTipoPago[data.tipo](this, data);
             this.tmp_porc_monto_excento_var = undefined;
 
             if (data.tipo == 'pagado') {
@@ -2062,6 +2068,7 @@ header("content-type: text/javascript; charset=UTF-8");
             // this.Cmp.nro_cuenta_bancaria.tdata.id_padre = this.idContenedor;
             this.Cmp.id_proveedor_cta_bancaria.store.baseParams.id_proveedor = data.id_proveedor;
             this.Cmp.id_proveedor_cta_bancaria.tdata.id_padre = this.idContenedor;
+
 
 
         },
@@ -2459,6 +2466,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 me.ocultarComponente(me.Cmp.monto_no_pagado);
                 me.ocultarComponente(me.Cmp.monto_retgar_mo);
                 me.ocultarComponente(me.Cmp.monto_anticipo);
+                me.ocultarComponente(me.Cmp.obs_descuento_inter_serv);
                 me.ocultarGrupo(2); //ocultar el grupo de ajustes
                 me.ocultarGrupo(3); //ocultar el grupo de periodo del costo
             },
@@ -2497,7 +2505,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 me.ocultarComponente(me.Cmp.monto_retgar_mo);
                 me.ocultarComponente(me.Cmp.descuento_ley);
                 me.ocultarComponente(me.Cmp.monto_ejecutar_total_mo);
-                me.ocultarComponente(me.Cmp.obs_descuento_inter_serv);
+                // me.ocultarComponente(me.Cmp.obs_descuento_inter_serv);
                 me.ocultarComponente(me.Cmp.obs_descuentos_anticipo);
                 me.ocultarComponente(me.Cmp.obs_otros_descuentos);
                 me.ocultarComponente(me.Cmp.obs_descuentos_ley);
@@ -2519,7 +2527,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 me.ocultarComponente(me.Cmp.monto_ejecutar_total_mo);
                 me.ocultarComponente(me.Cmp.monto_retgar_mo);
                 me.ocultarComponente(me.Cmp.monto_ejecutar_total_mo);
-                me.ocultarComponente(me.Cmp.obs_descuento_inter_serv);
+                // me.ocultarComponente(me.Cmp.obs_descuento_inter_serv);
                 me.ocultarComponente(me.Cmp.obs_descuentos_anticipo);
                 me.ocultarComponente(me.Cmp.obs_otros_descuentos);
                 me.ocultarComponente(me.Cmp.monto_anticipo);
@@ -2597,6 +2605,8 @@ header("content-type: text/javascript; charset=UTF-8");
                 me.ocultarComponente(me.Cmp.nro_cheque);
             }
 
+            me.ocultarComponente(me.Cmp.obs_descuento_inter_serv);
+
         },
 
 
@@ -2634,6 +2644,11 @@ header("content-type: text/javascript; charset=UTF-8");
             Phx.vista.SoliPlanPago.superclass.onButtonNew.call(this);
             this.ocultarGrupo(2); //ocultar el grupo de ajustes
             // this.ocultarGrupo(3); //ocultar el grupo de ajustes
+            this.ocultarComponente(this.Cmp.otros_descuentos);
+
+            this.ocultarComponente(this.Cmp.obs_descuento_inter_serv);
+            this.ocultarComponente(this.Cmp.descuento_inter_serv);
+            this.ocultarComponente(this.Cmp.monto_retgar_mo);
 
             if (this.Cmp.id_depto_lb.getValue() > 0) {
                 this.Cmp.id_cuenta_bancaria.store.baseParams = Ext.apply(this.Cmp.id_cuenta_bancaria.store.baseParams, {
@@ -2646,15 +2661,16 @@ header("content-type: text/javascript; charset=UTF-8");
 
             this.Cmp.forma_pago.enable();
 
-            //console.log('acaaa5',this.Cmp.id_proveedor.getValue());
-            //para listar las cuentas de banco de un proveedor
-            //this.Cmp.id_proveedor_cta_bancaria.store.baseParams.id_proveedor = this.maestro.id_proveedor;
-            //this.Cmp.id_proveedor_cta_bancaria.tdata.id_padre = this.idContenedor;
+
+            this.Cmp.id_proveedor_cta_bancaria.store.baseParams = Ext.apply(this.Cmp.id_proveedor_cta_bancaria.store.baseParams, {
+                id_proveedor: this.maestro.id_proveedor
+            });
 
 
-            //this.Cmp.id_proveedor_cta_bancaria.store.baseParams.id_proveedor = this.Cmp.id_proveedor.getValue();
-            console.log('acaaa',this.maestro.id_proveedor)
+            // console.log('datos del this',this.idContenedor)
 
+            this.Cmp.id_proveedor_cta_bancaria.tdata.id_padre = this.idContenedor;
+            this.Cmp.id_proveedor_cta_bancaria.tdata.id_proveedor = this.maestro.id_proveedor;
 
 
         },
@@ -2791,6 +2807,7 @@ header("content-type: text/javascript; charset=UTF-8");
         cargarCuenta : function (id_proveedor_cta_bancaria,nro_cuenta_bancaria ) {
             this.Cmp.id_proveedor_cta_bancaria.setValue(id_proveedor_cta_bancaria);
             this.Cmp.id_proveedor_cta_bancaria.setRawValue(id_proveedor_cta_bancaria);
+            console.log('cargar cuenta valor', this.Cmp.id_proveedor_cta_bancaria)
         }
 
     })
