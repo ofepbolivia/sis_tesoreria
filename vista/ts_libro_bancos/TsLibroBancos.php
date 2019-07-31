@@ -361,7 +361,7 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
                 width: 177,
                 gwidth: 100,
                 format: 'd/m/Y',
-                renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+                renderer:function (value,p,record){return value?value:''}
             },
             type:'DateField',
             filters:{pfiltro:'lban.fecha_pago',type:'date'},
