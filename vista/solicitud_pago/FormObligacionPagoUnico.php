@@ -68,7 +68,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     pageSize:10,
                     queryDelay:1000,
                     minChars:2,
-                    qtip:'Si el conceto de gasto que necesita no existe por favor  comuniquese con el área de presupuestos para solictar la creación',
+                    qtip:'Si el concepto de gasto que necesita no existe por favor  comuniquese con el área de presupuestos para solicitar la creación',
                     tpl: '<tpl for="."><div class="x-combo-list-item"><p><b>{desc_ingas}</b></p><strong>{tipo}</strong><p>PARTIDA: {desc_partida}</p></div></tpl>',
                 }),
                 'id_centro_costo': new Ext.form.ComboRec({
@@ -427,7 +427,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     },
                     {
 
-                        header: 'Centro de costo',
+                        header: 'Centro de Costo',
                         dataIndex: 'id_centro_costo',
                         align: 'center',
                         width: 260,
@@ -445,7 +445,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     },
                     {
 
-                        header: 'Description',
+                        header: 'Descripción',
                         dataIndex: 'descripcion',
                         align: 'center',
                         width: 280,
@@ -581,7 +581,7 @@ header("content-type: text/javascript; charset=UTF-8");
             {
                 config:{
                     name: 'fecha',
-                    fieldLabel: 'Fecha Sol',
+                    fieldLabel: 'Fecha Sol.',
                     qtip: 'Según esta fecha se escoje el formulario de solicitud',
                     readOnly : false,
                     allowBlank: false,
@@ -669,9 +669,9 @@ header("content-type: text/javascript; charset=UTF-8");
             {
                 config:{
                     name: 'obs',
-                    fieldLabel: 'Desc',
+                    fieldLabel: 'Desc.',
                     allowBlank: false,
-                    qtip: 'Descripcion del objetivo del pago, o Si el proveedor es PASAJEROS PERJUDICADOS aqui va el nombre del pasajero',
+                    qtip: 'Descripciçión del objetivo del pago, o Si el proveedor es PASAJEROS PERJUDICADOS aqui va el nombre del pasajero',
                     anchor: '95%',
                     maxLength:1000
                 },
@@ -720,8 +720,8 @@ header("content-type: text/javascript; charset=UTF-8");
             {
                 config:{
                     name: 'fecha_pp_ini',
-                    fieldLabel: 'Fecha Tentativa',
-                    qtip: 'Fecha tentativa para el pago',
+                    fieldLabel: 'Fecha Tentativa del Pago',
+                    qtip: 'Fecha Tentativa para el Pago',
                     allowBlank: false,
                     gwidth: 100,
                     format: 'd/m/Y'

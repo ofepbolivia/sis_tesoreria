@@ -161,7 +161,7 @@ header("content-type: text/javascript; charset=UTF-8");
             var me = this;
             // me.objSolForm = Phx.CP.loadWindows('../../../sis_tesoreria/vista/obligacion_pago/FormObligacion.php',
             me.objSolForm = Phx.CP.loadWindows('../../../sis_tesoreria/vista/solicitud_pago/FormObligacionPagoUnico.php',
-                'Formulario de obligación de pago directo',
+                'Formulario de Obligación de Pago Directo',
                 {
                     modal:true,
                     width:'90%',
@@ -231,7 +231,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Obligación de pago:&nbsp;&nbsp;</b> {numero}</p>',
                 '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Depto:&nbsp;&nbsp;</b> {nombre_depto}</p>',
                 '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Justificación:&nbsp;&nbsp;</b> {obs}</p>',
-                '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Obs del área de presupeustos:&nbsp;&nbsp;</b> {obs_presupuestos}</p><br>'
+                '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Obs. del área de presupuestos:&nbsp;&nbsp;</b> {obs_presupuestos}</p><br>'
             )
         }),
 

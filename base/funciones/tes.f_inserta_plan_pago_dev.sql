@@ -218,7 +218,7 @@ BEGIN
           -------------------------------------------------------------------
           --  VALIDACION DE MONTO FALTANTE, SEGUN TIPO DE CUOTA
           ------------------------------------------------------------
---tipo de obligacion SIP para  internacionales especial_spi
+
           IF (p_hstore->'tipo') in('devengado_rrhh','devengado','devengado_pagado','devengado_pagado_1c','especial','especial_spi') THEN
 
                 --si es un proceso variable, verifica que el registro no sobrepase el total a pagar
@@ -511,7 +511,7 @@ BEGIN
 
                -- validamos que la obligacion tenga definido el  porceentaje por descuento de anticipo
                IF v_registros.porc_anticipo = 0 THEN
-                 raise exception 'para registrar una ciota de anticipo tiene que definir un porcentaje de retención en la boligación';
+                 raise exception 'para registrar una cuota de anticipo tiene que definir un porcentaje de retención en la oligación';
                END IF;
 
             END IF;
@@ -698,4 +698,5 @@ $body$
 LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
+SECURITY INVOKER
 COST 100;

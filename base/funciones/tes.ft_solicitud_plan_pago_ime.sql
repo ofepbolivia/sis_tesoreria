@@ -520,7 +520,7 @@ BEGIN
 
            --(may) 18-07-2019 los tipo pp especial_spi son para las internacionales -tramites SIP
            --(may) 20-07-2019 los tipo plan de pago devengado_pagado_1c_sp son para las internacionales -tramites sp con contato
-           IF v_registros_pp.tipo in ('devengado_pagado','devengado','devengado_pagado_1c_sp','especial_spi') THEN
+           IF v_registros_pp.tipo in ('devengado_pagado','devengado','devengado_pagado_1c_sp','especial_spi', 'v_registros_pp.tipo','devengado_pagado_1c') THEN
 
 
                  IF v_registros_pp.tipo in  ('especial_spi') THEN
@@ -549,7 +549,7 @@ BEGIN
                         --   si es  un pago no variable  (si es una cuota de devengao_pagado, devegando_pagado_1c, pagado)
                         --  validar que no se haga el ultimo pago sin  terminar de descontar el anticipo,
 
-                        IF   v_registros_pp.tipo in('devengado_pagado','devengado_pagado_1c_sp')  THEN
+                        IF   v_registros_pp.tipo in('devengado_pagado','devengado_pagado_1c_sp', 'devengado_pagado_1c')  THEN
                             -- saldo_x_pagar = determinar cuanto falta por pagar (sin considerar el devengado)
                             v_saldo_x_pagar = tes.f_determinar_total_faltante(v_parametros.id_obligacion_pago,'total_registrado_pagado');
 

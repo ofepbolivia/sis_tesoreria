@@ -429,7 +429,7 @@ BEGIN
                                v_id_estado_actual,
                                NULL,
                                v_registros.id_depto,
-                              ('Solicutd de devengado para la OP:'|| COALESCE(v_registros.numero,'s/n')||' cuota nro'||v_nro_cuota::varchar),
+                              ('Solicitud de devengado para la OP:'|| COALESCE(v_registros.numero,'s/n')||' cuota nro'||v_nro_cuota::varchar),
                                v_registros_tpp.codigo_proceso_llave_wf,
                                COALESCE(v_registros.numero,'s/n')||'-N# '||v_nro_cuota::varchar
                            );
@@ -461,7 +461,7 @@ BEGIN
                            v_registros.id_estado_wf,
                            NULL,
                            v_registros.id_depto,
-                           ('Solicutd de devengado para la OP:'|| v_registros.numero||' cuota nro'||v_nro_cuota::varchar),
+                           ('Solicitud de devengado para la OP:'|| v_registros.numero||' cuota nro'||v_nro_cuota::varchar),
                            v_registros_tpp.codigo_proceso_llave_wf,
                            v_registros.numero||'-N# '||v_nro_cuota::varchar
                          );
@@ -504,7 +504,7 @@ BEGIN
 
                -- validamos que la obligacion tenga definido el  porceentaje por descuento de anticipo
                IF v_registros.porc_anticipo = 0 THEN
-                 raise exception 'para registrar una ciota de anticipo tiene que definir un porcentaje de retención en la boligación';
+                 raise exception 'para registrar una cuota de anticipo tiene que definir un porcentaje de retención en la obligación';
                END IF;
 
             END IF;
@@ -634,7 +634,7 @@ BEGIN
 
 
             -- inserta documentos en estado borrador si estan configurados
-            v_resp_doc =  wf.f_inserta_documento_wf(p_id_usuario, v_id_proceso_wf, v_id_estado_wf);
+            --v_resp_doc =  wf.f_inserta_documento_wf(p_id_usuario, v_id_proceso_wf, v_id_estado_wf);
 
             -- verificar documentos
             v_resp_doc = wf.f_verifica_documento(p_id_usuario, v_id_estado_wf);

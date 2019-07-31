@@ -41,7 +41,9 @@ Phx.vista.FormRendicion = {
 		
 		this.Cmp.dia.hide();
 		this.Cmp.fecha.setReadOnly(false);
-		
+
+		this.Cmp.fecha_vencimiento.setReadOnly(false);
+
 		this.Cmp.id_depto_conta.store = new Ext.data.JsonStore({
 			url: '../../sis_parametros/control/DeptoDepto/listarDeptoDepto',
 			id: 'id_depto',
