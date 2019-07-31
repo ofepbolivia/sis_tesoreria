@@ -165,6 +165,8 @@ class MODSolicitudRendicionDet extends MODbase{
 			$this->setParametro('importe_retgar','importe_retgar','numeric');
 			$this->setParametro('importe_neto','importe_neto','numeric');
 			$this->setParametro('id_auxiliar','id_auxiliar','integer');
+
+            $this->setParametro('fecha_vencimiento', 'fecha_vencimiento', 'date');
 			
 			//Ejecuta la instruccion
             $this->armarConsulta();
@@ -361,6 +363,8 @@ class MODSolicitudRendicionDet extends MODbase{
 			$this->setParametro('importe_retgar','importe_retgar','numeric');
 			$this->setParametro('importe_neto','importe_neto','numeric');
 			$this->setParametro('id_auxiliar','id_auxiliar','integer');
+
+            $this->setParametro('fecha_vencimiento', 'fecha_vencimiento', 'date');
 			
 			//Ejecuta la instruccion
             $this->armarConsulta();
