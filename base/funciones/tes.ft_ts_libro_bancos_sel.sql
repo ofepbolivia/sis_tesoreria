@@ -653,7 +653,7 @@ BEGIN
                                   fpa.codigo as variable,
                                   fpa.tipo
                                   from  param.tforma_pago fpa
-                                  where fpa.desc_forma_pago not in 
+                                  where fpa.codigo not in 
                                   (''transf_interna_debe'',''transf_interna_haber'')
                                   and (''' ||v_filtro|| '''=ANY(fpa.cod_inter))
                                   and ';
@@ -704,7 +704,7 @@ BEGIN
 			--Sentencia de la consulta de conteo de registros
 			v_consulta:='select count(fpa.id_forma_pago)
             			 from  param.tforma_pago fpa                         
-                         where fpa.desc_forma_pago not in 
+                         where fpa.codigo not in 
                         (''transf_interna_debe'',''transf_interna_haber'')
                         and (''' ||v_filtro|| '''=ANY(fpa.cod_inter))
                         and ';
