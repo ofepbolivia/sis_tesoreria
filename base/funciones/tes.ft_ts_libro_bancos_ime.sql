@@ -33,7 +33,7 @@ DECLARE
     g_nro_cuenta_banco		varchar;
     g_nro_cheque			varchar;
     g_indice				numeric;
-    g_max_nro_cheque		integer;
+    g_max_nro_cheque		varchar;
     g_registros				record;
     g_fecha_ant				date;
     g_estado_actual			varchar;
@@ -41,7 +41,7 @@ DECLARE
     v_id_estado_wf			integer;
     v_codigo_estado			varchar;
     v_id_tipo_estado		integer;
-    v_id_estado_actual		integer;
+integer    v_id_estado_actual		integer;
     v_pedir_obs				varchar;
     v_codigo_estado_siguiente	varchar;
     v_id_depto				integer;
