@@ -791,6 +791,7 @@ BEGIN
           --VERIFICAMOS SI ES UN DEPOSITO, transferencia o debito automatico
          	IF(v_tipo in (select fo.codigo from param.tforma_pago fo where fo.tipo  = 'Ingreso') or 
                v_tipo in ('deposito','debito_automatico','transferencia_carta') ) Then
+                    if(v_codigo_estado_siguiente in ('depositado','cobrado') AND g_indice IS NULL)then
                     --Obtenemos el numero de indice que sera asignado al nuevo registro
                     Select max(lb.indice)
                     Into g_indice
