@@ -744,7 +744,8 @@ header("content-type: text/javascript; charset=UTF-8");
 		{name:'saldo_deposito', type: 'numeric'},
 		{name:'sistema_origen', type: 'string'},
 		{name:'fondo_devolucion_retencion', type: 'string'},
-        'id_forma_pago'
+		{name:'id_forma_pago',type:'numeric'},
+        {name:'desc_forma_pago',  type:'string'}
 	],
 		sortInfo : {
 			//field : 'fecha',

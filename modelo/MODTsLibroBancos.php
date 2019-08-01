@@ -63,6 +63,8 @@ class MODTsLibroBancos extends MODbase{
 		$this->captura('tramite','varchar');
 		$this->captura('comprobante_sigep','varchar');
         $this->captura('fecha_pago','date');        
+        $this->captura('id_forma_pago','int4');
+        $this->captura('desc_forma_pago','varchar');
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		//var_dump($this->consulta);exit;

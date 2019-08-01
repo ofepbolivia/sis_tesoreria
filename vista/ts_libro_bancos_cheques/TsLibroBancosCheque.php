@@ -734,7 +734,8 @@ header("content-type: text/javascript; charset=UTF-8");
 		{name:'sistema_origen', type: 'string'},
 		{name:'notificado', type: 'string'},
 		{name:'tramite', type: 'string'},
-        'id_forma_pago'
+        {name:'id_forma_pago',type:'numeric'},
+        {name:'desc_forma_pago',  type:'string'}
 		
 	],
         sortInfo : {

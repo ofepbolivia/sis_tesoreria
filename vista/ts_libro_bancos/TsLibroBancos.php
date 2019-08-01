@@ -387,15 +387,16 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
                             field: 'variable',
                             direction: 'ASC'
                     },
-                    totalProperty: 'total',
+                    totalProperty: 'total',                    
                     fields: ['id_forma_pago','variable','desc_forma_pago','tipo'],
                     // turn on remote sorting
                     remoteSort: true                    
                     }),
+                //gdisplayField:'desc_forma_pago',                    
                 valueField: 'variable',
                 displayField: 'desc_forma_pago', 
                 forceSelection:true,
-                typeAhead: false,
+                typeAhead: false,                
                 triggerAction: 'all',
                 lazyRender:true,
                 mode:'remote',
@@ -789,7 +790,8 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
 		{name:'sistema_origen', type: 'string'},
 		{name:'fecha_pago', type: 'string'},
         {name:'nro_deposito', type: 'string'},
-        'id_forma_pago',
+        {name:'id_forma_pago',type:'numeric'},
+        {name:'desc_forma_pago',  type:'string'}
 
 	],
 	sortInfo:{
