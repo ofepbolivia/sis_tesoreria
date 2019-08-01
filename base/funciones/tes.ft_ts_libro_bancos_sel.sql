@@ -711,7 +711,12 @@ BEGIN
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
-
+              if(pxp.f_existe_parametro(p_tabla, 'vista'))then
+                  if(v_parametros.vista = 'reporte')then
+                    v_consulta:=v_consulta||'UNION
+                                            SELECT  0';
+                  end if;            
+              end if;
 			--Devuelve la respuesta
 			return v_consulta;
 
