@@ -63,6 +63,7 @@ BEGIN
     		  v_filtro =  'MAD';
             END IF;
             
+        if(pxp.f_existe_parametro(p_tabla,'mycls')=TRUE) then
            if v_parametros.mycls = 'TsLibroBancosCheque' then
              v_filtro_1 = ' lban.tipo in (select f.codigo
               from param.tforma_pago f
@@ -78,6 +79,9 @@ BEGIN
            else 
            v_filtro_1 = ' 0=0 and ';
            end if;
+	  else 
+                 v_filtro_1 = ' 0=0 and ';
+      end if; 
 
     		--Sentencia de la consulta
 			v_consulta:=' select 
@@ -187,6 +191,7 @@ BEGIN
     		  v_filtro =  'MAD';
             END IF;
             
+        if(pxp.f_existe_parametro(p_tabla,'mycls')=TRUE) then
            if v_parametros.mycls = 'TsLibroBancosCheque' then
              v_filtro_1 = ' lban.tipo in (select f.codigo
               from param.tforma_pago f
@@ -202,6 +207,9 @@ BEGIN
            else 
            v_filtro_1 = ' 0=0 and ';
            end if;
+	  else 
+                 v_filtro_1 = ' 0=0 and ';
+      end if; 
 
 			--Sentencia de la consulta de conteo de registros
 			v_consulta:='select count(lban.id_libro_bancos)

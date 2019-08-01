@@ -1290,7 +1290,7 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
 				
 			},this);*/
 		
-		this.cmpTipo.on('select',function(com,dat){            
+		this.cmpTipo.on('select',function(com,dat){                        
             var value = dat.data.variable
             var tipo_valor  = dat.data.tipo;
 			if(value =='cheque' && tipo_valor == 'Gasto'){				
@@ -1303,7 +1303,7 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
                     var cta_bancaria = this.cmpIdCuentaBancaria.getValue();
                     Ext.Ajax.request({
                         url:'../../sis_tesoreria/control/TsLibroBancos/listarTsLibroBancos',                        
-                        params:{start:0, limit:this.tam_pag, m_id_cuenta_bancaria:cta_bancaria,m_nro_cheque:'si'},                        
+                        params:{start:0, limit:this.tam_pag, m_id_cuenta_bancaria:cta_bancaria,m_nro_cheque:'si',mycls:this.cls},                        
                         success: function (resp){                        
                             var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
                             console.log('resp => ',reg);
