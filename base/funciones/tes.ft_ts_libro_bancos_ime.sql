@@ -41,7 +41,7 @@ DECLARE
     v_id_estado_wf			integer;
     v_codigo_estado			varchar;
     v_id_tipo_estado		integer;
-integer    v_id_estado_actual		integer;
+    v_id_estado_actual		integer;
     v_pedir_obs				varchar;
     v_codigo_estado_siguiente	varchar;
     v_id_depto				integer;
