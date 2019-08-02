@@ -87,50 +87,51 @@ header("content-type: text/javascript; charset=UTF-8");
                     sysorigen:'sis_contabilidad',
                     fieldLabel: 'Orden Trabajo',
                     origen:'OT',
-                    allowBlank:true
+                    allowBlank:true,
+                    baseParams:{par_filtro:'desc_orden'}
                 }),
 
-                /*'id_orden_trabajo': new Ext.form.ComboBox({
-
-
-                                        //tasignacion:true,
-                                           name: 'id_orden_trabajo',
-                                           tinit:true,
-                                        resizable:true,
-
-                                        fieldLabel: 'Orden Trabajo',
-                                        allowBlank: true,
-                                        emptyText : 'Ordenes...',
-                                        store : new Ext.data.JsonStore({
-                                            url:'../../sis_contabilidad/control/OrdenTrabajo/listarOrdenTrabajo',
-                                            id : 'id_orden_trabajo',
-                                            root: 'datos',
-                                            sortInfo:{
-                                                field: 'motivo_orden',
-                                                direction: 'ASC'
-                                            },
-                                            totalProperty: 'total',
-                                            fields: ['id_orden_trabajo','motivo_orden','desc_orden','motivo_orden','codigo'],
-                                            remoteSort: true,
-                                            baseParams: {par_filtro:'codigo#desc_orden#motivo_orden'}
-                                        }),
-                                        valueField: 'id_orden_trabajo',
-                                        tpl:'<tpl for="."><div class="x-combo-list-item"><p><b>{codigo}</b></p><p>{desc_orden}</p> </div></tpl>',
-                                        displayField: 'desc_orden',
-                                        gdisplayField: 'desc_orden',
-                                        hiddenName: 'id_orden_trabajo',
-                                        forceSelection:true,
-                                        typeAhead: false,
-                                        triggerAction: 'all',
-                                        listWidth:350,
-                                        lazyRender:true,
-                                        mode:'remote',
-                                        pageSize:10,
-                                        queryDelay:1000,
-                                        width:350,
-                                        gwidth:350,
-                                        minChars:2
-                                }),*/
+                // 'id_orden_trabajo': new Ext.form.ComboBox({
+                //
+                //
+                //                         //tasignacion:true,
+                //                            name: 'id_orden_trabajo',
+                //                            tinit:true,
+                //                         resizable:true,
+                //
+                //                         fieldLabel: 'Orden Trabajoooo',
+                //                         allowBlank: true,
+                //                         emptyText : 'Ordenes...',
+                //                         store : new Ext.data.JsonStore({
+                //                             url:'../../sis_contabilidad/control/OrdenTrabajo/listarOrdenTrabajo',
+                //                             id : 'id_orden_trabajo',
+                //                             root: 'datos',
+                //                             sortInfo:{
+                //                                 field: 'motivo_orden',
+                //                                 direction: 'ASC'
+                //                             },
+                //                             totalProperty: 'total',
+                //                             fields: ['id_orden_trabajo','motivo_orden','desc_orden','motivo_orden','codigo'],
+                //                             remoteSort: true,
+                //                             baseParams: {par_filtro:'codigo#desc_orden#motivo_orden'}
+                //                         }),
+                //                         valueField: 'id_orden_trabajo',
+                //                         tpl:'<tpl for="."><div class="x-combo-list-item"><p><b>{codigo}</b></p><p>{desc_orden}</p> </div></tpl>',
+                //                         displayField: 'desc_orden',
+                //                         gdisplayField: 'desc_orden',
+                //                         hiddenName: 'id_orden_trabajo',
+                //                         forceSelection:true,
+                //                         typeAhead: false,
+                //                         triggerAction: 'all',
+                //                         listWidth:350,
+                //                         lazyRender:true,
+                //                         mode:'remote',
+                //                         pageSize:10,
+                //                         queryDelay:1000,
+                //                         width:350,
+                //                         gwidth:350,
+                //                         minChars:2
+                //                 }),
 
                 'descripcion': new Ext.form.TextField({
                     name: 'descripcion',
@@ -440,7 +441,7 @@ header("content-type: text/javascript; charset=UTF-8");
                         dataIndex: 'id_orden_trabajo',
                         align: 'center',
                         width: 260,
-                        renderer:function(value, p, record){return String.format('{0}', record.data['desc_orden_trabajo']?record.data['desc_orden_trabajo']:'');},
+                        renderer:function(value, p, record){return String.format('{0}', record.data['desc_orden_trabajo']);},
                         editor: this.detCmp.id_orden_trabajo
                     },
                     {

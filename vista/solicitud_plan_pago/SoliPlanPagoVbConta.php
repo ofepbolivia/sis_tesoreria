@@ -232,7 +232,7 @@ header("content-type: text/javascript; charset=UTF-8");
             if (data.estado == 'vbsolicitante') {
                 this.Cmp.fecha_tentativa.disable();
                 this.Cmp.id_plantilla.disable();
-                this.Cmp.forma_pago.disable();
+                // this.Cmp.forma_pago.disable();
                 this.Cmp.nombre_pago.disable();
                 this.Cmp.nro_cheque.disable();
                 // this.Cmp.nro_cuenta_bancaria.disable();
@@ -245,7 +245,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.Cmp.obs_monto_no_pagado.disable();
                 this.Cmp.obs_descuentos_ley.disable();
             }
-            this.Cmp.forma_pago.disable();
+            // this.Cmp.forma_pago.disable();
 
         },
 

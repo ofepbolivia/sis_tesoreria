@@ -1027,6 +1027,7 @@ BEGIN
 
 
 						--tipo de obligacion SIP para  internacionales pago_especial_spi
+                        --pago para bol pago_especial
 
                          IF v_tipo_obligacion in  ('pago_especial') THEN
                             v_tipo_plan_pago = 'especial';
@@ -1045,9 +1046,9 @@ BEGIN
                                   v_tipo_plan_pago = 'devengado_pagado_1c';
                            END IF;
 
-                           -- para los pagos internacionales que solo es devengado_pagado_1c
+                           -- para los pagos internacionales que solo es devengado_pagado_1c_sp
                            IF v_tipo_obligacion in  ('spd') THEN
-                           	v_tipo_plan_pago = 'devengado_pagado_1c';
+                           	v_tipo_plan_pago = 'devengado_pagado_1c_sp';
                            END IF;
 						   --
                          END IF;
@@ -1085,7 +1086,8 @@ BEGIN
 
 
                             -- si es un proceso de pago unico,  la primera cuota pasa de borrador al siguiente estado de manera automatica
-                            IF  ((v_tipo_obligacion = 'pbr' or v_tipo_obligacion = 'ppm' or v_tipo_obligacion = 'pga' or v_tipo_obligacion = 'pce' or v_tipo_obligacion = 'pago_unico') and   v_i = 1)   THEN
+                            -- para los pagos internacionales es tipo de pago spd
+                            IF  ((v_tipo_obligacion = 'pbr' or v_tipo_obligacion = 'ppm' or v_tipo_obligacion = 'pga' or v_tipo_obligacion = 'pce' or v_tipo_obligacion = 'pago_unico' or v_tipo_obligacion = 'spd') and   v_i = 1)   THEN
                                v_sw_saltar = TRUE;
                             else
                                v_sw_saltar = FALSE;
@@ -2095,4 +2097,5 @@ $body$
 LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
+SECURITY INVOKER
 COST 100;

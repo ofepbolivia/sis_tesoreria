@@ -253,6 +253,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     if(rec.data.variable == 'devengado'||
                         rec.data.variable =='devengado_pagado'||
                         rec.data.variable =='devengado_pagado_1c'||
+                        rec.data.variable =='devengado_pagado_1c_sp'||
                         rec.data.variable =='rendicion'||
                         rec.data.variable =='anticipo'){
                         this.obtenerFaltante('registrado,ant_parcial_descontado');
@@ -590,7 +591,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     }
 
 
-                    if(this.Cmp.tipo.getValue()=='devengado_pagado'||this.Cmp.tipo.getValue()=='devengado_pagado_1c'||this.Cmp.tipo.getValue()=='pagado'){
+                    if(this.Cmp.tipo.getValue()=='devengado_pagado'||this.Cmp.tipo.getValue()=='devengado_pagado_1c'||this.Cmp.tipo.getValue()=='pagado'||this.Cmp.tipo.getValue()=='devengado_pagado_1c_sp'){
                         //si es un pago calculamos el descuento de anticipo
                         this.Cmp.descuento_anticipo.setValue(reg.ROOT.datos.ant_parcial_descontado);
                         this.Cmp.descuento_anticipo.maxValue=reg.ROOT.datos.ant_parcial_descontado;

@@ -219,7 +219,7 @@ BEGIN
           --  VALIDACION DE MONTO FALTANTE, SEGUN TIPO DE CUOTA
           ------------------------------------------------------------
 
-          IF (p_hstore->'tipo') in('devengado_rrhh','devengado','devengado_pagado','devengado_pagado_1c','especial','especial_spi') THEN
+          IF (p_hstore->'tipo') in('devengado_rrhh','devengado','devengado_pagado','devengado_pagado_1c','especial','especial_spi', 'devengado_pagado_1c_sp') THEN
 
                 --si es un proceso variable, verifica que el registro no sobrepase el total a pagar
                 IF v_registros.pago_variable='no' THEN
@@ -233,7 +233,7 @@ BEGIN
                         --   si es  un pago no variable  (si es una cuota de devengao_pagado, devegando_pagado_1c, pagado)
                         --  validar que no se haga el ultimo pago sin  terminar de descontar el anticipo,
 
-                        IF   (p_hstore->'tipo') in('devengado_pagado','devengado_pagado_1c')  THEN
+                        IF   (p_hstore->'tipo') in('devengado_pagado','devengado_pagado_1c','devengado_pagado_1c_sp')  THEN
                             -- saldo_x_pagar = determinar cuanto falta por pagar (sin considerar el devengado)
                             v_saldo_x_pagar = tes.f_determinar_total_faltante((p_hstore->'id_obligacion_pago')::integer,'total_registrado_pagado');
 
@@ -290,7 +290,7 @@ BEGIN
           END IF;
 
           --revision de anticipo
-          IF (p_hstore->'tipo') in('devengado','devengado_pagado','devengado_pagado_1c') THEN
+          IF (p_hstore->'tipo') in('devengado','devengado_pagado','devengado_pagado_1c','devengado_pagado_1c_sp') THEN
                --si es un proceso variable, verifica que el registro no sobrepase el total a pagar
                IF v_registros.pago_variable='no' THEN
                         -- Validamos anticipos mistos
@@ -667,11 +667,13 @@ BEGIN
                END IF;
             END IF;
 
+			IF (p_hstore->'tipo' != 'devengado_pagado_1c_sp') THEN
             --si el salto esta habilitado cambiamos la cuota al siguiente estado
-            IF p_salta  and v_registros.pago_variable = 'no' THEN
-                  IF not tes.f_cambio_estado_plan_pago(p_id_usuario, v_id_plan_pago) THEN
-                    raise exception 'error al cambiar de estado';
-                  END IF;
+              IF p_salta  and v_registros.pago_variable = 'no' THEN
+                    IF not tes.f_cambio_estado_plan_pago(p_id_usuario, v_id_plan_pago) THEN
+                      raise exception 'error al cambiar de estado';
+                    END IF;
+              END IF;
             END IF;
 
 			--Definicion de la respuesta

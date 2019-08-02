@@ -786,11 +786,11 @@ header("content-type: text/javascript; charset=UTF-8");
                             id: 'id_forma_pago',
                             root:'datos',
                             sortInfo:{
-                                field:'desc_forma_pago',
+                                field:'orden',
                                 direction:'ASC'
                             },
                             totalProperty:'total',
-                            fields: ['id_forma_pago','desc_forma_pago','observaciones','cod_inter','codigo'],
+                            fields: ['id_forma_pago','desc_forma_pago','observaciones','cod_inter','codigo','orden'],
                             remoteSort: true,
                             baseParams:{par_filtro:'desc_forma_pago'}
                         }),
@@ -1817,7 +1817,7 @@ header("content-type: text/javascript; charset=UTF-8");
 
 
             this.objWizard = Phx.CP.loadWindows('../../../sis_workflow/vista/estado_wf/FormEstadoWf.php',
-                'Estado de Wf',
+                'Estado de Wfff',
                 {
                     modal: true,
                     width: 700,
@@ -2292,37 +2292,37 @@ header("content-type: text/javascript; charset=UTF-8");
             this.Cmp.monto_ajuste_siguiente_pag.setValue(0);
             this.Cmp.monto_anticipo.setValue(0);
 
-            this.Cmp.tipo.setValue('devengado_pagado_1c_sp');
+            // this.Cmp.tipo.setValue('devengado_pagado_1c_sp');
 
 
         },
 
         ocultarCheCue: function (me, pFormaPago) {
 
-            if (pFormaPago == 'Transferencia') {
-
-
-                //Habilita nrocuenta bancaria destino
-                // me.Cmp.nro_cuenta_bancaria.allowBlank = false;
-                // me.Cmp.nro_cuenta_bancaria.enable()
-                //
-                me.ocultarComponente(me.Cmp.id_proveedor_cta_bancaria);
-                me.Cmp.id_proveedor_cta_bancaria.allowBlank = false;
-                // me.Cmp.id_proveedor_cta_bancaria.enable();
-
-            }
-            else {
+            // if (pFormaPago == 'Transferencia') {
+            //
             //
             //     //Habilita nrocuenta bancaria destino
-            //     me.Cmp.nro_cuenta_bancaria.allowBlank = true;
-            //     me.Cmp.nro_cuenta_bancaria.setValue('');
-            //     me.Cmp.nro_cuenta_bancaria.disable();
-
-                me.mostrarComponente(me.Cmp.id_proveedor_cta_bancaria);
-                me.Cmp.id_proveedor_cta_bancaria.allowBlank = true;
-                me.Cmp.id_proveedor_cta_bancaria.setValue('');
-                // me.Cmp.id_proveedor_cta_bancaria.disable();
-            }
+            //     // me.Cmp.nro_cuenta_bancaria.allowBlank = false;
+            //     // me.Cmp.nro_cuenta_bancaria.enable()
+            //     //
+            //     me.ocultarComponente(me.Cmp.id_proveedor_cta_bancaria);
+            //     me.Cmp.id_proveedor_cta_bancaria.allowBlank = false;
+            //     // me.Cmp.id_proveedor_cta_bancaria.enable();
+            //
+            // }
+            // else {
+            // //
+            // //     //Habilita nrocuenta bancaria destino
+            // //     me.Cmp.nro_cuenta_bancaria.allowBlank = true;
+            // //     me.Cmp.nro_cuenta_bancaria.setValue('');
+            // //     me.Cmp.nro_cuenta_bancaria.disable();
+            //
+            //     me.mostrarComponente(me.Cmp.id_proveedor_cta_bancaria);
+            //     me.Cmp.id_proveedor_cta_bancaria.allowBlank = true;
+            //     me.Cmp.id_proveedor_cta_bancaria.setValue('');
+            //     // me.Cmp.id_proveedor_cta_bancaria.disable();
+            // }
 
         },
 
@@ -2644,7 +2644,7 @@ header("content-type: text/javascript; charset=UTF-8");
             Phx.vista.SoliPlanPago.superclass.onButtonNew.call(this);
             this.ocultarGrupo(2); //ocultar el grupo de ajustes
             // this.ocultarGrupo(3); //ocultar el grupo de ajustes
-            this.ocultarComponente(this.Cmp.otros_descuentos);
+            this.mostrarComponente(this.Cmp.otros_descuentos);
 
             this.ocultarComponente(this.Cmp.obs_descuento_inter_serv);
             this.ocultarComponente(this.Cmp.descuento_inter_serv);
