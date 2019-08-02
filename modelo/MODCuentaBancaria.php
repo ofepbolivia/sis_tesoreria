@@ -58,7 +58,7 @@ class MODCuentaBancaria extends MODbase{
 		$this->setParametro('permiso','permiso','varchar');
 		//Definicion de la lista del resultado del query
         $this->captura('id_cuenta_bancaria','int4');
-        $this->captura('d_deb_hab', 'numeric');
+        $this->captura('saldo', 'numeric');
 		$this->captura('estado_reg','varchar');
 		$this->captura('fecha_baja','date');
 		$this->captura('nro_cuenta','varchar');

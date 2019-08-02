@@ -306,6 +306,50 @@ header("content-type: text/javascript; charset=UTF-8");
 				fieldLabel:'Tipo',
 				allowBlank:false,
 				emptyText:'Tipo...',
+				typeAhead: true,								
+				mode: 'local',				
+				gwidth: 100,                
+                hiddenName: 'id_forma_pago',                
+                store: new Ext.data.JsonStore({
+                         url: '../../sis_tesoreria/control/TsLibroBancos/consultaFormaPagoEgreso',
+                         id: 'id_forma_pago',
+                         root: 'datos',                         
+                         sortInfo:{
+                            field: 'orden',
+                            direction: 'ASC'                            
+                    },
+                    totalProperty: 'total',
+                    fields: ['id_forma_pago','variable','desc_forma_pago'],
+                    // turn on remote sorting
+                    remoteSort: true,
+                    baseParams:{par_filtro:'fpa.desc_forma_pago'}                    
+                    }),
+                valueField: 'variable',
+                displayField: 'desc_forma_pago', 
+                forceSelection:true,
+                typeAhead: false,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode:'remote',
+                pageSize:10,
+                queryDelay:1000,
+                listWidth:250,
+                minChars:1,
+                resizable:true,
+                anchor:'80%'
+			},
+			type:'ComboBox',
+			id_grupo:1,		
+			grid:true,
+			form:true
+		},
+        /*        
+		{
+			config:{
+				name:'tipo',
+				fieldLabel:'Tipo',
+				allowBlank:false,
+				emptyText:'Tipo...',
 				typeAhead: true,
 				triggerAction: 'all',
 				lazyRender:true,
@@ -331,18 +375,18 @@ header("content-type: text/javascript; charset=UTF-8");
 			grid:true,
 			valorInicial:'cheque',
 			form:true
-		},
+		},*/
 		{
 			config:{
 				name: 'nro_cheque',
-				fieldLabel: 'Nro Cheque',
+				fieldLabel: 'Nro Documento',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 80,
-				maxLength:6
+				maxLength:30
 			},
-				type:'NumberField',
-				filters:{pfiltro:'lban.nro_cheque',type:'numeric'},
+				type:'TextField',
+				filters:{pfiltro:'lban.nro_cheque',type:'string'},
 				bottom_filter: true,
 				id_grupo:1,
 				grid:true,
@@ -354,8 +398,7 @@ header("content-type: text/javascript; charset=UTF-8");
 				fieldLabel: 'Importe Deposito',
 				allowBlank: false,
 				anchor: '80%',
-				gwidth: 100,
-				maxLength:1310722
+				gwidth: 100				
 			},
 				type:'NumberField',
 				filters:{pfiltro:'lban.importe_deposito',type:'numeric'},
@@ -660,7 +703,7 @@ header("content-type: text/javascript; charset=UTF-8");
 		{name:'id_proceso_wf', type: 'numeric'},
 		{name:'id_estado_wf', type: 'numeric'},
 		{name:'a_favor', type: 'string'},
-		{name:'nro_cheque', type: 'numeric'},
+		{name:'nro_cheque', type: 'string'},
 		{name:'importe_deposito', type: 'numeric'},
 		{name:'nro_liquidacion', type: 'string'},
 		{name:'detalle', type: 'string'},
@@ -690,7 +733,9 @@ header("content-type: text/javascript; charset=UTF-8");
 		{name:'nombre_regional', type: 'string'},
 		{name:'sistema_origen', type: 'string'},
 		{name:'notificado', type: 'string'},
-		{name:'tramite', type: 'string'}
+		{name:'tramite', type: 'string'},
+        {name:'id_forma_pago',type:'numeric'},
+        {name:'desc_forma_pago',  type:'string'}
 		
 	],
         sortInfo : {
@@ -703,7 +748,7 @@ header("content-type: text/javascript; charset=UTF-8");
 		
 		iniciarEventos:function(){
 		
-			this.cmpTipo = this.getComponente('tipo');		
+			this.cmpTipo = this.getComponente('id_forma_pago');		
 			this.cmpNroCheque = this.getComponente('nro_cheque');
 			this.cmpImporteDeposito = this.getComponente('importe_deposito');
 			this.cmpImporteCheque = this.getComponente('importe_cheque');
@@ -724,45 +769,36 @@ header("content-type: text/javascript; charset=UTF-8");
 			this.ocultarComponente(this.cmpIdLibroBancosFk);
 			
 			this.cmpNroCheque.on('focus',function(componente){
-
-				var cta_bancaria = this.cmpIdCuentaBancaria.getValue();
-
-				Ext.Ajax.request({
-					url:'../../sis_tesoreria/control/TsLibroBancos/listarTsLibroBancos',
-					params:{start:0, limit:this.tam_pag, m_id_cuenta_bancaria:cta_bancaria,m_nro_cheque:'si'},
-					success: function (resp){
-						var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
-						this.cmpNroCheque.setValue(parseInt(reg.datos[0].nro_cheque)+1);
-					},
-					failure: this.conexionFailure,
-					timeout:this.timeout,
-					scope:this
-				});
+                if(this.cmpTipo.value.toLowerCase() == 'cheque') {
+                    var cta_bancaria = this.cmpIdCuentaBancaria.getValue();
+                    
+                    Ext.Ajax.request({
+                        url:'../../sis_tesoreria/control/TsLibroBancos/listarTsLibroBancos',
+                        params:{start:0, limit:this.tam_pag, m_id_cuenta_bancaria:cta_bancaria,m_nro_cheque:'si'},
+                        success: function (resp){
+                            var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+                            this.cmpNroCheque.setValue(parseInt(reg.datos[0].nro_cheque)+1);
+                        },
+                        failure: this.conexionFailure,
+                        timeout:this.timeout,
+                        scope:this
+                    });
+                }
 				
 			},this);
 			
-			 this.cmpTipo.on('select',function(com,dat){
-			 
-				  switch(dat.data.variable){
-					case  'debito_automatico':
-						this.ocultarComponente(this.cmpNroCheque);
-						this.cmpImporteDeposito.setValue(0.00);
-						this.ocultarComponente(this.cmpImporteDeposito);
-						//this.cmpImporteCheque.setValue(0.00);
-						this.mostrarComponente(this.cmpImporteCheque);
-						this.cmpNroCheque.reset();
-						break;	
+			 this.cmpTipo.on('select',function(com,dat){                               
+                    this.cmpNroCheque.reset();                                    
+				  switch(dat.data.variable){	
 					case 'cheque':
 						this.mostrarComponente(this.cmpNroCheque);
 						this.cmpImporteDeposito.setValue(0.00);
 						this.ocultarComponente(this.cmpImporteDeposito);
 						//this.cmpImporteCheque.setValue(0.00);
-						this.mostrarComponente(this.cmpImporteCheque);
-						
+						this.mostrarComponente(this.cmpImporteCheque);						
 						break;
-					
-					case 'transferencia_carta':
-						this.ocultarComponente(this.cmpNroCheque);
+					default:					
+						this.mostrarComponente(this.cmpNroCheque);
 						this.cmpImporteDeposito.setValue(0.00);
 						this.ocultarComponente(this.cmpImporteDeposito);
 						//this.cmpImporteCheque.setValue(0.00);
@@ -1192,6 +1228,8 @@ header("content-type: text/javascript; charset=UTF-8");
 			this.cmpDepto.enable();
 			this.cmpFecha.enable();
 			this.cmpTipo.enable();
+            var date = new Date();
+            this.cmpFecha.setValue(date.dateFormat('d/m/Y'));            
 				
 			var record = this.cmpTipo.getStore();
 			record.data.variable = 'cheque';			
@@ -1206,8 +1244,7 @@ header("content-type: text/javascript; charset=UTF-8");
 		onButtonEdit:function(){
 			Phx.vista.TsLibroBancosCheque.superclass.onButtonEdit.call(this);
 			//this.cmpTipo.disable();			
-			var data = this.getSelectedData();
-			
+			var data = this.getSelectedData();			           
 			if(data.tipo=='cheque')
 				this.mostrarComponente(this.cmpNroCheque);
 			else

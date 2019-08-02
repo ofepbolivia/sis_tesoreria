@@ -203,7 +203,7 @@ class MODProcesoCaja extends MODbase{
 		$this->captura('desc_cuenta_bancaria','text');
 		$this->captura('fecha','date');
 		$this->captura('tipo','varchar');
-		$this->captura('nro_deposito','int4');
+		$this->captura('nro_deposito','varchar');
 		$this->captura('importe_deposito','numeric');
 		$this->captura('origen','varchar');
 		$this->captura('nombre_finalidad','varchar');
@@ -382,7 +382,7 @@ class MODProcesoCaja extends MODbase{
 		$this->captura('nro_cbte','VARCHAR');
 		$this->captura('num_memo','VARCHAR');
 		$this->captura('num_rendicion','VARCHAR');
-		$this->captura('nro_cheque','integer');
+		$this->captura('nro_cheque','varchar');
 		$this->captura('importe_solicitado','numeric');
 
 		//Ejecuta la instruccion

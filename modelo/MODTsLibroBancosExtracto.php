@@ -25,7 +25,7 @@ class MODTsLibroBancosExtracto extends MODbase{
         $this->captura('id_cuenta_bancaria','int4');
         $this->captura('fecha','date');
         $this->captura('a_favor','varchar');
-        $this->captura('nro_cheque','int4');
+        $this->captura('nro_cheque','varchar');
         $this->captura('importe_deposito','numeric');
         $this->captura('nro_liquidacion','varchar');
         $this->captura('detalle','text');
@@ -39,7 +39,7 @@ class MODTsLibroBancosExtracto extends MODbase{
         $this->captura('indice','numeric');
         $this->captura('estado_reg','varchar');
         $this->captura('tipo','varchar');
-        $this->captura('nro_deposito','integer');
+        $this->captura('nro_deposito','varchar');
         $this->captura('fecha_reg','timestamp');
         $this->captura('id_usuario_reg','int4');
         $this->captura('fecha_mod','timestamp');
@@ -111,7 +111,7 @@ class MODTsLibroBancosExtracto extends MODbase{
         $this->captura('nro_liquidacion','varchar');
         $this->captura('nro_comprobante','varchar');
         $this->captura('comprobante_sigma','varchar');
-        $this->captura('nro_cheque','integer');
+        $this->captura('nro_cheque','varchar');
         $this->captura('importe_deposito','text');
         $this->captura('importe_cheque','text');
         $this->captura('saldo','text');
@@ -139,8 +139,8 @@ class MODTsLibroBancosExtracto extends MODbase{
         $this->setParametro('id_depto','id_depto','int4');
         $this->setParametro('fecha','fecha','date');
         $this->setParametro('a_favor','a_favor','varchar');
-        $this->setParametro('nro_cheque','nro_cheque','int4');
-        $this->setParametro('nro_deposito','nro_deposito','int4');
+        $this->setParametro('nro_cheque','nro_cheque','varchar');
+        $this->setParametro('nro_deposito','nro_deposito','varchar');
         $this->setParametro('importe_deposito','importe_deposito','numeric');
         $this->setParametro('nro_liquidacion','nro_liquidacion','varchar');
         $this->setParametro('detalle','detalle','text');
@@ -175,7 +175,7 @@ class MODTsLibroBancosExtracto extends MODbase{
         $this->setParametro('id_cuenta_bancaria','id_cuenta_bancaria','int4');
         $this->setParametro('fecha','fecha','date');
         $this->setParametro('a_favor','a_favor','varchar');
-        $this->setParametro('nro_cheque','nro_cheque','int4');
+        $this->setParametro('nro_cheque','nro_cheque','varchar');
         $this->setParametro('importe_deposito','importe_deposito','numeric');
         $this->setParametro('nro_liquidacion','nro_liquidacion','varchar');
         $this->setParametro('detalle','detalle','text');
@@ -360,7 +360,7 @@ class MODTsLibroBancosExtracto extends MODbase{
         $this->captura('observaciones','text');
         $this->captura('nro_liquidacion','varchar');
         $this->captura('nro_comprobante','varchar');
-        $this->captura('nro_cheque','int4');
+        $this->captura('nro_cheque','varchar');
         $this->captura('tipo','varchar');
         $this->captura('importe_deposito','numeric');
         $this->captura('importe_cheque','numeric');

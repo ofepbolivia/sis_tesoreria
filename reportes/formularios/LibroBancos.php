@@ -116,6 +116,53 @@ header("content-type: text/javascript; charset=UTF-8");
 			config:{
 				name:'tipo',
 				fieldLabel:'Tipo',
+				allowBlank:false,
+				emptyText:'Tipo...',
+				typeAhead: true,								
+				mode: 'local',				
+				gwidth: 100,                
+                hiddenName: 'id_forma_pago',                
+                store: new Ext.data.JsonStore({
+                         url: '../../sis_tesoreria/control/TsLibroBancos/consultaFormaPagoRepo',                         
+                         id: 'id_forma_pago',
+                         root: 'datos',
+                         sortInfo:{
+                            field: 'id_forma_pago',
+                            direction: 'ASC'
+                    },
+                    totalProperty: 'total',
+                    fields: ['id_forma_pago','variable','desc_forma_pago'],
+                    // turn on remote sorting
+                    remoteSort: true,
+                    baseParams:{par_filtro:'fpa.desc_forma_pago'}                    
+                    }),
+                valueField: 'variable',
+                displayField: 'desc_forma_pago', 
+                forceSelection:true,
+                typeAhead: false,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode:'remote',
+                pageSize:10,
+                queryDelay:1000,
+                listWidth:250,
+                resizable:true,
+                anchor:'80%'
+			},
+			type:'ComboBox',
+			id_grupo:1,		
+            filters:{   
+                        pfiltro:'variable',
+                        type:'string'
+                    },            
+			grid:true,
+			form:true
+		},        
+        /*
+		{
+			config:{
+				name:'tipo',
+				fieldLabel:'Tipo',
 				typeAhead: true,
 				allowBlank:false,
 	    		triggerAction: 'all',
@@ -139,7 +186,7 @@ header("content-type: text/javascript; charset=UTF-8");
 			type:'ComboBox',
 			id_grupo:1,
 			form:true
-		},
+		},*/
 		{
 			config:{
 				name:'estado',
@@ -278,7 +325,7 @@ header("content-type: text/javascript; charset=UTF-8");
 			this.cmpFechaFin = this.getComponente('fecha_fin');
 			this.cmpIdCuentaBancaria = this.getComponente('id_cuenta_bancaria');
 			this.cmpEstado = this.getComponente('estado');
-			this.cmpTipo = this.getComponente('tipo');
+			this.cmpTipo = this.getComponente('id_forma_pago');
 			this.cmpNombreBanco = this.getComponente('nombre_banco');
 			this.cmpNroCuenta = this.getComponente('nro_cuenta');
 			
@@ -289,8 +336,12 @@ header("content-type: text/javascript; charset=UTF-8");
 			},this);
 			
 			this.cmpIdCuentaBancaria.on('select',function(c,r,n){
+                console.log('cc=> ',c);
 				this.cmpNombreBanco.setValue(r.data.nombre_institucion);
 				this.cmpNroCuenta.setValue(c.lastSelectionText);
+                this.getComponente('id_forma_pago').reset();
+                this.getComponente('id_forma_pago').store.baseParams={vista: 'reporte'};
+                this.getComponente('id_forma_pago').modificado=true;
 				this.getComponente('id_finalidad').reset();
 				this.getComponente('id_finalidad').store.baseParams={id_cuenta_bancaria:c.value, vista: 'reporte'};				
 				this.getComponente('id_finalidad').modificado=true;
@@ -298,7 +349,7 @@ header("content-type: text/javascript; charset=UTF-8");
 		},
 		
 		onSubmit:function(o){
-			if(this.cmpFormatoReporte.getValue()==2){
+			if(this.cmpFormatoReporte.getValue()==2){                
 				var data = 'FechaIni=' + this.cmpFechaIni.getValue().format('d-m-Y');
 				data = data + '&FechaFin=' + this.cmpFechaFin.getValue().format('d-m-Y');
 				data = data + '&IdCuentaBancaria=' + this.cmpIdCuentaBancaria.getValue();
