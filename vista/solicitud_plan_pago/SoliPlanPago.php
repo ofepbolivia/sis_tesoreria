@@ -792,13 +792,13 @@ header("content-type: text/javascript; charset=UTF-8");
                             totalProperty:'total',
                             fields: ['id_forma_pago','desc_forma_pago','observaciones','cod_inter','codigo','orden'],
                             remoteSort: true,
-                            baseParams:{par_filtro:'desc_forma_pago'}
+                            baseParams:{par_filtro:'desc_forma_pago#codigo'}
                         }),
                     tpl:'<tpl for="."><div class="x-combo-list-item"><p>{desc_forma_pago}</p></div></tpl>',
                     valueField: 'codigo',
                     hiddenValue: 'id_forma_pago',
-                    displayField: 'desc_forma_pago',
-                    gdisplayField:'desc_forma_pago',
+                    displayField: 'codigo',
+                    gdisplayField:'codigo',
                     listWidth:'280',
                     forceSelection:true,
                     typeAhead: false,
@@ -1763,9 +1763,9 @@ header("content-type: text/javascript; charset=UTF-8");
 
 
             //aviso para completar datos del formulario antes de pasar al siguiente estado
-            if (rec.data['forma_pago'] == '' || rec.data['forma_pago'] == null ||
-                rec.data['id_cuenta_bancaria'] == '' || rec.data['id_cuenta_bancaria'] == null ||
-                rec.data['nro_cuenta_bancaria'] == '' || rec.data['nro_cuenta_bancaria'] == null
+            if (rec.data['forma_pago'] == '' || rec.data['forma_pago'] == null
+                // || rec.data['id_cuenta_bancaria'] == '' || rec.data['id_cuenta_bancaria'] == null
+                // || rec.data['nro_cuenta_bancaria'] == '' || rec.data['nro_cuenta_bancaria'] == null
             ) {
 
                 Ext.Msg.show({

@@ -677,7 +677,7 @@ header("content-type: text/javascript; charset=UTF-8");
             {
                 config:{
                     name: 'obs',
-                    fieldLabel: 'Desc.',
+                    fieldLabel: 'Descripción',
                     allowBlank: false,
                     qtip: 'Descripciçión del objetivo del pago, o Si el proveedor es PASAJEROS PERJUDICADOS aqui va el nombre del pasajero',
                     anchor: '95%',
