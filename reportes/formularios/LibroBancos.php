@@ -328,6 +328,7 @@ header("content-type: text/javascript; charset=UTF-8");
 			this.cmpTipo = this.getComponente('id_forma_pago');
 			this.cmpNombreBanco = this.getComponente('nombre_banco');
 			this.cmpNroCuenta = this.getComponente('nro_cuenta');
+            this.cmpFinalidad = this.getComponente('id_finalidad');
 			
 			this.getComponente('finalidad').hide(true);
 			this.cmpNroCuenta.hide(true);
@@ -347,9 +348,21 @@ header("content-type: text/javascript; charset=UTF-8");
 				this.getComponente('id_finalidad').modificado=true;
 			},this);
 		},
-		
 		onSubmit:function(o){
-			if(this.cmpFormatoReporte.getValue()==2){                
+			if(this.cmpFormatoReporte.getValue()==2){    
+                var loca = new Date();
+                var r = loca.toTimeString();                                
+                var n1 = r.indexOf(')');
+                var s = r.substring(27,n1);
+                var filtro = '';
+                switch (s) {
+                    case 'Bolivia':
+                        filtro = 'BOL';
+                        break;
+                    case  'Argentina':
+                        filtro = 'BUE';
+                }
+                var l = s
 				var data = 'FechaIni=' + this.cmpFechaIni.getValue().format('d-m-Y');
 				data = data + '&FechaFin=' + this.cmpFechaFin.getValue().format('d-m-Y');
 				data = data + '&IdCuentaBancaria=' + this.cmpIdCuentaBancaria.getValue();
@@ -357,6 +370,8 @@ header("content-type: text/javascript; charset=UTF-8");
 				data = data + '&Tipo=' + this.cmpTipo.getValue();
 				data = data + '&NombreBanco=' + this.cmpNombreBanco.getValue();
 				data = data + '&NumeroCuenta=' + this.cmpNroCuenta.getValue();
+                data = data + '&FINALIDAD=' + this.cmpFinalidad.getValue();                 
+                data = data + '&FILTRO=' + filtro;
 				
 				console.log(data);
 				window.open('http://sms.obairlines.bo/LibroBancos/Home/VerLibroBancos?'+data);
