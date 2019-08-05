@@ -374,7 +374,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 data = data + '&FILTRO=' + filtro;
 				
 				console.log(data);
-				window.open('http://sms.obairlines.bo/LibroBancos/Home/VerLibroBancos?'+data);
+				window.open('http://sms.obairlines.bo/ErpReports/Reporte/VerLibroBancos?'+data);
 				//window.open('http://localhost:2309/Home/VerLibroBancos?'+data);				
 			}else{
 				Phx.vista.ReporteLibroBancos.superclass.onSubmit.call(this,o);				
