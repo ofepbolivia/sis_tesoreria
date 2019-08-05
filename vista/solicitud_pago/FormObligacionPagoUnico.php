@@ -77,18 +77,19 @@ header("content-type: text/javascript; charset=UTF-8");
                     origen:'CENTROCOSTO',
                     fieldLabel: 'Centro de Costos',
                     url: '../../sis_parametros/control/CentroCosto/listarCentroCostoFiltradoXDepto',
-                    emptyText : 'Centro Costo...',
+                    emptyText : 'Centro de Costo...',
                     allowBlank: false,
                     baseParams:{filtrar:'grupo_ep'}
                 }),
                 'id_orden_trabajo': new Ext.form.ComboRec({
                     name:'id_orden_trabajo',
                     msgTarget: 'title',
+                    origen:'OT',
                     sysorigen:'sis_contabilidad',
                     fieldLabel: 'Orden Trabajo',
-                    origen:'OT',
-                    allowBlank:true,
-                    baseParams:{par_filtro:'desc_orden'}
+                    emptyText : 'Orden de Trabajo...',
+                    allowBlank:false,
+                    baseParams:{par_filtro:'codigo#desc_orden#motivo_orden'}
                 }),
 
                 // 'id_orden_trabajo': new Ext.form.ComboBox({
@@ -171,6 +172,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     this.detCmp.id_orden_trabajo.store.baseParams = {
                         filtro_ot:rec.data.filtro_ot,
                         requiere_ot:rec.data.requiere_ot,
+                        par_filtro:'codigo#desc_orden#motivo_orden',
                         id_grupo_ots:rec.data.id_grupo_ots
                     };
                     //(fea)this.detCmp.id_orden_trabajo.modificado = true;
@@ -186,6 +188,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 }else{
                     this.detCmp.id_orden_trabajo.store.baseParams = {
                         filtro_ot:rec.data.filtro_ot,
+                        par_filtro:'codigo#desc_orden#motivo_orden',
                         requiere_ot:rec.data.requiere_ot,
                         id_grupo_ots:rec.data.id_grupo_ots,
                         id_centro_costo : this.detCmp.id_centro_costo.getValue()
@@ -375,7 +378,9 @@ header("content-type: text/javascript; charset=UTF-8");
                 stripeRows: true,
                 tbar: [{
                     /*iconCls: 'badd',*/
-                    text: '<i class="fa fa-plus-circle fa-lg"></i> Agregar Concepto',
+                    text: '<div style="font-size:12px;"> <i class="fa fa-plus-circle fa-lg"></i> Agregar Concepto</div>',
+
+                    //text: '<i class="fa fa-plus-circle fa-lg"></i> Agregar Concepto',
                     scope: this,
                     width: '100',
                     handler: function(){
@@ -404,7 +409,9 @@ header("content-type: text/javascript; charset=UTF-8");
                     }
                 },{
                     ref: '../removeBtn',
-                    text: '<i class="fa fa-trash fa-lg"></i> Eliminar',
+                    text: '<div style="font-size:12px; color:red;"> <i class="fa fa-trash fa-lg" > </i> Eliminar</div>',
+
+                   // text: '<i class="fa fa-trash fa-lg"></i> Eliminar',
                     scope:this,
                     handler: function(){
                         this.editorDetail.stopEditing();

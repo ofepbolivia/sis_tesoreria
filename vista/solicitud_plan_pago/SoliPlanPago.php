@@ -1632,7 +1632,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Obligación de pago:&nbsp;&nbsp;</b> {numero_op}</p>',
                 '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Documento:&nbsp;&nbsp;</b> {desc_plantilla}</p>',
                 '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Monto:&nbsp;&nbsp;</b> {monto}</p>',
-                '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Monto Excento:&nbsp;&nbsp;</b> {monto_excento}</p>',
+                // '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Monto Excento:&nbsp;&nbsp;</b> {monto_excento}</p>',
                 '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Anticipo:&nbsp;&nbsp;</b> {monto_anticipo}</p>',
                 '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Descuento Anticipo:&nbsp;&nbsp;</b> {descuento_anticipo}</p>',
                 // '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Retención de garantia:&nbsp;&nbsp;</b> {monto_retgar_mo}</p>',
@@ -1817,7 +1817,7 @@ header("content-type: text/javascript; charset=UTF-8");
 
 
             this.objWizard = Phx.CP.loadWindows('../../../sis_workflow/vista/estado_wf/FormEstadoWf.php',
-                'Estado de Wfff',
+                'Estado de Wf',
                 {
                     modal: true,
                     width: 700,
@@ -2030,6 +2030,7 @@ header("content-type: text/javascript; charset=UTF-8");
             this.ocultarComponente(this.Cmp.obs_descuento_inter_serv);
             this.ocultarComponente(this.Cmp.descuento_inter_serv);
             this.ocultarComponente(this.Cmp.monto_retgar_mo);
+            this.ocultarComponente(this.Cmp.monto_excento);
             this.mostrarComponente(this.Cmp.otros_descuentos);
 
             //modificacion para las internacionales muestren solo genere un comprobante
@@ -2338,7 +2339,7 @@ header("content-type: text/javascript; charset=UTF-8");
             'devengado': function (me) {
                 //plantilla (TIPO DOCUMENTO)
                 me.mostrarComponente(me.Cmp.id_plantilla);
-                me.mostrarComponente(me.Cmp.monto_excento);
+                // me.mostrarComponente(me.Cmp.monto_excento);
                 me.mostrarComponente(me.Cmp.monto_no_pagado);
                 me.mostrarComponente(me.Cmp.obs_monto_no_pagado);
                 me.mostrarComponente(me.Cmp.liquido_pagable);
@@ -2359,7 +2360,7 @@ header("content-type: text/javascript; charset=UTF-8");
             'devengado_rrhh': function (me) {
                 //plantilla (TIPO DOCUMENTO)
                 me.mostrarComponente(me.Cmp.id_plantilla);
-                me.mostrarComponente(me.Cmp.monto_excento);
+                // me.mostrarComponente(me.Cmp.monto_excento);
                 me.mostrarComponente(me.Cmp.monto_no_pagado);
                 me.mostrarComponente(me.Cmp.obs_monto_no_pagado);
                 me.mostrarComponente(me.Cmp.liquido_pagable);
@@ -2379,7 +2380,7 @@ header("content-type: text/javascript; charset=UTF-8");
             'devengado_pagado': function (me) {
                 //plantilla (TIPO DOCUMENTO)
                 me.mostrarComponente(me.Cmp.id_plantilla);
-                me.mostrarComponente(me.Cmp.monto_excento);
+                // me.mostrarComponente(me.Cmp.monto_excento);
                 me.mostrarComponente(me.Cmp.monto_no_pagado);
                 me.mostrarComponente(me.Cmp.obs_monto_no_pagado);
                 me.mostrarComponente(me.Cmp.liquido_pagable);
@@ -2411,7 +2412,7 @@ header("content-type: text/javascript; charset=UTF-8");
             'rendicion': function (me) {
                 //plantilla (TIPO DOCUMENTO)
                 me.mostrarComponente(me.Cmp.id_plantilla);
-                me.mostrarComponente(me.Cmp.monto_excento);
+                // me.mostrarComponente(me.Cmp.monto_excento);
                 me.mostrarComponente(me.Cmp.monto_no_pagado);
                 me.mostrarComponente(me.Cmp.obs_monto_no_pagado);
                 me.ocultarComponente(me.Cmp.monto_anticipo);
@@ -2649,6 +2650,7 @@ header("content-type: text/javascript; charset=UTF-8");
             this.ocultarComponente(this.Cmp.obs_descuento_inter_serv);
             this.ocultarComponente(this.Cmp.descuento_inter_serv);
             this.ocultarComponente(this.Cmp.monto_retgar_mo);
+            this.ocultarComponente(this.Cmp.monto_excento);
 
             if (this.Cmp.id_depto_lb.getValue() > 0) {
                 this.Cmp.id_cuenta_bancaria.store.baseParams = Ext.apply(this.Cmp.id_cuenta_bancaria.store.baseParams, {

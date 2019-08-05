@@ -120,7 +120,14 @@ header("content-type: text/javascript; charset=UTF-8");
 
         },
         iniciarEventosDetalle: function () {
+          /*Cambiando tamaño*/
+          this.megrid.topToolbar.items.items[0].container.dom.style.width="75px";
+          this.megrid.topToolbar.items.items[0].container.dom.style.height="35px";
+          this.megrid.topToolbar.items.items[0].btnEl.dom.style.height="35px";
 
+          this.megrid.topToolbar.items.items[1].container.dom.style.width="75px";
+          /**********************************************************************/
+          console.log("llega aqui",this);
             this.detCmp.id_concepto_ingas.on('change', function (cmb, rec, ind) {
                 this.detCmp.id_orden_trabajo.reset();
             }, this);
@@ -304,7 +311,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 stripeRows: true,
                 tbar: [{
                     /*iconCls: 'badd',*/
-                    text: '<i class="fa fa-plus-circle fa-lg"></i> Agregar Concepto',
+                    text: '<div style="font-size:12px;"> <i class="fa fa-plus-circle fa-lg"></i> Agregar Concepto</div>',
                     scope: this,
                     width: '100',
                     handler: function () {
@@ -333,7 +340,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     }
                 }, {
                     ref: '../removeBtn',
-                    text: '<i class="fa fa-trash fa-lg"></i> Eliminar',
+                    text: '<div style="font-size:12px; color:red;"> <i class="fa fa-trash fa-lg" > </i> Eliminar</div>',
                     scope: this,
                     handler: function () {
                         this.editorDetail.stopEditing();
@@ -583,9 +590,9 @@ header("content-type: text/javascript; charset=UTF-8");
             {
                 config: {
                     name: 'obs',
-                    fieldLabel: 'Desc',
+                    fieldLabel: 'Descripción',
                     allowBlank: false,
-                    qtip: 'Descripcion del objetivo del pago, o Si el proveedor es PASAJEROS PERJUDICADOS aqui va el nombre del pasajero',
+                    qtip: 'Descripción del objetivo del pago, o Si el proveedor es PASAJEROS PERJUDICADOS aqui va el nombre del pasajero',
                     anchor: '100%',
                     maxLength: 1000
                 },
@@ -596,7 +603,7 @@ header("content-type: text/javascript; charset=UTF-8");
             {
                 config: {
                     name: 'fecha_pp_ini',
-                    fieldLabel: 'Fecha pago.',
+                    fieldLabel: 'Fecha Tentativa del Pago',
                     qtip: 'Fecha tentativa para el pago',
                     allowBlank: false,
                     anchor: '93%',
