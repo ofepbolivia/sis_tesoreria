@@ -353,14 +353,17 @@ header("content-type: text/javascript; charset=UTF-8");
                 var loca = new Date();
                 var r = loca.toTimeString();                                
                 var n1 = r.indexOf(')');
-                var s = r.substring(27,n1);
-                var filtro = '';
+                var s = r.substring(2,n1);
+                var filtro = '';                
                 switch (s) {
                     case 'Bolivia':
                         filtro = 'BOL';
                         break;
                     case  'Argentina':
                         filtro = 'BUE';
+                    default:
+                        filtro = 'BOL';
+                        break;                        
                 }
                 var l = s
 				var data = 'FechaIni=' + this.cmpFechaIni.getValue().format('d-m-Y');
