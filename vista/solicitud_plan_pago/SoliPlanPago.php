@@ -639,6 +639,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 grid: true,
                 form: true
             },
+
             {
 
                 config:{
@@ -772,6 +773,18 @@ header("content-type: text/javascript; charset=UTF-8");
                 id_grupo: 1,
                 grid: true,
                 form: true
+            },
+            {
+                config:{
+                    name: 'tipo_cambio',
+                    fieldLabel: 'Tipo de Cambio de Pago',
+                    allowBlank: false,
+                    anchor: '100%%',
+                    maxLength:131074
+                },
+                type:'NumberField',
+                id_grupo:1,
+                form:true
             },
             {
 
@@ -1622,8 +1635,7 @@ header("content-type: text/javascript; charset=UTF-8");
             'descuento_anticipo', 'monto_retgar_mo', 'monto_no_pagado', 'otros_descuentos', 'descuento_inter_serv', 'descuento_ley', 'id_depto_lb',
             'id_depto_lb', 'id_cuenta_bancaria', 'obs_wf', 'fecha_dev', 'fecha_pag', 'obs_descuentos_anticipo', 'obs_monto_no_pagado',
             'obs_otros_descuentos', 'obs_descuentos_ley', 'obs_descuento_inter_serv', 'monto_ajuste_ag', 'monto_ajuste_siguiente_pag', 'fecha_costo_ini',
-
-            'fecha_costo_fin', 'funcionario_wf', 'monto_anticipo', 'monto', 'monto_ejecutar_total_mo', 'monto_establecido','nit'],
+            'fecha_costo_fin', 'funcionario_wf', 'monto_anticipo', 'monto', 'monto_ejecutar_total_mo', 'monto_establecido','nit','tipo_cambio'],
 
 
         rowExpander: new Ext.ux.grid.RowExpander({

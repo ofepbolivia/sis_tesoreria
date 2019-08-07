@@ -849,7 +849,7 @@ BEGIN
             liquido_pagable=v_liquido_pagable,
 			fecha_mod = now(),
 			id_usuario_mod = p_id_usuario,
-            --tipo_cambio= v_parametros.tipo_cambio,
+            tipo_cambio= v_parametros.tipo_cambio,
             monto_retgar_mo= v_parametros.monto_retgar_mo,
             descuento_ley=v_parametros.descuento_ley,
             obs_descuentos_ley=v_parametros.obs_descuentos_ley,

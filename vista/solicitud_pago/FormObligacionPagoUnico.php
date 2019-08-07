@@ -589,7 +589,7 @@ header("content-type: text/javascript; charset=UTF-8");
             {
                 config:{
                     name: 'fecha',
-                    fieldLabel: 'Fecha Sol.',
+                    fieldLabel: 'Fecha Solicitud',
                     qtip: 'Según esta fecha se escoje el formulario de solicitud',
                     readOnly : false,
                     allowBlank: false,
@@ -646,18 +646,18 @@ header("content-type: text/javascript; charset=UTF-8");
                 id_grupo: 1,
                 form: true
             },
-            {
-                config:{
-                    name: 'tipo_cambio_conv',
-                    fieldLabel: 'Tipo Cambio',
-                    allowBlank: false,
-                    anchor: '100%%',
-                    maxLength:131074
-                },
-                type:'NumberField',
-                id_grupo:1,
-                form:true
-            },
+            // {
+            //     config:{
+            //         name: 'tipo_cambio_conv',
+            //         fieldLabel: 'Tipo Cambio',
+            //         allowBlank: false,
+            //         anchor: '100%%',
+            //         maxLength:131074
+            //     },
+            //     type:'NumberField',
+            //     id_grupo:1,
+            //     form:true
+            // },
 
             {
                 config: {
@@ -853,7 +853,7 @@ header("content-type: text/javascript; charset=UTF-8");
             this.cmpFecha=this.getComponente('fecha');
             this.cmpMoneda=this.getComponente('id_moneda');
             this.cmpDepto=this.getComponente('id_depto');
-            this.cmpTipoCambioConv=this.getComponente('tipo_cambio_conv');
+            // this.cmpTipoCambioConv=this.getComponente('tipo_cambio_conv');
             this.cmpTipoObligacion=this.getComponente('tipo_obligacion');
 
 
@@ -880,21 +880,21 @@ header("content-type: text/javascript; charset=UTF-8");
             },this);
 
 
-            this.cmpMoneda.on('select',function(com,dat){
-
-                if(dat.data.tipo_moneda == 'base'){
-                    this.cmpTipoCambioConv.disable();
-                    this.cmpTipoCambioConv.setValue(1);
-
-                }
-                else{
-
-                    this.cmpTipoCambioConv.enable();
-                    this.obtenerTipoCambio();
-                }
-
-
-            },this);
+            // this.cmpMoneda.on('select',function(com,dat){
+            //
+            //     if(dat.data.tipo_moneda == 'base'){
+            //         this.cmpTipoCambioConv.disable();
+            //         this.cmpTipoCambioConv.setValue(1);
+            //
+            //     }
+            //     else{
+            //
+            //         this.cmpTipoCambioConv.enable();
+            //         this.obtenerTipoCambio();
+            //     }
+            //
+            //
+            // },this);
 
             this.cmpProveedor.enable();
             this.mostrarComponente(this.cmpProveedor);
@@ -951,7 +951,7 @@ header("content-type: text/javascript; charset=UTF-8");
             var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
             if(!reg.ROOT.error){
 
-                this.cmpTipoCambioConv.setValue(reg.ROOT.datos.tipo_cambio);
+                // this.cmpTipoCambioConv.setValue(reg.ROOT.datos.tipo_cambio);
             }else{
 
                 alert('ocurrio al obtener el tipo de Cambio')
@@ -970,7 +970,7 @@ header("content-type: text/javascript; charset=UTF-8");
             this.mostrarComponente(this.cmpFuncionario);
             this.cmpFuncionario.reset();
             this.cmpFecha.enable();
-            this.cmpTipoCambioConv.enable();
+            // this.cmpTipoCambioConv.disable();
             this.cmpProveedor.enable();
             this.cmpMoneda.enable();
             this.cmpFuncionario.disable();
