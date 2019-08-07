@@ -94,7 +94,7 @@ BEGIN
                 
     --determina la fecha del periodo
     
-    select tipo into v_tipo from param.tforma_pago where id_forma_pago = (p_hstore->'id_fora_pago')::integer;
+    select tipo into v_tipo from param.tforma_pago where id_forma_pago = (p_hstore->'id_forma_pago')::integer;
     
 
             
@@ -260,10 +260,18 @@ BEGIN
                 	raise exception 'No existe un departamento con el codigo Obligaciones de Pago';
                 END IF;
                                 
-            	select tp.codigo into v_codigo_tipo_pro
-				from wf.ttipo_proceso tp
-				inner join wf.tproceso_macro pm on pm.id_proceso_macro=tp.id_proceso_macro
-				where tp.inicio='si' and pm.codigo=v_codigo_proceso_macro and tp.estado_reg='activo';
+        --(frankli.espinoza) no se define inicio como si
+        if pxp.f_get_variable_global('ESTACION_inicio') = 'BOL' then
+            select tp.codigo into v_codigo_tipo_pro
+            from wf.ttipo_proceso tp
+            inner join wf.tproceso_macro pm on pm.id_proceso_macro=tp.id_proceso_macro
+            where tp.inicio='si' and pm.codigo=v_codigo_proceso_macro and tp.estado_reg='activo';
+        else
+          select tp.codigo into v_codigo_tipo_pro
+            from wf.ttipo_proceso tp
+            inner join wf.tproceso_macro pm on pm.id_proceso_macro=tp.id_proceso_macro
+            where pm.codigo=v_codigo_proceso_macro and tp.estado_reg='activo' and tp.codigo_llave=(p_hstore->'tipo')::varchar;
+        end if;
                 
 				IF v_codigo_tipo_pro IS NULL THEN
                 	raise exception 'No existe en proceso de inicio para el proceso macro %', v_codigo_proceso_macro;
