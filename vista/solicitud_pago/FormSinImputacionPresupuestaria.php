@@ -91,7 +91,8 @@ header("content-type: text/javascript; charset=UTF-8");
                     sysorigen: 'sis_contabilidad',
                     fieldLabel: 'Orden Trabajo',
                     origen: 'OT',
-                    allowBlank: true
+                    allowBlank: true,
+                    baseParams:{par_filtro:'codigo#desc_orden#motivo_orden'}
                 }),
 
                 'descripcion': new Ext.form.TextField({
@@ -137,6 +138,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.detCmp.id_orden_trabajo.store.baseParams = {
                     filtro_ot: rec.data.filtro_ot,
                     requiere_ot: rec.data.requiere_ot,
+                    par_filtro:'codigo#desc_orden#motivo_orden',
                     id_grupo_ots: rec.data.id_grupo_ots
                 };
                 this.detCmp.id_orden_trabajo.modificado = true;

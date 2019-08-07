@@ -506,7 +506,7 @@ header("content-type: text/javascript; charset=UTF-8");
         },
         sortInfo: {
             field: 'numero_op',
-            direction: 'ASC'
+            direction: 'DESC'
         },
 
         //funciones adiconales para boton de reportes
