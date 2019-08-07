@@ -1275,7 +1275,7 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
 		this.ocultarComponente(this.cmpIdLibroBancosFk);	
         this.ocultarComponente(this.cmpNroDeposito);
 
-		/*this.cmpNroCheque.on('focus',function(componente){            
+		this.cmpNroCheque.on('focus',function(componente){            
 				var cta_bancaria = this.cmpIdCuentaBancaria.getValue();                
 
 				Ext.Ajax.request({
@@ -1290,7 +1290,7 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
 					scope:this
 				});
 				
-			},this);*/
+			},this);
 		
 		this.cmpTipo.on('select',function(com,dat){                        
             var value = dat.data.variable
