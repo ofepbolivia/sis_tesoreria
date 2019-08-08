@@ -353,19 +353,20 @@ header("content-type: text/javascript; charset=UTF-8");
                 var loca = new Date();
                 var r = loca.toTimeString();                                
                 var n1 = r.indexOf(')');
-                var s = r.substring(2,n1);
-                var filtro = '';                
-                switch (s) {
-                    case 'Bolivia':
-                        filtro = 'BOL';
-                        break;
-                    case  'Argentina':
-                        filtro = 'BUE';
-                    default:
-                        filtro = 'BOL';
-                        break;                        
+                var s = r.substring(27,n1);
+                var filtro = '';
+                var c;
+                var that = this;
+                fetch('http://ip-api.com/json').then(response => response.json()).then((data) => {
+                    that.c = data.country;                     
+                });
+                console.log('Pais => ',that.c);
+                if (s == 'Bolivia' || that.c == 'Bolivia'){
+                    filtro = 'BOL';
+                }else if(s == 'Argentina' || that.c == 'Argentina'){
+                    filtro = 'BUE';
                 }
-                var l = s
+
 				var data = 'FechaIni=' + this.cmpFechaIni.getValue().format('d-m-Y');
 				data = data + '&FechaFin=' + this.cmpFechaFin.getValue().format('d-m-Y');
 				data = data + '&IdCuentaBancaria=' + this.cmpIdCuentaBancaria.getValue();
