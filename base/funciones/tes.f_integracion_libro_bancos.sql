@@ -90,9 +90,9 @@ BEGIN
           --(franklin.espinoza)generamos ligro de bancos mas deposito si corresponde
           if pxp.f_get_variable_global('ESTACION_inicio') = 'BUE' then
             IF(v_registros.centro!='si')THEN
-                  v_respuesta_libro_bancos = tes.f_generar_deposito_cheque(p_id_usuario,p_id_int_comprobante, v_id_finalidad,NULL,COALESCE(v_registros.c31,''),'internacional');
+                  v_respuesta_libro_bancos = tes.f_generar_deposito_cheque(p_id_usuario,p_id_int_comprobante, v_id_finalidad,NULL,COALESCE(v_registros.c31,''),'nacional');
             ELSE
-                  v_respuesta_libro_bancos = tes.f_generar_cheque(p_id_usuario,p_id_int_comprobante, v_id_finalidad,NULL,COALESCE(v_registros.c31,''),'internacional');
+                  v_respuesta_libro_bancos = tes.f_generar_cheque(p_id_usuario,p_id_int_comprobante, v_id_finalidad,NULL,COALESCE(v_registros.c31,''),'nacional');
             END IF;
           end if;
           v_resp= 'true';
@@ -131,7 +131,7 @@ BEGIN
           --v_respuesta_libro_bancos = tes.f_generar_transferencia(p_id_usuario,p_id_int_comprobante, v_id_finalidad,NULL,'','internacional');
           --(franklin.espinoza)generar transferencia en libro de bancos
           if pxp.f_get_variable_global('ESTACION_inicio') = 'BUE' then
-            v_respuesta_libro_bancos = tes.f_generar_transferencia(p_id_usuario,p_id_int_comprobante, v_id_finalidad,NULL,'','internacional');
+            v_respuesta_libro_bancos = tes.f_generar_transferencia(p_id_usuario,p_id_int_comprobante, v_id_finalidad,NULL,'','nacional');
           end if;
           v_resp= 'true';
       elsif(v_registros.prioridad_conta = 2 and v_registros.prioridad_libro =1 )then
@@ -139,7 +139,7 @@ BEGIN
       end if;
     ELSE --(franklin.espinoza) otro tipo de forma de pago
     	if pxp.f_get_variable_global('ESTACION_inicio') = 'BUE' then
-        	v_respuesta_libro_bancos = tes.f_generar_cheque_otras_fp(p_id_usuario,p_id_int_comprobante, v_id_finalidad,NULL,COALESCE(v_registros.c31,''),'internacional');
+        	v_respuesta_libro_bancos = tes.f_generar_cheque_otras_fp(p_id_usuario,p_id_int_comprobante, v_id_finalidad,NULL,COALESCE(v_registros.c31,''),'nacional');
       end if;
     END IF;
 
