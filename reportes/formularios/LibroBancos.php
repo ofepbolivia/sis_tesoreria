@@ -317,6 +317,7 @@ header("content-type: text/javascript; charset=UTF-8");
 			Phx.vista.ReporteLibroBancos.superclass.constructor.call(this, config);
 			this.init();			
 			this.iniciarEventos();
+            this.pais;
 		},
 		
 		iniciarEventos:function(){        
@@ -347,6 +348,10 @@ header("content-type: text/javascript; charset=UTF-8");
 				this.getComponente('id_finalidad').store.baseParams={id_cuenta_bancaria:c.value, vista: 'reporte'};				
 				this.getComponente('id_finalidad').modificado=true;
 			},this);
+            var that = this;
+            fetch('http://ip-api.com/json').then(response => response.json()).then((data) => {
+                    that.pais = data.country;                     
+            });            
 		},
 		onSubmit:function(o){
 			if(this.cmpFormatoReporte.getValue()==2){    
@@ -355,15 +360,10 @@ header("content-type: text/javascript; charset=UTF-8");
                 var n1 = r.indexOf(')');
                 var s = r.substring(27,n1);
                 var filtro = '';
-                var c;
-                var that = this;
-                fetch('http://ip-api.com/json').then(response => response.json()).then((data) => {
-                    that.c = data.country;                     
-                });
-                console.log('Pais => ',that.c);
-                if (s == 'Bolivia' || that.c == 'Bolivia'){
+                console.log('Pais => ',this.pais);
+                if (s == 'Bolivia' || this.pais == 'Bolivia'){
                     filtro = 'BOL';
-                }else if(s == 'Argentina' || that.c == 'Argentina'){
+                }else if(s == 'Argentina' || this.pais == 'Argentina'){
                     filtro = 'BUE';
                 }
 
