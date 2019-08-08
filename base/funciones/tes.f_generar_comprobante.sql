@@ -387,6 +387,11 @@ BEGIN
                usuario_ai = p_usuario_ai
              where id_plan_pago  = p_id_plan_pago;
 
+             --actualiza el id_comprobante en doc_compra_venta, para facturas generadas desde borrador(procesos internacionales)
+              update conta.tdoc_compra_venta set
+                id_int_comprobante = v_id_int_comprobante
+              where id_plan_pago = p_id_plan_pago;
+
 
  v_respuesta[1]= 'TRUE';
 
@@ -411,6 +416,3 @@ VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
 COST 100;
-
-ALTER FUNCTION tes.f_generar_comprobante (p_id_usuario integer, p_id_usuario_ai integer, p_usuario_ai varchar, p_id_plan_pago integer, p_id_depto_conta integer, p_conexion varchar)
-  OWNER TO postgres;
