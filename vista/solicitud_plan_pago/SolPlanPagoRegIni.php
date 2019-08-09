@@ -293,6 +293,7 @@ header("content-type: text/javascript; charset=UTF-8");
             },this);
 
 
+
             //eventos de fechas de costo
             this.Cmp.fecha_costo_ini.on('change',function( o, newValue, oldValue ){
                 this.Cmp.fecha_costo_fin.setMinValue(newValue);
@@ -304,6 +305,15 @@ header("content-type: text/javascript; charset=UTF-8");
             this.Cmp.fecha_costo_fin.on('change',function(o, newValue, oldValue){
                 this.Cmp.fecha_costo_ini.setMaxValue(newValue);
             }, this);
+            //
+            this.Cmp.tipo.on('change',function(o, newValue, oldValue){
+                this.Cmp.fecha_costo_ini.setMaxValue(newValue);
+                this.Cmp.fecha_costo_ini.reset();
+                this.Cmp.fecha_costo_fin.reset();
+            }, this);
+
+
+
 
             //(may)para controlar que id de estas cuentas bancarias sean desactivados los campos en forma de pago (61,78,79)
             // this.Cmp.id_cuenta_bancaria.on('select', function (groupRadio,radio) {
@@ -313,7 +323,7 @@ header("content-type: text/javascript; charset=UTF-8");
 
 
             this.Cmp.forma_pago.on('change',function(groupRadio,radio){
-                this.ocultarCheCue(this,radio.inputValue);
+                this.ocultarCheCue(this,radio);
             },this);
 
 
@@ -551,8 +561,6 @@ header("content-type: text/javascript; charset=UTF-8");
             // //para filtro de id_proveedor_cta_bancaria
             // this.Cmp.id_proveedor_cta_bancaria.store.baseParams = Ext.apply(this.Cmp.id_proveedor_cta_bancaria.store.baseParams,{ id_proveedor: this.maestro.id_proveedor});
             // this.Cmp.id_proveedor_cta_bancaria.modificado = true;
-
-
 
         },
 

@@ -779,8 +779,10 @@ header("content-type: text/javascript; charset=UTF-8");
                     name: 'tipo_cambio',
                     fieldLabel: 'Tipo de Cambio de Pago',
                     allowBlank: false,
-                    anchor: '100%%',
-                    maxLength:131074
+                    anchor: '100%',
+                    maxLength:100,
+                    allowDecimals:true,
+                    decimalPrecision:15
                 },
                 type:'NumberField',
                 id_grupo:1,
@@ -2311,6 +2313,16 @@ header("content-type: text/javascript; charset=UTF-8");
         },
 
         ocultarCheCue: function (me, pFormaPago) {
+            console.log('llega2m', pFormaPago)
+            if (pFormaPago == 'transferencia') {
+                me.Cmp.id_proveedor_cta_bancaria.allowBlank = false;
+                me.Cmp.id_proveedor_cta_bancaria.enable()
+            }else{
+                me.Cmp.id_proveedor_cta_bancaria.allowBlank = true;
+                me.Cmp.id_proveedor_cta_bancaria.setValue('');
+                me.Cmp.id_proveedor_cta_bancaria.disable();
+            }
+
 
             // if (pFormaPago == 'Transferencia') {
             //
