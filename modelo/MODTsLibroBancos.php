@@ -455,6 +455,22 @@ class MODTsLibroBancos extends MODbase{
 		
 		//Devuelve la respuesta
 		return $this->respuesta;        
-    }   	
+    }
+    function codPais() {
+		$this->procedimiento='tes.ft_ts_libro_bancos_sel';
+		$this->transaccion='TES_CODPAI_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+        $this->setCount(false);                
+		//Definicion de la lista del resultado del query
+        $this->captura('codigo','text');
+		
+		//Ejecuta la instruccion
+        $this->armarConsulta();
+        //echo($this->consulta);exit;
+		$this->ejecutarConsulta();
+		
+		//Devuelve la respuesta
+		return $this->respuesta;        
+    }       	
 }
 ?>

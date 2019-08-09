@@ -730,7 +730,37 @@ BEGIN
 			--Devuelve la respuesta
 			return v_consulta;
 
-		end;        
+		end; 
+	/*********************************
+ 	#TRANSACCION:  'TES_CODPAI_SEL'
+ 	#DESCRIPCION:	Consulta Formas de pago
+ 	#AUTOR:		BVP
+	***********************************/
+	elsif(p_transaccion='TES_CODPAI_SEL')then
+
+    	begin
+        
+        	v_estacion = pxp.f_get_variable_global('ESTACION_inicio');
+
+            IF v_estacion = 'BOL' THEN
+    		  v_filtro =  'BOL';
+            ELSIF v_estacion = 'BUE' THEN
+    		  v_filtro =  'BUE';
+            ELSIF v_estacion = 'MIA' THEN
+    		  v_filtro =  'MIA';
+            ELSIF v_estacion = 'SAO' THEN
+    		  v_filtro =  'SAO';
+            ELSIF v_estacion = 'MAD' THEN
+    		  v_filtro =  'MAD';
+            END IF;
+                    
+    		--Sentencia de la consulta
+			v_consulta:=' select '''||v_filtro||''' as codigo';        
+			--Devuelve la respuesta
+            raise notice '%',v_consulta;
+			return v_consulta;
+
+		end;                
 
 	else
 

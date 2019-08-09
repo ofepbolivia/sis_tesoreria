@@ -348,24 +348,23 @@ header("content-type: text/javascript; charset=UTF-8");
 				this.getComponente('id_finalidad').store.baseParams={id_cuenta_bancaria:c.value, vista: 'reporte'};				
 				this.getComponente('id_finalidad').modificado=true;
 			},this);
-            var that = this;
-            fetch('http://ip-api.com/json').then(response => response.json()).then((data) => {
-                    that.pais = data.country;                     
-            });            
+
+            Ext.Ajax.request({
+					url:'../../sis_tesoreria/control/TsLibroBancos/codPais',
+					params:{si:0},
+					success: this.setPais,
+					failure: this.conexionFailure,
+					timeout:this.timeout,
+					scope:this
+				});            
 		},
+        setPais: function (resp){
+            var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));                        
+            this.pais = reg.datos[0].codigo;            
+        },        
 		onSubmit:function(o){
 			if(this.cmpFormatoReporte.getValue()==2){    
-                var loca = new Date();
-                var r = loca.toTimeString();                                
-                var n1 = r.indexOf(')');
-                var s = r.substring(27,n1);
-                var filtro = '';
-                console.log('Pais => ',this.pais);
-                if (s == 'Bolivia' || this.pais == 'Bolivia'){
-                    filtro = 'BOL';
-                }else if(s == 'Argentina' || this.pais == 'Argentina'){
-                    filtro = 'BUE';
-                }
+                console.log('Country =>',this.pais);
 
 				var data = 'FechaIni=' + this.cmpFechaIni.getValue().format('d-m-Y');
 				data = data + '&FechaFin=' + this.cmpFechaFin.getValue().format('d-m-Y');
@@ -375,7 +374,7 @@ header("content-type: text/javascript; charset=UTF-8");
 				data = data + '&NombreBanco=' + this.cmpNombreBanco.getValue();
 				data = data + '&NumeroCuenta=' + this.cmpNroCuenta.getValue();
                 data = data + '&FINALIDAD=' + this.cmpFinalidad.getValue();                 
-                data = data + '&FILTRO=' + filtro;
+                data = data + '&FILTRO=' + this.pais;
 				
 				console.log(data);
 				window.open('http://sms.obairlines.bo/ErpReports/Reporte/VerLibroBancos?'+data);

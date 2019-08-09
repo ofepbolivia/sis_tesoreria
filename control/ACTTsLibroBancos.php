@@ -591,6 +591,11 @@ class ACTTsLibroBancos extends ACTbase{
         $this->res=$this->objFunc->consultaFormaPago($this->objParam);
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
+    function codPais(){                        		       
+        $this->objFunc=$this->create('MODTsLibroBancos');
+        $this->res=$this->objFunc->codPais($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }    
 }
 
 ?>
