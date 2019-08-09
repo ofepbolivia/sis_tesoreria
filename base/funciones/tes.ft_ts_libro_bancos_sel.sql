@@ -755,7 +755,7 @@ BEGIN
             END IF;
                     
     		--Sentencia de la consulta
-			v_consulta:=' select '''||v_filtro||''' as codigo';        
+			v_consulta:=' select '''||v_filtro||'''::varchar as codigo';        
 			--Devuelve la respuesta
             raise notice '%',v_consulta;
 			return v_consulta;
