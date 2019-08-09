@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION tes.ft_proceso_caja_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -14,13 +12,13 @@ $body$
  DESCRIPCION:   Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'tes.tproceso_caja'
  AUTOR: 		 (gsarmiento)
  FECHA:	        21-12-2015 20:15:22
- COMENTARIOS:	
+ COMENTARIOS:
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
 
- DESCRIPCION:	
- AUTOR:			
- FECHA:		
+ DESCRIPCION:
+ AUTOR:
+ FECHA:
 ***************************************************************************/
 
 DECLARE
@@ -81,6 +79,8 @@ DECLARE
     v_sistema_origen		varchar;
     v_importe				numeric;
     v_tabla					varchar;
+
+    v_id_sol_rendicion		integer;
 
 BEGIN
 
@@ -328,13 +328,13 @@ BEGIN
                  id_cuenta_bancaria_mov = v_parametros.id_cuenta_bancaria_mov
                 where id_proceso_wf = v_parametros.id_proceso_wf_act;
 
-
+				--09-08-2019
                 --TODO
-                 v_sincronizar = pxp.f_get_variable_global('sincronizar');
+              /*   v_sincronizar = pxp.f_get_variable_global('sincronizar');
                  --  generacion de comprobante
                 IF (v_sincronizar = 'true') THEN
                   select * into v_nombre_conexion from migra.f_crear_conexion();
-                END IF;
+                END IF;*/
 
 
                 --  Si NO  se contabiliza nacionalmente
@@ -349,6 +349,42 @@ BEGIN
 
 
 
+   FOR v_id_sol_rendicion IN (select srend.id_solicitud_rendicion_det
+   							from tes.tsolicitud_rendicion_det srend
+   							where srend.id_proceso_caja = v_id_proceso_caja)    LOOP
+
+          IF (v_codigo_plantilla_cbte in ('RENDICIONCAJA','REPOCAJA', 'CIERRECAJA','REPOCAJA')) THEN
+
+                   update conta.tdoc_compra_venta set
+                      id_int_comprobante = v_id_int_comprobante
+                    where id_origen = v_id_sol_rendicion
+                    and tabla_origen = 'tes.tsolicitud_rendicion_det';
+
+           END IF;
+
+    END LOOP;
+
+
+
+
+   /* select srend.id_solicitud_rendicion_det
+    into v_id_sol_rendicion
+    from tes.tsolicitud_rendicion_det srend
+    where srend.id_proceso_caja = v_id_proceso_caja;
+
+
+/*raise exception 'llega2 %',v_id_sol_rendicion;*/
+
+     IF (v_codigo_plantilla_cbte in ('RENDICIONCAJA')) THEN
+
+             update conta.tdoc_compra_venta set
+                id_int_comprobante = v_id_int_comprobante
+              where id_origen = v_id_sol_rendicion;
+
+     END IF;
+ */
+--
+  -- raise exception 'llega fin ';
 
                 update tes.tproceso_caja  p set
                     id_int_comprobante = v_id_int_comprobante
@@ -767,33 +803,33 @@ BEGIN
                 SET importe_contable_deposito = v_parametros.importe_contable_deposito
                 WHERE id_libro_bancos = v_parametros.id_libro_bancos
                 AND id_proceso_caja=v_parametros.id_proceso_caja;
-                
+
             END IF;
-              
+
             --Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Importe Contable Deposito modificado'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Importe Contable Deposito modificado');
             v_resp = pxp.f_agrega_clave(v_resp,'id_libro_bancos',v_parametros.id_libro_bancos::varchar);
-              
+
             --Devuelve la respuesta
             return v_resp;
 
 		end;
-        
+
 	else
-     
+
     	raise exception 'Transaccion inexistente: %',p_transaccion;
 
 	end if;
 
 EXCEPTION
-				
+
 	WHEN OTHERS THEN
 		v_resp='';
 		v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
 		v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
 		v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
 		raise exception '%',v_resp;
-				        
+
 END;
 $body$
 LANGUAGE 'plpgsql'
