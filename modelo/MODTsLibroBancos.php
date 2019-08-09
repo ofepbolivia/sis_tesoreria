@@ -462,7 +462,7 @@ class MODTsLibroBancos extends MODbase{
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
         $this->setCount(false);                
 		//Definicion de la lista del resultado del query
-        $this->captura('codigo','text');
+        $this->captura('codigo','varchar');
 		
 		//Ejecuta la instruccion
         $this->armarConsulta();
