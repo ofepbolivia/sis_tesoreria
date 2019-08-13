@@ -700,7 +700,7 @@ BEGIN
                         from tes.tcuenta_bancaria cb
                         where cb.id_cuenta_bancaria = v_parametros.id_cuenta_bancaria;
 
-                        IF (v_forma_pago_cb != v_parametros.forma_pago) then
+                        IF (upper(v_forma_pago_cb) != upper(v_parametros.forma_pago)) then
                               raise exception 'Modificar la Forma de Pago, este pertenece como  %  para la Cuenta Bancaria %', UPPER(v_forma_pago_cb), v_nro_cuenta;
                         END IF;
                       END IF;
