@@ -218,15 +218,19 @@ BEGIN
               and lb.nro_cheque is not null 
               and lb.nro_cheque <> '';
               
-            elsif(v_form_pago.tipo = 'Ingreso' AND v_parametros.nro_deposito is not null)then 
-              select cb.nro_cuenta into g_nro_cuenta_banco
-              from tes.tts_libro_bancos lb
-              inner join tes.tcuenta_bancaria cb on cb.id_cuenta_bancaria=lb.id_cuenta_bancaria
-              where lb.id_cuenta_bancaria = v_parametros.id_cuenta_bancaria
-              and lb.nro_deposito = v_parametros.nro_deposito
-              and lb.tipo = v_parametros.tipo
-              and lb.nro_deposito is not null 
-              and lb.nro_deposito <> '';
+            elsif(v_form_pago.tipo = 'Ingreso' )then 
+                if (pxp.f_existe_parametro(p_tabla,'nro_deposito'))then
+                    if (v_parametros.nro_deposito is not null)then 
+                        select cb.nro_cuenta into g_nro_cuenta_banco
+                        from tes.tts_libro_bancos lb
+                        inner join tes.tcuenta_bancaria cb on cb.id_cuenta_bancaria=lb.id_cuenta_bancaria
+                        where lb.id_cuenta_bancaria = v_parametros.id_cuenta_bancaria
+                        and lb.nro_deposito = v_parametros.nro_deposito
+                        and lb.tipo = v_parametros.tipo
+                        and lb.nro_deposito is not null 
+                        and lb.nro_deposito <> '';
+                    end if;
+                end if;
             end if;  
                            
             if(g_nro_cuenta_banco is not null)then
@@ -479,34 +483,34 @@ BEGIN
         end if;
 
 			IF(v_form_pago.tipo = 'Gasto' and v_parametros.nro_cheque is not null)then
-             if ((select tl.nro_cheque
-            	from tes.tts_libro_bancos tl 
-            	where tl.id_libro_bancos = v_parametros.id_libro_bancos) <> v_parametros.nro_cheque) then 
-            
-              select cb.nro_cuenta into g_nro_cuenta_banco
-              from tes.tts_libro_bancos lb
-              inner join tes.tcuenta_bancaria cb on cb.id_cuenta_bancaria=lb.id_cuenta_bancaria
-              where lb.id_cuenta_bancaria = v_parametros.id_cuenta_bancaria
-              and lb.nro_cheque = v_parametros.nro_cheque
-              and lb.tipo = v_parametros.tipo
-              and lb.nro_cheque is not null 
-              and lb.nro_cheque <> '';
-            end if;  
+                if (coalesce((select tl.nro_cheque
+                              from tes.tts_libro_bancos tl 
+                              where tl.id_libro_bancos = v_parametros.id_libro_bancos),'0' ) <> v_parametros.nro_cheque) then 
+                
+                    select cb.nro_cuenta into g_nro_cuenta_banco
+                    from tes.tts_libro_bancos lb
+                    inner join tes.tcuenta_bancaria cb on cb.id_cuenta_bancaria=lb.id_cuenta_bancaria
+                    where lb.id_cuenta_bancaria = v_parametros.id_cuenta_bancaria
+                    and lb.nro_cheque = v_parametros.nro_cheque
+                    and lb.tipo = v_parametros.tipo
+                    and lb.nro_cheque is not null 
+                    and lb.nro_cheque <> '';
+                end if;  
             
             elsif(v_form_pago.tipo = 'Ingreso' and v_parametros.nro_deposito is not null)then 
-               if ((select tl.nro_deposito
-            	from tes.tts_libro_bancos tl 
-            	where tl.id_libro_bancos = v_parametros.id_libro_bancos) <> v_parametros.nro_deposito) then 
-                
-              select cb.nro_cuenta into g_nro_cuenta_banco
-              from tes.tts_libro_bancos lb
-              inner join tes.tcuenta_bancaria cb on cb.id_cuenta_bancaria=lb.id_cuenta_bancaria
-              where lb.id_cuenta_bancaria = v_parametros.id_cuenta_bancaria
-              and lb.nro_deposito = v_parametros.nro_deposito
-              and lb.tipo = v_parametros.tipo
-              and lb.nro_deposito is not null 
-              and lb.nro_deposito <> '';
-            end if;
+                if (coalesce((select tl.nro_deposito
+                              from tes.tts_libro_bancos tl 
+                              where tl.id_libro_bancos = v_parametros.id_libro_bancos),'0' ) <> v_parametros.nro_deposito) then 
+                    
+                    select cb.nro_cuenta into g_nro_cuenta_banco
+                    from tes.tts_libro_bancos lb
+                    inner join tes.tcuenta_bancaria cb on cb.id_cuenta_bancaria=lb.id_cuenta_bancaria
+                    where lb.id_cuenta_bancaria = v_parametros.id_cuenta_bancaria
+                    and lb.nro_deposito = v_parametros.nro_deposito
+                    and lb.tipo = v_parametros.tipo
+                    and lb.nro_deposito is not null 
+                    and lb.nro_deposito <> '';
+                end if;
             end if;
                              
             if(g_nro_cuenta_banco is not null)then
