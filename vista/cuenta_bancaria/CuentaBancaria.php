@@ -396,23 +396,24 @@ Phx.vista.CuentaBancaria=Ext.extend(Phx.gridInterfaz,{
                 emptyText:'Forma de Pago...',
                 store:new Ext.data.JsonStore(
                     {
-                        url: '../../sis_parametros/control/FormaPago/listarFormaPago',
+                        // url: '../../sis_parametros/control/FormaPago/listarFormaPago',
+                        url: '../../sis_parametros/control/FormaPago/listarFormaPagofil',
                         id: 'id_forma_pago',
                         root:'datos',
                         sortInfo:{
-                            field:'desc_forma_pago',
+                            field:'orden',
                             direction:'ASC'
                         },
                         totalProperty:'total',
-                        fields: ['id_forma_pago','desc_forma_pago','observaciones','cod_inter'],
+                        fields: ['id_forma_pago','desc_forma_pago','observaciones','cod_inter', 'codigo', 'orden'],
                         remoteSort: true,
-                        baseParams:{par_filtro:'desc_forma_pago'}
+                        baseParams:{par_filtro:'desc_forma_pago#codigo'}
                     }),
                 tpl:'<tpl for="."><div class="x-combo-list-item"><p>{desc_forma_pago}</p></div></tpl>',
-                valueField: 'desc_forma_pago',
+                valueField: 'codigo',
                 hiddenValue: 'id_forma_pago',
-                displayField: 'desc_forma_pago',
-                gdisplayField:'desc_forma_pago',
+                displayField: 'codigo',
+                gdisplayField:'codigo',
                 listWidth:'280',
                 forceSelection:true,
                 typeAhead: false,

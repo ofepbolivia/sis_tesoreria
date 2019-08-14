@@ -784,19 +784,19 @@ header("content-type: text/javascript; charset=UTF-8");
                             id: 'id_forma_pago',
                             root:'datos',
                             sortInfo:{
-                                field:'desc_forma_pago',
+                                field:'orden',
                                 direction:'ASC'
                             },
                             totalProperty:'total',
-                            fields: ['id_forma_pago','desc_forma_pago','observaciones','cod_inter','codigo'],
+                            fields: ['id_forma_pago','desc_forma_pago','observaciones','cod_inter','codigo', 'orden'],
                             remoteSort: true,
-                            baseParams:{par_filtro:'desc_forma_pago'}
+                            baseParams:{par_filtro:'desc_forma_pago#codigo'}
                         }),
                     tpl:'<tpl for="."><div class="x-combo-list-item"><p>{desc_forma_pago}</p></div></tpl>',
                     valueField: 'codigo',
                     hiddenValue: 'id_forma_pago',
-                    displayField: 'desc_forma_pago',
-                    gdisplayField:'desc_forma_pago',
+                    displayField: 'codigo',
+                    gdisplayField:'codigo',
                     listWidth:'280',
                     forceSelection:true,
                     typeAhead: false,
@@ -2297,7 +2297,7 @@ header("content-type: text/javascript; charset=UTF-8");
 
         ocultarFP: function (me, pFormaPago) {
 
-            if ((this.Cmp.id_cuenta_bancaria.getValue() == 61) || (this.Cmp.id_cuenta_bancaria.getValue() == 78) || (this.Cmp.id_cuenta_bancaria.getValue() == 79)) {
+            if ((this.Cmp.id_cuenta_bancaria.getValue() == 61) || (this.Cmp.id_cuenta_bancaria.getValue() == 78) || (this.Cmp.id_cuenta_bancaria.getValue() == 79) ) {
                 me.Cmp.forma_pago.disable();
                 me.Cmp.forma_pago.setValue('transferencia');
 
