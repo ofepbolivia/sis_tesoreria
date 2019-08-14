@@ -994,6 +994,17 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
 			this.cmpImporteCheque.enable();
 			this.cmpNroCheque.enable();
 		}
+        this.cmpTipo.on('select',function(com,dat){ 
+            if (dat.data.tipo == 'Ingreso') {
+                this.cmpNroCheque.reset();
+                this.cmpNroCheque.setValue('');
+            }
+            else if(dat.data.tipo == 'Gasto'){
+                this.cmpNroDeposito.reset();
+                this.cmpNroDeposito.setValue('');
+            }
+        },this);        
+
 	},
 		
 	antEstado:function(res,eve)

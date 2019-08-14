@@ -207,16 +207,41 @@ BEGIN
             END IF;--fin de la verifiacion de cheque, debito automatico o transferencia con carta
 
             --Verificacion de unicidad de numero de cheque
-            IF(v_parametros.tipo='cheque' AND v_parametros.nro_cheque is not null)THEN
+			IF(v_form_pago.tipo = 'Gasto' AND v_parametros.nro_cheque is not null)then
+             
               select cb.nro_cuenta into g_nro_cuenta_banco
               from tes.tts_libro_bancos lb
               inner join tes.tcuenta_bancaria cb on cb.id_cuenta_bancaria=lb.id_cuenta_bancaria
-              where lb.id_cuenta_bancaria=v_parametros.id_cuenta_bancaria and lb.nro_cheque=v_parametros.nro_cheque;
-
-              if(g_nro_cuenta_banco is not null)then
-                 raise exception 'Ya existe el cheque nro % en la cuenta bancaria %', v_parametros.nro_cheque, g_nro_cuenta_banco;
-              end if;
-        	END IF;
+              where lb.id_cuenta_bancaria = v_parametros.id_cuenta_bancaria
+              and lb.nro_cheque = v_parametros.nro_cheque
+              and lb.tipo = v_parametros.tipo
+              and lb.nro_cheque is not null 
+              and lb.nro_cheque <> '';
+              
+            elsif(v_form_pago.tipo = 'Ingreso' AND v_parametros.nro_deposito is not null)then 
+              select cb.nro_cuenta into g_nro_cuenta_banco
+              from tes.tts_libro_bancos lb
+              inner join tes.tcuenta_bancaria cb on cb.id_cuenta_bancaria=lb.id_cuenta_bancaria
+              where lb.id_cuenta_bancaria = v_parametros.id_cuenta_bancaria
+              and lb.nro_deposito = v_parametros.nro_deposito
+              and lb.tipo = v_parametros.tipo
+              and lb.nro_deposito is not null 
+              and lb.nro_deposito <> '';
+            end if;  
+                           
+            if(g_nro_cuenta_banco is not null)then
+                if(v_parametros.tipo ='cheque')then
+                   raise exception 'Ya existe el cheque nro % en la cuenta bancaria %', v_parametros.nro_cheque, g_nro_cuenta_banco;
+                else 
+                   raise exception 'Ya existe el documento nro % en la cuenta bancaria %', 
+                   								case when 
+                   								v_parametros.nro_cheque is null or v_parametros.nro_cheque = '' then 
+                                                v_parametros.nro_deposito
+                                                else 
+                                                v_parametros.nro_cheque end
+                                                , g_nro_cuenta_banco;
+                end if;
+            end if; 
 
         --solo en el caso de cheques colocamos el numero de cheque
             if(v_parametros.tipo ='cheque')then
@@ -447,11 +472,57 @@ BEGIN
               end if;
         END IF;*/
         --solo en el caso de cheques colocamos el numero de cheque
-        if(v_parametros.tipo ='cheque')then
-        	g_nro_cheque=v_parametros.nro_cheque;
+        if(v_form_pago.tipo ='Gasto')then
+        	g_nro_cheque = v_parametros.nro_cheque;       
         else
-        	g_nro_cheque=null;
+        	g_nro_cheque = null;
         end if;
+
+			IF(v_form_pago.tipo = 'Gasto' and v_parametros.nro_cheque is not null)then
+             if ((select tl.nro_cheque
+            	from tes.tts_libro_bancos tl 
+            	where tl.id_libro_bancos = v_parametros.id_libro_bancos) <> v_parametros.nro_cheque) then 
+            
+              select cb.nro_cuenta into g_nro_cuenta_banco
+              from tes.tts_libro_bancos lb
+              inner join tes.tcuenta_bancaria cb on cb.id_cuenta_bancaria=lb.id_cuenta_bancaria
+              where lb.id_cuenta_bancaria = v_parametros.id_cuenta_bancaria
+              and lb.nro_cheque = v_parametros.nro_cheque
+              and lb.tipo = v_parametros.tipo
+              and lb.nro_cheque is not null 
+              and lb.nro_cheque <> '';
+            end if;  
+            
+            elsif(v_form_pago.tipo = 'Ingreso' and v_parametros.nro_deposito is not null)then 
+               if ((select tl.nro_deposito
+            	from tes.tts_libro_bancos tl 
+            	where tl.id_libro_bancos = v_parametros.id_libro_bancos) <> v_parametros.nro_deposito) then 
+                
+              select cb.nro_cuenta into g_nro_cuenta_banco
+              from tes.tts_libro_bancos lb
+              inner join tes.tcuenta_bancaria cb on cb.id_cuenta_bancaria=lb.id_cuenta_bancaria
+              where lb.id_cuenta_bancaria = v_parametros.id_cuenta_bancaria
+              and lb.nro_deposito = v_parametros.nro_deposito
+              and lb.tipo = v_parametros.tipo
+              and lb.nro_deposito is not null 
+              and lb.nro_deposito <> '';
+            end if;
+            end if;
+                             
+            if(g_nro_cuenta_banco is not null)then
+                if(v_parametros.tipo ='cheque')then
+                   raise exception 'Ya existe el cheque nro % en la cuenta bancaria %', v_parametros.nro_cheque, g_nro_cuenta_banco;
+                else 
+                   raise exception 'Ya existe el documento nro % en la cuenta bancaria %', 
+                   								case when 
+                   								v_parametros.nro_cheque is null or v_parametros.nro_cheque = '' then 
+                                                v_parametros.nro_deposito
+                                                else 
+                                                v_parametros.nro_cheque end
+                                                , g_nro_cuenta_banco;
+                end if;
+            end if;
+
 
 		UPDATE tes.tts_libro_bancos SET
 		id_cuenta_bancaria=v_parametros.id_cuenta_bancaria,
