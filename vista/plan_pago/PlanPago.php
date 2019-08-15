@@ -2058,6 +2058,15 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.Cmp.id_proveedor_cta_bancaria.allowBlank = false;
                 this.mostrarComponente(this.Cmp.id_proveedor_cta_bancaria);
                 this.Cmp.obs_monto_no_pagado.allowBlank = false;
+
+                if (data.forma_pago == 'transferencia' ) {
+                    this.Cmp.id_proveedor_cta_bancaria.enable();
+                    this.Cmp.id_proveedor_cta_bancaria.allowBlank = false;
+                }else {
+                    this.Cmp.id_proveedor_cta_bancaria.disable();
+                    this.Cmp.id_proveedor_cta_bancaria.allowBlank = true;
+                    this.Cmp.id_proveedor_cta_bancaria.setValue('');
+                }
             }
 
             Phx.vista.PlanPago.superclass.onButtonEdit.call(this);
