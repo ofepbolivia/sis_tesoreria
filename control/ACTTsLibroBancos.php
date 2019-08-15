@@ -64,14 +64,12 @@ class ACTTsLibroBancos extends ACTbase{
 		}
 		
 		if($this->objParam->getParametro('m_nro_cheque')!=''){
-			$this->objParam->addFiltro("lban.nro_cheque= (Select lb.nro_cheque
-													From tes.tts_libro_bancos lb 
-                                                    Where lb.id_cuenta_bancaria=".$this->objParam->getParametro('m_id_cuenta_bancaria')."
-                                                    and lb.nro_cheque is not null
-                                                    and lb.nro_cheque <> ''''
-                                                    and lb.tipo = ''cheque''
-                                                    order by lb.fecha_reg desc
-                                                    limit 1 ) ");	
+			$this->objParam->addFiltro("lban.nro_cheque = (select (max(cast (lb.nro_cheque as integer)))::varchar
+            from tes.tts_libro_bancos lb 
+            Where lb.id_cuenta_bancaria = ".$this->objParam->getParametro('m_id_cuenta_bancaria')."
+            and lb.nro_cheque is not null
+            and lb.tipo = ''cheque''
+            and lb.nro_cheque <> '''')");	
 		}		
 
 
