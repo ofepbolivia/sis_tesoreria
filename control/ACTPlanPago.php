@@ -536,6 +536,12 @@ class ACTPlanPago extends ACTbase{
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
 
+    function clonarPP(){
+        $this->objFunc=$this->create('MODPlanPago');
+        $this->res=$this->objFunc->clonarPP($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+
 }
 
 ?>
