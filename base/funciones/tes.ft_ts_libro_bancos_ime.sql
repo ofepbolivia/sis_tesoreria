@@ -80,6 +80,7 @@ DECLARE
     --variables forma pago
     v_form_pago				record;
     v_hstore_aux			hstore;
+    v_nro_deposito_g		varchar;
 BEGIN
     v_nombre_funcion = 'tes.ft_ts_libro_bancos_ime';
     v_parametros = pxp.f_get_record(p_tabla);
@@ -105,6 +106,12 @@ BEGIN
           into v_form_pago
           from param.tforma_pago fo
           where fo.codigo = v_parametros.tipo;
+
+          if (pxp.f_existe_parametro(p_tabla,'nro_deposito'))then          
+                v_nro_deposito_g = v_parametros.nro_deposito;
+          else
+                v_nro_deposito_g = null;
+          end if;
 
         	select ctaban.centro into g_centro
             from tes.tcuenta_bancaria ctaban
@@ -219,18 +226,18 @@ BEGIN
               and lb.nro_cheque <> '';
               
             elsif(v_form_pago.tipo = 'Ingreso' )then 
-                if (pxp.f_existe_parametro(p_tabla,'nro_deposito'))then
-                    if (v_parametros.nro_deposito is not null)then 
+                
+                    if (v_nro_deposito_g is not null)then 
                         select cb.nro_cuenta into g_nro_cuenta_banco
                         from tes.tts_libro_bancos lb
                         inner join tes.tcuenta_bancaria cb on cb.id_cuenta_bancaria=lb.id_cuenta_bancaria
                         where lb.id_cuenta_bancaria = v_parametros.id_cuenta_bancaria
-                        and lb.nro_deposito = v_parametros.nro_deposito
+                        and lb.nro_deposito = v_nro_deposito_g
                         and lb.tipo = v_parametros.tipo
                         and lb.nro_deposito is not null 
                         and lb.nro_deposito <> '';
                     end if;
-                end if;
+                
             end if;  
                            
             if(g_nro_cuenta_banco is not null)then
@@ -240,7 +247,7 @@ BEGIN
                    raise exception 'Ya existe el documento nro % en la cuenta bancaria %', 
                    								case when 
                    								v_parametros.nro_cheque is null or v_parametros.nro_cheque = '' then 
-                                                v_parametros.nro_deposito
+                                                v_nro_deposito_g
                                                 else 
                                                 v_parametros.nro_cheque end
                                                 , g_nro_cuenta_banco;
@@ -497,16 +504,16 @@ BEGIN
                     and lb.nro_cheque <> '';
                 end if;  
             
-            elsif(v_form_pago.tipo = 'Ingreso' and v_parametros.nro_deposito is not null)then 
+            elsif(v_form_pago.tipo = 'Ingreso' and v_nro_deposito_g is not null)then 
                 if (coalesce((select tl.nro_deposito
                               from tes.tts_libro_bancos tl 
-                              where tl.id_libro_bancos = v_parametros.id_libro_bancos),'0' ) <> v_parametros.nro_deposito) then 
+                              where tl.id_libro_bancos = v_parametros.id_libro_bancos),'0' ) <> v_nro_deposito_g) then 
                     
                     select cb.nro_cuenta into g_nro_cuenta_banco
                     from tes.tts_libro_bancos lb
                     inner join tes.tcuenta_bancaria cb on cb.id_cuenta_bancaria=lb.id_cuenta_bancaria
                     where lb.id_cuenta_bancaria = v_parametros.id_cuenta_bancaria
-                    and lb.nro_deposito = v_parametros.nro_deposito
+                    and lb.nro_deposito = v_nro_deposito_g
                     and lb.tipo = v_parametros.tipo
                     and lb.nro_deposito is not null 
                     and lb.nro_deposito <> '';
@@ -520,7 +527,7 @@ BEGIN
                    raise exception 'Ya existe el documento nro % en la cuenta bancaria %', 
                    								case when 
                    								v_parametros.nro_cheque is null or v_parametros.nro_cheque = '' then 
-                                                v_parametros.nro_deposito
+                                                v_nro_deposito_g
                                                 else 
                                                 v_parametros.nro_cheque end
                                                 , g_nro_cuenta_banco;
