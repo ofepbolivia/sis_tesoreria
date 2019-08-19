@@ -642,51 +642,53 @@ header("content-type: text/javascript; charset=UTF-8");
 
             {
 
-                config:{
+                config: {
                     name: 'id_plantilla',
                     fieldLabel: 'Tipo Documento',
                     allowBlank: false,
-                    emptyText:'Elija una plantilla...',
-                    store:new Ext.data.JsonStore(
+                    emptyText: 'Elija una plantilla...',
+                    store: new Ext.data.JsonStore(
                         {
                             url: '../../sis_parametros/control/Plantilla/listarPlantillaFil',
                             id: 'id_plantilla',
-                            root:'datos',
-                            sortInfo:{
-                                field:'desc_plantilla',
-                                direction:'ASC'
+                            root: 'datos',
+                            sortInfo: {
+                                field: 'desc_plantilla',
+                                direction: 'ASC'
                             },
-                            totalProperty:'total',
+                            totalProperty: 'total',
                             fields: ['id_plantilla',
                                 'nro_linea',
                                 'desc_plantilla',
-                                'tipo','sw_tesoro', 'sw_compro','sw_monto_excento','tipo_excento','valor_excento' ],
+                                'tipo', 'sw_tesoro', 'sw_compro', 'sw_monto_excento', 'tipo_excento', 'valor_excento'],
                             remoteSort: true,
-                            baseParams:{par_filtro:'plt.desc_plantilla',sw_compro:'si',sw_tesoro:'si'}
+                            baseParams: {par_filtro: 'plt.desc_plantilla', sw_compro: 'si', sw_tesoro: 'si'}
                         }),
-                    tpl:'<tpl for="."><div class="x-combo-list-item"><p>{desc_plantilla}</p></div></tpl>',
+                    tpl: '<tpl for="."><div class="x-combo-list-item"><p>{desc_plantilla}</p></div></tpl>',
                     valueField: 'id_plantilla',
                     hiddenValue: 'id_plantilla',
                     displayField: 'desc_plantilla',
-                    gdisplayField:'desc_plantilla',
-                    listWidth:'280',
-                    forceSelection:true,
+                    gdisplayField: 'desc_plantilla',
+                    listWidth: '280',
+                    forceSelection: true,
                     typeAhead: false,
                     triggerAction: 'all',
-                    lazyRender:true,
-                    mode:'remote',
-                    pageSize:20,
-                    queryDelay:500,
+                    lazyRender: true,
+                    mode: 'remote',
+                    pageSize: 20,
+                    queryDelay: 500,
 
                     gwidth: 250,
-                    minChars:2,
-                    renderer:function (value, p, record){return String.format('{0}', record.data['desc_plantilla']);}
+                    minChars: 2,
+                    renderer: function (value, p, record) {
+                        return String.format('{0}', record.data['desc_plantilla']);
+                    }
                 },
-                type:'ComboBox',
-                filters:{pfiltro:'pla.desc_plantilla',type:'string'},
-                id_grupo:1,
-                grid:true,
-                form:true
+                type: 'ComboBox',
+                filters: {pfiltro: 'pla.desc_plantilla', type: 'string'},
+                id_grupo: 1,
+                grid: true,
+                form: true
             },
             {
                 config: {
@@ -775,63 +777,65 @@ header("content-type: text/javascript; charset=UTF-8");
                 form: true
             },
             {
-                config:{
+                config: {
                     name: 'tipo_cambio',
                     fieldLabel: 'Tipo de Cambio de Pago',
                     allowBlank: false,
                     anchor: '100%',
-                    maxLength:100,
-                    allowDecimals:true,
-                    decimalPrecision:15
+                    maxLength: 100,
+                    allowDecimals: true,
+                    decimalPrecision: 15
                 },
-                type:'NumberField',
-                id_grupo:1,
-                form:true
+                type: 'NumberField',
+                id_grupo: 1,
+                form: true
             },
             {
 
-                config:{
+                config: {
                     name: 'forma_pago',
                     fieldLabel: 'Forma de Pago',
                     allowBlank: false,
-                    emptyText:'Forma de Pago...',
-                    store:new Ext.data.JsonStore(
+                    emptyText: 'Forma de Pago...',
+                    store: new Ext.data.JsonStore(
                         {
                             url: '../../sis_parametros/control/FormaPago/listarFormaPagofil',
                             id: 'id_forma_pago',
-                            root:'datos',
-                            sortInfo:{
-                                field:'orden',
-                                direction:'ASC'
+                            root: 'datos',
+                            sortInfo: {
+                                field: 'orden',
+                                direction: 'ASC'
                             },
-                            totalProperty:'total',
-                            fields: ['id_forma_pago','desc_forma_pago','observaciones','cod_inter','codigo','orden'],
+                            totalProperty: 'total',
+                            fields: ['id_forma_pago', 'desc_forma_pago', 'observaciones', 'cod_inter', 'codigo', 'orden'],
                             remoteSort: true,
-                            baseParams:{par_filtro:'desc_forma_pago#codigo'}
+                            baseParams: {par_filtro: 'desc_forma_pago#codigo'}
                         }),
-                    tpl:'<tpl for="."><div class="x-combo-list-item"><p>{desc_forma_pago}</p></div></tpl>',
+                    tpl: '<tpl for="."><div class="x-combo-list-item"><p>{desc_forma_pago}</p></div></tpl>',
                     valueField: 'codigo',
                     hiddenValue: 'id_forma_pago',
                     displayField: 'codigo',
-                    gdisplayField:'codigo',
-                    listWidth:'280',
-                    forceSelection:true,
+                    gdisplayField: 'codigo',
+                    listWidth: '280',
+                    forceSelection: true,
                     typeAhead: false,
                     triggerAction: 'all',
-                    lazyRender:true,
-                    mode:'remote',
-                    pageSize:20,
-                    queryDelay:500,
+                    lazyRender: true,
+                    mode: 'remote',
+                    pageSize: 20,
+                    queryDelay: 500,
 
                     gwidth: 250,
-                    minChars:2,
-                    renderer:function (value, p, record){return String.format('{0}', record.data['forma_pago']);}
+                    minChars: 2,
+                    renderer: function (value, p, record) {
+                        return String.format('{0}', record.data['forma_pago']);
+                    }
                 },
-                type:'ComboBox',
-                filters:{pfiltro:'plapa.forma_pago',type:'string'},
-                id_grupo:1,
-                grid:true,
-                form:true
+                type: 'ComboBox',
+                filters: {pfiltro: 'plapa.forma_pago', type: 'string'},
+                id_grupo: 1,
+                grid: true,
+                form: true
             },
 
             {
@@ -839,7 +843,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     name: 'id_proveedor_cta_bancaria',
                     fieldLabel: 'Cuenta Bancaria(Pov.)',
                     allowBlank: true,
-                    resizable:true,
+                    resizable: true,
                     emptyText: 'Elija una Cuenta...',
                     store: new Ext.data.JsonStore(
                         {
@@ -852,7 +856,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                 direction: 'ASC'
                             },
                             totalProperty: 'total',
-                            fields: ['id_proveedor_cta_bancaria', 'nro_cuenta', 'banco_beneficiario','prioridad'],
+                            fields: ['id_proveedor_cta_bancaria', 'nro_cuenta', 'banco_beneficiario', 'prioridad'],
 
                             remoteSort: true,
                             baseParams: {
@@ -865,27 +869,27 @@ header("content-type: text/javascript; charset=UTF-8");
                     displayField: 'nro_cuenta',
                     gdisplayField: 'nro_cuenta_bancaria',
                     hiddenName: 'id_proveedor_cta_bancaria',
-                    forceSelection:true,
+                    forceSelection: true,
                     typeAhead: false,
                     triggerAction: 'all',
-                    lazyRender:true,
-                    mode:'remote',
-                    pageSize:10,
-                    queryDelay:1000,
+                    lazyRender: true,
+                    mode: 'remote',
+                    pageSize: 10,
+                    queryDelay: 1000,
                     // width:250,
                     gwidth: 250,
                     listWidth: '290',
                     // minChars:2,
-                    lazyRender:true,
+                    lazyRender: true,
                     // tinit: true,
                     // tname:'id_proveedor_cta_bancaria',
                     // tasignacion:true,
-                    turl:'../../../sis_parametros/vista/proveedor_cta_bancaria/FormProvCta.php',
-                    ttitle:'Banco y Cuenta Bancaria Dest.',
-                    tconfig:{width: '35%' ,height:'50%'},
-                    tdata:{},
-                    tcls:'FormProvCta',
-                    pid:this.idContenedor,
+                    turl: '../../../sis_parametros/vista/proveedor_cta_bancaria/FormProvCta.php',
+                    ttitle: 'Banco y Cuenta Bancaria Dest.',
+                    tconfig: {width: '35%', height: '50%'},
+                    tdata: {},
+                    tcls: 'FormProvCta',
+                    pid: this.idContenedor,
                     renderer: function (value, p, record) {
                         return String.format('{0}', record.data['nro_cuenta_bancaria']);
                     }
@@ -1637,7 +1641,7 @@ header("content-type: text/javascript; charset=UTF-8");
             'descuento_anticipo', 'monto_retgar_mo', 'monto_no_pagado', 'otros_descuentos', 'descuento_inter_serv', 'descuento_ley', 'id_depto_lb',
             'id_depto_lb', 'id_cuenta_bancaria', 'obs_wf', 'fecha_dev', 'fecha_pag', 'obs_descuentos_anticipo', 'obs_monto_no_pagado',
             'obs_otros_descuentos', 'obs_descuentos_ley', 'obs_descuento_inter_serv', 'monto_ajuste_ag', 'monto_ajuste_siguiente_pag', 'fecha_costo_ini',
-            'fecha_costo_fin', 'funcionario_wf', 'monto_anticipo', 'monto', 'monto_ejecutar_total_mo', 'monto_establecido','nit','tipo_cambio'],
+            'fecha_costo_fin', 'funcionario_wf', 'monto_anticipo', 'monto', 'monto_ejecutar_total_mo', 'monto_establecido', 'nit', 'tipo_cambio'],
 
 
         rowExpander: new Ext.ux.grid.RowExpander({
@@ -1706,14 +1710,14 @@ header("content-type: text/javascript; charset=UTF-8");
             }, rec.data, this.idContenedor, 'SolDocCompraVentaCbte');
         },
 
-        onImportePP: function(){
-            var rec=this.sm.getSelected();
+        onImportePP: function () {
+            var rec = this.sm.getSelected();
             Phx.CP.loadingShow();
             // console.debug(rec);
-            console.log('acaaaa',rec);
+            console.log('acaaaa', rec);
             Ext.Ajax.request({
-                url:'../../sis_tesoreria/control/ConsultaImportePP/importePP',
-                params:{'id_plan_pago':rec.data.id_plan_pago},
+                url: '../../sis_tesoreria/control/ConsultaImportePP/importePP',
+                params: {'id_plan_pago': rec.data.id_plan_pago},
                 success: this.successExport,
                 failure: this.conexionFailure,
                 timeout: this.timeout,
@@ -1723,7 +1727,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 // timeout: function() {
                 //     alert("timeout");
                 // },
-                scope:this
+                scope: this
             });
         },
 
@@ -1778,8 +1782,8 @@ header("content-type: text/javascript; charset=UTF-8");
 
             //aviso para completar datos del formulario antes de pasar al siguiente estado
             if (rec.data['forma_pago'] == '' || rec.data['forma_pago'] == null
-                // || rec.data['id_cuenta_bancaria'] == '' || rec.data['id_cuenta_bancaria'] == null
-                // || rec.data['nro_cuenta_bancaria'] == '' || rec.data['nro_cuenta_bancaria'] == null
+            // || rec.data['id_cuenta_bancaria'] == '' || rec.data['id_cuenta_bancaria'] == null
+            // || rec.data['nro_cuenta_bancaria'] == '' || rec.data['nro_cuenta_bancaria'] == null
             ) {
 
                 Ext.Msg.show({
@@ -1797,10 +1801,9 @@ header("content-type: text/javascript; charset=UTF-8");
                     icon: Ext.MessageBox.WARNING
                 }, this);
 
-            }else {
+            } else {
                 this.mostrarWizard(rec);
             }
-
 
 
         },
@@ -2070,6 +2073,15 @@ header("content-type: text/javascript; charset=UTF-8");
 
             if (data.estado == 'vbconta') {
                 this.Cmp.obs_monto_no_pagado.allowBlank = false;
+
+                if (data.forma_pago == 'transferencia') {
+                    this.Cmp.id_proveedor_cta_bancaria.enable();
+                    this.Cmp.id_proveedor_cta_bancaria.allowBlank = false;
+                } else {
+                    this.Cmp.id_proveedor_cta_bancaria.disable();
+                    this.Cmp.id_proveedor_cta_bancaria.allowBlank = true;
+                    this.Cmp.id_proveedor_cta_bancaria.setValue('');
+                }
             }
 
 
@@ -2083,7 +2095,6 @@ header("content-type: text/javascript; charset=UTF-8");
             // this.Cmp.nro_cuenta_bancaria.tdata.id_padre = this.idContenedor;
             this.Cmp.id_proveedor_cta_bancaria.store.baseParams.id_proveedor = data.id_proveedor;
             this.Cmp.id_proveedor_cta_bancaria.tdata.id_padre = this.idContenedor;
-
 
 
         },
@@ -2317,37 +2328,11 @@ header("content-type: text/javascript; charset=UTF-8");
             if (pFormaPago == 'transferencia') {
                 me.Cmp.id_proveedor_cta_bancaria.allowBlank = false;
                 me.Cmp.id_proveedor_cta_bancaria.enable()
-            }else{
+            } else {
                 me.Cmp.id_proveedor_cta_bancaria.allowBlank = true;
                 me.Cmp.id_proveedor_cta_bancaria.setValue('');
                 me.Cmp.id_proveedor_cta_bancaria.disable();
             }
-
-
-            // if (pFormaPago == 'Transferencia') {
-            //
-            //
-            //     //Habilita nrocuenta bancaria destino
-            //     // me.Cmp.nro_cuenta_bancaria.allowBlank = false;
-            //     // me.Cmp.nro_cuenta_bancaria.enable()
-            //     //
-            //     me.ocultarComponente(me.Cmp.id_proveedor_cta_bancaria);
-            //     me.Cmp.id_proveedor_cta_bancaria.allowBlank = false;
-            //     // me.Cmp.id_proveedor_cta_bancaria.enable();
-            //
-            // }
-            // else {
-            // //
-            // //     //Habilita nrocuenta bancaria destino
-            // //     me.Cmp.nro_cuenta_bancaria.allowBlank = true;
-            // //     me.Cmp.nro_cuenta_bancaria.setValue('');
-            // //     me.Cmp.nro_cuenta_bancaria.disable();
-            //
-            //     me.mostrarComponente(me.Cmp.id_proveedor_cta_bancaria);
-            //     me.Cmp.id_proveedor_cta_bancaria.allowBlank = true;
-            //     me.Cmp.id_proveedor_cta_bancaria.setValue('');
-            //     // me.Cmp.id_proveedor_cta_bancaria.disable();
-            // }
 
         },
 
@@ -2830,7 +2815,7 @@ header("content-type: text/javascript; charset=UTF-8");
             )
 
         },
-        cargarCuenta : function (id_proveedor_cta_bancaria,nro_cuenta_bancaria ) {
+        cargarCuenta: function (id_proveedor_cta_bancaria, nro_cuenta_bancaria) {
             this.Cmp.id_proveedor_cta_bancaria.setValue(id_proveedor_cta_bancaria);
             this.Cmp.id_proveedor_cta_bancaria.setRawValue(id_proveedor_cta_bancaria);
             console.log('cargar cuenta valor', this.Cmp.id_proveedor_cta_bancaria)
