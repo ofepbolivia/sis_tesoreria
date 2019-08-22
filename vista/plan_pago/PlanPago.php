@@ -2065,7 +2065,6 @@ header("content-type: text/javascript; charset=UTF-8");
                 }else {
                     this.Cmp.id_proveedor_cta_bancaria.disable();
                     this.Cmp.id_proveedor_cta_bancaria.allowBlank = true;
-                    this.Cmp.id_proveedor_cta_bancaria.setValue('');
                 }
             }
 
