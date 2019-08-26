@@ -326,7 +326,8 @@ class MODTsLibroBancos extends MODbase{
 		$this->setParametro('a_favor','a_favor','varchar');
 		$this->setParametro('detalle','detalle','varchar');
 		$this->setParametro('fecha','fecha','date');
-		$this->setParametro('id_finalidad','id_finalidad','int4');
+        $this->setParametro('id_finalidad','id_finalidad','int4');
+        $this->setParametro('tipo_cambio','tipo_cambio','numeric');
 		
         //Ejecuta la instruccion
         $this->armarConsulta();

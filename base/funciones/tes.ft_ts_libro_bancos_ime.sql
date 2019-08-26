@@ -81,6 +81,12 @@ DECLARE
     v_form_pago				record;
     v_hstore_aux			hstore;
     v_nro_deposito_g		varchar;
+    v_cuent_denomi			varchar;
+    v_id_moneda_des			integer;
+    v_id_moneda_org			integer;
+    v_monto_transfe_1		numeric;
+    v_monto_transfe_2		numeric;    
+    v_id_forma_pago			integer;    
 BEGIN
     v_nombre_funcion = 'tes.ft_ts_libro_bancos_ime';
     v_parametros = pxp.f_get_record(p_tabla);
@@ -1296,6 +1302,111 @@ BEGIN
             return v_resp;
 
     	END;
+    /*********************************
+ 	#TRANSACCION:  'TES_TRACUEN_IME'
+ 	#DESCRIPCION:	Transferencias
+ 	#AUTOR:		
+ 	#FECHA:		
+	***********************************/
+
+	elsif(p_transaccion='TES_TRACUEN_IME')then
+
+		BEGIN
+            
+
+
+        -- comparar el saldo de la cuenta origen con el importe de transferencia
+              Select coalesce(sum(Coalesce(lbr.importe_deposito, 0)) -
+                          sum(coalesce(lbr.importe_cheque, 0)), 0)
+                          into g_saldo_cuenta_bancaria
+                  From tes.tts_libro_bancos lbr
+                  where lbr.fecha <= g_fecha and
+                  lbr.id_cuenta_bancaria = v_parametros.id_cuenta_bancaria_origen;        
+
+        	if v_parametros.importe_transferencia > g_saldo_cuenta_bancaria then
+            	select (ctaban.nro_cuenta||' - '||ctaban.denominacion)
+                into v_cuent_denomi
+                from tes.tcuenta_bancaria ctaban
+                where ctaban.id_cuenta_bancaria = v_parametros.id_cuenta_bancaria_origen;
+            	raise exception 'El importe que intenta transferir excede el saldo general de la cuenta origen %.',v_cuent_denomi;
+        	end if;
+            
+            
+            if v_parametros.tipo_cambio is not null then 
+                     
+                select ct.id_moneda into v_id_moneda_des
+                from tes.tcuenta_bancaria ct
+                where ct.id_cuenta_bancaria = v_parametros.id_cuenta_bancaria_origen;
+                
+                if exists ( select 1
+                      from param.tmoneda mo
+                      where mo.id_moneda = v_id_moneda_des
+                      and mo.codigo_internacional = 'USD') then 
+
+	                v_monto_transfe_1 = round(v_parametros.importe_transferencia * v_parametros.tipo_cambio,2);
+                    v_monto_transfe_2 = v_parametros.importe_transferencia;
+                    
+                else
+                                                
+    	            v_monto_transfe_1 = round(v_parametros.importe_transferencia / v_parametros.tipo_cambio,2);
+                    v_monto_transfe_2 = v_parametros.importe_transferencia;                    
+                    
+                end if;
+			else 
+	    	        v_monto_transfe_1 = v_parametros.importe_transferencia;                                             	
+	    	        v_monto_transfe_2 = v_parametros.importe_transferencia;                                             	                    
+            end if;
+   			
+			/*
+            v_hstore_aux =  hstore(v_parametros) || ('id_forma_pago=> 11')::hstore
+                            || ('id_depto=>'||v_parametros.id_depto_lb)::hstore
+                            || ('tipo=>transferencia_fondos')::hstore
+                            || ('importe_cheque => 0')::hstore
+                            || ('importe_deposito=>'||v_monto_transfe)::hstore; 
+                        
+
+            v_id_libro_bancos =	tes.f_inserta_libro_bancos(p_administrador, p_id_usuario, v_hstore_aux);  
+
+            
+            v_hstore_aux =  hstore(v_parametros) || ('id_forma_pago=> 11')::hstore
+            				|| ('id_depto=>'||v_parametros.id_depto_lb)::hstore
+                            || ('tipo=>transferencia_fondos')::hstore
+                            || ('importe_cheque =>'||v_monto_transfe)::hstore
+                            || ('importe_deposito=> 0')::hstore
+                            || ('id_cuenta_bancaria=>'||v_parametros.id_cuenta_bancaria_origen)::hstore; 
+
+            v_id_libro_bancos =	tes.f_inserta_libro_bancos(p_administrador, p_id_usuario, v_hstore_aux);
+            */
+                                  
+			select fo.id_forma_pago into v_id_forma_pago
+            from param.tforma_pago fo
+            where fo.codigo = 'transferencia';
+            
+            v_hstore_aux =  hstore(v_parametros) || ('id_forma_pago=>'||v_id_forma_pago)::hstore
+            				|| ('id_depto=>'||v_parametros.id_depto_lb)::hstore
+                            || ('tipo=>transferencia')::hstore
+                            || ('importe_cheque => 0')::hstore
+                            || ('importe_deposito=>'||v_monto_transfe_1)::hstore; 
+            
+
+			v_id_libro_bancos =	tes.f_inserta_libro_bancos(p_administrador, p_id_usuario, v_hstore_aux);
+            
+            v_hstore_aux =  hstore(v_parametros) || ('id_forma_pago=>'||v_id_forma_pago)::hstore
+            				|| ('id_depto=>'||v_parametros.id_depto_lb)::hstore
+                            || ('tipo=>transferencia')::hstore
+                            || ('importe_cheque =>'||v_monto_transfe_2)::hstore
+                            || ('importe_deposito=> 0')::hstore
+                            || ('id_cuenta_bancaria=>'||v_parametros.id_cuenta_bancaria_origen)::hstore; 
+            --raise exception '%',v_hstore_aux;          
+            v_id_libro_bancos =	tes.f_inserta_libro_bancos(p_administrador, p_id_usuario, v_hstore_aux);
+            
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Se realizo la Transferencia');
+            v_resp = pxp.f_agrega_clave(v_resp,'operacion','cambio_exitoso');
+
+            -- Devuelve la respuesta
+            return v_resp;
+
+    	END;         
 
 	else
 

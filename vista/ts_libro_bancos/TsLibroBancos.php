@@ -1326,7 +1326,7 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
                         timeout:this.timeout,
                         scope:this
                     });                    
-            }else if(value == 'deposito' && tipo_valor == 'Ingreso'){  									
+            }else if(value == 'deposito' || tipo_valor == 'Ingreso'){  									
 					this.ocultarComponente(this.cmpNroCheque);
 					this.cmpImporteDeposito.setValue('');
 					this.mostrarComponente(this.cmpImporteDeposito);

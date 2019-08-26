@@ -136,6 +136,7 @@ Phx.vista.CuentaBancariaESIS = {
 	},
 
 	transferir:function(wizard,resp){
+                
 		Phx.CP.loadingShow();
 		Ext.Ajax.request({
 			url:'../../sis_tesoreria/control/TsLibroBancos/transferirCuenta',
@@ -147,7 +148,8 @@ Phx.vista.CuentaBancariaESIS = {
 				   a_favor:resp.a_favor,
 				   detalle:resp.detalle,
 				   importe_transferencia:resp.importe_transferencia,
-				   id_finalidad:resp.id_finalidad
+				   id_finalidad:resp.id_finalidad,
+                   tipo_cambio: resp.tipo_cambio
 			 },
 			argument:{wizard:wizard},
 			success:this.successWizard,
