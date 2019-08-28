@@ -618,10 +618,12 @@ class MODObligacionPago extends MODbase
         $this->captura('pagado', 'numeric');
         $this->captura('revertible', 'numeric');
         $this->captura('revertir', 'numeric');
-
+        $this->captura('moneda', 'varchar');          
+        $this->captura('desc_orden', 'varchar');
 
         //Ejecuta la instruccion
         $this->armarConsulta();
+        //echo($this->consulta);exit;
         $this->ejecutarConsulta();
         //Devuelve la respuesta
         return $this->respuesta;
@@ -1039,7 +1041,45 @@ class MODObligacionPago extends MODbase
 		
 		//Devuelve la respuesta
 		return $this->respuesta;        
-    }    
+    }
+    function listarEvoluPresup()
+    {
+        //Definicion de variables para ejecucion del procedimientp
+        $this->procedimiento = 'tes.ft_obligacion_pago_sel';
+        $this->transaccion = 'TES_DETEVPRE_SEL';
+        $this->tipo_procedimiento = 'SEL';//tipo de transaccion
+        $this->setCount(false);
+
+        $this->setParametro('id_partida_ejecucion_com', 'id_partida_ejecucion_com', 'int4');
+        $this->setParametro('tipo_interfaz', 'tipo_interfaz', 'varchar');
+        
+        //Definicion de la lista del resultado del query
+        $this->captura('id_partida_ejecucion', 'int4');
+        $this->captura('id_partida_ejecucion_fk', 'int4');
+        $this->captura('moneda', 'varchar');
+        $this->captura('comprometido', 'numeric');
+        $this->captura('ejecutado', 'numeric');
+        $this->captura('pagado', 'numeric');        
+        $this->captura('nro_tramite', 'varchar');
+        $this->captura('tipo_movimiento', 'varchar');
+        $this->captura('nombre_partida', 'varchar');
+        $this->captura('codigo', 'varchar');
+        $this->captura('codigo_categoria', 'varchar');
+        $this->captura('fecha', 'date');
+        $this->captura('codigo_cc', 'varchar');
+        $this->captura('usr_reg', 'varchar');
+        $this->captura('usr_mod', 'varchar');
+        $this->captura('fecha_reg', 'timestamp');
+        $this->captura('fecha_mod', 'timestamp');    
+        $this->captura('estado_reg', 'varchar');
+       
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        //echo($this->consulta);exit;
+        $this->ejecutarConsulta();
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }        
 }
 
 ?>
