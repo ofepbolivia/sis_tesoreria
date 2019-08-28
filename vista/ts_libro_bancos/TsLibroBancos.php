@@ -827,8 +827,8 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
 		
 		if(NumSelect != 0)
 		{            
-			this.onButtonNew();
-			
+			this.onButtonNew();			
+            
 			this.cmpAFavor = this.getComponente('a_favor');
 			this.cmpObservaciones = this.getComponente('observaciones');
 			this.cmpDetalle = this.getComponente('detalle');		
@@ -973,11 +973,11 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
 		}
 		else{
 			this.ocultarComponente(this.cmpNroCheque);
-			if(data.tipo=='deposito'){
+			if(data.tipo=='deposito'){                                
 				this.mostrarComponente(this.cmpImporteDeposito);
 				this.ocultarComponente(this.cmpImporteCheque);
 			}
-			else{
+			else{                                
 				this.mostrarComponente(this.cmpImporteCheque);
 				this.ocultarComponente(this.cmpImporteDeposito);
 			}
@@ -1287,30 +1287,35 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
         this.ocultarComponente(this.cmpNroDeposito);
 
 		this.cmpNroCheque.on('focus',function(componente){            
-				var cta_bancaria = this.cmpIdCuentaBancaria.getValue();                
-
+				var cta_bancaria = this.cmpIdCuentaBancaria.getValue();                 
+            if(this.cmpTipo.getValue() == 'cheque') {
 				Ext.Ajax.request({
 					url:'../../sis_tesoreria/control/TsLibroBancos/listarTsLibroBancos',
 					params:{start:0, limit:this.tam_pag, m_id_cuenta_bancaria:cta_bancaria,m_nro_cheque:'si'},
 					success: function (resp){
-						var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));                        
-						this.cmpNroCheque.setValue(parseInt(reg.datos[0].nro_cheque)+1);
+						var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+                        console.log('cheques => ',reg.datos);                                                
+                        reg.datos.length > 0 && this.cmpNroCheque.setValue(parseInt(reg.datos[0].nro_cheque)+1);
+                        
 					},
 					failure: this.conexionFailure,
 					timeout:this.timeout,
 					scope:this
 				});
+            }
 				
 			},this);
-		
+        		
 		this.cmpTipo.on('select',function(com,dat){                        
             var value = dat.data.variable
             var tipo_valor  = dat.data.tipo;
+            var monto_gasto = this.cmpImporteCheque.getValue();
+            var monto_ingreso = this.cmpImporteDeposito.getValue();
 			if(value =='cheque' && tipo_valor == 'Gasto'){				
 					this.mostrarComponente(this.cmpNroCheque);
-					this.cmpImporteDeposito.setValue(0.00);
+					this.cmpImporteDeposito.setValue(monto_ingreso);
 					this.ocultarComponente(this.cmpImporteDeposito);
-					this.cmpImporteCheque.setValue('');
+					this.cmpImporteCheque.setValue(monto_gasto);
 					this.mostrarComponente(this.cmpImporteCheque);
                     this.ocultarComponente(this.cmpNroDeposito);
                     var cta_bancaria = this.cmpIdCuentaBancaria.getValue();
@@ -1319,8 +1324,8 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
                         params:{start:0, limit:this.tam_pag, m_id_cuenta_bancaria:cta_bancaria,m_nro_cheque:'si',mycls:this.cls},                        
                         success: function (resp){                        
                             var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
-                            console.log('resp => ',reg);
-                            this.cmpNroCheque.setValue(parseInt(reg.datos[0].nro_cheque)+1);
+                            console.log('cheques => ',reg.datos);                                                                                    
+                            reg.datos.length > 0 && this.cmpNroCheque.setValue(parseInt(reg.datos[0].nro_cheque)+1);
                         },
                         failure: this.conexionFailure,
                         timeout:this.timeout,
@@ -1328,20 +1333,19 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
                     });                    
             }else if(value == 'deposito' || tipo_valor == 'Ingreso'){  									
 					this.ocultarComponente(this.cmpNroCheque);
-					this.cmpImporteDeposito.setValue('');
+					this.cmpImporteDeposito.setValue(monto_ingreso);
 					this.mostrarComponente(this.cmpImporteDeposito);
-					this.cmpImporteCheque.setValue(0.00);
+					this.cmpImporteCheque.setValue(monto_gasto);
 					this.ocultarComponente(this.cmpImporteCheque);
 					this.cmpNroCheque.reset();
-                    this.mostrarComponente(this.cmpNroDeposito);
-                    this.cmpNroCheque.reset();
+                    this.mostrarComponente(this.cmpNroDeposito);                    
             }else if(tipo_valor != 'Ingreso'){					
 				    this.ocultarComponente(this.cmpNroDeposito);
                     this.cmpNroDeposito.reset();
 					this.mostrarComponente(this.cmpNroCheque);
-					this.cmpImporteDeposito.setValue(0.00);
-					this.ocultarComponente(this.cmpImporteDeposito);
-					this.cmpImporteCheque.setValue('');
+					this.cmpImporteDeposito.setValue(monto_ingreso);
+					this.ocultarComponente(this.cmpImporteDeposito);                    
+					this.cmpImporteCheque.setValue(monto_gasto);
 					this.mostrarComponente(this.cmpImporteCheque);
 					this.cmpNroCheque.reset();					
 			}              

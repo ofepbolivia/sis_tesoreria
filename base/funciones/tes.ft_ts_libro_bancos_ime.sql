@@ -86,7 +86,9 @@ DECLARE
     v_id_moneda_org			integer;
     v_monto_transfe_1		numeric;
     v_monto_transfe_2		numeric;    
-    v_id_forma_pago			integer;    
+    v_id_forma_pago			integer;  
+    v_importe_gasto			numeric;
+    v_importe_ingreso		numeric;      
 BEGIN
     v_nombre_funcion = 'tes.ft_ts_libro_bancos_ime';
     v_parametros = pxp.f_get_record(p_tabla);
@@ -314,10 +316,18 @@ BEGIN
 
 		begin
 
-		select fo.id_forma_pago,fo.tipo
+		    select fo.id_forma_pago,fo.tipo
              into v_form_pago
             from param.tforma_pago fo
-            where fo.codigo = v_parametros.tipo;  
+            where fo.codigo = v_parametros.tipo; 
+
+        	if v_form_pago.tipo = 'Gasto' then 
+            	v_importe_gasto = v_parametros.importe_cheque;
+                v_importe_ingreso = 0;
+            elsif v_form_pago.tipo = 'Ingreso' then
+            	v_importe_gasto = 0;
+            	v_importe_ingreso = v_parametros.importe_deposito;
+            end if;              
 
         	--VERIFICA EXISTENCIA DEL REGISTRO
             IF NOT EXISTS(SELECT 1 FROM tes.tts_libro_bancos LBRBAN
@@ -392,7 +402,7 @@ BEGIN
              and lbr.id_cuenta_bancaria = v_parametros.id_cuenta_bancaria;
 
             --Comparamos el saldo de la cuenta bancaria con el importe del cheque
-            IF(v_parametros.importe_cheque > g_saldo_cuenta_bancaria) Then
+            IF(v_importe_gasto > g_saldo_cuenta_bancaria) Then
               raise exception 'El importe que intenta registrar excede el saldo general de la cuenta bancaria al %. Por favor revise el saldo de la cuenta al %.',v_parametros.fecha,v_parametros.fecha;
             End If;
 
@@ -417,7 +427,7 @@ BEGIN
               Where lb.id_libro_bancos = v_parametros.id_libro_bancos_fk;
 
               --Comparamos el saldo del deposito con el importe del cheque
-              IF(v_parametros.importe_cheque > g_saldo_deposito) Then
+              IF(v_importe_gasto > g_saldo_deposito) Then
                 raise exception 'El importe que intenta registrar, excede el saldo del deposito asociado. Por favor revise el saldo.';
               End If;
 
@@ -439,7 +449,7 @@ BEGIN
               From tes.tts_libro_bancos lb
               Where lb.id_libro_bancos = v_parametros.id_libro_bancos;
 
-              if(v_parametros.importe_deposito < g_saldo_deposito)then
+              if(v_importe_ingreso < g_saldo_deposito)then
               	raise exception 'El monto que intenta ingresar es menor a la suma de los cheques y depositos adicionales';
               end if;
             ELSE
@@ -464,7 +474,7 @@ BEGIN
                  From tes.tts_libro_bancos lb
                 Where lb.id_libro_bancos = v_parametros.id_libro_bancos;
 
-                IF ((v_parametros.importe_deposito + g_saldo_deposito) < 0) THEN
+                IF ((v_importe_ingreso + g_saldo_deposito) < 0) THEN
                 	raise exception 'el saldo del deposito no puede ser menor a 0';
                 END IF;
             END IF;
@@ -546,13 +556,13 @@ BEGIN
 		fecha=v_parametros.fecha,
 		a_favor=upper(translate (v_parametros.a_favor, 'áéíóúÁÉÍÓÚäëïöüÄËÏÖÜñ', 'aeiouAEIOUaeiouAEIOUÑ')),
 		nro_cheque=g_nro_cheque,
-        importe_deposito=v_parametros.importe_deposito,
+        importe_deposito=v_importe_ingreso,
 		nro_comprobante=v_parametros.nro_comprobante,
         nro_liquidacion=upper(translate (v_parametros.nro_liquidacion, 'áéíóúÁÉÍÓÚäëïöüÄËÏÖÜñ', 'aeiouAEIOUaeiouAEIOUÑ')),
         detalle=upper(translate (v_parametros.detalle, 'áéíóúÁÉÍÓÚäëïöüÄËÏÖÜñ', 'aeiouAEIOUaeiouAEIOUÑ')),
 		origen=v_parametros.origen,
         observaciones=upper(translate (v_parametros.observaciones, 'áéíóúÁÉÍÓÚäëïöüÄËÏÖÜñ', 'aeiouAEIOUaeiouAEIOUÑ')),
-		importe_cheque=v_parametros.importe_cheque,
+		importe_cheque=v_importe_gasto,
         id_libro_bancos_fk=v_parametros.id_libro_bancos_fk,
         tipo=v_parametros.tipo,
 		fecha_mod=now(),
