@@ -198,6 +198,8 @@ DECLARE
 
     v_estado					varchar;
 
+    v_parametros_pp				record;
+
 
 BEGIN
 
@@ -2158,6 +2160,39 @@ v_pre_integrar_presupuestos = pxp.f_get_variable_global('pre_integrar_presupuest
             --Devuelve la respuesta
             return v_resp;
         end;
+
+
+    /*********************************
+ 	#TRANSACCION:  'TES_REPPP_IME'
+ 	#DESCRIPCION:	Replicacion Plan de Pago
+ 	#AUTOR:		Maylee Perez Pastor
+ 	#FECHA:		15-08-2019 22:09:52
+	***********************************/
+
+	elsif(p_transaccion='TES_REPPP_IME')then
+
+		begin
+                /*--------------------
+                Replicar un Plan de Pago
+                ----------------------*/
+
+ 				select pp.*
+                into v_parametros_pp
+                from tes.tplan_pago pp
+                where pp.id_plan_pago = v_parametros.id_plan_pago;
+
+            v_resp = tes.f_inserta_plan_pago_replicado(p_administrador, p_id_usuario,hstore(v_parametros_pp));
+
+
+
+            --Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Plan Pago Replicado');
+            v_resp = pxp.f_agrega_clave(v_resp,'id_plan_pago',v_id_plan_pago::varchar);
+
+            --Devuelve la respuesta
+            return v_resp;
+
+		end;
 
 
 

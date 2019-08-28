@@ -80,10 +80,10 @@ BEGIN
                    from tes.tplan_pago pp
                    where pp.id_obligacion_pago =  p_id_obligacion_pago
                         and pp.estado_reg = 'activo'
-                         and pp.estado not in ('devengado','pagado', 'anticipado', 'aplicado', 'devuelto','contabilizado')) THEN
+                         and pp.estado not in ('devengado','pagado', 'anticipado', 'aplicado', 'devuelto','contabilizado', 'pago_exterior')) THEN
 
 
-             raise exception 'existen cuotas pendientes de finanización';
+             raise exception 'Existen cuotas pendientes de finalización';
 
           END IF;
 
@@ -186,7 +186,7 @@ BEGIN
 
 
                 ELSEIF  v_saldo_x_pagar < 0 THEN
-                   raise exception 'El monto de  ampliacion se excede en (%). Reduzaca el monto de ampliacion', v_saldo_x_pagar;
+                   raise exception 'El monto de  ampliación se excede en (%). Reduzaca el monto de ampliación', v_saldo_x_pagar;
                 END IF;
 
 

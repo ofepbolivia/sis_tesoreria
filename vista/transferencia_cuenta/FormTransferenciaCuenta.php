@@ -44,7 +44,7 @@ Phx.vista.FormTransferenciaCuenta=Ext.extend(Phx.frmInterfaz,{
 		{
             config:{
                 name: 'id_cuenta_bancaria',
-                fieldLabel: 'Cuenta Bancaria',
+                fieldLabel: 'Cuenta Bancaria Destino',
                 allowBlank: false,
                 emptyText:'Elija una Cuenta...',
                 store:new Ext.data.JsonStore(
@@ -57,7 +57,7 @@ Phx.vista.FormTransferenciaCuenta=Ext.extend(Phx.frmInterfaz,{
                         direction:'ASC'
                     },
                     totalProperty:'total',
-                    fields: ['id_cuenta_bancaria','nro_cuenta','nombre_institucion','codigo_moneda','centro','denominacion'],
+                    fields: ['id_cuenta_bancaria','nro_cuenta','nombre_institucion','codigo_moneda','centro','denominacion','id_moneda'],
                     remoteSort: true,
                     baseParams : {
 						par_filtro :'nro_cuenta'
@@ -75,9 +75,11 @@ Phx.vista.FormTransferenciaCuenta=Ext.extend(Phx.frmInterfaz,{
                 lazyRender:true,
                 mode:'remote',
                 pageSize:20,
+                anchor: '80%',
                 queryDelay:500,
                 gwidth: 250,
                 minChars:2,
+                resizable: true,
                 renderer:function(value, p, record){return String.format('{0}', record.data['desc_cuenta_bancaria']);}
              },
             type:'ComboBox',
@@ -86,6 +88,19 @@ Phx.vista.FormTransferenciaCuenta=Ext.extend(Phx.frmInterfaz,{
             grid:true,
             form:true
         },
+		{
+			config:{
+				name: 'tipo_cambio',
+				fieldLabel: 'Tipo Cambio',
+				allowBlank: false,
+				anchor: '80%',
+				gwidth: 100,				
+			},
+				type:'NumberField',                
+				id_grupo:1,
+				grid:true,
+				form:true
+		},        
 		{
 			config:{
 				name: 'fecha',
@@ -170,33 +185,33 @@ Phx.vista.FormTransferenciaCuenta=Ext.extend(Phx.frmInterfaz,{
                 allowBlank:false,
                 emptyText:'Finalidad...',
                 store: new Ext.data.JsonStore({
-                         url: '../../sis_tesoreria/control/Finalidad/listarFinalidadCuentaBancaria',
-                         id: 'id_finalidad',
-                         root: 'datos',
-                         sortInfo:{
-                            field: 'nombre_finalidad',
-                            direction: 'ASC'
-                    },
-                    totalProperty: 'total',
-                    fields: ['id_finalidad','nombre_finalidad','color'],
-                    // turn on remote sorting
-                    remoteSort: true,
-                    baseParams:{par_filtro:'nombre_finalidad', vista: 'vista'}
-                    }),
+              			url: '../../sis_tesoreria/control/Finalidad/listarFinalidad',
+       					id: 'id_finalidad',
+       					root: 'datos',
+       					sortInfo:{
+       						field: 'nombre_finalidad',
+       						direction: 'ASC'
+       					},
+       					totalProperty: 'total',
+       					fields: ['id_finalidad','nombre_finalidad'],
+       					// turn on remote sorting
+       					remoteSort: true,
+       					baseParams:{par_filtro:'nombre_finalidad'}
+       					
+       				}),
                 valueField: 'id_finalidad',
                 displayField: 'nombre_finalidad',
-                //tpl:'<tpl for="."><div class="x-combo-list-item"><p><b>{nro_cuenta}</b></p><p>{denominacion}</p></div></tpl>',
-                hiddenName: 'id_finalidad',
                 forceSelection:true,
-                typeAhead: false,
+                typeAhead: true,
                 triggerAction: 'all',
                 lazyRender:true,
                 mode:'remote',
                 pageSize:10,
                 queryDelay:1000,
-                listWidth:600,
+                width:220,
+                minChars:2,
                 resizable:true,
-                anchor:'80%',
+                listWidth:'230',
                 renderer : function(value, p, record) {
 					//return String.format(record.data['nombre_finalidad']);
 					return String.format('{0}', '<FONT COLOR="'+record.data['color']+'"><b>'+record.data['nombre_finalidad']+'</b></FONT>');
@@ -214,9 +229,40 @@ Phx.vista.FormTransferenciaCuenta=Ext.extend(Phx.frmInterfaz,{
 	iniciarEventos:function(){
 		this.cmpIdCuentaBancariaOrigen = this.getComponente('id_cuenta_bancaria_origen');	
 		this.cmpIdCuentaBancariaOrigen.setValue(this.data.id_cuenta_bancaria);
-		this.cmpIdDeptoLb = this.getComponente('id_depto_lb');	
+		this.cmpIdDeptoLb = this.getComponente('id_depto_lb');
+        var fecha_ini = new Date();
+        this.getComponente('fecha').setValue(fecha_ini.format('d/m/Y'));        	
 		this.cmpIdDeptoLb.setValue(this.id_depto_lb);
-		Ext.apply(this.Cmp.id_cuenta_bancaria.store.baseParams,{id_depto_lb:this.id_depto_lb,permiso : 'libro_bancos'});		
+        this.cmpTipoCambio = this.getComponente('tipo_cambio');
+        this.ocultarComponente(this.cmpTipoCambio);
+        var moneda_origen = this.data.id_moneda; 
+
+        this.Cmp.id_cuenta_bancaria.on('select', (com, dat) => {            
+            var moneda_destino = dat.data.id_moneda;            
+            if( moneda_origen != moneda_destino) {
+                this.cmpTipoCambio.reset();
+                this.mostrarComponente(this.cmpTipoCambio);
+
+                Ext.Ajax.request({
+                        url:'../../sis_parametros/control/TipoCambio/listarTipoCambio',
+                        params:{start:0,limit:1, fecha_trans:'si'},
+                        success: function (resp){
+                            var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+                            this.cmpTipoCambio.setValue(reg.datos[0].oficial); 
+                        },
+                        failure: this.conexionFailure,
+                        timeout:this.timeout,
+                        scope:this
+                    });
+                    
+                this.Cmp.tipo_cambio.modificado = true;                
+            }else{
+                this.cmpTipoCambio.reset();
+                this.ocultarComponente(this.cmpTipoCambio);                
+                this.Cmp.tipo_cambio.modificado = true;
+            }            
+        },this);          
+		Ext.apply(this.Cmp.id_cuenta_bancaria.store.baseParams,{id_depto_lb:this.id_depto_lb,permiso : 'libro_bancos',id_cuenta_bancaria_origen:this.data.id_cuenta_bancaria});		
 	},
 	
 	onSubmit:function(){
@@ -236,7 +282,8 @@ Phx.vista.FormTransferenciaCuenta=Ext.extend(Phx.frmInterfaz,{
 				   a_favor:this.Cmp.a_favor.getValue(),
 				   detalle:this.Cmp.detalle.getValue(),
 				   importe_transferencia:this.Cmp.importe_transferencia.getValue(),
-				   id_finalidad:this.Cmp.id_finalidad.getValue()				   
+				   id_finalidad:this.Cmp.id_finalidad.getValue(),
+                   tipo_cambio: this.Cmp.tipo_cambio.getValue()				   
             }   
          return resp;   
      }

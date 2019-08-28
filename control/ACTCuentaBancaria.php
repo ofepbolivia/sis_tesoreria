@@ -38,11 +38,11 @@ class ACTCuentaBancaria extends ACTbase{
 	function listarCuentaBancariaUsuario(){
 		$this->objParam->defecto('ordenacion','id_cuenta_bancaria');
 		$this->objParam->defecto('dir_ordenacion','asc');
-		
+	
 		if($this->objParam->getParametro('id_depto_lb')!=''){
 			$this->objParam->addFiltro("deptctab.id_depto = ".$this->objParam->getParametro('id_depto_lb'));
 		}
-		
+		$this->objParam->getParametro('id_cuenta_bancaria_origen')!='' && $this->objParam->addFiltro("deptctab.id_cuenta_bancaria <> ".$this->objParam->getParametro('id_cuenta_bancaria_origen'));
 		/*if($this->objParam->getParametro('permiso')!=''){
 			$permisos = explode(',',$this->objParam->getParametro('permiso'));
 			

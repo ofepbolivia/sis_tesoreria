@@ -115,14 +115,14 @@ BEGIN
             	IF p_administrador !=1 THEN
               		v_filtro = ' (op.id_funcionario  = ' || v_parametros.id_funcionario_usu::varchar || ' or op.id_usuario_reg = ' || p_id_usuario||' ) and ';
                 END IF;
-            	v_filtro = v_filtro || ' lower(plapa.tipo) in (''devengado'',''devengado_pagado'',''devengado_pagado_1c'') and plapa.fecha_conformidad is null and  ';
+            	v_filtro = v_filtro || ' lower(plapa.tipo) in (''devengado'',''devengado_pagado'',''devengado_pagado_1c'', ''devengado_pagado_1c_sp'') and plapa.fecha_conformidad is null and  ';
             END IF;
 
             IF  lower(v_parametros.tipo_interfaz) = 'planpagoconformidadrealizada'  THEN
               	IF p_administrador !=1 THEN
               		v_filtro = ' (op.id_funcionario  = ' || v_parametros.id_funcionario_usu::varchar || ' or op.id_usuario_reg = ' || p_id_usuario||' ) and ';
                 END IF;
-            	v_filtro = v_filtro || ' lower(plapa.tipo) in (''devengado'',''devengado_pagado'',''devengado_pagado_1c'') and plapa.fecha_conformidad is not null and  ';
+            	v_filtro = v_filtro || ' lower(plapa.tipo) in (''devengado'',''devengado_pagado'',''devengado_pagado_1c'', ''devengado_pagado_1c_sp'') and plapa.fecha_conformidad is not null and  ';
             END IF;
 
 
@@ -1264,4 +1264,5 @@ $body$
 LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
+SECURITY INVOKER
 COST 100;

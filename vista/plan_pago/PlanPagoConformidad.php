@@ -184,7 +184,7 @@ header("content-type: text/javascript; charset=UTF-8");
             Phx.vista.PlanPagoConformidad.superclass.preparaMenu.call(this, n);
             this.getBoton('diagrama_gantt').enable();
 
-            if (data.tipo == 'devengado' || data.tipo == 'devengado_pagado' || data.tipo == 'devengado_pagado_1c') {
+            if (data.tipo == 'devengado' || data.tipo == 'devengado_pagado' || data.tipo == 'devengado_pagado_1c'|| data.tipo == 'devengado_pagado_1c_sp') {
                 this.getBoton('btnConformidad').enable();
             } else {
                 this.getBoton('btnConformidad').disable();

@@ -80,6 +80,15 @@ DECLARE
     --variables forma pago
     v_form_pago				record;
     v_hstore_aux			hstore;
+    v_nro_deposito_g		varchar;
+    v_cuent_denomi			varchar;
+    v_id_moneda_des			integer;
+    v_id_moneda_org			integer;
+    v_monto_transfe_1		numeric;
+    v_monto_transfe_2		numeric;    
+    v_id_forma_pago			integer;  
+    v_importe_gasto			numeric;
+    v_importe_ingreso		numeric;      
 BEGIN
     v_nombre_funcion = 'tes.ft_ts_libro_bancos_ime';
     v_parametros = pxp.f_get_record(p_tabla);
@@ -105,6 +114,12 @@ BEGIN
           into v_form_pago
           from param.tforma_pago fo
           where fo.codigo = v_parametros.tipo;
+
+          if (pxp.f_existe_parametro(p_tabla,'nro_deposito'))then          
+                v_nro_deposito_g = v_parametros.nro_deposito;
+          else
+                v_nro_deposito_g = null;
+          end if;
 
         	select ctaban.centro into g_centro
             from tes.tcuenta_bancaria ctaban
@@ -219,18 +234,18 @@ BEGIN
               and lb.nro_cheque <> '';
               
             elsif(v_form_pago.tipo = 'Ingreso' )then 
-                if (pxp.f_existe_parametro(p_tabla,'nro_deposito'))then
-                    if (v_parametros.nro_deposito is not null)then 
+                
+                    if (v_nro_deposito_g is not null)then 
                         select cb.nro_cuenta into g_nro_cuenta_banco
                         from tes.tts_libro_bancos lb
                         inner join tes.tcuenta_bancaria cb on cb.id_cuenta_bancaria=lb.id_cuenta_bancaria
                         where lb.id_cuenta_bancaria = v_parametros.id_cuenta_bancaria
-                        and lb.nro_deposito = v_parametros.nro_deposito
+                        and lb.nro_deposito = v_nro_deposito_g
                         and lb.tipo = v_parametros.tipo
                         and lb.nro_deposito is not null 
                         and lb.nro_deposito <> '';
                     end if;
-                end if;
+                
             end if;  
                            
             if(g_nro_cuenta_banco is not null)then
@@ -240,7 +255,7 @@ BEGIN
                    raise exception 'Ya existe el documento nro % en la cuenta bancaria %', 
                    								case when 
                    								v_parametros.nro_cheque is null or v_parametros.nro_cheque = '' then 
-                                                v_parametros.nro_deposito
+                                                v_nro_deposito_g
                                                 else 
                                                 v_parametros.nro_cheque end
                                                 , g_nro_cuenta_banco;
@@ -301,10 +316,18 @@ BEGIN
 
 		begin
 
-		select fo.id_forma_pago,fo.tipo
+		    select fo.id_forma_pago,fo.tipo
              into v_form_pago
             from param.tforma_pago fo
-            where fo.codigo = v_parametros.tipo;  
+            where fo.codigo = v_parametros.tipo; 
+
+        	if v_form_pago.tipo = 'Gasto' then 
+            	v_importe_gasto = v_parametros.importe_cheque;
+                v_importe_ingreso = 0;
+            elsif v_form_pago.tipo = 'Ingreso' then
+            	v_importe_gasto = 0;
+            	v_importe_ingreso = v_parametros.importe_deposito;
+            end if;              
 
         	--VERIFICA EXISTENCIA DEL REGISTRO
             IF NOT EXISTS(SELECT 1 FROM tes.tts_libro_bancos LBRBAN
@@ -379,7 +402,7 @@ BEGIN
              and lbr.id_cuenta_bancaria = v_parametros.id_cuenta_bancaria;
 
             --Comparamos el saldo de la cuenta bancaria con el importe del cheque
-            IF(v_parametros.importe_cheque > g_saldo_cuenta_bancaria) Then
+            IF(v_importe_gasto > g_saldo_cuenta_bancaria) Then
               raise exception 'El importe que intenta registrar excede el saldo general de la cuenta bancaria al %. Por favor revise el saldo de la cuenta al %.',v_parametros.fecha,v_parametros.fecha;
             End If;
 
@@ -404,7 +427,7 @@ BEGIN
               Where lb.id_libro_bancos = v_parametros.id_libro_bancos_fk;
 
               --Comparamos el saldo del deposito con el importe del cheque
-              IF(v_parametros.importe_cheque > g_saldo_deposito) Then
+              IF(v_importe_gasto > g_saldo_deposito) Then
                 raise exception 'El importe que intenta registrar, excede el saldo del deposito asociado. Por favor revise el saldo.';
               End If;
 
@@ -426,7 +449,7 @@ BEGIN
               From tes.tts_libro_bancos lb
               Where lb.id_libro_bancos = v_parametros.id_libro_bancos;
 
-              if(v_parametros.importe_deposito < g_saldo_deposito)then
+              if(v_importe_ingreso < g_saldo_deposito)then
               	raise exception 'El monto que intenta ingresar es menor a la suma de los cheques y depositos adicionales';
               end if;
             ELSE
@@ -451,7 +474,7 @@ BEGIN
                  From tes.tts_libro_bancos lb
                 Where lb.id_libro_bancos = v_parametros.id_libro_bancos;
 
-                IF ((v_parametros.importe_deposito + g_saldo_deposito) < 0) THEN
+                IF ((v_importe_ingreso + g_saldo_deposito) < 0) THEN
                 	raise exception 'el saldo del deposito no puede ser menor a 0';
                 END IF;
             END IF;
@@ -497,16 +520,16 @@ BEGIN
                     and lb.nro_cheque <> '';
                 end if;  
             
-            elsif(v_form_pago.tipo = 'Ingreso' and v_parametros.nro_deposito is not null)then 
+            elsif(v_form_pago.tipo = 'Ingreso' and v_nro_deposito_g is not null)then 
                 if (coalesce((select tl.nro_deposito
                               from tes.tts_libro_bancos tl 
-                              where tl.id_libro_bancos = v_parametros.id_libro_bancos),'0' ) <> v_parametros.nro_deposito) then 
+                              where tl.id_libro_bancos = v_parametros.id_libro_bancos),'0' ) <> v_nro_deposito_g) then 
                     
                     select cb.nro_cuenta into g_nro_cuenta_banco
                     from tes.tts_libro_bancos lb
                     inner join tes.tcuenta_bancaria cb on cb.id_cuenta_bancaria=lb.id_cuenta_bancaria
                     where lb.id_cuenta_bancaria = v_parametros.id_cuenta_bancaria
-                    and lb.nro_deposito = v_parametros.nro_deposito
+                    and lb.nro_deposito = v_nro_deposito_g
                     and lb.tipo = v_parametros.tipo
                     and lb.nro_deposito is not null 
                     and lb.nro_deposito <> '';
@@ -520,7 +543,7 @@ BEGIN
                    raise exception 'Ya existe el documento nro % en la cuenta bancaria %', 
                    								case when 
                    								v_parametros.nro_cheque is null or v_parametros.nro_cheque = '' then 
-                                                v_parametros.nro_deposito
+                                                v_nro_deposito_g
                                                 else 
                                                 v_parametros.nro_cheque end
                                                 , g_nro_cuenta_banco;
@@ -533,13 +556,13 @@ BEGIN
 		fecha=v_parametros.fecha,
 		a_favor=upper(translate (v_parametros.a_favor, 'áéíóúÁÉÍÓÚäëïöüÄËÏÖÜñ', 'aeiouAEIOUaeiouAEIOUÑ')),
 		nro_cheque=g_nro_cheque,
-        importe_deposito=v_parametros.importe_deposito,
+        importe_deposito=v_importe_ingreso,
 		nro_comprobante=v_parametros.nro_comprobante,
         nro_liquidacion=upper(translate (v_parametros.nro_liquidacion, 'áéíóúÁÉÍÓÚäëïöüÄËÏÖÜñ', 'aeiouAEIOUaeiouAEIOUÑ')),
         detalle=upper(translate (v_parametros.detalle, 'áéíóúÁÉÍÓÚäëïöüÄËÏÖÜñ', 'aeiouAEIOUaeiouAEIOUÑ')),
 		origen=v_parametros.origen,
         observaciones=upper(translate (v_parametros.observaciones, 'áéíóúÁÉÍÓÚäëïöüÄËÏÖÜñ', 'aeiouAEIOUaeiouAEIOUÑ')),
-		importe_cheque=v_parametros.importe_cheque,
+		importe_cheque=v_importe_gasto,
         id_libro_bancos_fk=v_parametros.id_libro_bancos_fk,
         tipo=v_parametros.tipo,
 		fecha_mod=now(),
@@ -1289,6 +1312,111 @@ BEGIN
             return v_resp;
 
     	END;
+    /*********************************
+ 	#TRANSACCION:  'TES_TRACUEN_IME'
+ 	#DESCRIPCION:	Transferencias
+ 	#AUTOR:		
+ 	#FECHA:		
+	***********************************/
+
+	elsif(p_transaccion='TES_TRACUEN_IME')then
+
+		BEGIN
+            
+
+
+        -- comparar el saldo de la cuenta origen con el importe de transferencia
+              Select coalesce(sum(Coalesce(lbr.importe_deposito, 0)) -
+                          sum(coalesce(lbr.importe_cheque, 0)), 0)
+                          into g_saldo_cuenta_bancaria
+                  From tes.tts_libro_bancos lbr
+                  where lbr.fecha <= g_fecha and
+                  lbr.id_cuenta_bancaria = v_parametros.id_cuenta_bancaria_origen;        
+
+        	if v_parametros.importe_transferencia > g_saldo_cuenta_bancaria then
+            	select (ctaban.nro_cuenta||' - '||ctaban.denominacion)
+                into v_cuent_denomi
+                from tes.tcuenta_bancaria ctaban
+                where ctaban.id_cuenta_bancaria = v_parametros.id_cuenta_bancaria_origen;
+            	raise exception 'El importe que intenta transferir excede el saldo general de la cuenta origen %.',v_cuent_denomi;
+        	end if;
+            
+            
+            if v_parametros.tipo_cambio is not null then 
+                     
+                select ct.id_moneda into v_id_moneda_des
+                from tes.tcuenta_bancaria ct
+                where ct.id_cuenta_bancaria = v_parametros.id_cuenta_bancaria_origen;
+                
+                if exists ( select 1
+                      from param.tmoneda mo
+                      where mo.id_moneda = v_id_moneda_des
+                      and mo.codigo_internacional = 'USD') then 
+
+	                v_monto_transfe_1 = round(v_parametros.importe_transferencia * v_parametros.tipo_cambio,2);
+                    v_monto_transfe_2 = v_parametros.importe_transferencia;
+                    
+                else
+                                                
+    	            v_monto_transfe_1 = round(v_parametros.importe_transferencia / v_parametros.tipo_cambio,2);
+                    v_monto_transfe_2 = v_parametros.importe_transferencia;                    
+                    
+                end if;
+			else 
+	    	        v_monto_transfe_1 = v_parametros.importe_transferencia;                                             	
+	    	        v_monto_transfe_2 = v_parametros.importe_transferencia;                                             	                    
+            end if;
+   			
+			/*
+            v_hstore_aux =  hstore(v_parametros) || ('id_forma_pago=> 11')::hstore
+                            || ('id_depto=>'||v_parametros.id_depto_lb)::hstore
+                            || ('tipo=>transferencia_fondos')::hstore
+                            || ('importe_cheque => 0')::hstore
+                            || ('importe_deposito=>'||v_monto_transfe)::hstore; 
+                        
+
+            v_id_libro_bancos =	tes.f_inserta_libro_bancos(p_administrador, p_id_usuario, v_hstore_aux);  
+
+            
+            v_hstore_aux =  hstore(v_parametros) || ('id_forma_pago=> 11')::hstore
+            				|| ('id_depto=>'||v_parametros.id_depto_lb)::hstore
+                            || ('tipo=>transferencia_fondos')::hstore
+                            || ('importe_cheque =>'||v_monto_transfe)::hstore
+                            || ('importe_deposito=> 0')::hstore
+                            || ('id_cuenta_bancaria=>'||v_parametros.id_cuenta_bancaria_origen)::hstore; 
+
+            v_id_libro_bancos =	tes.f_inserta_libro_bancos(p_administrador, p_id_usuario, v_hstore_aux);
+            */
+                                  
+			select fo.id_forma_pago into v_id_forma_pago
+            from param.tforma_pago fo
+            where fo.codigo = 'transferencia';
+            
+            v_hstore_aux =  hstore(v_parametros) || ('id_forma_pago=>'||v_id_forma_pago)::hstore
+            				|| ('id_depto=>'||v_parametros.id_depto_lb)::hstore
+                            || ('tipo=>transferencia')::hstore
+                            || ('importe_cheque => 0')::hstore
+                            || ('importe_deposito=>'||v_monto_transfe_1)::hstore; 
+            
+
+			v_id_libro_bancos =	tes.f_inserta_libro_bancos(p_administrador, p_id_usuario, v_hstore_aux);
+            
+            v_hstore_aux =  hstore(v_parametros) || ('id_forma_pago=>'||v_id_forma_pago)::hstore
+            				|| ('id_depto=>'||v_parametros.id_depto_lb)::hstore
+                            || ('tipo=>transferencia')::hstore
+                            || ('importe_cheque =>'||v_monto_transfe_2)::hstore
+                            || ('importe_deposito=> 0')::hstore
+                            || ('id_cuenta_bancaria=>'||v_parametros.id_cuenta_bancaria_origen)::hstore; 
+            --raise exception '%',v_hstore_aux;          
+            v_id_libro_bancos =	tes.f_inserta_libro_bancos(p_administrador, p_id_usuario, v_hstore_aux);
+            
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Se realizo la Transferencia');
+            v_resp = pxp.f_agrega_clave(v_resp,'operacion','cambio_exitoso');
+
+            -- Devuelve la respuesta
+            return v_resp;
+
+    	END;         
 
 	else
 
