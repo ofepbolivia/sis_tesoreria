@@ -175,7 +175,10 @@ DECLARE
     v_cuenta_bancaria_benef		varchar;
     v_plan_pago					integer;
 
-
+    --- franklin.espinoza
+    v_documentos				integer[];
+    v_tam_array_doc				integer;
+	v_id_documento				integer;
 BEGIN
 
     v_nombre_funcion = 'tes.ft_solicitud_plan_pago_ime';
@@ -395,7 +398,6 @@ BEGIN
 
            -- raise exception '%, %, %,%,%', COALESCE(v_parametros.id_cuenta_bancaria,0), COALESCE(v_parametros.id_cuenta_bancaria_mov,0),  COALESCE(v_parametros.forma_pago,''),  COALESCE(v_parametros.nro_cheque,0),  COALESCE(v_parametros.nro_cuenta_bancaria,'');
 
-
              IF  pxp.f_existe_parametro(p_tabla,'id_cuenta_bancaria') THEN
                v_id_cuenta_bancaria =  v_parametros.id_cuenta_bancaria;
              END IF;
@@ -513,18 +515,18 @@ BEGIN
            -- Si es una cuota de devengado
            -- Segun el tipo de cuota
            ------------------------------------
-
+--raise exception 'tipo  %', v_registros_pp.tipo;
            -----------------------------------------------------------------------------------------------
            -- EDICION DE CUOTAS QUE TIENEN DEVENGADO   ('devengado_pagado','devengado','devengado_pagado_1c'), 'devengado_pagado_1c_sp'
            --------------------------------------------------------------------------------------------------
 
            --(may) 18-07-2019 los tipo pp especial_spi son para las internacionales -tramites SIP
            --(may) 20-07-2019 los tipo plan de pago devengado_pagado_1c_sp son para las internacionales -tramites sp con contato
-           IF v_registros_pp.tipo in ('devengado_pagado','devengado','devengado_pagado_1c_sp','especial_spi', 'v_registros_pp.tipo','devengado_pagado_1c') THEN
+           IF v_registros_pp.tipo in ('devengado_pagado','devengado','devengado_pagado_1c_sp','especial_spi', 'especial', 'v_registros_pp.tipo','devengado_pagado_1c') THEN
 
 
-                 IF v_registros_pp.tipo in  ('especial_spi') THEN
-
+                 IF v_registros_pp.tipo in  ('especial_spi', 'especial') THEN
+--raise exception 'tipo  %, %', v_registros_pp.tipo, v_registros.pago_variable;
                        IF v_registros.pago_variable = 'no' THEN
                            v_monto_total = tes.f_determinar_total_faltante(v_parametros.id_obligacion_pago, 'especial_total');
                            v_especial = tes.f_determinar_total_faltante(v_parametros.id_obligacion_pago, 'especial_spi');
@@ -575,7 +577,7 @@ BEGIN
 
                      -- calcula el liquido pagable y el monto a ejecutar presupeustaria mente
                      v_liquido_pagable = COALESCE(v_parametros.monto,0) - COALESCE(v_parametros.monto_no_pagado,0) - COALESCE(v_parametros.otros_descuentos,0) - COALESCE( v_parametros.monto_retgar_mo,0) - COALESCE(v_parametros.descuento_ley,0) - COALESCE(v_parametros.descuento_anticipo,0)- COALESCE(v_parametros.descuento_inter_serv,0);
-                     v_monto_ejecutar_total_mo  = COALESCE(v_parametros.monto,0) -  COALESCE(v_parametros.monto_no_pagado,0) -  COALESCE(v_parametros.monto_anticipo,0);
+                     v_monto_ejecutar_total_mo  = COALESCE(v_parametros.monto,0) /*(f.e.a)3182019-  COALESCE(v_parametros.monto_no_pagado,0)*/ -  COALESCE(v_parametros.monto_anticipo,0);
                      v_porc_monto_retgar = COALESCE(v_parametros.monto_retgar_mo,0)/COALESCE(v_parametros.monto,0);
 
                      IF   v_liquido_pagable  < 0  or v_monto_ejecutar_total_mo < 0  THEN
@@ -827,8 +829,29 @@ BEGIN
 
 
 
---RAISE EXCEPTION 'v_parametros.es_ultima_cuota : %', v_parametros.es_ultima_cuota;
-
+			--franklin.espinoza
+            --verifacion si existe parametro documentos a relacionar a un plan de pago
+            if pxp.f_existe_parametro(p_tabla,'documentos') then
+                v_documentos = string_to_array(v_parametros.documentos,',');
+                v_tam_array_doc = array_length(v_documentos,1);
+                --raise exception 'documentosSSSSS %, %, %', v_parametros.documentos, v_documentos, v_tam_array_doc;
+                if v_tam_array_doc > 0 then
+                    for v_id_documento in SELECT documento FROM unnest(v_documentos) AS documento loop
+                        update conta.tdoc_compra_venta set
+                        	id_plan_pago = v_parametros.id_plan_pago
+                        where id_doc_compra_venta = v_id_documento;
+                    end loop;
+                end if;
+            else
+				--if pxp.f_existe_parametro(p_tabla,'documentos') then
+                  if v_parametros.id_doc_compra_venta is not null then
+                    update conta.tdoc_compra_venta set
+                        id_plan_pago = v_parametros.id_plan_pago
+                    where id_doc_compra_venta = v_parametros.id_doc_compra_venta;
+                  end if;
+                --end if;
+            end if;
+--raise exception 'v_monto_ejecutar_total_mo: %',v_monto_ejecutar_total_mo;
 			--Sentencia de la modificacion
 			update tes.tplan_pago set
 			monto_ejecutar_total_mo = v_monto_ejecutar_total_mo,
@@ -849,7 +872,7 @@ BEGIN
             liquido_pagable=v_liquido_pagable,
 			fecha_mod = now(),
 			id_usuario_mod = p_id_usuario,
-            tipo_cambio= v_parametros.tipo_cambio,
+            tipo_cambio= case when v_parametros.tipo_cambio is null then 1 else v_parametros.tipo_cambio end,
             monto_retgar_mo= v_parametros.monto_retgar_mo,
             descuento_ley=v_parametros.descuento_ley,
             obs_descuentos_ley=v_parametros.obs_descuentos_ley,

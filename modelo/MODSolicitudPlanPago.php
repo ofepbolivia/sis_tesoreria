@@ -120,6 +120,7 @@ class MODSolicitudPlanPago extends MODbase{
         $this->captura('nit','varchar');
 
         $this->captura('id_proveedor_cta_bancaria','integer');
+        $this->captura('id_doc_compra_venta','integer');
 
 
         //Ejecuta la instruccion
@@ -134,7 +135,7 @@ class MODSolicitudPlanPago extends MODbase{
         //Definicion de variables para ejecucion del procedimiento
         $this->procedimiento='tes.ft_solicitud_plan_pago_ime';
 
-        if (in_array($this->objParam->getParametro('tipo'), array("devengado_pagado","devengado","devengado_pagado_1c_sp","especial_spi"))){
+        if (in_array($this->objParam->getParametro('tipo'), array("devengado_pagado","devengado","devengado_pagado_1c_sp","especial_spi","especial"))){
             /////////////////////////////
             // Cuotas de primer nivel que tienen prorateo
             //////////////////////////////
@@ -210,6 +211,10 @@ class MODSolicitudPlanPago extends MODbase{
         $this->setParametro('monto_establecido','monto_establecido','numeric');
         $this->setParametro('id_proveedor_cta_bancaria','id_proveedor_cta_bancaria','int4');
 
+        //franklin.espinoza
+        $this->setParametro('documentos','documentos','text');
+        $this->setParametro('id_doc_compra_venta','id_doc_compra_venta','integer');
+
 
 
         //Ejecuta la instruccion
@@ -271,6 +276,10 @@ class MODSolicitudPlanPago extends MODbase{
 
         $this->setParametro('monto_establecido','monto_establecido','numeric');
         $this->setParametro('id_proveedor_cta_bancaria','id_proveedor_cta_bancaria','int4');
+
+        //franklin.espinoza
+        $this->setParametro('documentos','documentos','varchar');
+        $this->setParametro('id_doc_compra_venta','id_doc_compra_venta','int4');
 
 
         //Ejecuta la instruccion

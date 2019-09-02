@@ -75,10 +75,13 @@ DECLARE
 
 
 
-v_cuenta_bancaria_benef		varchar;
-v_tipo_obligacion			varchar;
+	v_cuenta_bancaria_benef		varchar;
+	v_tipo_obligacion			varchar;
 
-
+	--- franklin.espinoza
+    v_documentos				integer[];
+    v_tam_array_doc				integer;
+	v_id_documento				integer;
 BEGIN
 
     /*
@@ -510,7 +513,7 @@ BEGIN
             END IF;
 
 
-
+--raise exception 'hstore: %',(p_hstore->'documentos')::varchar;
             --Sentencia de la insercion
         	insert into tes.tplan_pago(
 			estado_reg,
@@ -593,7 +596,7 @@ BEGIN
 			null,
             v_liquido_pagable,
             (p_hstore->'fecha_tentativa')::date,
-            (p_hstore->'tipo_cambio')::numeric,
+            case when (p_hstore->'tipo_cambio')::numeric is null then 1 else (p_hstore->'tipo_cambio')::numeric  end,
             (p_hstore->'monto_retgar_mo')::numeric,
             (p_hstore->'descuento_ley')::numeric,
             (p_hstore->'obs_descuentos_ley'),
@@ -618,6 +621,26 @@ BEGIN
             (p_hstore->'id_proveedor_cta_bancaria')::integer
            )RETURNING id_plan_pago into v_id_plan_pago;
 
+       		--franklin.espinoza 31/8/2019
+            --verifacion si existe parametro documentos a relacionar a un plan de pago
+            if (p_hstore->'documentos')::varchar is not null or (p_hstore->'documentos')::varchar != '' then
+                v_documentos = string_to_array((p_hstore->'documentos')::varchar,',');
+                v_tam_array_doc = array_length(v_documentos,1);
+
+                if v_tam_array_doc > 0 then
+                    for v_id_documento in SELECT documento FROM unnest(v_documentos) AS documento loop
+                        update conta.tdoc_compra_venta set
+                        	id_plan_pago = v_id_plan_pago
+                        where id_doc_compra_venta = v_id_documento;
+                    end loop;
+                end if;
+            else
+            	if v_parametros.id_doc_compra_venta is not null then
+                    	update conta.tdoc_compra_venta set
+                        	id_plan_pago = v_id_plan_pago
+                        where id_doc_compra_venta = (p_hstore->'id_doc_compra_venta')::varchar;
+                    end if;
+            end if;
 
  		   IF (v_fecha_ini_pp is not Null or v_fecha_fin_pp is not Null) THEN
            update tes.tplan_pago set

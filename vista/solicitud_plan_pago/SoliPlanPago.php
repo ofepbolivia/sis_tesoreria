@@ -114,6 +114,10 @@ header("content-type: text/javascript; charset=UTF-8");
             //llama al constructor de la clase padre
             Phx.vista.SoliPlanPago.superclass.constructor.call(this, config);
             this.init();
+            this.iniciarEventos();
+
+            this.Cmp.id_doc_compra_venta.pid = this.idContenedor;
+
             this.addButton('ini_estado', {
                 grupo: [0, 1],
                 argument: {estado: 'inicio'},
@@ -397,8 +401,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     renderer: function (value, p, record) {
                         if (record.data.usr_reg == 'vitalia.penia' || record.data.usr_reg == 'shirley.torrez' || record.data.usr_reg == 'patricia.lopez' || record.data.usr_reg == 'patricia.lopez') {
                             return String.format('<b><font color="orange">{0}</font></b>', value);
-                        }
-                        else {
+                        } else {
                             return value;
                         }
 
@@ -453,22 +456,18 @@ header("content-type: text/javascript; charset=UTF-8");
                     renderer: function (value, p, record) {
                         if (record.data.total_pagado == record.data.monto_ejecutar_total_mo) {
                             return String.format('<b><font color="green">{0}</font></b>', value);
-                        }
-                        else {
+                        } else {
 
                             if (record.data.total_prorrateado != record.data.monto_ejecutar_total_mo) {
                                 return String.format('<b><font color="red">{0}</font></b>', value);
-                            }
-                            else {
+                            } else {
                                 if (record.data.total_pagado != record.data.monto_ejecutar_total_mo
                                     && (record.data.tipo == 'devengado' || record.data.tipo == 'devengado_pagado')) {
                                     return String.format('<b><font color="orange">{0}</font></b>', value);
-                                }
-                                else {
+                                } else {
                                     if (record.data.tipo == 'pagado' || record.data.tipo == 'ant_aplicado') {
                                         return String.format('--> {0}', value);
-                                    }
-                                    else {
+                                    } else {
                                         return String.format('{0}', value);
                                     }
 
@@ -499,8 +498,7 @@ header("content-type: text/javascript; charset=UTF-8");
 
                         if (record.data.total_prorrateado != record.data.monto_ejecutar_total_mo || record.data.contador_estados > 1) {
                             return String.format('<div title="Número de revisiones: {1}"><b><font color="red">{0} - ({1})</font></b></div>', value, record.data.contador_estados);
-                        }
-                        else {
+                        } else {
                             return String.format('<div title="Número de revisiones: {1}">{0} - ({1})</div>', value, record.data.contador_estados);
                         }
                     },
@@ -607,8 +605,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     renderer: function (value, p, record) {
                         if (record.data.total_prorrateado != record.data.monto_ejecutar_total_mo) {
                             return String.format('<b><font color="red">{0}</font></b>', value);
-                        }
-                        else {
+                        } else {
                             return String.format('{0}', value);
                         }
                     },
@@ -745,7 +742,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                 direction: 'ASC'
                             },
                             totalProperty: 'total',
-                            fields: ['id_cuenta_bancaria', 'nro_cuenta', 'nombre_institucion', 'codigo_moneda', 'centro', 'denominacion'],
+                            fields: ['id_cuenta_bancaria', 'nro_cuenta', 'nombre_institucion', 'codigo_moneda', 'centro', 'denominacion', 'id_moneda'],
                             remoteSort: true,
                             baseParams: {
                                 par_filtro: 'nro_cuenta'
@@ -841,7 +838,7 @@ header("content-type: text/javascript; charset=UTF-8");
             {
                 config: {
                     name: 'id_proveedor_cta_bancaria',
-                    fieldLabel: 'Cuenta Bancaria(Pov.)',
+                    fieldLabel: 'Cuenta Bancaria(Prov.)',
                     allowBlank: true,
                     resizable: true,
                     emptyText: 'Elija una Cuenta...',
@@ -984,15 +981,98 @@ header("content-type: text/javascript; charset=UTF-8");
                 grid: true,
                 form: true
             },
+            // {
+            //     config: {
+            //         name: 'monto_no_pagado',
+            //         currencyChar: ' ',
+            //         fieldLabel: 'Nota de Crédito/Débito',
+            //         allowBlank: true,
+            //         allowNegative: true,
+            //         gtip: 'Ej: Débito= -1 y Crédito= 1',
+            //         gwidth: 250,
+            //         maxLength: 1245186,
+            //         turl: '../../../sis_parametros/vista/proveedor_cta_bancaria/FormProvCta.php',
+            //         ttitle: 'Banco y Cuenta Bancaria Dest.',
+            //         tconfig: {width: '35%', height: '50%'},
+            //         tdata: {},
+            //         tcls: 'FormProvCta',
+            //         pid: this.idContenedor,
+            //         renderer: function (value, p, record) {
+            //             return String.format('{0}', record.data['monto_no_pagado']);
+            //         }
+            //     },
+            //     type: 'MoneyField',
+            //     filters: {pfiltro: 'plapa.monto_no_pagado', type: 'numeric'},
+            //     id_grupo: 1,
+            //     grid: true,
+            //     form: true
+            // },
+            {
+                config: {
+                    name: 'id_doc_compra_venta',
+                    fieldLabel: 'Nota de Crédito/Débito',
+                    allowBlank: true,
+                    store: new Ext.data.JsonStore(
+                        {
+                            url: '../../sis_contabilidad/control/DocCompraVenta/listarDocCompraVentaCreDeb',
+                            id: 'id_doc_compra_venta',
+                            root: 'datos',
+                            sortInfo: {
+                                field: 'dcv.nro_documento',
+                                direction: 'asc'
+                            },
+                            totalProperty: 'total',
+                            fields: ['id_doc_compra_venta', 'revisado', 'nro_documento', 'nit',
+                                'desc_plantilla', 'desc_moneda', 'importe_doc', 'nro_documento',
+                                'tipo', 'razon_social', 'fecha', 'tipo_cambio','id_moneda'],
+                            remoteSort: true,
+                            baseParams: {par_filtro: 'pla.desc_plantilla#dcv.razon_social#dcv.nro_documento#dcv.nit#dcv.importe_doc#dcv.codigo_control'},
+                        }),
+                    tpl: '<tpl for="."><div class="x-combo-list-item"> <div class="awesomecombo-item {checked}"> <p><b>{razon_social}</b>,  NIT: {nit}</p></div><p>{desc_plantilla} </p><p ><span style="color: #F00000">Doc: {nro_documento}</span> de Fecha: {fecha}</p><p style="color: green;"> {importe_doc} {desc_moneda}  </p><p> Tipo de Cambio: {tipo_cambio}  </p></div></tpl>',
+                    valueField: 'id_doc_compra_venta',
+                    hiddenValue: 'id_doc_compra_venta',
+                    displayField: 'desc_plantilla',
+                    gdisplayField: 'nro_documento',
+                    listWidth: '401',
+                    forceSelection: true,
+                    typeAhead: false,
+                    triggerAction: 'all',
+                    lazyRender: true,
+                    mode: 'remote',
+                    pageSize: 20,
+                    queryDelay: 500,
+                    gwidth: 250,
+                    minChars: 2,
+                    resizable: true,
+                    // turl: '../../../sis_contabilidad/vista/doc_compra_venta/SolDocCompraVentaCbte.php',
+                    turl: '../../../sis_contabilidad/vista/doc_compra_venta/SolDocCompraVentaPP.php',
+                    ttitle: 'Formulario de Documento Compra/Venta',
+                    // tconfig: {width: '35%', height: '50%'},
+                    tname: 'id_doc_compra_venta',
+                    tdata: {},
+                    tcls: 'SolDocCompraVentaPP',
+                    pid: this.idContenedor,
+                    enableMultiSelect: true
+                },
+                type: 'TrigguerCombo',
+                id_grupo: 1,
+                grid: true,
+                form: true
+            },
+
             {
                 config: {
                     name: 'monto_no_pagado',
                     currencyChar: ' ',
-                    fieldLabel: 'Monto No Pagado',
+                    fieldLabel: 'Monto de Crédito/Débito',
                     allowBlank: true,
                     allowNegative: false,
                     gwidth: 100,
                     maxLength: 1245186
+                    // ,
+                    // renderer: function (value, p, record) {
+                    //                 return String.format('{0}', record.data['importe_doc']);
+                    //             }
                 },
                 type: 'MoneyField',
                 filters: {pfiltro: 'plapa.monto_no_pagado', type: 'numeric'},
@@ -1000,6 +1080,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 grid: true,
                 form: true
             },
+
             {
                 config: {
                     name: 'otros_descuentos',
@@ -1632,7 +1713,8 @@ header("content-type: text/javascript; charset=UTF-8");
             {name: 'monto_establecido', type: 'numeric'},
             {name: 'id_proveedor', type: 'numeric'},
             {name: 'nit', type: 'string'},
-            'id_proveedor_cta_bancaria'
+            'id_proveedor_cta_bancaria',
+            'id_doc_compra_venta'
 
         ],
 
@@ -1666,9 +1748,13 @@ header("content-type: text/javascript; charset=UTF-8");
                 '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Intrucciones:&nbsp;&nbsp;</b> {obs_wf}</p><br>'
             )
         }),
-        // iniciarEventos: function () {
-        //
-        // },
+
+        iniciarEventos: function () {
+
+            this.Cmp.monto_no_pagado.on('change', this.calculaMontoPago, this);
+
+        },
+
         // ocultarFP: function (me, pFormaPago) {
         //
         //     if ((this.Cmp.id_cuenta_bancaria.getValue() == 61) || (this.Cmp.id_cuenta_bancaria.getValue() == 78) || (this.Cmp.id_cuenta_bancaria.getValue() == 79)) {
@@ -1991,8 +2077,7 @@ header("content-type: text/javascript; charset=UTF-8");
             console.log('this.tmp_porc_monto_excento_var', this.tmp_porc_monto_excento_var);
             if (this.tmp_porc_monto_excento_var) {
                 this.Cmp.monto_excento.setValue(this.Cmp.monto.getValue() * this.tmp_porc_monto_excento_var)
-            }
-            else {
+            } else {
 
                 console.log('...', this.Cmp.tipo_excento.getValue(), this.Cmp.tipo_excento.getValue())
                 if (this.Cmp.tipo_excento.getValue() == 'constante') {
@@ -2021,7 +2106,8 @@ header("content-type: text/javascript; charset=UTF-8");
             //     }
             //
             // }
-
+            /*var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+            console.log('llegaaq', reg.ROOT.datos.importe_doc)*/
 
             var monto_ret_gar = 0;
             if (this.porc_ret_gar > 0 && (this.Cmp.tipo.getValue() == 'pagado' || this.Cmp.tipo.getValue() == 'pagado_rrhh')) {
@@ -2033,8 +2119,38 @@ header("content-type: text/javascript; charset=UTF-8");
 
             var liquido = this.Cmp.monto.getValue() - this.Cmp.monto_no_pagado.getValue() - this.Cmp.otros_descuentos.getValue() - monto_ret_gar - this.Cmp.descuento_ley.getValue() - this.Cmp.descuento_inter_serv.getValue() - this.Cmp.descuento_anticipo.getValue();
             this.Cmp.liquido_pagable.setValue(liquido > 0 ? liquido : 0);
-            var eje = this.Cmp.monto.getValue() - this.Cmp.monto_no_pagado.getValue() - this.Cmp.monto_anticipo.getValue()
+            var eje = this.Cmp.monto.getValue() -  this.Cmp.monto_anticipo.getValue()
             this.Cmp.monto_ejecutar_total_mo.setValue(eje > 0 ? eje : 0);
+
+            //
+            console.log('llega id_doc_compra: ')
+            /*this.Cmp.id_doc_compra_venta.on('select', function (combo, record, index) {
+                console.log('llega id_doc_compra_venta1: ', combo)
+                // console.log('llega id_doc_compra_venta2: ', record)
+                if (!record.data.importe_doc) {
+                    alert('La factura no tiene su importe');
+                    return
+                }
+
+                this.Cmp.monto_no_pagado.reset();
+                this.Cmp.monto_no_pagado.store.baseParams.importe_doc = record.data.importe_doc;
+                this.Cmp.monto_no_pagado.modificado = true;
+                this.Cmp.monto_no_pagado.enable();
+
+                this.Cmp.monto_no_pagado.store.load({
+                    params: {start: 0, limit: this.tam_pag},
+                    callback: function (r) {
+                        if (r.length == 1) {
+                            this.Cmp.monto_no_pagado.setValue(r[0].data.monto_no_pagado);
+                        }
+
+                    }, scope: this
+                });
+
+
+            }, this);*/
+            //
+
         },
 
         onButtonEdit: function () {
@@ -2066,8 +2182,7 @@ header("content-type: text/javascript; charset=UTF-8");
 
             if (data.tipo == 'ant_aplicado' || data.tipo == 'pagado') {
                 this.tmp_porc_monto_excento_var = data.porc_monto_excento_var;
-            }
-            else {
+            } else {
                 this.tmp_porc_monto_excento_var = undefined;
             }
 
@@ -2080,7 +2195,6 @@ header("content-type: text/javascript; charset=UTF-8");
                 } else {
                     this.Cmp.id_proveedor_cta_bancaria.disable();
                     this.Cmp.id_proveedor_cta_bancaria.allowBlank = true;
-                    this.Cmp.id_proveedor_cta_bancaria.setValue('');
                 }
             }
 
@@ -2096,7 +2210,67 @@ header("content-type: text/javascript; charset=UTF-8");
             this.Cmp.id_proveedor_cta_bancaria.store.baseParams.id_proveedor = data.id_proveedor;
             this.Cmp.id_proveedor_cta_bancaria.tdata.id_padre = this.idContenedor;
 
+            this.Cmp.id_doc_compra_venta.store.baseParams.id_proveedor = data.id_proveedor;
 
+            // que filtre por plan de pago para el campo Nota de Crédito/Débito desde el formulario de plan de pago
+            this.Cmp.id_doc_compra_venta.store.baseParams.id_plan_pago = data.id_plan_pago;
+            this.Cmp.id_doc_compra_venta.tdata.id_padre = this.idContenedor;
+            this.Cmp.id_doc_compra_venta.tdata.momento = this.accionFormulario;
+            this.Cmp.id_doc_compra_venta.tdata.tipo_cambio = this.Cmp.tipo_cambio.getValue();
+
+            console.log('llega ppmayedtmodat', this.maestro.id_moneda)
+            //(may) tipo de cambio solo muestre para la moneda en dolares
+            this.Cmp.id_cuenta_bancaria.on('select', function (cmb, rec, i) {
+                if (this.maestro.id_moneda != rec.data.id_moneda ) {
+                    this.mostrarComponente(this.Cmp.tipo_cambio);
+                    //this.Cmp.tipo_cambio.setValue(1);
+                } else {
+                    this.ocultarComponente(this.Cmp.tipo_cambio);
+                    this.Cmp.tipo_cambio.reset();
+                }
+            }, this);
+
+            //(may) segun el monto de la factura actualiza el Monto de Crédito/Débito
+            this.Cmp.id_doc_compra_venta.on('select', function (cmb, rec, i) {
+                //console.log('llega monto', rec.data.importe_doc)
+                console.log('llega tipocambio',  this.Cmp.tipo_cambio.getValue())
+
+                console.log('llega maestro',  this.maestro.id_moneda)
+                console.log('llega factura',  cmb, 'rec',rec.data)
+
+                if (this.maestro.id_moneda != rec.data.id_moneda ) {
+                    console.log('llega 1',  this.Cmp.tipo_cambio.getValue())
+                    //if (rec.data.tipo_cambio == null || rec.data.tipo_cambio == ''){
+                        //rec.data.tipo_cambio = 1;
+                    //}
+                    if (rec.data.id_moneda == 2){
+                        console.log('llega 2',  this.Cmp.tipo_cambio.getValue())
+                        this.Cmp.monto_no_pagado.setValue(rec.data.importe_doc * rec.data.tipo_cambio);
+                    }else{
+                        console.log('llega 3',  this.Cmp.tipo_cambio.getValue())
+                        this.Cmp.monto_no_pagado.setValue(rec.data.importe_doc / this.Cmp.tipo_cambio.getValue());
+                    }
+                }else{
+                    console.log('llega else',  this.Cmp.tipo_cambio.getValue())
+
+                    this.Cmp.monto_no_pagado.setValue(rec.data.importe_doc);
+                }
+                this.calculaMontoPago();
+            }, this);
+
+
+        },
+        definirDC: function (importe, id_documentos) {
+
+            Ext.Msg.show({
+                title: 'Alerta',
+                msg: '<b> Estimado Usuario: <br><br><span style="color: red;">Su nota han sido añadidas con exito.</span></b>',
+                buttons: Ext.Msg.OK,
+                width: 512,
+                icon: Ext.Msg.WARNING
+            });
+            this.Cmp.monto_no_pagado.setValue(importe);
+            this.argumentExtraSubmit = {documentos: id_documentos};
         },
 
         getPlantilla: function (id_plantilla) {
@@ -2317,6 +2491,9 @@ header("content-type: text/javascript; charset=UTF-8");
             this.Cmp.monto_ajuste_ag.setValue(0);
             this.Cmp.monto_ajuste_siguiente_pag.setValue(0);
             this.Cmp.monto_anticipo.setValue(0);
+
+            this.Cmp.nombre_pago.setValue(this.maestro.desc_proveedor);
+
 
             // this.Cmp.tipo.setValue('devengado_pagado_1c_sp');
 
@@ -2563,8 +2740,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 if (data.pago_variable == 'si') {
                     me.mostrarGrupo(2); //mostra el grupo de ajustes
                     me.Cmp.monto_ajuste_siguiente_pag.setReadOnly(true);
-                }
-                else {
+                } else {
                     me.ocultarGrupo(2); //ocultar el grupo de ajustes
                 }
 
@@ -2649,8 +2825,13 @@ header("content-type: text/javascript; charset=UTF-8");
             return {'dias': dias, 'horas': horas, 'minutos': minutos, 'segundos': segundos};
         },
 
+        /*onDeclinar: function() {
+            this.window.hide()
+        },*/
+
         onButtonNew: function () {
             this.accionFormulario = 'NEW';
+            //this.Cmp.id_doc_compra_venta.tdata.tipo_cambio = this.Cmp.tipo_cambio.getValue();
             Phx.vista.SoliPlanPago.superclass.onButtonNew.call(this);
             this.ocultarGrupo(2); //ocultar el grupo de ajustes
             // this.ocultarGrupo(3); //ocultar el grupo de ajustes
@@ -2660,6 +2841,7 @@ header("content-type: text/javascript; charset=UTF-8");
             this.ocultarComponente(this.Cmp.descuento_inter_serv);
             this.ocultarComponente(this.Cmp.monto_retgar_mo);
             this.ocultarComponente(this.Cmp.monto_excento);
+
 
             if (this.Cmp.id_depto_lb.getValue() > 0) {
                 this.Cmp.id_cuenta_bancaria.store.baseParams = Ext.apply(this.Cmp.id_cuenta_bancaria.store.baseParams, {
@@ -2677,12 +2859,67 @@ header("content-type: text/javascript; charset=UTF-8");
                 id_proveedor: this.maestro.id_proveedor
             });
 
+            this.Cmp.id_doc_compra_venta.store.baseParams = Ext.apply(this.Cmp.id_doc_compra_venta.store.baseParams, {
+                id_proveedor: this.maestro.id_proveedor
+            });
+
 
             // console.log('datos del this',this.idContenedor)
 
             this.Cmp.id_proveedor_cta_bancaria.tdata.id_padre = this.idContenedor;
             this.Cmp.id_proveedor_cta_bancaria.tdata.id_proveedor = this.maestro.id_proveedor;
 
+            this.Cmp.id_doc_compra_venta.tdata.id_padre = this.idContenedor;
+            //this.Cmp.id_doc_compra_venta.tdata.id_plan_pago = this.maestro.id_plan_pago;
+            this.Cmp.id_doc_compra_venta.tdata.momento = this.accionFormulario;
+
+            this.Cmp.id_doc_compra_venta.tdata.tipo_cambio = this.getComponente('tipo_cambio').getValue();
+
+            console.log('llega en new m', this.getComponente('tipo_cambio'), this.getComponente('tipo_cambio').getValue());
+
+
+            console.log('llega ppmay', this.maestro.id_moneda)
+
+
+            //(may) tipo de cambio solo muestre para la moneda en dolares
+            this.mostrarComponente(this.Cmp.tipo_cambio);
+            this.Cmp.id_cuenta_bancaria.on('select', function (cmb, rec, i) {
+                if (this.maestro.id_moneda != rec.data.id_moneda ) {
+                    this.mostrarComponente(this.Cmp.tipo_cambio);
+                    //this.Cmp.tipo_cambio.setValue(1);
+                } else {
+                    this.ocultarComponente(this.Cmp.tipo_cambio);
+                    this.Cmp.tipo_cambio.reset();
+                }
+            }, this);
+
+            //(may) segun el monto de la factura actualiza el Monto de Crédito/Débito
+            this.Cmp.id_doc_compra_venta.on('select', function (cmb, rec, i) {
+                //console.log('llega monto', rec.data.importe_doc)
+                console.log('llega tipocambio',  this.Cmp.tipo_cambio.getValue())
+
+                console.log('llega maestro',  this.maestro.id_moneda)
+                console.log('llega factura',  cmb, 'rec',rec.data)
+
+                if (this.maestro.id_moneda != rec.data.id_moneda ) {
+                    console.log('llega 1',  this.Cmp.tipo_cambio.getValue())
+                    //if (rec.data.tipo_cambio == null || rec.data.tipo_cambio == ''){
+                    //rec.data.tipo_cambio = 1;
+                    //}
+                    if (rec.data.id_moneda == 2){
+                        console.log('llega 2',  this.Cmp.tipo_cambio.getValue())
+                        this.Cmp.monto_no_pagado.setValue(rec.data.importe_doc * rec.data.tipo_cambio);
+                    }else{
+                        console.log('llega 3',  this.Cmp.tipo_cambio.getValue())
+                        this.Cmp.monto_no_pagado.setValue(rec.data.importe_doc / this.Cmp.tipo_cambio.getValue());
+                    }
+                }else{
+                    console.log('llega else',  this.Cmp.tipo_cambio.getValue())
+
+                    this.Cmp.monto_no_pagado.setValue(rec.data.importe_doc);
+                }
+                this.calculaMontoPago();
+            }, this);
 
         },
 
@@ -2692,6 +2929,8 @@ header("content-type: text/javascript; charset=UTF-8");
             if (!reg.ROOT.error) {
                 this.Cmp.porc_descuento_ley.setValue(reg.ROOT.datos.descuento_porc * 1.00);
                 this.Cmp.obs_descuentos_ley.setValue(reg.ROOT.datos.observaciones);
+
+                this.Cmp.id_doc_compra_venta.setValue(reg.ROOT.datos.importe_doc);
                 this.calculaMontoPago();
             } else {
                 alert(reg.ROOT.mensaje)
