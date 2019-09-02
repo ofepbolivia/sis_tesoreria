@@ -777,7 +777,8 @@ header("content-type: text/javascript; charset=UTF-8");
                         params:{start:0, limit:this.tam_pag, m_id_cuenta_bancaria:cta_bancaria,m_nro_cheque:'si'},
                         success: function (resp){
                             var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
-                            this.cmpNroCheque.setValue(parseInt(reg.datos[0].nro_cheque)+1);
+                            console.log('cheques => ',reg.datos);
+                            reg.datos.length > 0  && this.cmpNroCheque.setValue(parseInt(reg.datos[0].nro_cheque)+1);
                         },
                         failure: this.conexionFailure,
                         timeout:this.timeout,

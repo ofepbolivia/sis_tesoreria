@@ -137,7 +137,7 @@ Phx.vista.CuentaBancaria=Ext.extend(Phx.gridInterfaz,{
 				fieldLabel: 'Central',
 				allowBlank: false,
 				anchor: '80%',
-				gwidth: 250,
+				gwidth: 100,
 				maxLength:25,
 				typeAhead:true,
 				triggerAction:'all',
@@ -157,7 +157,7 @@ Phx.vista.CuentaBancaria=Ext.extend(Phx.gridInterfaz,{
 				fieldLabel: 'Fecha Alta',
 				allowBlank: true,
 				anchor: '80%',
-				gwidth: 250,
+				gwidth: 100,
 						format: 'd/m/Y', 
 						renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
 			},

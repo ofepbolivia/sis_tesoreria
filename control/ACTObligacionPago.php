@@ -748,6 +748,24 @@ class ACTObligacionPago extends ACTbase
 		}
 		$this->res->imprimirRespuesta($this->res->generarJson());        
     }
+    function listarEvoluPresup()
+    {
+        $this->objParam->defecto('ordenacion', 'id_partida_ejecucion');
+        $this->objParam->defecto('dir_ordenacion', 'desc');
+        
+        //$this->objParam->getParametro('tipo_interfaz') == 'comprometido' && $this->objParam->addFiltro("tipo_movimiento = ''comprometido'' and tipo_movimiento is null ");
+        //$this->objParam->getParametro('tipo_interfaz') == 'ejecutado'  && $this->objParam->addFiltro("tipo_movimiento = ''ejecutado'' and tipo_movimiento is null ");
+        //$this->objParam->getParametro('tipo_interfaz') == 'pagado'  && $this->objParam->addFiltro("tipo_movimiento = ''pagado'' and tipo_movimiento is null");
+
+        if ($this->objParam->getParametro('tipoReporte') == 'excel_grid' || $this->objParam->getParametro('tipoReporte') == 'pdf_grid') {
+            $this->objReporte = new Reporte($this->objParam, $this);
+            $this->res = $this->objReporte->generarReporteListado('MODObligacionPago', 'listarEvoluPresup');
+        } else {
+            $this->objFunc = $this->create('MODObligacionPago');
+            $this->res = $this->objFunc->listarEvoluPresup($this->objParam);
+        }
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }    
 
 }
 

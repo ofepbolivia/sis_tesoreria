@@ -1923,7 +1923,7 @@ header("content-type: text/javascript; charset=UTF-8");
             //Se define el nombre de la columna de la llave primaria
 
 
-            Phx.CP.loadWindows('../../../sis_tesoreria/vista/presupuesto/CheckPresupuesto.php', 'Evolución presupuestaria (' + rec.data.moneda + ')', {
+            Phx.CP.loadWindows('../../../sis_tesoreria/vista/presupuesto/CheckPresupuesto.php', 'Evolución presupuestaria <span style="color:green; font-size:15;">(' + rec.data.moneda + ')</span>', {
                 modal: true,
                 width: '98%',
                 height: '70%',

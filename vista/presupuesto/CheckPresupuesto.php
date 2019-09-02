@@ -98,13 +98,43 @@ header("content-type: text/javascript; charset=UTF-8");
 			id_grupo : 1,
 			grid : true,
 			form : false
-		},{
+		}, { 
+            config : {
+                name : 'desc_orden',
+                fieldLabel : 'Orden Trabajo',
+                gwidth : 150
+            },
+            filters : {
+                pfiltro : 'desc_orden',
+                type: 'string'
+            },
+            type : 'TextField',
+            id_grupo : 1,
+            grid : 1,
+            form : false
+        },
+        {
+            config : {
+                name : 'moneda',
+                fieldLabel : 'Moneda',
+                gwidth : 100
+            },
+            filters : {
+                pfiltro : 'moneda',
+                type: 'string'
+            },
+            type : 'TextField',
+            id_grupo : 1,
+            grid : true,
+            form : false
+        },        
+        {
 			config : {
 				name : 'comprometido',
 				fieldLabel : 'Comprometido',
 				gwidth : 100,
                 renderer:function (value,p,record){
-                    return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
+                    return  String.format('<div style="text-align:right;"><b>{0}</b></div>',Ext.util.Format.number(value,'0,000.00'));                    
                 }
 			},
 			type : 'NumberField',
@@ -117,7 +147,7 @@ header("content-type: text/javascript; charset=UTF-8");
 				fieldLabel : 'Ejecutado',
 				gwidth : 100,
                 renderer:function (value,p,record){
-                    return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
+                    return  String.format('<div style="text-align:right;"><b>{0}</b></div>',Ext.util.Format.number(value,'0,000.00'));
                 }
 			},
 			type : 'TextField',
@@ -130,7 +160,7 @@ header("content-type: text/javascript; charset=UTF-8");
 				fieldLabel : 'Pagado',
 				gwidth : 100,
                 renderer:function (value,p,record){
-                    return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
+                    return  String.format('<div style="text-align:right;"><b>{0}</b></div>',Ext.util.Format.number(value,'0,000.00'));
                 }
 			},
 			type : 'NumberField',
@@ -143,7 +173,7 @@ header("content-type: text/javascript; charset=UTF-8");
 				fieldLabel : 'Revertible',
 				gwidth : 100,
                 renderer:function (value,p,record){
-                    return  String.format('{0}', Ext.util.Format.number(value,'0,000.00'));
+                    return  String.format('<div style="text-align:right;"><b>{0}</b></div>',Ext.util.Format.number(value,'0,000.00'));
                 }
 			},
 			type : 'NumberField',
@@ -155,7 +185,8 @@ header("content-type: text/javascript; charset=UTF-8");
 			grid : true,
 			egrid: false,
 			form : false
-		},{
+		},
+        {
 			config : {
 				name : 'revertir',
 				fieldLabel : 'Revertir/Incrementar',
@@ -187,16 +218,41 @@ header("content-type: text/javascript; charset=UTF-8");
                     'comprometido',
                     'ejecutado',
                     'pagado',
-                    'revertible','revertir'
+                    'revertible','revertir',
+                    'moneda',                    
+                    'desc_orden'
 		],
 		sortInfo : {
 			field : 'nombre_partida',
 			direction : 'ASC'
 		},
+
+        tabsouth: [
+            {
+                url: '../../../sis_tesoreria/vista/presupuesto/EvoluPresupDet.php',
+                title: '<span style="font-size:15;">Comprometido</span>',
+                height: '50%',
+                cls: 'EvoluPresupDet'
+            },
+            {
+                url: '../../../sis_tesoreria/vista/presupuesto/EvoluPresupDetEjecutado.php',
+                title: '<span style="font-size:15;">Ejecutado</span>',
+                height: '50%',
+                cls: 'EvoluPresupDetEjecutado'
+            },
+            {
+                url: '../../../sis_tesoreria/vista/presupuesto/EvoluPresupDetPagado.php',
+                title: '<span style="font-size:15;">Pagado</span>',
+                height: '50%',
+                cls: 'EvoluPresupDetPagado'
+            }                        
+        ],
+
 		bdel :   false,
 		bsave :  false,
 		bnew:    false,
 		bedit:   false,
+        btest:   false,
 		tam_pag: 1000,
 		
 		successSinc:function(resp){
@@ -211,7 +267,8 @@ header("content-type: text/javascript; charset=UTF-8");
 			
 		revertirParcial:function(){
 			var me = this;
-			var filas=this.store.getModifiedRecords();		
+			var filas=this.store.getModifiedRecords();            
+            		
 	 	    if(filas.length>0){	
 			     if(confirm("Está seguro de revertir el presupeusto?")){
 					if(confirm("Realmente seguro?, no podrá retroceder")){
