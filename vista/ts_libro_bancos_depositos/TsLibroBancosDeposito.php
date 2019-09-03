@@ -311,11 +311,12 @@ header("content-type: text/javascript; charset=UTF-8");
                             direction: 'ASC'                            
                     },
                     totalProperty: 'total',
-                    fields: ['id_forma_pago','variable','desc_forma_pago'],
+                    fields: ['id_forma_pago','variable','desc_forma_pago','tipo'],
                     // turn on remote sorting
                     remoteSort: true,
                     baseParams:{par_filtro:'fpa.desc_forma_pago'}                   
                     }),
+                    tpl: '<tpl for="."><div class="x-combo-list-item"><b><p >{desc_forma_pago}<p style="color:green;">Tipo: {tipo}</p></b></div></tpl>',
                 valueField: 'variable',
                 displayField: 'desc_forma_pago', 
                 forceSelection:true,
@@ -399,7 +400,7 @@ header("content-type: text/javascript; charset=UTF-8");
 		{
 			config:{
 				name: 'importe_deposito',
-				fieldLabel: 'Importe Depósito',
+				fieldLabel: 'Importe Ingreso',
 				allowBlank: false,
 				anchor: '80%',
 				gwidth: 100,
