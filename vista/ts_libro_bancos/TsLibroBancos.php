@@ -392,7 +392,8 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
                     // turn on remote sorting
                     remoteSort: true                    
                     }),
-                //gdisplayField:'desc_forma_pago',                    
+                //gdisplayField:'desc_forma_pago',
+                tpl: '<tpl for="."><div class="x-combo-list-item"><b><p >{desc_forma_pago}<p style="color:green;">Tipo: {tipo}</p></b></div></tpl>',
                 valueField: 'variable',
                 displayField: 'desc_forma_pago', 
                 forceSelection:true,
@@ -456,7 +457,7 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'importe_deposito',
-				fieldLabel: 'Importe Debe',
+				fieldLabel: 'Importe Ingreso',
 				allowBlank: false,
 				anchor: '80%',
 				gwidth: 100,
@@ -473,7 +474,7 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'importe_cheque',
-				fieldLabel: 'Importe Haber',
+				fieldLabel: 'Importe Gasto',
 				allowBlank: false,
 				anchor: '80%',
 				gwidth: 100,
