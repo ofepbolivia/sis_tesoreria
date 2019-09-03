@@ -88,7 +88,9 @@ DECLARE
     v_monto_transfe_2		numeric;    
     v_id_forma_pago			integer;  
     v_importe_gasto			numeric;
-    v_importe_ingreso		numeric;      
+    v_importe_ingreso		numeric;
+    --control para la cuenta CUT
+    v_nro_cuenta			varchar;          
 BEGIN
     v_nombre_funcion = 'tes.ft_ts_libro_bancos_ime';
     v_parametros = pxp.f_get_record(p_tabla);
@@ -426,9 +428,16 @@ BEGIN
               From tes.tts_libro_bancos lb
               Where lb.id_libro_bancos = v_parametros.id_libro_bancos_fk;
 
+               --control para la cuenta CUT
+              select tcb.nro_cuenta
+              into v_nro_cuenta
+              from tes.tcuenta_bancaria tcb
+              where tcb.id_cuenta_bancaria = v_parametros.id_cuenta_bancaria;
               --Comparamos el saldo del deposito con el importe del cheque
               IF(v_importe_gasto > g_saldo_deposito) Then
-                raise exception 'El importe que intenta registrar, excede el saldo del deposito asociado. Por favor revise el saldo.';
+                if v_nro_cuenta != '05780102002' then
+              		raise exception 'El importe que intenta registrar excede el saldo general de la cuenta bancaria al %. Por favor revise el saldo de la cuenta al %.',to_char(v_parametros.fecha, 'dd/mm/yyyy'),to_char(v_parametros.fecha, 'dd/mm/yyyy');
+                end if;
               End If;
 
             End If; --fin de la verifiacion de si es un cheque asociado a un deposito
@@ -861,7 +870,11 @@ BEGIN
              fecha_mod=now()
 
           where id_proceso_wf = v_parametros.id_proceso_wf_act;
-          if((v_codigo_estado_siguiente in ('impreso', 'anulado','depositado')) or (v_tipo in('debito_automatico','transferencia_carta') and v_codigo_estado_siguiente='cobrado'))then
+
+                    if((v_codigo_estado_siguiente in ('impreso', 'anulado','depositado')) or (v_tipo in (select f.codigo
+                                                                                                      from param.tforma_pago f  
+                                                                                                      where f.codigo not in ('transferencia_exterior','transferencia_interna','transf_interna_debe',
+                                                                                                                 'transf_interna_haber','cheque')) and v_codigo_estado_siguiente='cobrado'))then
 
             SELECT LBRBAN.fecha,LBRBAN.id_cuenta_bancaria into g_fecha, v_id_cuenta_bancaria
             FROM tes.tts_libro_bancos LBRBAN
@@ -887,8 +900,12 @@ BEGIN
           end if;
 
           --VERIFICAMOS SI ES UN DEPOSITO, transferencia o debito automatico
-         	IF(v_tipo in (select fo.codigo from param.tforma_pago fo where fo.tipo  = 'Ingreso') or 
-               v_tipo in ('deposito','debito_automatico','transferencia_carta') ) Then
+         	IF(v_tipo in (             
+                      select f.codigo
+                      from param.tforma_pago f  
+                      where f.codigo not in ('transferencia_exterior','transferencia_interna','transf_interna_debe',
+                                             'transf_interna_haber','cheque'))
+               ) Then
                     if(v_codigo_estado_siguiente in ('depositado','cobrado') AND g_indice IS NULL)then
                     --Obtenemos el numero de indice que sera asignado al nuevo registro
                     Select max(lb.indice)
