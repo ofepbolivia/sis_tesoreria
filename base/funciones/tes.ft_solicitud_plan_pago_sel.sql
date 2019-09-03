@@ -266,7 +266,8 @@ BEGIN
                         plapa.monto_establecido,
                         pro.id_proveedor,
                         pro.nit,
-                        plapa.id_proveedor_cta_bancaria
+                        plapa.id_proveedor_cta_bancaria,
+                        dcv.id_doc_compra_venta::integer
 
                         from tes.tplan_pago plapa
                         inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = plapa.id_proceso_wf
@@ -285,6 +286,7 @@ BEGIN
 
                         left join param.tdepto depc on depc.id_depto = plapa.id_depto_conta
                         left join conta.tint_comprobante tcon on tcon.id_int_comprobante = plapa.id_int_comprobante
+                        left join conta.tdoc_compra_venta dcv on dcv.id_plan_pago = plapa.id_plan_pago
                        where  plapa.estado_reg=''activo''  and '||v_filtro;
 
 			--Definicion de la respuesta
@@ -385,6 +387,8 @@ BEGIN
                         left join param.tdepto depto on depto.id_depto = plapa.id_depto_lb
                         left join tes.tts_libro_bancos lb on plapa.id_int_comprobante = lb.id_int_comprobante
                         left join conta.tint_comprobante tcon on tcon.id_int_comprobante = plapa.id_int_comprobante
+
+                        left join conta.tdoc_compra_venta dcv on dcv.id_plan_pago = plapa.id_plan_pago
 
                        where  plapa.estado_reg=''activo''   and '||v_filtro;
 
