@@ -439,6 +439,8 @@ BEGIN
               NULL as nro_comprobante,
               NULL as comprobante_sigma,
               NULL as nro_cheque,
+              NULL AS nro_deposito,
+              NULL AS tipo,              
               NULL as debe,
               NULL as haber,
 
@@ -471,6 +473,12 @@ BEGIN
               LB.nro_comprobante,
               LB.comprobante_sigma,
               LB.nro_cheque,
+              LB.nro_deposito,
+              case when LB.tipo in ( select codigo from param.tforma_pago f where f.tipo = ''Gasto'') then
+	              		''Gasto''::varchar
+                    else
+                    	''Ingreso''::varchar
+    	            end as tipo,               
               case when LB.importe_deposito = 0 then
                   NULL
               else

@@ -119,7 +119,9 @@ class MODTsLibroBancos extends MODbase{
 		$this->captura('nro_liquidacion','varchar');
 		$this->captura('nro_comprobante','varchar');
 		$this->captura('comprobante_sigma','varchar');
-		$this->captura('nro_cheque','varchar');
+        $this->captura('nro_cheque','varchar');
+        $this->captura('nro_deposito','varchar');
+        $this->captura('tipo','varchar');
 		$this->captura('importe_deposito','text');
 		$this->captura('importe_cheque','text');
 		$this->captura('saldo','text');

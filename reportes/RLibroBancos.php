@@ -66,7 +66,7 @@ require_once dirname(__FILE__).'/../../pxp/pxpReport/Report.php';
 			$this->Cell($width7, $height, 'Nº Liq/Cite', $blackAll, 0, 'C', true, '', 1, false, 'T', 'C');
 			$this->Cell($width4, $height, 'Nº Com.', $blackAll, 0, 'C', true, '', 1, false, 'T', 'C');
 			$this->Cell($width8, $height, 'Com. Sigma', $blackAll, 0, 'C', true, '', 1, false, 'T', 'C');
-			$this->Cell($width4, $height, 'Nº Cheque', $blackAll, 0, 'C', true, '', 1, false, 'T', 'C');								
+			$this->Cell($width4, $height, 'Nº Documento', $blackAll, 0, 'C', true, '', 1, false, 'T', 'C');								
 			$this->Cell($width5, $height, 'Debe', $blackAll, 0, 'C', true, '', 1, false, 'T', 'C');
 			$this->Cell($width5, $height, 'Haber', $blackAll, 0, 'C', true, '', 1, false, 'T', 'C');
 		}else{
@@ -76,7 +76,7 @@ require_once dirname(__FILE__).'/../../pxp/pxpReport/Report.php';
 			$this->Cell($width7, $height, 'Nº Liq/Cite', $blackAll, 0, 'C', true, '', 1, false, 'T', 'C');
 			$this->Cell($width4, $height, 'Nº Com.', $blackAll, 0, 'C', true, '', 1, false, 'T', 'C');
 			$this->Cell($width8, $height, 'Com. Sigma', $blackAll, 0, 'C', true, '', 1, false, 'T', 'C');
-			$this->Cell($width4, $height, 'Nº Cheque', $blackAll, 0, 'C', true, '', 1, false, 'T', 'C');								
+			$this->Cell($width4, $height, 'Nº Documento', $blackAll, 0, 'C', true, '', 1, false, 'T', 'C');								
 			$this->Cell($width5, $height, 'Debe', $blackAll, 0, 'C', true, '', 1, false, 'T', 'C');
 			$this->Cell($width5, $height, 'Haber', $blackAll, 0, 'C', true, '', 1, false, 'T', 'C');
 			$this->Cell($width5, $height, 'Saldos', $blackAll, 0, 'C', true, '', 1, false, 'T', 'C');			
@@ -176,12 +176,14 @@ Class RLibroBancos extends Report {
 		}
         $saldo_final=0;
 		$total_debe=0;
-		$total_haber=0;
+        $total_haber=0;
+        $nro_document = '';
 		$RowArray;
 		foreach($dataSource->getDataset() as $row) {
             
 			if($this->getDataSource()->getParameter('estado') != 'Todos' )
 			{
+                if ($row['tipo'] == 'Gasto') {$document= $row['nro_cheque'];}else{ $nro_document = $row['nro_deposito'];}
 				$RowArray = array(
 							'fecha_reporte'  =>  $row['fecha_reporte'],
 							'a_favor'  => $row['a_favor'],
@@ -189,11 +191,12 @@ Class RLibroBancos extends Report {
 							'nro_liquidacion' => $row['nro_liquidacion'],
 							'nro_comprobante' => $row['nro_comprobante'],
 							'comprobante_sigma' => $row['comprobante_sigma'],
-							'nro_cheque' => $row['nro_cheque'],
+							'nro_cheque' => $nro_document,
 							'importe_deposito' => $row['importe_deposito'],
 							'importe_cheque' => $row['importe_cheque']
 						);
 			}else{
+                if ($row['tipo'] == 'Gasto') {$nro_document= $row['nro_cheque'];}else{ $nro_document = $row['nro_deposito'];}
 				$RowArray = array(
 							'fecha_reporte'  =>  $row['fecha_reporte'],
 							'a_favor'  => $row['a_favor'],
@@ -201,7 +204,7 @@ Class RLibroBancos extends Report {
 							'nro_liquidacion' => $row['nro_liquidacion'],
 							'nro_comprobante' => $row['nro_comprobante'],
 							'comprobante_sigma' => $row['comprobante_sigma'],
-							'nro_cheque' => $row['nro_cheque'],
+							'nro_cheque' => $nro_document,
 							'importe_deposito' => $row['importe_deposito'],
 							'importe_cheque' => $row['importe_cheque'],
 							'saldo' => $row['saldo']
