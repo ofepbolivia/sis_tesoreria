@@ -191,7 +191,7 @@ header("content-type: text/javascript; charset=UTF-8");
 						if(record.data['num_tramite'].search('REP-')>=0){
 							return String.format('{0}', '<FONT COLOR="'+record.data['color']+'"><b>'+'C.CH. '+value+'</b></FONT>');
 						}						
-						return String.format('{0}', '<FONT COLOR="'+record.data['color']+'"><b>'+'PG '+value+'</b></FONT>');
+						return String.format('{0}', '<FONT COLOR="'+record.data['color']+'"><b>'+value+'</b></FONT>');
 					}else{
 						if(record.data['sistema_origen']=='FONDOS_AVANCE'){
 							return String.format('{0}', '<FONT COLOR="'+record.data['color']+'"><b>'+'F.A. '+value+'</b></FONT>');					

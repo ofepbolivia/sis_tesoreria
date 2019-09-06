@@ -245,7 +245,7 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
 						return String.format('{0}', '<FONT COLOR="'+record.data['color']+'"><b>'+'F.A. '+value+'</b></FONT>');
 					}else{
 						if(record.data['sistema_origen']=='KERP')						
-							return String.format('{0}', '<FONT COLOR="'+record.data['color']+'"><b>'+'PG '+value+'</b></FONT>');					
+							return String.format('{0}', '<FONT COLOR="'+record.data['color']+'"><b>'+value+'</b></FONT>');					
 						else
 							return String.format('{0}', '<FONT COLOR="'+record.data['color']+'"><b>'+value+'</b></FONT>');
 					}
