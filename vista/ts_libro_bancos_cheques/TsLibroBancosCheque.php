@@ -380,7 +380,7 @@ header("content-type: text/javascript; charset=UTF-8");
 		{
 			config:{
 				name: 'nro_cheque',
-				fieldLabel: 'Nro Documento',
+				fieldLabel: 'Nro Documento Gasto.',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 80,
@@ -736,7 +736,8 @@ header("content-type: text/javascript; charset=UTF-8");
 		{name:'notificado', type: 'string'},
 		{name:'tramite', type: 'string'},
         {name:'id_forma_pago',type:'numeric'},
-        {name:'desc_forma_pago',  type:'string'}
+        {name:'desc_forma_pago',  type:'string'},
+        {name:'tipo_i_g', type: 'string'}
 		
 	],
         sortInfo : {
@@ -1245,12 +1246,15 @@ header("content-type: text/javascript; charset=UTF-8");
 		
 		onButtonEdit:function(){
 			Phx.vista.TsLibroBancosCheque.superclass.onButtonEdit.call(this);
-			//this.cmpTipo.disable();			
-			var data = this.getSelectedData();			           
-			if(data.tipo=='cheque')
+			//this.cmpTipo.disable();            
+            			
+			var data = this.getSelectedData();			                       
+			if(data.tipo_i_g == 'Gasto'){            
 				this.mostrarComponente(this.cmpNroCheque);
-			else
+            }
+			else{
 				this.ocultarComponente(this.cmpNroCheque);
+            }
 			if(data.estado=='impreso' || data.estado=='entregado' || data.estado=='cobrado'){
 				this.cmpDepto.disable();
 				this.cmpFecha.disable();
