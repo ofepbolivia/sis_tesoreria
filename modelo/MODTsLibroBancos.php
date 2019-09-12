@@ -65,6 +65,7 @@ class MODTsLibroBancos extends MODbase{
         $this->captura('fecha_pago','date');        
         $this->captura('id_forma_pago','int4');
         $this->captura('desc_forma_pago','varchar');
+        $this->captura('tipo_i_g','varchar');
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		//var_dump($this->consulta);exit;

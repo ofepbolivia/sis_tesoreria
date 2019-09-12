@@ -792,7 +792,8 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
 		{name:'fecha_pago', type: 'string'},
         {name:'nro_deposito', type: 'string'},
         {name:'id_forma_pago',type:'numeric'},
-        {name:'desc_forma_pago',  type:'string'}
+        {name:'desc_forma_pago',  type:'string'},
+        {name:'tipo_i_g', type:'string'}
 
 	],
 	sortInfo:{
@@ -968,21 +969,30 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
 		//this.cmpTipo.disable();
 		var data = this.getSelectedData();	        				
         
-		if(data.tipo=='cheque'){
+        
+		if(data.tipo_i_g == 'Gasto'){
+            this.ocultarComponente(this.cmpImporteDeposito);
+            this.ocultarComponente(this.cmpNroDeposito);
 			this.mostrarComponente(this.cmpNroCheque);
 			this.mostrarComponente(this.cmpImporteCheque);
-		}
-		else{
+		}else if(data.tipo_i_g == 'Ingreso'){
+            this.mostrarComponente(this.cmpImporteDeposito);
+            this.mostrarComponente(this.cmpNroDeposito);
+            this.ocultarComponente(this.cmpNroCheque);
+			this.ocultarComponente(this.cmpImporteCheque);
+        }
+/* 		else{
 			this.ocultarComponente(this.cmpNroCheque);
-			if(data.tipo=='deposito'){                                
+			if(data.tipo_i_g=='Ingreso'){                                
 				this.mostrarComponente(this.cmpImporteDeposito);
+                this.mostrarComponente(this.cmpNroDeposito);
 				this.ocultarComponente(this.cmpImporteCheque);
 			}
 			else{                                
 				this.mostrarComponente(this.cmpImporteCheque);
 				this.ocultarComponente(this.cmpImporteDeposito);
 			}
-		}
+		} */
 		if(data.estado=='impreso' || data.estado=='entregado' || data.estado=='cobrado'|| data.estado=='depositado'){
 			this.cmpDepto.disable();
 			this.cmpFecha.disable();
