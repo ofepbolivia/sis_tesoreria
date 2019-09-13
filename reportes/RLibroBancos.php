@@ -8,6 +8,7 @@ require_once dirname(__FILE__).'/../../pxp/pxpReport/Report.php';
     
     public function setDataSource(DataSource $dataSource) {
         $this->dataSource = $dataSource;
+        //var_dump($this->dataSource);exit;
     }
     
     public function getDataSource() {
@@ -186,8 +187,8 @@ Class RLibroBancos extends Report {
                 if ($row['tipo'] == 'Gasto') {$document= $row['nro_cheque'];}else{ $nro_document = $row['nro_deposito'];}
 				$RowArray = array(
 							'fecha_reporte'  =>  $row['fecha_reporte'],
-							'a_favor'  => $row['a_favor'],
-							'detalle'    => $row['detalle'],
+							'a_favor'  => trim($row['a_favor']),
+							'detalle'    => trim($row['detalle']),
 							'nro_liquidacion' => $row['nro_liquidacion'],
 							'nro_comprobante' => $row['nro_comprobante'],
 							'comprobante_sigma' => $row['comprobante_sigma'],
@@ -199,8 +200,8 @@ Class RLibroBancos extends Report {
                 if ($row['tipo'] == 'Gasto') {$nro_document= $row['nro_cheque'];}else{ $nro_document = $row['nro_deposito'];}
 				$RowArray = array(
 							'fecha_reporte'  =>  $row['fecha_reporte'],
-							'a_favor'  => $row['a_favor'],
-							'detalle'    => $row['detalle'],
+							'a_favor'  => trim($row['a_favor']),
+							'detalle'    => trim($row['detalle']),
 							'nro_liquidacion' => $row['nro_liquidacion'],
 							'nro_comprobante' => $row['nro_comprobante'],
 							'comprobante_sigma' => $row['comprobante_sigma'],
