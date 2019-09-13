@@ -183,8 +183,7 @@ Class RLibroBancos extends Report {
 		foreach($dataSource->getDataset() as $row) {
             
 			if($this->getDataSource()->getParameter('estado') != 'Todos' )
-			{
-                if ($row['tipo'] == 'Gasto') {$document= $row['nro_cheque'];}else{ $nro_document = $row['nro_deposito'];}
+			{                
 				$RowArray = array(
 							'fecha_reporte'  =>  $row['fecha_reporte'],
 							'a_favor'  => trim($row['a_favor']),
@@ -192,12 +191,11 @@ Class RLibroBancos extends Report {
 							'nro_liquidacion' => $row['nro_liquidacion'],
 							'nro_comprobante' => $row['nro_comprobante'],
 							'comprobante_sigma' => $row['comprobante_sigma'],
-							'nro_cheque' => $nro_document,
+							'nro_cheque' => ($row['tipo'] == 'Gasto')?$row['nro_cheque']:$row['nro_deposito'],
 							'importe_deposito' => $row['importe_deposito'],
 							'importe_cheque' => $row['importe_cheque']
 						);
-			}else{
-                if ($row['tipo'] == 'Gasto') {$nro_document= $row['nro_cheque'];}else{ $nro_document = $row['nro_deposito'];}
+			}else{                                
 				$RowArray = array(
 							'fecha_reporte'  =>  $row['fecha_reporte'],
 							'a_favor'  => trim($row['a_favor']),
@@ -205,7 +203,7 @@ Class RLibroBancos extends Report {
 							'nro_liquidacion' => $row['nro_liquidacion'],
 							'nro_comprobante' => $row['nro_comprobante'],
 							'comprobante_sigma' => $row['comprobante_sigma'],
-							'nro_cheque' => $nro_document,
+							'nro_cheque' => ($row['tipo'] == 'Gasto')?$row['nro_cheque']:$row['nro_deposito'],
 							'importe_deposito' => $row['importe_deposito'],
 							'importe_cheque' => $row['importe_cheque'],
 							'saldo' => $row['saldo']
