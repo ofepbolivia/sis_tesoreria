@@ -113,6 +113,10 @@ header("content-type: text/javascript; charset=UTF-8");
 
             //llama al constructor de la clase padre
             Phx.vista.SoliPlanPago.superclass.constructor.call(this, config);
+
+            //(f.e.a)3/9/2019
+            //var cuenta_bancaria = {};
+
             this.init();
             this.iniciarEventos();
 
@@ -742,7 +746,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                 direction: 'ASC'
                             },
                             totalProperty: 'total',
-                            fields: ['id_cuenta_bancaria', 'nro_cuenta', 'nombre_institucion', 'codigo_moneda', 'centro', 'denominacion', 'id_moneda'],
+                            fields: ['id_cuenta_bancaria', 'nro_cuenta', 'nombre_institucion', 'codigo_moneda', 'centro', 'denominacion', 'id_moneda', 'tipo_moneda'],
                             remoteSort: true,
                             baseParams: {
                                 par_filtro: 'nro_cuenta'
@@ -1046,7 +1050,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     resizable: true,
                     // turl: '../../../sis_contabilidad/vista/doc_compra_venta/SolDocCompraVentaCbte.php',
                     turl: '../../../sis_contabilidad/vista/doc_compra_venta/SolDocCompraVentaPP.php',
-                    ttitle: 'Formulario de Documento Compra/Venta',
+                    ttitle: 'Nota de Crédito / Débito',
                     // tconfig: {width: '35%', height: '50%'},
                     tname: 'id_doc_compra_venta',
                     tdata: {},
@@ -2216,43 +2220,58 @@ header("content-type: text/javascript; charset=UTF-8");
             this.Cmp.id_doc_compra_venta.store.baseParams.id_plan_pago = data.id_plan_pago;
             this.Cmp.id_doc_compra_venta.tdata.id_padre = this.idContenedor;
             this.Cmp.id_doc_compra_venta.tdata.momento = this.accionFormulario;
+            //(c comen)
             this.Cmp.id_doc_compra_venta.tdata.tipo_cambio = this.Cmp.tipo_cambio.getValue();
 
-            console.log('llega ppmayedtmodat', this.maestro.id_moneda)
+
+
             //(may) tipo de cambio solo muestre para la moneda en dolares
             this.Cmp.id_cuenta_bancaria.on('select', function (cmb, rec, i) {
+                //(c no comen)
+                //this.Cmp.id_doc_compra_venta.tdata.id_moneda = rec.data.id_moneda;
+                //this.Cmp.id_doc_compra_venta.tdata.tipo_moneda = rec.data.tipo_moneda;
+
+                //(f.e.a)asignamos el objeto cuenta Bancaria
+                //cuenta_bancaria = rec.data;
+                //this.Cmp.id_doc_compra_venta.tdata.cuenta_bancaria = cuenta_bancaria;
+
                 if (this.maestro.id_moneda != rec.data.id_moneda ) {
                     this.mostrarComponente(this.Cmp.tipo_cambio);
-                    //this.Cmp.tipo_cambio.setValue(1);
+                    this.Cmp.tipo_cambio.reset();
                 } else {
                     this.ocultarComponente(this.Cmp.tipo_cambio);
                     this.Cmp.tipo_cambio.reset();
                 }
             }, this);
 
+
+
             //(may) segun el monto de la factura actualiza el Monto de Crédito/Débito
             this.Cmp.id_doc_compra_venta.on('select', function (cmb, rec, i) {
-                //console.log('llega monto', rec.data.importe_doc)
-                console.log('llega tipocambio',  this.Cmp.tipo_cambio.getValue())
-
-                console.log('llega maestro',  this.maestro.id_moneda)
-                console.log('llega factura',  cmb, 'rec',rec.data)
+               // this.Cmp.id_doc_compra_venta.tdata.cuenta_bancaria = cuenta_bancaria;
 
                 if (this.maestro.id_moneda != rec.data.id_moneda ) {
-                    console.log('llega 1',  this.Cmp.tipo_cambio.getValue())
                     //if (rec.data.tipo_cambio == null || rec.data.tipo_cambio == ''){
                         //rec.data.tipo_cambio = 1;
                     //}
                     if (rec.data.id_moneda == 2){
-                        console.log('llega 2',  this.Cmp.tipo_cambio.getValue())
+                        console.log('llega1',rec.data.importe_doc * rec.data.tipo_cambio)
                         this.Cmp.monto_no_pagado.setValue(rec.data.importe_doc * rec.data.tipo_cambio);
                     }else{
-                        console.log('llega 3',  this.Cmp.tipo_cambio.getValue())
-                        this.Cmp.monto_no_pagado.setValue(rec.data.importe_doc / this.Cmp.tipo_cambio.getValue());
+                        console.log('llega2',this.Cmp.tipo_cambio.getValue())
+                        if (  this.Cmp.tipo_cambio.getValue() != null  || this.Cmp.tipo_cambio.getValue() == '' || this.Cmp.tipo_cambio.getValue() == 1)  {
+                            this.Cmp.tipo_cambio.setVisible(true);
+                            this.Cmp.tipo_cambio.enable();
+                            this.Cmp.tipo_cambio.focus(false,200);
+
+                            this.Cmp.tipo_cambio.on('blur', function () {
+                                this.Cmp.monto_no_pagado.setValue(rec.data.importe_doc / this.Cmp.tipo_cambio.getValue());
+                                this.calculaMontoPago();
+                            },this);
+                        }
+
                     }
                 }else{
-                    console.log('llega else',  this.Cmp.tipo_cambio.getValue())
-
                     this.Cmp.monto_no_pagado.setValue(rec.data.importe_doc);
                 }
                 this.calculaMontoPago();
@@ -2261,14 +2280,28 @@ header("content-type: text/javascript; charset=UTF-8");
 
         },
         definirDC: function (importe, id_documentos) {
+            /*if (v_tipo_cambio != 1 ) {
+                Phx.CP.getPagina(idContenedor).onDestroy();
+                Ext.Msg.show({
+                    title: 'Alerta',
+                    msg: '<b> Estimado Usuario: <br><br><span style="color: red;">Sus notas han sido añadidas con éxito.</span></b>',
+                    buttons: Ext.Msg.OK,
+                    width: 512,
+                    icon: Ext.Msg.WARNING
+                });
 
-            Ext.Msg.show({
-                title: 'Alerta',
-                msg: '<b> Estimado Usuario: <br><br><span style="color: red;">Su nota han sido añadidas con exito.</span></b>',
-                buttons: Ext.Msg.OK,
-                width: 512,
-                icon: Ext.Msg.WARNING
-            });
+            }else{
+                Phx.CP.getPagina(idContenedor).onDestroy();
+                Ext.Msg.show({
+                    title: 'Alerta',
+                    msg: '<b> Estimado Usuario: <br><br><span style="color: red;">Falta registrar el Tipo de Cambio de la Cuota.</span></b>',
+                    buttons: Ext.Msg.OK,
+                    width: 512,
+                    icon: Ext.Msg.WARNING
+                });
+
+            }*/
+            console.log('importe',importe,'id_documentos',id_documentos);
             this.Cmp.monto_no_pagado.setValue(importe);
             this.argumentExtraSubmit = {documentos: id_documentos};
         },
@@ -2831,6 +2864,8 @@ header("content-type: text/javascript; charset=UTF-8");
 
         onButtonNew: function () {
             this.accionFormulario = 'NEW';
+            //c no comen
+            //this.id_moneda_cb = null;
             //this.Cmp.id_doc_compra_venta.tdata.tipo_cambio = this.Cmp.tipo_cambio.getValue();
             Phx.vista.SoliPlanPago.superclass.onButtonNew.call(this);
             this.ocultarGrupo(2); //ocultar el grupo de ajustes
@@ -2875,18 +2910,22 @@ header("content-type: text/javascript; charset=UTF-8");
 
             this.Cmp.id_doc_compra_venta.tdata.tipo_cambio = this.getComponente('tipo_cambio').getValue();
 
+            // c no comen
+            //this.Cmp.id_doc_compra_venta.tdata.id_moneda_cb = this.id_moneda_cb;
+
             console.log('llega en new m', this.getComponente('tipo_cambio'), this.getComponente('tipo_cambio').getValue());
-
-
-            console.log('llega ppmay', this.maestro.id_moneda)
-
 
             //(may) tipo de cambio solo muestre para la moneda en dolares
             this.mostrarComponente(this.Cmp.tipo_cambio);
             this.Cmp.id_cuenta_bancaria.on('select', function (cmb, rec, i) {
+                //c no comen
+               // this.id_moneda_cb = rec.data.id_moneda;
+
+                //(f.e.a)asignamos el objeto cuenta Bancaria
+                //((cuenta_bancaria = rec;
+
                 if (this.maestro.id_moneda != rec.data.id_moneda ) {
                     this.mostrarComponente(this.Cmp.tipo_cambio);
-                    //this.Cmp.tipo_cambio.setValue(1);
                 } else {
                     this.ocultarComponente(this.Cmp.tipo_cambio);
                     this.Cmp.tipo_cambio.reset();
@@ -2895,27 +2934,35 @@ header("content-type: text/javascript; charset=UTF-8");
 
             //(may) segun el monto de la factura actualiza el Monto de Crédito/Débito
             this.Cmp.id_doc_compra_venta.on('select', function (cmb, rec, i) {
-                //console.log('llega monto', rec.data.importe_doc)
-                console.log('llega tipocambio',  this.Cmp.tipo_cambio.getValue())
-
-                console.log('llega maestro',  this.maestro.id_moneda)
-                console.log('llega factura',  cmb, 'rec',rec.data)
 
                 if (this.maestro.id_moneda != rec.data.id_moneda ) {
-                    console.log('llega 1',  this.Cmp.tipo_cambio.getValue())
                     //if (rec.data.tipo_cambio == null || rec.data.tipo_cambio == ''){
                     //rec.data.tipo_cambio = 1;
                     //}
                     if (rec.data.id_moneda == 2){
-                        console.log('llega 2',  this.Cmp.tipo_cambio.getValue())
                         this.Cmp.monto_no_pagado.setValue(rec.data.importe_doc * rec.data.tipo_cambio);
                     }else{
-                        console.log('llega 3',  this.Cmp.tipo_cambio.getValue())
-                        this.Cmp.monto_no_pagado.setValue(rec.data.importe_doc / this.Cmp.tipo_cambio.getValue());
+                        if (  this.Cmp.tipo_cambio.getValue() == null  || this.Cmp.tipo_cambio.getValue() == '' || this.Cmp.tipo_cambio.getValue() == 1)  {
+                            this.Cmp.tipo_cambio.setVisible(true);
+                            this.Cmp.tipo_cambio.enable();
+                            this.Cmp.tipo_cambio.focus(false,200);
+
+                            this.Cmp.tipo_cambio.on('blur', function () {
+                                this.Cmp.monto_no_pagado.setValue(rec.data.importe_doc / this.Cmp.tipo_cambio.getValue());
+                                this.calculaMontoPago();
+                            },this);
+                        }else{
+                            this.Cmp.tipo_cambio.setVisible(true);
+                            this.Cmp.tipo_cambio.enable();
+                            this.Cmp.tipo_cambio.focus(false,200);
+
+                            this.Cmp.tipo_cambio.on('blur', function () {
+                                this.Cmp.monto_no_pagado.setValue(rec.data.importe_doc / this.Cmp.tipo_cambio.getValue());
+                                this.calculaMontoPago();
+                            },this);
+                        }
                     }
                 }else{
-                    console.log('llega else',  this.Cmp.tipo_cambio.getValue())
-
                     this.Cmp.monto_no_pagado.setValue(rec.data.importe_doc);
                 }
                 this.calculaMontoPago();
@@ -3054,9 +3101,9 @@ header("content-type: text/javascript; charset=UTF-8");
             )
 
         },
-        cargarCuenta: function (id_proveedor_cta_bancaria, nro_cuenta_bancaria) {
+        cargarCuenta: function (id_proveedor_cta_bancaria, nro_cuenta) {
             this.Cmp.id_proveedor_cta_bancaria.setValue(id_proveedor_cta_bancaria);
-            this.Cmp.id_proveedor_cta_bancaria.setRawValue(id_proveedor_cta_bancaria);
+            this.Cmp.id_proveedor_cta_bancaria.setRawValue(nro_cuenta);
             console.log('cargar cuenta valor', this.Cmp.id_proveedor_cta_bancaria)
         }
 
