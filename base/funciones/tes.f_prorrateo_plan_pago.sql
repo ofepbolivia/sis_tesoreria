@@ -8,10 +8,10 @@ CREATE OR REPLACE FUNCTION tes.f_prorrateo_plan_pago (
 )
 RETURNS boolean AS
 $body$
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'TES_PLAPAPA_INS'
  	#DESCRIPCION:	insercion del prorrateo del plan de pagos
- 	#AUTOR:		RAC KPLIAN	
+ 	#AUTOR:		RAC KPLIAN
  	#FECHA:  23/12/2013
 	***********************************/
 
@@ -32,34 +32,34 @@ v_factor numeric;
 v_monto_ejecutar_total_mb numeric;
 v_tipo_cambio numeric;
 v_monto_ejecutar_total_mo_devengado numeric;
- 
+
 BEGIN
 
  v_nombre_funcion = 'tes.f_prorrateo_plan_pago';
- 
- 
-      select 
+
+
+      select
        pp.tipo_cambio,
        pp.monto,
        pp.tipo
      into
        v_registros_plan_pago
      FROM
-       tes.tplan_pago pp 
+       tes.tplan_pago pp
      WHERE
      pp.id_plan_pago = p_id_plan_pago;
- 
-    
-      IF (p_id_plan_pago_fk is NULL  or v_registros_plan_pago.tipo = 'ant_aplicado' ) THEN 
+
+
+      IF (p_id_plan_pago_fk is NULL  or v_registros_plan_pago.tipo = 'ant_aplicado' ) THEN
             ------------------------------------------------------------------------------
             --  SI ES UNA CUOTA DE DEVENGADO,   o una cuota de aplicacion de anticipo
             --  Inserta prorrateo automatico para cuota de devengado
             ------------------------------------------------------------------------------
-             
-             --acumulador del monto a pagar inciado en cero
-             v_monto_total=0; 
 
-             --IF p_pago_variable = 'si' THEN
+             --acumulador del monto a pagar inciado en cero
+             v_monto_total=0;
+
+             IF p_pago_variable = 'no' THEN
 
              --si los pagos no son variables entonces puede hacerce un prorrateo automatico
 
@@ -125,7 +125,7 @@ BEGIN
                       where pp.id_plan_pago = p_id_plan_pago;
 
 
-          /* se comenta porque no daba al clonar los registros del prorrate0
+
            ELSE
               --si los pagos no son automatico solo insertamos la base del prorrateo con valor cero
 
@@ -166,7 +166,7 @@ BEGIN
                     update  tes.tplan_pago pp set
                     total_prorrateado=p_monto_ejecutar_total_mo
                     where pp.id_plan_pago = p_id_plan_pago;
-              END IF;*/
+              END IF;
       ELSE
       -------------------------------------------------------------------------------
       -- SI ES UNA CUOTA DE PAGO

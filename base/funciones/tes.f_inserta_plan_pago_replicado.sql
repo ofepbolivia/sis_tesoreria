@@ -332,7 +332,7 @@ BEGIN
             ------------------------------------------------
            IF not ( SELECT * FROM tes.f_prorrateo_plan_pago( v_id_plan_pago,
                										 (p_hstore->'id_obligacion_pago')::integer,
-                                                     v_registros.pago_variable,
+                                                     'no',
                                                      (p_hstore->'monto_ejecutar_total_mo')::numeric,
                                                      p_id_usuario)) THEN
 
@@ -376,3 +376,6 @@ VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
 COST 100;
+
+ALTER FUNCTION tes.f_inserta_plan_pago_replicado (p_administrador integer, p_id_usuario integer, p_hstore public.hstore, p_salta boolean)
+  OWNER TO mperez;
