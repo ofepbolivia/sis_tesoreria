@@ -730,7 +730,11 @@ header("content-type: text/javascript; charset=UTF-8");
 			  var data = this.getSelectedData();
 			  
 			  Phx.vista.TsLibroBancosDepositoExtra.superclass.preparaMenu.call(this,n); 
-			  
+              if(data['tipo'] == 'transf_interna_debe' || data['tipo'] == 'transf_interna_haber'){
+                    this.getBoton('btnClonar').disable();
+                }else{
+                    this.getBoton('btnClonar').enable();
+                }
 			  if(data['id_proceso_wf'] !== null){
 				  if(data['estado']=='borrador'){
 					this.getBoton('edit').enable();

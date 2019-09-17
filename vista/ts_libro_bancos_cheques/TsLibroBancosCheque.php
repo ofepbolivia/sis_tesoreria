@@ -821,9 +821,12 @@ header("content-type: text/javascript; charset=UTF-8");
 			  //var tb =this.tbar;
 			  
 			  Phx.vista.TsLibroBancosCheque.superclass.preparaMenu.call(this,n); 
-			  
+              if(data['tipo'] == 'transf_interna_debe' || data['tipo'] == 'transf_interna_haber'){
+                    this.getBoton('btnClonar').disable();
+                }else{
+                    this.getBoton('btnClonar').enable();
+                }
 			  if(data['id_proceso_wf'] !== null){
-			
 			  if(data['tipo'] == 'cheque'){				  
 				  this.getBoton('btnChequeoDocumentosWf').enable();
 				  this.getBoton('diagrama_gantt').enable();
@@ -873,8 +876,9 @@ header("content-type: text/javascript; charset=UTF-8");
 					}
 				  }
 				  
-			  }else{
-				  //this.getBoton('btnMemoramdum').disable();
+			  }
+              else{                
+				  //this.getBoton('btnMemoramdum').disable();                  
 				  this.getBoton('btnNotificacion').disable();				  
 				  this.getBoton('btnCheque').disable();
 				  this.getBoton('btnCheque2').disable();				

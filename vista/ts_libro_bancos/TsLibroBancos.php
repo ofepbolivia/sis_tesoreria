@@ -826,7 +826,7 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
 		
 		var data = this.getSelectedData();
 		var NumSelect=this.sm.getCount();
-		
+        		
 		if(NumSelect != 0)
 		{            
 			this.onButtonNew();			
@@ -835,7 +835,9 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
 			this.cmpObservaciones = this.getComponente('observaciones');
 			this.cmpDetalle = this.getComponente('detalle');		
 			this.cmpNroLiquidacion = this.getComponente('nro_liquidacion');
-			this.cmpIdLibroBancosFk = this.getComponente('id_libro_bancos_fk');				
+			this.cmpIdLibroBancosFk = this.getComponente('id_libro_bancos_fk');
+            this.cmpNroCheque = this.getComponente('nro_cheque');
+            this.cmpNroDeposito = this.getComponente('nro_deposito');
 			this.cmpTipo.setValue(data.tipo);
 			this.cmpAFavor.setValue(data.a_favor);
 			this.cmpObservaciones.setValue(data.observaciones);
@@ -849,12 +851,16 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
 			
 			this.cmpTipo.fireEvent('select',this,record);
 			
-			if(data.tipo=='deposito'){			
+			if(data.tipo_i_g=='Ingreso'){			
 				this.ocultarComponente(this.cmpImporteCheque);
-				this.mostrarComponente(this.cmpImporteDeposito);				
+                this.ocultarComponente(this.cmpNroCheque);
+                this.mostrarComponente(this.cmpNroDeposito);
+				this.mostrarComponente(this.cmpImporteDeposito);
 			}
 			else{
 				this.mostrarComponente(this.cmpImporteCheque);
+                this.mostrarComponente(this.cmpNroCheque);
+                this.ocultarComponente(this.cmpNroDeposito);
 				this.ocultarComponente(this.cmpImporteDeposito);
 			}
 		}
@@ -869,7 +875,11 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
 		  //var tb =this.tbar;
 		  
 		  Phx.vista.TsLibroBancos.superclass.preparaMenu.call(this,n); 
-		  
+          if(data['tipo'] == 'transf_interna_debe' || data['tipo'] == 'transf_interna_haber'){
+                this.getBoton('btnClonar').disable();
+            }else{
+                this.getBoton('btnClonar').enable();
+            }		  
 		  if(data['id_proceso_wf'] !== null){
 			
 			  if(data['tipo'] == 'cheque'){				  
@@ -919,7 +929,7 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
 					}
 				  }
 				  
-			  }else{
+			  }else{                
 				  this.getBoton('btnMemoramdum').disable();
 				  this.getBoton('btnNotificacion').disable();				  
 				  this.getBoton('btnCheque').disable();
