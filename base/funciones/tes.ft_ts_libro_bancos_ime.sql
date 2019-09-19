@@ -214,9 +214,17 @@ BEGIN
                 Into g_saldo_deposito
                 From tes.tts_libro_bancos lb
                 Where lb.id_libro_bancos = v_parametros.id_libro_bancos_fk;
+                  
+                  --control para la cuenta CUT
+                  select tcb.nro_cuenta
+                  into v_nro_cuenta
+                  from tes.tcuenta_bancaria tcb
+                  where tcb.id_cuenta_bancaria = v_parametros.id_cuenta_bancaria;
 
                 If(v_parametros.importe_cheque > g_saldo_deposito) Then
-                  raise exception 'El importe que intenta registrar: % Bs., excede el saldo del deposito asociado: % Bs. Por favor revise el saldo.',v_parametros.importe_cheque,g_saldo_deposito;
+                    if v_nro_cuenta != '05780102002' then
+                        raise exception 'El importe que intenta registrar: % Bs., excede el saldo del deposito asociado: % Bs. Por favor revise el saldo.',v_parametros.importe_cheque,g_saldo_deposito;
+                    end if;
                 End If;
 
               END IF; --fin de la verificacio si es un registro asociado a un deposito
@@ -349,6 +357,8 @@ BEGIN
         	    raise exception 'Registro no almacenado, no pertenece a la gestion de la cuenta bancaria, revise la fecha';
     		END IF;*/
 
+            
+
             IF(v_parametros.id_libro_bancos_fk is null and g_centro in ('no','esp') and v_form_pago.tipo!='Ingreso')THEN
 				raise exception 'Los datos a ingresar deben tener un deposito asociado. Ingrese los datos a traves de Depositos y Cheques.';
 	        END IF;
@@ -403,9 +413,17 @@ BEGIN
              where lbr.fecha <= v_parametros.fecha
              and lbr.id_cuenta_bancaria = v_parametros.id_cuenta_bancaria;
 
+            --control para la cuenta CUT
+            select tcb.nro_cuenta
+            into v_nro_cuenta
+            from tes.tcuenta_bancaria tcb
+            where tcb.id_cuenta_bancaria = v_parametros.id_cuenta_bancaria;
+
             --Comparamos el saldo de la cuenta bancaria con el importe del cheque
             IF(v_importe_gasto > g_saldo_cuenta_bancaria) Then
-              raise exception 'El importe que intenta registrar excede el saldo general de la cuenta bancaria al %. Por favor revise el saldo de la cuenta al %.',v_parametros.fecha,v_parametros.fecha;
+                if v_nro_cuenta != '05780102002' then
+                    raise exception 'El importe que intenta registrar excede el saldo general de la cuenta bancaria al %. Por favor revise el saldo de la cuenta al %.',v_parametros.fecha,v_parametros.fecha;
+                end if;
             End If;
 
 
