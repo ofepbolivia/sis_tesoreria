@@ -46,7 +46,7 @@ class RConformidad extends  ReportePDFFormulario {
 		$this->firma['datos_documento']['proveedor'] = $proveedor;
 		$this->firma['datos_documento']['numero_cuota'] = $numero_cuota;
 		$this->firma['datos_documento']['fecha_conformidad'] = $fecha_conformidad;
-		$this->firma['datos_documento']['conformidad'] = $conformidad;
+		//$this->firma['datos_documento']['conformidad'] = $conformidad;
 
 
 
