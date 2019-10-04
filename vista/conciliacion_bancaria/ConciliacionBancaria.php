@@ -331,8 +331,16 @@ header("content-type: text/javascript; charset=UTF-8");
 		},
 		
 		onButtonEdit:function(){
-			Phx.vista.ConciliacionBancaria.superclass.onButtonEdit.call(this);			
+			Phx.vista.ConciliacionBancaria.superclass.onButtonEdit.call(this);
 			var data = this.getSelectedData();
+
+            this.Cmp.id_periodo.on('focus',function(c,r,n){
+
+                this.Cmp.id_periodo.reset();
+                this.Cmp.id_periodo.store.baseParams={id_gestion:data.id_gestion, vista: 'reporte'};
+                this.Cmp.id_periodo.modificado=true;
+
+            },this);
 		},
 		
         iniciarEventos:function(){

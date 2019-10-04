@@ -160,11 +160,11 @@ BEGIN
             LB.tipo in   ('cheque',
                                             'deposito',
                                             'debito_automatico',
-                                            'transferencia_carta')
-            and
-            LB.id_finalidad in (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13);                  
+                                            'transferencia_carta');
+
 	if v_count = 0 then v_count = 1; end if;
-  insert into  tt_conciliacion_t3 (nombre_institucion,nro_cuenta,denominacion,moneda,nro_cheque,concepto,total_haber,indice,fecha)
+
+    insert into  tt_conciliacion_t3 (nombre_institucion,nro_cuenta,denominacion,moneda,nro_cheque,concepto,total_haber,indice,fecha)
          select
          ins.nombre,
          cuba.nro_cuenta,
@@ -186,8 +186,6 @@ BEGIN
                                         'deposito',
                                         'debito_automatico',
                                         'transferencia_carta')
-                          and
-                          lbr.id_finalidad in (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13)
                           ) as total_haber,
         LB.indice,
         v_fecha_repo
@@ -205,8 +203,6 @@ BEGIN
                                         'deposito',
                                         'debito_automatico',
                                         'transferencia_carta')
-        and
-        LB.id_finalidad in (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13)              
           order by lb.fecha, lbp.indice, lb.nro_cheque asc
           offset v_count - 1;
                   
