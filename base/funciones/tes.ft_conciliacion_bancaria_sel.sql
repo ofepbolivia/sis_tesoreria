@@ -63,7 +63,12 @@ BEGIN
                                  usu1.cuenta as usr_reg,
                                  usu2.cuenta as usr_mod,
                                  fun.desc_funcionario2 as fun_elabo,
-                                 fu.desc_funcionario2  as fun_vb                                      
+                                 fu.desc_funcionario2  as fun_vb,
+                                 conci.estado,
+                                 conci.saldo_real_1,
+            					 conci.saldo_real_2,
+                                 conci.saldo_libros,
+                                 (conci.saldo_real_1 - conci.saldo_real_2)::numeric as diferencia                                                                       
                           from tes.tconciliacion_bancaria conci
                           inner join segu.tusuario usu1 on usu1.id_usuario = conci.id_usuario_reg
                           left join segu.tusuario usu2 on usu2.id_usuario = conci.id_usuario_mod
@@ -121,107 +126,89 @@ BEGIN
 	elsif(p_transaccion='TES_RECONCBAN_SEL')then
 
 		begin                        
-      --Sentencia de la consulta de conteo de registros  
-    create temp table tt_conciliacion_t3 (
-        nombre_institucion 	varchar,
-        nro_cuenta 			varchar,
-        denominacion		varchar,
-        moneda				varchar,
-        nro_cheque 			varchar,
-        concepto			text,        
-        total_haber 		numeric(18,2),
-        indice 				numeric(18,2),
-        fecha				date                
-    ) on commit drop;       
-	v_periodo = v_parametros.id_periodo;
+       --Sentencia de la consulta de conteo de registros  
+        create temp table tt_conciliacion_t3 (
+            nombre_institucion 	varchar,
+            nro_cuenta 			varchar,
+            denominacion		varchar,
+            moneda				varchar,
+            nro_cheque 			varchar,
+            concepto			text,        
+            total_haber 		numeric(18,2),
+            fecha				date                
+        ) on commit drop;
+    
+    	v_periodo = v_parametros.id_periodo;
 
         select per.fecha_fin
 	           into v_fecha_repo                
         from param.tperiodo per 
         where per.id_periodo = v_periodo;
-              
-   for i in 1..3 loop
-   
-        select per.fecha_ini, per.fecha_fin
-         into  v_fecha_ini, v_fecha_fin
-        from param.tperiodo per 
-        where per.id_periodo = v_periodo;  
-
-        SELECT
-           into v_count 
-            count(lb.id_cuenta_bancaria)
-            FROM tes.tts_libro_bancos LB
-            LEFT JOIN tes.tts_libro_bancos lbp on lbp.id_libro_bancos=LB.id_libro_bancos_fk
-            WHERE
-            LB.id_cuenta_bancaria = v_parametros.id_cuenta_bancaria and
-            LB.fecha BETWEEN v_fecha_ini and   v_fecha_fin 
-            and LB.estado in ('impreso', 'entregado' )
-            and
-            LB.tipo in   ('cheque',
-                                            'deposito',
-                                            'debito_automatico',
-                                            'transferencia_carta');
-
-	if v_count = 0 then v_count = 1; end if;
-
-    insert into  tt_conciliacion_t3 (nombre_institucion,nro_cuenta,denominacion,moneda,nro_cheque,concepto,total_haber,indice,fecha)
-         select
-         ins.nombre,
-         cuba.nro_cuenta,
-         cuba.denominacion,
-         mon.moneda,                
-         case when v_count > 1 then
-         'VARIOS'::varchar
-         else                
-         ''||LB.nro_cheque||''::varchar end,         
-        ('CHEQUES EN CIRCULACION '||upper(tes.f_month(lb.fecha))||'/'||substr((''||extract(year from lb.fecha)||'')::text,3,4)),         
-        (Select sum(lbr.importe_cheque)
-                         From tes.tts_libro_bancos lbr
-                         where lbr.fecha BETWEEN  v_fecha_ini and  LB.fecha
-                         and lbr.id_cuenta_bancaria = LB.id_cuenta_bancaria
-                         and 
-                          lbr.estado in ('impreso', 'entregado' )
-                          and
-                         lbr.tipo in   ('cheque',
-                                        'deposito',
-                                        'debito_automatico',
-                                        'transferencia_carta')
-                          ) as total_haber,
-        LB.indice,
-        v_fecha_repo
-        FROM tes.tts_libro_bancos LB
-        left join tes.tts_libro_bancos lbp on lbp.id_libro_bancos=LB.id_libro_bancos_fk
-        left join tes.tcuenta_bancaria cuba on cuba.id_cuenta_bancaria = lb.id_cuenta_bancaria
-        left join param.tinstitucion ins on ins.id_institucion = cuba.id_institucion
-        left join param.tmoneda mon on mon.id_moneda = cuba.id_moneda
-        WHERE
-        LB.id_cuenta_bancaria = v_parametros.id_cuenta_bancaria and
-        LB.fecha BETWEEN  v_fecha_ini and   v_fecha_fin 
-        and LB.estado in ('impreso', 'entregado' )
-        and
-        LB.tipo in   ('cheque',
-                                        'deposito',
-                                        'debito_automatico',
-                                        'transferencia_carta')
-          order by lb.fecha, lbp.indice, lb.nro_cheque asc
-          offset v_count - 1;
-                  
-        v_periodo = v_periodo - 1;
-	end loop;  
     
+    
+          with recursive det ( inst, nr_c, co, cou, saldo, mone, deno, nc) as (
+              select 
+                  ins.nombre as nombre_institucion,
+                  cuba.nro_cuenta,
+                 ('CHEQUES EN CIRCULACION '||upper(tes.f_month(cbre.fecha))||'/'||substr((''||extract(year from cbre.fecha)||'')::text,3,4)),
+                 (select count(id_periodo)
+                          from tes.tconciliacion_bancaria_rep
+                          where id_conciliacion_bancaria = cbre.id_conciliacion_bancaria
+                          and id_periodo = cbre.id_periodo) as contador,
+                 case when cbre.periodo_1 is not null then 
+                  cbre.periodo_1
+                  when cbre.periodo_2 is not null then 
+                  cbre.periodo_2
+                  when cbre.periodo_3 is not null then 
+                  cbre.periodo_3
+                  end as saldo,
+                  mon.moneda,
+                  cuba.denominacion,
+                  cbre.nro_cheque
+              from tes.tconciliacion_bancaria_rep cbre
+              inner join tes.tconciliacion_bancaria cb on cb.id_conciliacion_bancaria = cbre.id_conciliacion_bancaria
+              inner join tes.tcuenta_bancaria cuba on cuba.id_cuenta_bancaria = cb.id_cuenta_bancaria
+              inner join param.tinstitucion ins on ins.id_institucion = cuba.id_institucion
+              inner join param.tmoneda mon on mon.id_moneda = cuba.id_moneda
+              where  cbre.id_conciliacion_bancaria = v_parametros.id_conciliacion_bancaria)
+
+	  	insert into  tt_conciliacion_t3 (nombre_institucion, nro_cuenta, concepto, moneda, nro_cheque, denominacion, total_haber, fecha)
+                      
+          select 
+              inst,
+              nr_c,
+              co,
+              mone,
+              case when cou > 1 then
+              'VARIOS'::varchar
+              when cou = 1  then              
+              ''||nc||''::varchar end,              
+              deno,
+          	  saldo,
+              v_fecha_repo
+          from det;
+                
+              
       v_consulta:='select
       			   t3.nombre_institucion,
                    t3.nro_cuenta,
                    t3.concepto,
                    to_char(t3.fecha,''dd/mm/yyyy'')::text as fecha,
-                   t3.total_haber as saldo,
+                   sum(t3.total_haber) as saldo,
                    t3.moneda,
                    t3.denominacion,
                    t3.nro_cheque    
                  from tt_conciliacion_t3 t3
                  where  t3.total_haber > 0 and';
-			v_consulta:=v_consulta||v_parametros.filtro;
-
+			v_consulta:= v_consulta||v_parametros.filtro;
+			v_consulta:= v_consulta||'group by t3.nro_cheque,
+            						  t3.nombre_institucion,
+                                      t3.nro_cuenta,
+                                      t3.concepto,
+                                      t3.fecha,
+                                      t3.moneda,
+					                  t3.denominacion
+            			order by t3.fecha desc ';
 			--Devuelve la respuesta
 			return v_consulta;
 
@@ -250,7 +237,8 @@ BEGIN
                         deta.importe,
                         deta.nro_comprobante,
                         deta.tipo,
-                        tes.f_saldo_cuenta_bancaria(conba.id_cuenta_bancaria,conba.id_periodo) as sal_ext_ban,
+                        --tes.f_saldo_cuenta_bancaria(conba.id_cuenta_bancaria,conba.id_periodo) as sal_ext_ban,
+                        conba.saldo_libros as sal_ext_ban,                        
                         param.f_literal_periodo(conba.id_periodo)as periodo,
                         ges.gestion,
                         cban.nro_cuenta,
@@ -274,7 +262,63 @@ BEGIN
 			--Devuelve la respuesta
 			return v_consulta;
 
-		end;                    
+		end;            
+      /*********************************
+      #TRANSACCION:  'TES_DETREPCONBA_SEL'
+      #DESCRIPCION:	Consulta de datos
+      #AUTOR:		Breydi vasquez pacheco
+      #FECHA:		18-09-2019
+      ***********************************/
+
+      elsif(p_transaccion='TES_DETREPCONBA_SEL')then
+
+          begin        
+             v_consulta:='select cbre.id_conciliacion_bancaria_rep,
+                                 cbre.id_conciliacion_bancaria,
+                                 cbre.nro_cheque,
+                                 cbre.periodo_1,
+                                 cbre.periodo_2,
+                                 cbre.periodo_3,
+                                 cbre.total_haber,
+                                 cbre.estado,
+                                 cbre.detalle,
+                                 cbre.observacion,
+                                 cbre.fecha,
+                                 cbre.fecha_reg,
+                                 usu1.cuenta as usr_reg,
+                                 usu2.cuenta as usr_mod
+                        from tes.tconciliacion_bancaria_rep cbre
+                        inner join segu.tusuario usu1 on usu1.id_usuario = cbre.id_usuario_reg
+                        left join segu.tusuario usu2 on usu2.id_usuario = cbre.id_usuario_mod
+                        where cbre.total_haber > 0 and ';
+                  v_consulta:=v_consulta||v_parametros.filtro;
+				  v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+                  raise notice '%',v_consulta;
+                  --Devuelve la respuesta
+                  return v_consulta;
+		end; 
+      /*********************************
+      #TRANSACCION:  'TES_DETREPCONBA_CONT'
+      #DESCRIPCION:	Consulta de datos
+      #AUTOR:		Breydi vasquez pacheco
+      #FECHA:		18-09-2019
+      ***********************************/
+
+      elsif(p_transaccion='TES_DETREPCONBA_CONT')then
+
+          begin        
+             v_consulta:='select count(cbre.id_conciliacion_bancaria_rep),
+              					 sum(cbre.periodo_1) as total_1,
+                                 sum(cbre.periodo_2) as total_2,
+                                 sum(cbre.periodo_3) as total_3
+                        from tes.tconciliacion_bancaria_rep cbre
+                        inner join segu.tusuario usu1 on usu1.id_usuario = cbre.id_usuario_reg
+                        left join segu.tusuario usu2 on usu2.id_usuario = cbre.id_usuario_mod
+                        where cbre.total_haber > 0 and ';
+                  v_consulta:=v_consulta||v_parametros.filtro;
+                  --Devuelve la respuesta
+                  return v_consulta;
+		end;                
 	else
 
 		raise exception 'Transaccion inexistente';

@@ -1959,3 +1959,37 @@ ALTER TABLE tes.tplan_pago
 ALTER TABLE tes.tplan_pago
   ALTER COLUMN tipo_cambio SET DEFAULT 1;
 /*****************************F-SCP-MAY-TES-0-07/08/2019*************/
+
+/*****************************I-SCP-BVP-TES-0-09/10/2019*************/
+CREATE TABLE tes.tconciliacion_bancaria_rep (
+  id_conciliacion_bancaria_rep SERIAL,
+  id_libro_bancos INTEGER NOT NULL,
+  id_libro_bancos_fk INTEGER,
+  periodo_3 NUMERIC(20,2),
+  total_haber NUMERIC(20,2),
+  fecha DATE,
+  id_conciliacion_bancaria INTEGER NOT NULL,
+  nro_cheque VARCHAR(255),
+  detalle TEXT,
+  observacion TEXT,
+  periodo_1 NUMERIC(20,2),
+  periodo_2 NUMERIC(20,2),
+  estado VARCHAR(50),
+  id_periodo INTEGER,
+  CONSTRAINT tconciliacion_bancaria_rep_pkey PRIMARY KEY(id_conciliacion_bancaria_rep)
+) INHERITS (pxp.tbase)
+WITH (oids = false);
+
+ALTER TABLE tes.tconciliacion_bancaria
+  ADD COLUMN estado VARCHAR(50);
+
+ALTER TABLE tes.tconciliacion_bancaria
+  ADD COLUMN saldo_real_1 NUMERIC(18,2);
+  
+ALTER TABLE tes.tconciliacion_bancaria
+  ADD COLUMN saldo_real_2 NUMERIC(18,2); 
+
+ALTER TABLE tes.tconciliacion_bancaria
+  ADD COLUMN saldo_libros NUMERIC(18,2);
+
+/*****************************F-SCP-BVP-TES-0-09/10/2019*************/

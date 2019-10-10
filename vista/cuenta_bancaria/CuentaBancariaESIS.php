@@ -130,7 +130,7 @@ Phx.vista.CuentaBancariaESIS = {
 		var rec = this.sm.getSelected();
 		Phx.CP.loadWindows('../../../sis_tesoreria/vista/conciliacion_bancaria/ConciliacionBancaria.php', 'Conciliacion Bancaria', {
 			modal : true,
-			width : '60%',
+			width : '80%',
 			height : '90%',
 		}, rec.data, this.idContenedor, 'ConciliacionBancaria');
 	},

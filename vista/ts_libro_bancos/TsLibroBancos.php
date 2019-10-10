@@ -15,9 +15,9 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
 
 	constructor:function(config){
 		this.maestro=config.maestro;
-        this.tbarItems = ['-','<b style="color: red;">Gestion:</b>','-','-',
+        /*this.tbarItems = ['-','<b style="color: red;">Gestion:</b>','-','-',
             this.cmbGestion,'-'
-        ];
+        ];*/
     	//llama al constructor de la clase padre
 		Phx.vista.TsLibroBancos.superclass.constructor.call(this,config);
 		this.init();

@@ -35,8 +35,12 @@ class MODConciliacionBancaria extends MODbase{
 		$this->captura('usr_reg','varchar');
 		$this->captura('usr_mod','varchar');
 		$this->captura('fun_elabo','text');
-		$this->captura('fun_vb','text');		
-		
+        $this->captura('fun_vb','text');
+        $this->captura('estado','varchar');
+        $this->captura('saldo_real_1','numeric');
+        $this->captura('saldo_real_2','numeric');
+        $this->captura('saldo_libros','numeric');
+		$this->captura('diferencia','numeric');
 		//Ejecuta la instruccion
 		$this->armarConsulta();			
 		$this->ejecutarConsulta();
@@ -256,7 +260,67 @@ class MODConciliacionBancaria extends MODbase{
 
 		//Devuelve la respuesta
 		return $this->respuesta;
-	}
-	
+    }
+    function regDetalleRepo(){
+        $this->procedimiento='tes.ft_conciliacion_bancaria_ime';
+		$this->transaccion='TES_DETCOBREP_INS';
+        $this->tipo_procedimiento='IME';            
+
+        $this->setParametro('id_conciliacion_bancaria', 'id_conciliacion_bancaria' , 'int4');
+        $this->setParametro('id_cuenta_bancaria', 'id_cuenta_bancaria' , 'int4');
+        $this->setParametro('id_periodo', 'id_periodo', 'int4');
+        $this->setParametro('id_usuario_ai','id_usuario_ai','int4');
+        $this->setParametro('nombre_usuario_ai','nombre_usuario_ai','varchar');
+        
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        return $this->respuesta;
+    }
+	function detalleConciliaRepo (){
+        //Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='tes.ft_conciliacion_bancaria_sel';
+		$this->transaccion='TES_DETREPCONBA_SEL';
+        $this->tipo_procedimiento='SEL';//tipo de transaccion
+        
+        $this->capturaCount('total_1','numeric');
+        $this->capturaCount('total_2','numeric');
+        $this->capturaCount('total_3','numeric');
+
+		//Definicion de la lista del resultado del query
+		$this->captura('id_conciliacion_bancaria_rep','int4');
+		$this->captura('id_conciliacion_bancaria','int4');		
+		$this->captura('nro_cheque','varchar');
+        $this->captura('periodo_1','numeric');
+        $this->captura('periodo_2','numeric');
+        $this->captura('periodo_3','numeric');
+        $this->captura('total_haber', 'numeric');
+        $this->captura('estado', 'varchar');
+        $this->captura('detalle','text');
+        $this->captura('observacion', 'text');
+        $this->captura('fecha','date');
+		$this->captura('fecha_reg','timestamp');
+		$this->captura('usr_reg','varchar');
+		$this->captura('usr_mod','varchar');			
+		
+		//Ejecuta la instruccion
+        $this->armarConsulta();
+        //echo($this->consulta);exit;		
+		$this->ejecutarConsulta();
+		//Devuelve la respuesta
+		return $this->respuesta;
+    }
+    function finalizarConciliacion(){
+        $this->procedimiento='tes.ft_conciliacion_bancaria_ime';
+		$this->transaccion='TES_FINCONCI_FIN';
+        $this->tipo_procedimiento='IME';
+        
+        $this->setParametro('id_conciliacion_bancaria', 'id_conciliacion_bancaria' , 'int4');
+        
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        return $this->respuesta;
+    }    
 }
 ?>
