@@ -1985,11 +1985,21 @@ ALTER TABLE tes.tconciliacion_bancaria
 
 ALTER TABLE tes.tconciliacion_bancaria
   ADD COLUMN saldo_real_1 NUMERIC(18,2);
-  
+
 ALTER TABLE tes.tconciliacion_bancaria
-  ADD COLUMN saldo_real_2 NUMERIC(18,2); 
+  ADD COLUMN saldo_real_2 NUMERIC(18,2);
 
 ALTER TABLE tes.tconciliacion_bancaria
   ADD COLUMN saldo_libros NUMERIC(18,2);
 
 /*****************************F-SCP-BVP-TES-0-09/10/2019*************/
+
+/*****************************I-SCP-MAY-TES-0-04/10/2019*************/
+ALTER TABLE tes.tcuenta_bancaria
+  ADD COLUMN id_proveedor_cta_bancaria INTEGER;
+/*****************************F-SCP-MAY-TES-0-04/10/2019*************/
+
+/*****************************I-SCP-MAY-TES-0-16/10/2019*************/
+ALTER TABLE tes.tplan_pago
+  ADD COLUMN id_multa INTEGER;
+/*****************************F-SCP-MAY-TES-0-16/10/2019*************/

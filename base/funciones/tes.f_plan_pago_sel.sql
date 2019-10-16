@@ -266,7 +266,9 @@ BEGIN
                         plapa.monto_establecido,
                         pro.id_proveedor,
                         pro.nit,
-                        plapa.id_proveedor_cta_bancaria
+                        plapa.id_proveedor_cta_bancaria,
+                        mul.id_multa,
+                        mul.desc_multa
 
                         from tes.tplan_pago plapa
                         inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = plapa.id_proceso_wf
@@ -285,6 +287,7 @@ BEGIN
 
                         left join param.tdepto depc on depc.id_depto = plapa.id_depto_conta
                         left join conta.tint_comprobante tcon on tcon.id_int_comprobante = plapa.id_int_comprobante
+                        left join sigep.tmulta mul on mul.id_multa = plapa.id_multa
 
 
                        where  plapa.estado_reg=''activo''  and '||v_filtro;
@@ -942,7 +945,7 @@ BEGIN
 	elsif(p_transaccion='TES_PROCRE_SEL')then
 
 		begin
-        
+
 			v_consulta:='SELECT
                                 obli.id_proveedor,
                                 obli.id_moneda,
@@ -966,7 +969,7 @@ BEGIN
                                 inner join conta.tint_comprobante com on com.id_int_comprobante = pla.id_int_comprobante
                                 left join   leg.tcontrato cc on cc.id_contrato = obli.id_contrato
                                  WHERE pla.fecha_dev >= '''||v_parametros.fecha_ini||''' and pla.fecha_dev <= '''||v_parametros.fecha_fin||''' and (pla.estado in (''devengado'') and monto_retgar_mo != 0 or pla.estado in (''devuelto'' )) ';
-			
+
             if (v_parametros.id_proveedor >0) then
                 v_consulta:= v_consulta || 'and cc.id_proveedor = '||v_parametros.id_proveedor;
             end if;
@@ -976,7 +979,7 @@ BEGIN
 			--Definicion de la respuesta
             --v_consulta:=v_consulta||v_parametros.filtro;
 			 v_consulta:=v_consulta||'ORDER BY proveedor, obli.num_tramite, pla.nro_cuota ASC';
-			
+
             raise notice '% .',v_consulta;
 			--Devuelve la respuesta
 			return v_consulta;

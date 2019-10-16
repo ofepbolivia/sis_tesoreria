@@ -199,6 +199,10 @@ DECLARE
     v_estado					varchar;
 
     v_parametros_pp				record;
+    v_monto_pp					numeric;
+    v_id_plantilla				integer;
+    v_id_obligacion_pago_pp		integer;
+    v_numero_tramite			varchar;
 
 
 BEGIN
@@ -599,7 +603,7 @@ BEGIN
                      v_monto_ant_parcial_descontado = tes.f_determinar_total_faltante(v_parametros.id_obligacion_pago, 'ant_parcial_descontado' );
                      IF v_monto_ant_parcial_descontado + v_registros_pp.descuento_anticipo <  v_parametros.descuento_anticipo  THEN
 
-                          raise exception 'El decuento por anticipo no puede exceder el faltante por descontar que es  %',v_monto_ant_parcial_descontado;
+                          raise exception 'El descuento por anticipo no puede exceder el faltante por descontar que es  %',v_monto_ant_parcial_descontado;
 
                      END IF;
 
@@ -626,7 +630,7 @@ BEGIN
                      END IF;
 
 
-                      --si es un pago variable, controla que el total del plan de pago no sea mayor a lo comprometido
+                      --(may)si es un pago variable, controla que el total del plan de pago no sea mayor a lo comprometido
                       		--SELECT sum(pp.monto_ejecutar_total_mo)
                             SELECT sum(pp.monto_establecido)
                             INTO v_sum_monto_pp
@@ -693,7 +697,7 @@ BEGIN
                     from tes.tobligacion_pago
                     where id_obligacion_pago = v_parametros.id_obligacion_pago;
 
-                   IF (v_tipo_obligacion != 'sp' and v_tipo_obligacion != 'spd' and v_tipo_obligacion != 'spi' and v_tipo_obligacion != 'pago_especial_spi' )THEN
+                 /*  IF (v_tipo_obligacion != 'sp' and v_tipo_obligacion != 'spd' and v_tipo_obligacion != 'spi' and v_tipo_obligacion != 'pago_especial_spi' )THEN
 
                     --valida si forma_pago es igual a forma_pago cuenta bancaria
                    	  IF v_id_cuenta_bancaria is Not NULL THEN
@@ -706,7 +710,7 @@ BEGIN
                               raise exception 'Modificar la Forma de Pago, este pertenece como  %  para la Cuenta Bancaria %', UPPER(v_forma_pago_cb), v_nro_cuenta;
                         END IF;
                       END IF;
-                   END IF;
+                   END IF; */
               --
 
                END IF;
@@ -952,7 +956,8 @@ BEGIN
             fecha_conclusion_pago = v_parametros.fecha_conclusion_pago,
             /*es_ultima_cuota = v_parametros.es_ultima_cuota*/
             monto_establecido =v_monto_establecido,
-            id_proveedor_cta_bancaria = v_parametros.id_proveedor_cta_bancaria
+            id_proveedor_cta_bancaria = v_parametros.id_proveedor_cta_bancaria,
+            id_multa = v_parametros.id_multa
 
             where id_plan_pago = v_parametros.id_plan_pago;
 
@@ -991,7 +996,7 @@ BEGIN
 
 
 
-            IF v_registros_pp.tipo not in ('ant_parcial','anticipo','dev_garantia','dev_garantia_con','dev_garantia_con_ant') THEN
+             IF v_registros_pp.tipo not in ('ant_parcial','anticipo','dev_garantia','dev_garantia_con','dev_garantia_con_ant') THEN
 
                    ----------------------------------------------------------------------
                    -- Inserta prorrateo automatico  si no es algun tipo decuota sin prorrateo (sin presupeustos)
@@ -1275,7 +1280,7 @@ BEGIN
            inner join tes.tobligacion_pago op on op.id_obligacion_pago = pp.id_obligacion_pago
            where pp.id_plan_pago = v_parametros.id_plan_pago;
 
-v_pre_integrar_presupuestos = pxp.f_get_variable_global('pre_integrar_presupuestos');
+	v_pre_integrar_presupuestos = pxp.f_get_variable_global('pre_integrar_presupuestos');
 	IF v_pre_integrar_presupuestos = 'true' THEN
            /*jrr:29/10/2014
            1) si el presupuesto no esta comprometido*/
@@ -1620,7 +1625,11 @@ v_pre_integrar_presupuestos = pxp.f_get_variable_global('pre_integrar_presupuest
             pp.estado,
             pp.id_estado_wf,
             op.tipo_obligacion,
-            pp.id_depto_lb
+            pp.id_depto_lb,
+            pp.monto,
+            pp.id_plantilla,
+            pp.id_obligacion_pago,
+            op.num_tramite
         into
             v_id_plan_pago,
             v_id_proceso_wf,
@@ -1632,7 +1641,11 @@ v_pre_integrar_presupuestos = pxp.f_get_variable_global('pre_integrar_presupuest
             v_estado_aux,
             v_id_estado_actual,
             v_tipo_obligacion,
-            v_id_depto_lb_pp
+            v_id_depto_lb_pp,
+            v_monto_pp,
+            v_id_plantilla,
+            v_id_obligacion_pago_pp,
+            v_numero_tramite
 
         from tes.tplan_pago  pp
         inner  join tes.tobligacion_pago op on op.id_obligacion_pago = pp.id_obligacion_pago
@@ -1803,6 +1816,61 @@ v_pre_integrar_presupuestos = pxp.f_get_variable_global('pre_integrar_presupuest
                                             v_codigo_estado_siguiente) THEN
 
           END IF;
+
+          --(may) controla que el total del plan de pago no sea mayor a lo comprometido
+
+          IF (v_estado_aux = 'borrador') THEN
+
+          		SELECT sum(pp.monto_establecido)
+                INTO v_sum_monto_pp
+                FROM tes.tplan_pago pp
+                WHERE pp.estado != 'anulado' and pp.estado != 'pago_exterior' and pp.estado != 'pagado'
+                and pp.estado_reg != 'anulado'
+                and pp.id_obligacion_pago = v_id_obligacion_pago_pp;
+
+                SELECT pp.monto_establecido
+                INTO v_sum_monto_solo_pp
+                FROM tes.tplan_pago pp
+                WHERE pp.id_plan_pago= v_id_plan_pago;
+
+                SELECT sum(pe.monto)
+                INTO v_sum_monto_pe
+                FROM pre.tpartida_ejecucion pe
+                join tes.tobligacion_pago opa on opa.num_tramite = pe.nro_tramite
+                WHERE pe.tipo_movimiento = 'comprometido'
+                and opa.id_obligacion_pago = v_id_obligacion_pago_pp;
+              raise exception 'llegaa %',v_sum_monto_pe;
+                SELECT pc.codigo_tipo_relacion
+                INTO v_codigo_tipo_relacion
+                FROM param.tplantilla p
+                inner join conta.tplantilla_calculo pc on pc.id_plantilla = p.id_plantilla
+                WHERE  pc.codigo_tipo_relacion = 'IVA-CF'
+                and p.id_plantilla = v_id_plantilla;
+
+                --para los que se descuentan el IVA 13%
+                IF (v_codigo_tipo_relacion = 'IVA-CF') THEN
+
+                    v_porcentaje13_monto = COALESCE(v_monto_pp * 0.13, 0);
+                    v_monto_establecido  = COALESCE(v_monto_pp, 0) - v_porcentaje13_monto;
+
+                    v_sum_total_pp = (v_sum_monto_pp - v_sum_monto_solo_pp) + v_monto_establecido;
+
+                   IF ((v_sum_total_pp) > v_sum_monto_pe) THEN
+                      raise exception ' El monto total de las cuotas es de % y excede al monto total certificado de % para el trámite %. Comunicarse con la Unidad de Presupuestos. ',v_sum_total_pp, v_sum_monto_pe, v_numero_tramite;
+                   END IF;
+
+               ELSE
+
+                 v_monto_establecido  = COALESCE(v_monto_pp);
+                 v_sum_total_pp = (COALESCE(v_sum_monto_pp,0) - COALESCE(v_sum_monto_solo_pp, 0)) + COALESCE(v_monto_pp, 0);
+
+                   IF ((v_sum_total_pp) > v_sum_monto_pe) THEN
+                      raise exception ' El monto total de las cuotas es de % y excede al monto total certificado de % para el trámite %. Comunicarse con la Unidad de Presupuestos. ',v_sum_total_pp, v_sum_monto_pe, v_numero_tramite;
+                   END IF;
+               END IF;
+
+          END IF;
+
 
           ---
           /*------------------------------------------------------------------

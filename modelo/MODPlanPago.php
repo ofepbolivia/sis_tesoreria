@@ -126,6 +126,8 @@ class MODPlanPago extends MODbase{
         $this->captura('nit','varchar');
 
         $this->captura('id_proveedor_cta_bancaria','integer');
+        $this->captura('id_multa','integer');
+        $this->captura('desc_multa','varchar');
 
         //Ejecuta la instruccion
         $this->armarConsulta();
@@ -213,6 +215,7 @@ class MODPlanPago extends MODbase{
 
         $this->setParametro('monto_establecido','monto_establecido','numeric');
         $this->setParametro('id_proveedor_cta_bancaria','id_proveedor_cta_bancaria','int4');
+        $this->setParametro('id_multa','id_multa','int4');
 
 
 
@@ -274,6 +277,7 @@ class MODPlanPago extends MODbase{
 
         $this->setParametro('monto_establecido','monto_establecido','numeric');
         $this->setParametro('id_proveedor_cta_bancaria','id_proveedor_cta_bancaria','int4');
+        $this->setParametro('id_multa','id_multa','int4');
 
 
 
@@ -931,7 +935,7 @@ class MODPlanPago extends MODbase{
 
         $this->setParametro('fecha_ini','fecha_ini','date');
         $this->setParametro('fecha_fin','fecha_fin','date');
-		$this->setParametro('id_proveedor','id_proveedor','integer');
+        $this->setParametro('id_proveedor','id_proveedor','integer');
         $this->setParametro('id_contrato','id_contrato','integer');
         $this->setCount(false);
 
@@ -949,7 +953,7 @@ class MODPlanPago extends MODbase{
         $this->captura('moneda', 'varchar');
         $this->captura('liquido_pagable', 'NUMERIC');
         $this->captura('c31', 'varchar');
-		$this->captura('numero', 'varchar');
+        $this->captura('numero', 'varchar');
 
         //Ejecuta la instruccion
         $this->armarConsulta();
