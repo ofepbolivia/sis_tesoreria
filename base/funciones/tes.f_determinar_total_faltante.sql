@@ -61,7 +61,7 @@ BEGIN
 
 --raise exception 'llega2 %',p_filtro;
 			--(may) 18-07-2019 los tipo pp especial_spi son para las internacionales -tramites SIP
-            IF p_filtro not in ('registrado','registrado_pagado','registrado_monto_ejecutar','especial_total','anticipo_sin_aplicar','total_registrado_pagado','devengado','pagado','ant_parcial','ant_parcial_descontado','ant_aplicado_descontado','dev_garantia','ant_aplicado_descontado_op_variable','especial','especial_spi') THEN
+            IF p_filtro not in ('registrado','registrado_pagado','registrado_monto_ejecutar','especial_total','anticipo_sin_aplicar','total_registrado_pagado','devengado','pagado','ant_parcial','ant_parcial_descontado','ant_aplicado_descontado','dev_garantia','ant_aplicado_descontado_op_variable','especial','especial_spi','dev_garantia_con','dev_garantia_con_ant') THEN
 
               		raise exception 'filtro no reconocido (%) para determinar el total faltante ', p_filtro;
 

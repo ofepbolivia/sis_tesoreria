@@ -942,7 +942,7 @@ BEGIN
 	elsif(p_transaccion='TES_PROCRE_SEL')then
 
 		begin
-
+        
 			v_consulta:='SELECT
                                 obli.id_proveedor,
                                 obli.id_moneda,
@@ -957,18 +957,26 @@ BEGIN
                                 pla.monto_retgar_mo,
                                 mo.moneda,
                                 pla.liquido_pagable,
-                                com.c31
+                                com.c31,
+                                cc.numero
                                 FROM tes.tobligacion_pago obli
                                 inner join tes.tplan_pago pla on pla.id_obligacion_pago = obli.id_obligacion_pago
                                 inner join param.vproveedor pro on pro.id_proveedor = obli.id_proveedor
                                 inner join param.tmoneda mo on mo.id_moneda = obli.id_moneda
                                 inner join conta.tint_comprobante com on com.id_int_comprobante = pla.id_int_comprobante
-                                 WHERE pla.fecha_dev >= '''||v_parametros.fecha_ini||''' and pla.fecha_dev <= '''||v_parametros.fecha_fin||''' and (pla.estado in (''devengado'',''pagado'') and monto_retgar_mo != 0 or pla.estado in (''devuelto'' )) ';
-
+                                left join   leg.tcontrato cc on cc.id_contrato = obli.id_contrato
+                                 WHERE pla.fecha_dev >= '''||v_parametros.fecha_ini||''' and pla.fecha_dev <= '''||v_parametros.fecha_fin||''' and (pla.estado in (''devengado'') and monto_retgar_mo != 0 or pla.estado in (''devuelto'' )) ';
+			
+            if (v_parametros.id_proveedor >0) then
+                v_consulta:= v_consulta || 'and cc.id_proveedor = '||v_parametros.id_proveedor;
+            end if;
+            if (v_parametros.id_contrato >0) then
+            	v_consulta:= v_consulta || 'and cc.id_contrato = '||v_parametros.id_contrato;
+            end if;
 			--Definicion de la respuesta
             --v_consulta:=v_consulta||v_parametros.filtro;
 			 v_consulta:=v_consulta||'ORDER BY proveedor, obli.num_tramite, pla.nro_cuota ASC';
-
+			
             raise notice '% .',v_consulta;
 			--Devuelve la respuesta
 			return v_consulta;
