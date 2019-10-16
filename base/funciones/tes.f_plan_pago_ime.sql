@@ -716,7 +716,7 @@ BEGIN
            -- EDICION DE CUOTAS DEL ANTICIPO   (ant_parcial,anticipo)
            --------------------------------------------------------------
 
-           ELSIF v_registros_pp.tipo in  ('ant_parcial', 'anticipo', 'dev_garantia') THEN
+           ELSIF v_registros_pp.tipo in  ('ant_parcial', 'anticipo', 'dev_garantia','dev_garantia_con','dev_garantia_con_ant') THEN
 
 
 
@@ -991,7 +991,7 @@ BEGIN
 
 
 
-            IF v_registros_pp.tipo not in ('ant_parcial','anticipo','dev_garantia') THEN
+            IF v_registros_pp.tipo not in ('ant_parcial','anticipo','dev_garantia','dev_garantia_con','dev_garantia_con_ant') THEN
 
                    ----------------------------------------------------------------------
                    -- Inserta prorrateo automatico  si no es algun tipo decuota sin prorrateo (sin presupeustos)
@@ -1087,7 +1087,7 @@ BEGIN
            -------------------------------------------------
            --  Eliminacion de cuentas de primer nivel
            ------------------------------------------------
-           IF  v_registros.tipo in  ('devengado_pagado','devengado','devengado_pagado_1c','ant_parcial','anticipo','dev_garantia','especial')   THEN
+           IF  v_registros.tipo in  ('devengado_pagado','devengado','devengado_pagado_1c','ant_parcial','anticipo','dev_garantia','especial','dev_garantia_con','dev_garantia_con_ant')   THEN
                      select
                       max(pp.nro_cuota)
                      into

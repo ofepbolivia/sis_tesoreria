@@ -211,6 +211,8 @@ header("content-type: text/javascript; charset=UTF-8");
                 ['devengado', 'Devengar'],
                 //['devengado_rrhh','Devengar RH'],
                 ['dev_garantia', 'Devolucion de Garantia'], //es similr a un devengar y pagar pero no genera prorrateo directamente
+                ['dev_garantia_con', 'Devolucion de Garantia Gestion Actual'],
+                ['dev_garantia_con_ant', 'Devolucion de Garantia Gestion Anterior'],
                 ['anticipo', 'Anticipo Fact/Rec (No ejecuta presupuesto, necesita Documento)'],
                 ['ant_parcial', 'Anticipo Parcial(No ejecuta presupuesto, Con retenciones parciales en cada pago)']
             ],
@@ -472,6 +474,8 @@ header("content-type: text/javascript; charset=UTF-8");
                         dato = (dato == '' && value == 'ant_parcial') ? 'Anticipo Parcial' : dato;
                         dato = (dato == '' && value == 'ant_rendicion') ? 'Ant. por Rendir' : dato;
                         dato = (dato == '' && value == 'dev_garantia') ? 'Devolucion de Garantia' : dato;
+                        dato = (dato == '' && value == 'dev_garantia_con') ? 'Devolucion de Garantia Gestion Actual' : dato;
+                        dato = (dato == '' && value == 'dev_garantia_con_ant') ? 'Devolucion de Garantia Gestion Anterior' : dato;
                         dato = (dato == '' && value == 'ant_aplicado') ? 'Aplicacion de Anticipo' : dato;
                         dato = (dato == '' && value == 'rendicion') ? 'Rendicion Ant.' : dato;
                         dato = (dato == '' && value == 'ret_rendicion') ? 'Detalle de Rendicion' : dato;
@@ -2482,7 +2486,41 @@ header("content-type: text/javascript; charset=UTF-8");
 
 
             },
+            'dev_garantia_con': function (me) {
+                me.ocultarComponente(me.Cmp.id_plantilla);
+                me.mostrarComponente(me.Cmp.liquido_pagable);
+                me.mostrarComponentesPago(me);
+                me.deshabilitarDescuentos(me);
+                me.ocultarComponente(me.Cmp.descuento_ley);
+                me.ocultarComponente(me.Cmp.obs_descuentos_ley);
+                me.ocultarComponente(me.Cmp.monto_ejecutar_total_mo);
+                me.ocultarComponente(me.Cmp.monto_no_pagado);
+                me.ocultarComponente(me.Cmp.monto_retgar_mo);
+                me.ocultarComponente(me.Cmp.monto_anticipo);
+                me.ocultarGrupo(2); //ocultar el grupo de ajustes
+                me.ocultarGrupo(3); //ocultar el grupo de periodo del costo
 
+                me.ocultarComponente(me.Cmp.id_proveedor_cta_bancaria);
+
+
+            },
+            'dev_garantia_con_ant': function (me) {
+                me.ocultarComponente(me.Cmp.id_plantilla);
+                me.mostrarComponente(me.Cmp.liquido_pagable);
+                me.mostrarComponentesPago(me);
+                me.deshabilitarDescuentos(me);
+                me.ocultarComponente(me.Cmp.descuento_ley);
+                me.ocultarComponente(me.Cmp.obs_descuentos_ley);
+                me.ocultarComponente(me.Cmp.monto_ejecutar_total_mo);
+                me.ocultarComponente(me.Cmp.monto_no_pagado);
+                me.ocultarComponente(me.Cmp.monto_retgar_mo);
+                me.ocultarComponente(me.Cmp.monto_anticipo);
+                me.ocultarGrupo(2); //ocultar el grupo de ajustes
+                me.ocultarGrupo(3); //ocultar el grupo de periodo del costo
+
+                me.ocultarComponente(me.Cmp.id_proveedor_cta_bancaria);
+
+            },
             'especial': function (me) {
                 me.ocultarComponente(me.Cmp.id_plantilla);
                 me.mostrarComponente(me.Cmp.liquido_pagable);
