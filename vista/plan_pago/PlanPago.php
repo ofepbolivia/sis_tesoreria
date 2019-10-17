@@ -1470,7 +1470,7 @@ header("content-type: text/javascript; charset=UTF-8");
                             remoteSort: true,
                             baseParams: {par_filtro: 'desc_multa#codigo'}
                         }),
-                    tpl: '<tpl for="."><div class="x-combo-list-item"><p>{desc_multa}</p></div></tpl>',
+                    tpl: '<tpl for="."><div class="x-combo-list-item"><p>{codigo}  {desc_multa}</p></div></tpl>',
                     valueField: 'id_multa',
                     hiddenValue: 'id_multa',
                     displayField: 'desc_multa',
@@ -1479,12 +1479,13 @@ header("content-type: text/javascript; charset=UTF-8");
                     forceSelection: true,
                     typeAhead: false,
                     triggerAction: 'all',
+                    resizable: true,
                     lazyRender: true,
                     mode: 'remote',
                     pageSize: 20,
                     queryDelay: 500,
-
-                    gwidth: 250,
+                    width: 280,
+                    gwidth: 280,
                     minChars: 2,
                     renderer: function (value, p, record) {
                         return String.format('{0}', record.data['desc_multa']);
