@@ -40,7 +40,8 @@ class MODConciliacionBancaria extends MODbase{
         $this->captura('saldo_real_1','numeric');
         $this->captura('saldo_real_2','numeric');
         $this->captura('saldo_libros','numeric');
-		$this->captura('diferencia','numeric');
+        $this->captura('diferencia','numeric');
+        $this->captura('jefe_tesoreria','varchar');
 		//Ejecuta la instruccion
 		$this->armarConsulta();			
 		$this->ejecutarConsulta();
@@ -316,7 +317,7 @@ class MODConciliacionBancaria extends MODbase{
         $this->tipo_procedimiento='IME';
         
         $this->setParametro('id_conciliacion_bancaria', 'id_conciliacion_bancaria' , 'int4');
-        
+        $this->setParametro('tipo_cambio', 'tipo_cambio', 'varchar');
         $this->armarConsulta();
         $this->ejecutarConsulta();
 

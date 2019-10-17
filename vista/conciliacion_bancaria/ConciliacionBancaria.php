@@ -50,6 +50,14 @@ header("content-type: text/javascript; charset=UTF-8");
 				handler:this.Finalizar,
 				tooltip: '<b>Finalizar</b><br/>Finalizar.'
 		    });
+            this.addButton('btnRetroceso', {				
+				text: 'Habilitar Registro',
+				iconCls: 'batras',
+				disabled: false,
+                hidden: true,
+				handler:this.Retroceso,
+				tooltip: '<b>Retroceso:</b><br/> Habilita el registro para procesar los datos nuevamente.'
+		    });            
             Ext.Ajax.request({
                 url: '../../sis_parametros/control/Gestion/obtenerGestionByFecha',
                 params: {fecha: new Date()},
@@ -479,7 +487,8 @@ header("content-type: text/javascript; charset=UTF-8");
         {name:'saldo_real_1', type: 'numeric'},
         {name:'saldo_real_2', type: 'numeric'},
         {name:'saldo_libros', type: 'numeric'},
-        {name:'diferencia', type:'numeric'}
+        {name:'diferencia', type:'numeric'},
+        {name:'jefe_tesoreria', type:'string'}
 	],
 		sortInfo : {			
 			field : 'id_conciliacion_bancaria',
@@ -509,18 +518,31 @@ header("content-type: text/javascript; charset=UTF-8");
 		},
         preparaMenu:function(n){
 		  var data = this.getSelectedData();		              
-            
+                    
 		  Phx.vista.ConciliacionBancaria.superclass.preparaMenu.call(this,n); 
-          if ( data.estado == 'finalizado' ) {
-              this.getBoton('edit').disable();
-              this.getBoton('del').disable();
-              this.getBoton('btnfinalizado').disable();
-              this.getBoton('btnRdetalleRep').disable();
-          }else{
-            this.getBoton('edit').enable();
-            this.getBoton('del').enable();
-            this.getBoton('btnRdetalleRep').enable();
-            this.getBoton('btnfinalizado').enable();
+
+          if ( data.estado == 'finalizado' && data.jefe_tesoreria == 'no') {
+                this.getBoton('edit').disable();
+                this.getBoton('del').disable();
+                this.getBoton('btnfinalizado').disable();
+                this.getBoton('btnRdetalleRep').disable();
+          }else if (data.estado == 'finalizado' && data.jefe_tesoreria != 'no'){
+                this.getBoton('edit').disable();
+                this.getBoton('del').disable();
+                this.getBoton('btnfinalizado').disable();
+                this.getBoton('btnRdetalleRep').disable();              
+                this.getBoton('btnRetroceso').setVisible(true);
+          }else if (data.estado != 'finalizado' && data.jefe_tesoreria == 'no'){
+                this.getBoton('edit').enable();
+                this.getBoton('del').enable();
+                this.getBoton('btnRdetalleRep').enable();
+                this.getBoton('btnfinalizado').enable();            
+          }else if (data.estado != 'finalizado' && data.jefe_tesoreria != 'no'){
+                this.getBoton('edit').enable();
+                this.getBoton('del').enable();
+                this.getBoton('btnRdetalleRep').enable();
+                this.getBoton('btnfinalizado').enable();       
+                this.getBoton('btnRetroceso').setVisible(true);     
           }
         },		
         iniciarEventos:function(){
@@ -564,7 +586,7 @@ header("content-type: text/javascript; charset=UTF-8");
             var d = this.sm.getSelected().data;
             Ext.Ajax.request({
                             url:'../../sis_tesoreria/control/ConciliacionBancaria/finalizarConciliacion',
-                            params:{id_conciliacion_bancaria: d.id_conciliacion_bancaria},
+                            params:{id_conciliacion_bancaria: d.id_conciliacion_bancaria, tipo_cambio: 'finalizacion'},
                             success:this.successFinalizar,
                             failure: this.conexionFailure,
                             timeout:this.timeout,
@@ -577,7 +599,24 @@ header("content-type: text/javascript; charset=UTF-8");
                 if(!reg.ROOT.error){
                         this.reload();
                 }
-        },        
+        },
+        Retroceso:function(){
+            var data = this.getSelectedData();            
+            var NumSelect=this.sm.getCount();
+            if (NumSelect != 0){
+                Phx.CP.loadingShow();
+                Ext.Ajax.request({
+                            url:'../../sis_tesoreria/control/ConciliacionBancaria/finalizarConciliacion',
+                            params:{id_conciliacion_bancaria: data.id_conciliacion_bancaria, tipo_cambio: 'retroceso'},
+                            success:this.successFinalizar,
+                            failure: this.conexionFailure,
+                            timeout:this.timeout,
+                            scope:this
+                });
+            }else{
+				Ext.MessageBox.alert('Alerta', 'Antes debe seleccionar un item.');
+			} 
+        },                
 		reporteConcilBan : function(){					
             var data = this.getSelectedData();
             var NumSelect=this.sm.getCount();            

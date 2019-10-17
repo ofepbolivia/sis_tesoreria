@@ -42,7 +42,8 @@ DECLARE
     v_max						integer;
     v_depo_transito				numeric;
     v_debito_bancario			numeric;
-    v_credito_bancario          numeric;			    
+    v_credito_bancario          numeric;
+    v_dupl_conci			    record;			    
 BEGIN
 
     v_nombre_funcion = 'tes.ft_conciliacion_bancaria_ime';
@@ -58,58 +59,72 @@ BEGIN
 	if(p_transaccion='TES_CONCBAN_INS')then
 					
         begin
-        	--Sentencia de la insercion
-        	insert into tes.tconciliacion_bancaria(
-			estado_reg,
-			id_cuenta_bancaria,
-            id_gestion,
-            id_periodo,
-            id_funcionario_elabo,
-            id_funcionario_vb,
-            fecha,
-            observaciones,
-            saldo_banco,
-            estado,            
-			fecha_reg,
-			usuario_ai,
-			id_usuario_reg,
-			id_usuario_ai,
-			id_usuario_mod
-          	) values(
-			'activo',
-			v_parametros.id_cuenta_bancaria,
-			v_parametros.id_gestion,
-            v_parametros.id_periodo,
-            null,
-            null,
-            v_parametros.fecha,
-            v_parametros.observaciones,
-            v_parametros.saldo_banco,
-            'proceso',
-			now(),
-			v_parametros._nombre_usuario_ai,
-			p_id_usuario,
-			v_parametros._id_usuario_ai,
-			null												
-			)RETURNING id_conciliacion_bancaria into v_id_conciliacion_bancaria;
+        
+            --control duplicidad 
+            select ges.gestion,
+                param.f_literal_periodo(co.id_periodo) as periodo	
+                    into v_dupl_conci    
+                from tes.tconciliacion_bancaria co
+                inner join param.tgestion ges on ges.id_gestion = co.id_gestion
+                where co.id_gestion = v_parametros.id_gestion and 
+                    co.id_cuenta_bancaria = v_parametros.id_cuenta_bancaria and
+                    co.id_periodo = v_parametros.id_periodo;
+
+            if v_dupl_conci.gestion is not null then 
+                raise exception 'El periodo: % ya esta resgistrado para gestion: %.',v_dupl_conci.periodo, v_dupl_conci.gestion; 
+            else        
+                --Sentencia de la insercion
+                insert into tes.tconciliacion_bancaria(
+                estado_reg,
+                id_cuenta_bancaria,
+                id_gestion,
+                id_periodo,
+                id_funcionario_elabo,
+                id_funcionario_vb,
+                fecha,
+                observaciones,
+                saldo_banco,
+                estado,            
+                fecha_reg,
+                usuario_ai,
+                id_usuario_reg,
+                id_usuario_ai,
+                id_usuario_mod
+                ) values(
+                'activo',
+                v_parametros.id_cuenta_bancaria,
+                v_parametros.id_gestion,
+                v_parametros.id_periodo,
+                null,
+                null,
+                v_parametros.fecha,
+                v_parametros.observaciones,
+                v_parametros.saldo_banco,
+                'proceso',
+                now(),
+                v_parametros._nombre_usuario_ai,
+                p_id_usuario,
+                v_parametros._id_usuario_ai,
+                null												
+                )RETURNING id_conciliacion_bancaria into v_id_conciliacion_bancaria;
 
 
-            create temporary table tt_conciliacion(_id_usuario_ai int4, _nombre_usuario_ai varchar,
-            id_conciliacion_bancaria int4,id_cuenta_bancaria INT4,id_gestion INT4,id_periodo INT4) on commit drop;
+                create temporary table tt_conciliacion(_id_usuario_ai int4, _nombre_usuario_ai varchar,
+                id_conciliacion_bancaria int4,id_cuenta_bancaria INT4,id_gestion INT4,id_periodo INT4) on commit drop;
 
-            insert into tt_conciliacion
-            values (null, 'null', v_id_conciliacion_bancaria,v_parametros.id_cuenta_bancaria,v_parametros.id_gestion,v_parametros.id_periodo);
+                insert into tt_conciliacion
+                values (null, 'null', v_id_conciliacion_bancaria,v_parametros.id_cuenta_bancaria,v_parametros.id_gestion,v_parametros.id_periodo);
 
-             v_resp = tes.ft_conciliacion_bancaria_ime (
-             p_administrador,
-             p_id_usuario,
-             'tt_conciliacion',
-             'TES_DETCOBREP_INS');
+                v_resp = tes.ft_conciliacion_bancaria_ime (
+                p_administrador,
+                p_id_usuario,
+                'tt_conciliacion',
+                'TES_DETCOBREP_INS');
 
-			--Definicion de la respuesta
-			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Conciliacion almacenado(a) con exito (id_conciliacion_bancaria'||v_id_conciliacion_bancaria||')'); 
-            v_resp = pxp.f_agrega_clave(v_resp,'id_conciliacion_bancaria',v_id_conciliacion_bancaria::varchar);
-
+                --Definicion de la respuesta
+                v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Conciliacion almacenado(a) con exito (id_conciliacion_bancaria'||v_id_conciliacion_bancaria||')'); 
+                v_resp = pxp.f_agrega_clave(v_resp,'id_conciliacion_bancaria',v_id_conciliacion_bancaria::varchar);
+            end if;
             --Devuelve la respuesta
             return v_resp;
 
@@ -159,7 +174,7 @@ BEGIN
 		begin
            if exists(select 1 from tes.tdetalle_conciliacion_bancaria
                 where id_conciliacion_bancaria = v_parametros.id_conciliacion_bancaria) then
-              raise exception 'Elimine el detalle previamente y vuelva a intentarlo';
+                    raise exception 'Elimine los registros del Detalle Conciliacion previamente y vuelva a intentarlo';
             end if;         
 			--Sentencia de la eliminacion
 			delete from tes.tconciliacion_bancaria
@@ -436,9 +451,16 @@ BEGIN
       elsif(p_transaccion='TES_FINCONCI_FIN')then
 
           begin
+
+          if v_parametros.tipo_cambio = 'finalizacion' then         
             update tes.tconciliacion_bancaria set
             estado = 'finalizado'
             where id_conciliacion_bancaria = v_parametros.id_conciliacion_bancaria;            
+          elsif v_parametros.tipo_cambio = 'retroceso' then
+            update tes.tconciliacion_bancaria set
+            estado = 'proceso'
+            where id_conciliacion_bancaria = v_parametros.id_conciliacion_bancaria;                      
+          end if;
 			
 			--Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Conciliacion modificado(a)'); 

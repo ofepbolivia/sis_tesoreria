@@ -31,7 +31,8 @@ DECLARE
     v_pe			    integer;
     v_fecha_repo		date;
     i 					integer;
-    v_count				integer;    
+    v_count				integer;
+    v_cargo             varchar;    
 BEGIN
 
 	v_nombre_funcion = 'tes.ft_conciliacion_bancaria_sel';
@@ -47,6 +48,15 @@ BEGIN
 	if(p_transaccion='TES_CONCBAN_SEL')then
 
     	begin
+
+          select fc.descripcion_cargo into v_cargo
+          from segu.vusuario u
+          inner join orga.vfuncionario f on f.id_persona = u.id_persona
+          inner join orga.vfuncionario_cargo_lugar fc on fc.id_funcionario = f.id_funcionario
+          where u.id_usuario = p_id_usuario
+          and nombre_unidad = 'Tesorería'
+          and nombre_cargo = 'Jefe Tesorería';
+
     		--Sentencia de la consulta
 			v_consulta:=' select conci.id_conciliacion_bancaria,
                                  conci.id_cuenta_bancaria,
@@ -68,7 +78,8 @@ BEGIN
                                  conci.saldo_real_1,
             					 conci.saldo_real_2,
                                  conci.saldo_libros,
-                                 (conci.saldo_real_1 - conci.saldo_real_2)::numeric as diferencia                                                                       
+                                 (conci.saldo_real_1 - conci.saldo_real_2)::numeric as diferencia,
+                                 '''||coalesce(v_cargo,'no')||'''::varchar as jefe_tesoreria                                                                                                        
                           from tes.tconciliacion_bancaria conci
                           inner join segu.tusuario usu1 on usu1.id_usuario = conci.id_usuario_reg
                           left join segu.tusuario usu2 on usu2.id_usuario = conci.id_usuario_mod
