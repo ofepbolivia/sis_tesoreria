@@ -55,6 +55,9 @@ class ACTCuentaBancaria extends ACTbase{
 		if($this->objParam->getParametro('id_moneda')!=''){
 			$this->objParam->addFiltro("ctaban.id_moneda = ".$this->objParam->getParametro('id_moneda'));
 		}
+        if($this->objParam->getParametro('centro')!=''){
+            $this->objParam->addFiltro("ctaban.centro= ''otro'' ");
+        }
 		/*
 		if($this->objParam->getParametro('tipo_interfaz')!=''){
 			$this->objParam->addFiltro("''".$this->objParam->getParametro('tipo_interfaz')."''=ANY(fin.sw_tipo_interfaz)");
