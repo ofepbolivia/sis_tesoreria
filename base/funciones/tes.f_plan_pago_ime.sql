@@ -1839,7 +1839,7 @@ BEGIN
                 join tes.tobligacion_pago opa on opa.num_tramite = pe.nro_tramite
                 WHERE pe.tipo_movimiento = 'comprometido'
                 and opa.id_obligacion_pago = v_id_obligacion_pago_pp;
-              raise exception 'llegaa %',v_sum_monto_pe;
+              
                 SELECT pc.codigo_tipo_relacion
                 INTO v_codigo_tipo_relacion
                 FROM param.tplantilla p
