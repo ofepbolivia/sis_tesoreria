@@ -559,7 +559,7 @@ BEGIN
 										 v_monto_ant_descontado_temp
 										from tes.tplan_pago pp
 										where  pp.estado_reg='activo'  
-											  and pp.tipo in('dev_garantia') 
+											  and pp.tipo in('dev_garantia','dev_garantia_con','dev_garantia_con_ant') 
 											  and pp.id_obligacion_pago = g_registros.id_obligacion_pago;
 										v_monto_ant_descontado = COALESCE(v_monto_ant_descontado,0) + COALESCE(v_monto_ant_descontado_temp,0);
 								
