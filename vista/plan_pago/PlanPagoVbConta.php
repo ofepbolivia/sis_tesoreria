@@ -377,14 +377,17 @@ header("content-type: text/javascript; charset=UTF-8");
 
             //(may)para campo tipos multas
             this.Cmp.otros_descuentos.on('change',function(a,b,c){
+                console.log('llegam',b )
                 if( b > 0 ){
                     this.mostrarGrupo(5); //ocultar el grupo de multas
                     this.mostrarComponente(this.Cmp.id_multa);
+                    this.Cmp.id_multa.allowBlank = false;
                     this.Cmp.id_multa.modificado=true;
                 }else{
                     this.Cmp.id_multa.setValue('');
                     this.ocultarGrupo(5);
                     this.ocultarComponente(this.Cmp.id_multa);
+                    this.Cmp.id_multa.allowBlank = true;
                     this.Cmp.id_multa.modificado=true;
                 }
 
