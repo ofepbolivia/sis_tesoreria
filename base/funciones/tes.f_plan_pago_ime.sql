@@ -302,7 +302,7 @@ BEGIN
                            inner join conta.tplantilla_calculo pc on pc.id_plantilla = p.id_plantilla
                            WHERE p.id_plantilla = v_parametros.id_plantilla;
 
-                           --SELECT sum(pp.monto)
+                            --SELECT sum(pp.monto)
                             SELECT sum(pp.monto_establecido)
                             INTO v_sum_monto_pp
                             FROM tes.tplan_pago pp
@@ -322,12 +322,12 @@ BEGIN
 						IF (v_codigo_tipo_relacion = 'IVA-CF') THEN
 
                             v_porcentaje13_monto = COALESCE(v_parametros.monto * 0.13, 0);
-          					v_monto_establecido  = COALESCE(v_parametros.monto, 0) - v_porcentaje13_monto;
+          					v_monto_establecido  = COALESCE(v_parametros.monto, 0) - COALESCE(v_porcentaje13_monto,0);
 
                             v_sum_total_pp = COALESCE(v_sum_monto_pp,0) + COALESCE(v_monto_establecido, 0);
 
                            --raise exception 'llegaaaa %>= %', v_sum_total_pp,v_sum_monto_pe ;
-                            IF (v_sum_total_pp > v_sum_monto_pe) THEN
+                            IF (COALESCE(v_sum_total_pp,0) > COALESCE(v_sum_monto_pe,0)) THEN
                               raise exception ' El monto total de las cuotas es de % y excede al monto total certificado de % para el trámite %. Comunicarse con la Unidad de Presupuestos. ',v_sum_total_pp, v_sum_monto_pe, v_registros.num_tramite ;
                             END IF;
 
@@ -336,13 +336,13 @@ BEGIN
                             v_sum_total_pp = COALESCE(v_sum_monto_pp, 0) + COALESCE(v_parametros.monto, 0);
 
                            --raise exception 'llegaaaa %>= %', v_sum_total_pp,v_sum_monto_pe ;
-                            IF (v_sum_total_pp > v_sum_monto_pe) THEN
+                            IF (COALESCE(v_sum_total_pp,0) > COALESCE(v_sum_monto_pe,0)) THEN
                               raise exception ' El monto total de las cuotas es de % y excede al monto total certificado de % para el trámite %. Comunicarse con la Unidad de Presupuestos. ',v_sum_total_pp, v_sum_monto_pe, v_registros.num_tramite ;
                             END IF;
                       END IF;
                             v_sum_total_pp = COALESCE(v_parametros.monto,0);
 
-                            IF (v_sum_total_pp > v_sum_monto_pe) THEN
+                            IF (COALESCE(v_sum_total_pp,0) > COALESCE(v_sum_monto_pe,0)) THEN
                               raise exception ' El monto total de las cuotas es de % y excede al monto total certificado de % para el trámite %. Comunicarse con la Unidad de Presupuestos. ',v_sum_total_pp, v_sum_monto_pe, v_registros.num_tramite ;
                             END IF;
 
@@ -676,7 +676,7 @@ BEGIN
                             v_sum_total_pp = (v_sum_monto_pp - v_sum_monto_solo_pp) + v_monto_establecido;
                          --raise exception '% = % - % + %',v_sum_total_pp,  v_sum_monto_pp, v_sum_monto_solo_pp, v_parametros.monto;
 
-                           IF ((v_sum_total_pp) > v_sum_monto_pe) THEN
+                           IF (COALESCE(v_sum_total_pp,0) > COALESCE(v_sum_monto_pe,0)) THEN
                               raise exception ' El monto total de las cuotas es de % y excede al monto total certificado de % para el trámite %. Comunicarse con la Unidad de Presupuestos. ',v_sum_total_pp, v_sum_monto_pe, v_registros.num_tramite ;
                            END IF;
 
@@ -686,7 +686,7 @@ BEGIN
                          v_sum_total_pp = (COALESCE(v_sum_monto_pp,0) - COALESCE(v_sum_monto_solo_pp, 0)) + COALESCE(v_parametros.monto, 0);
                          --raise exception '% = % - % + %',v_sum_total_pp,  v_sum_monto_pp, v_sum_monto_solo_pp, v_parametros.monto;
 
-                           IF ((v_sum_total_pp) > v_sum_monto_pe) THEN
+                           IF (COALESCE(v_sum_total_pp,0) > COALESCE(v_sum_monto_pe,0)) THEN
                               raise exception ' El monto total de las cuotas es de % y excede al monto total certificado de % para el trámite %. Comunicarse con la Unidad de Presupuestos. ',v_sum_total_pp, v_sum_monto_pe, v_registros.num_tramite ;
                            END IF;
                        END IF;
@@ -1859,20 +1859,21 @@ BEGIN
                 IF (v_codigo_tipo_relacion = 'IVA-CF') THEN
 
                     v_porcentaje13_monto = COALESCE(v_monto_pp * 0.13, 0);
-                    v_monto_establecido  = COALESCE(v_monto_pp, 0) - v_porcentaje13_monto;
+                    v_monto_establecido  = COALESCE(v_monto_pp, 0) - COALESCE(v_porcentaje13_monto,0);
 
-                    v_sum_total_pp = (v_sum_monto_pp - v_sum_monto_solo_pp) + v_monto_establecido;
+                    v_sum_total_pp = COALESCE(v_sum_monto_pp,0);
 
-                   IF ((v_sum_total_pp) > v_sum_monto_pe) THEN
+                   IF (COALESCE(v_sum_total_pp,0) > COALESCE(v_sum_monto_pe,0)) THEN
                       raise exception ' El monto total de las cuotas es de % y excede al monto total certificado de % para el trámite %. Comunicarse con la Unidad de Presupuestos. ',v_sum_total_pp, v_sum_monto_pe, v_numero_tramite;
                    END IF;
 
                ELSE
 
-                 v_monto_establecido  = COALESCE(v_monto_pp);
-                 v_sum_total_pp = (COALESCE(v_sum_monto_pp,0) - COALESCE(v_sum_monto_solo_pp, 0)) + COALESCE(v_monto_pp, 0);
+                 v_monto_establecido  = COALESCE(v_monto_pp, 0);
+                 v_sum_total_pp = (COALESCE(v_sum_monto_pp,0));
+ 				--raise exception 'v_sum_total_pp % = v_sum_monto_pp % - v_sum_monto_solo_pp % + v_monto_pp %',v_sum_total_pp, v_sum_monto_pp,v_sum_monto_solo_pp, v_monto_pp;
 
-                   IF ((v_sum_total_pp) > v_sum_monto_pe) THEN
+                   IF (COALESCE(v_sum_total_pp,0) > COALESCE(v_sum_monto_pe, 0)) THEN
                       raise exception ' El monto total de las cuotas es de % y excede al monto total certificado de % para el trámite %. Comunicarse con la Unidad de Presupuestos. ',v_sum_total_pp, v_sum_monto_pe, v_numero_tramite;
                    END IF;
                END IF;
