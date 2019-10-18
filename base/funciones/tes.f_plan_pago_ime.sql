@@ -204,6 +204,8 @@ DECLARE
     v_id_obligacion_pago_pp		integer;
     v_numero_tramite			varchar;
 
+    vtipo_pp					varchar;
+
 
 BEGIN
 
@@ -1635,7 +1637,8 @@ BEGIN
             pp.monto,
             pp.id_plantilla,
             pp.id_obligacion_pago,
-            op.num_tramite
+            op.num_tramite,
+            pp.tipo
         into
             v_id_plan_pago,
             v_id_proceso_wf,
@@ -1651,7 +1654,8 @@ BEGIN
             v_monto_pp,
             v_id_plantilla,
             v_id_obligacion_pago_pp,
-            v_numero_tramite
+            v_numero_tramite,
+            vtipo_pp
 
         from tes.tplan_pago  pp
         inner  join tes.tobligacion_pago op on op.id_obligacion_pago = pp.id_obligacion_pago
@@ -1823,9 +1827,10 @@ BEGIN
 
           END IF;
 
-          --(may) controla que el total del plan de pago no sea mayor a lo comprometido
+          --(may) controla que el total del plan de pago no sea mayor a lo comprometido, controla en estado Borrador
+          -- y tipo de devoluciones de garantia , ,
 
-          IF (v_estado_aux = 'borrador') THEN
+          IF (v_estado_aux = 'borrador' and vtipo_pp not in ( 'dev_garantia', 'dev_garantia_con', 'dev_garantia_con_ant')) THEN
 
           		--SELECT sum(pp.monto_establecido)
                 SELECT sum(pp.monto)
@@ -1861,7 +1866,7 @@ BEGIN
                     v_porcentaje13_monto = COALESCE(v_monto_pp * 0.13, 0);
                     v_monto_establecido  = COALESCE(v_monto_pp, 0) - COALESCE(v_porcentaje13_monto,0);
 
-                    v_sum_total_pp = COALESCE(v_sum_monto_pp,0);
+                    v_sum_total_pp = COALESCE(v_monto_establecido,0);
 
                    IF (COALESCE(v_sum_total_pp,0) > COALESCE(v_sum_monto_pe,0)) THEN
                       raise exception ' El monto total de las cuotas es de % y excede al monto total certificado de % para el trámite %. Comunicarse con la Unidad de Presupuestos. ',v_sum_total_pp, v_sum_monto_pe, v_numero_tramite;
