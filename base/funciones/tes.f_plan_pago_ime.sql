@@ -307,6 +307,7 @@ BEGIN
                             INTO v_sum_monto_pp
                             FROM tes.tplan_pago pp
                             WHERE pp.estado != 'anulado' and pp.estado != 'pago_exterior' and pp.estado != 'pagado'
+                            and pp.tipo not in ( 'dev_garantia', 'dev_garantia_con', 'dev_garantia_con_ant')
                             and pp.id_obligacion_pago = v_parametros.id_obligacion_pago;
 
                             SELECT sum(pe.monto)
@@ -636,6 +637,7 @@ BEGIN
                             INTO v_sum_monto_pp
                             FROM tes.tplan_pago pp
                             WHERE pp.estado != 'anulado' and pp.estado != 'pago_exterior' and pp.estado != 'pagado'
+                            and pp.tipo not in ( 'dev_garantia', 'dev_garantia_con', 'dev_garantia_con_ant')
                             and pp.id_obligacion_pago = v_parametros.id_obligacion_pago;
 
                             --SELECT pp.monto_ejecutar_total_mo
@@ -1284,6 +1286,7 @@ BEGIN
 	IF v_pre_integrar_presupuestos = 'true' THEN
            /*jrr:29/10/2014
            1) si el presupuesto no esta comprometido*/
+
            if (v_registros.comprometido = 'no') then
 
          		/*1.1)Validar que la suma de los detalles igualen al total de la obligacion*/
@@ -1307,6 +1310,7 @@ BEGIN
                 where id_obligacion_pago = v_registros.id_obligacion_pago;
 
           end if;
+
 	  END IF;
 
           --(may) 20-07-2019 los tipo plan de pago devengado_pagado_1c_sp son para las internacionales -tramites sp con contato
@@ -1372,6 +1376,7 @@ BEGIN
            --si tiene contrato con renteciones de garantia validar que la rentecion de garantia sea mayor a cero
            --(may) 20-07-2019 los tipo plan de pago devengado_pagado_1c_sp son para las internacionales -tramites sp con contato
            IF  v_registros.tipo in ('devengado','devengado_pagado','devengado_pagado_1c', 'devengado_pagado_1c_sp') THEN
+
                IF v_registros.id_contrato is not null THEN
 
                    v_sw_retenciones = 'no';
@@ -1383,6 +1388,7 @@ BEGIN
                    where c.id_contrato = v_registros.id_contrato;
 
                    IF v_sw_retenciones = 'si' and  v_registros.monto_retgar_mo = 0 THEN
+
                       IF v_registros.monto != v_registros.descuento_inter_serv THEN
                         raise exception 'Según contrato este pago debe tener retenciones de garantia';
                       END IF;
@@ -1821,10 +1827,12 @@ BEGIN
 
           IF (v_estado_aux = 'borrador') THEN
 
-          		SELECT sum(pp.monto_establecido)
+          		--SELECT sum(pp.monto_establecido)
+                SELECT sum(pp.monto)
                 INTO v_sum_monto_pp
                 FROM tes.tplan_pago pp
                 WHERE pp.estado != 'anulado' and pp.estado != 'pago_exterior' and pp.estado != 'pagado'
+                and pp.tipo not in ( 'dev_garantia', 'dev_garantia_con', 'dev_garantia_con_ant')
                 and pp.estado_reg != 'anulado'
                 and pp.id_obligacion_pago = v_id_obligacion_pago_pp;
 
@@ -1839,7 +1847,7 @@ BEGIN
                 join tes.tobligacion_pago opa on opa.num_tramite = pe.nro_tramite
                 WHERE pe.tipo_movimiento = 'comprometido'
                 and opa.id_obligacion_pago = v_id_obligacion_pago_pp;
-              
+
                 SELECT pc.codigo_tipo_relacion
                 INTO v_codigo_tipo_relacion
                 FROM param.tplantilla p
