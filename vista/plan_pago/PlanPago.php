@@ -811,7 +811,7 @@ header("content-type: text/javascript; charset=UTF-8");
                             totalProperty:'total',
                             fields: ['id_forma_pago','desc_forma_pago','observaciones','cod_inter','codigo', 'orden'],
                             remoteSort: true,
-                            baseParams:{par_filtro:'desc_forma_pago#codigo'}
+                            baseParams:{par_filtro:'desc_forma_pago#codigo', cheque: 'no'}
                         }),
                     tpl:'<tpl for="."><div class="x-combo-list-item"><p>{desc_forma_pago}</p></div></tpl>',
                     valueField: 'codigo',
