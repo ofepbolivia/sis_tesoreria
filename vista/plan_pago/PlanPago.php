@@ -2128,7 +2128,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.mostrarComponente(this.Cmp.id_proveedor_cta_bancaria);
                 this.Cmp.obs_monto_no_pagado.allowBlank = false;
 
-                if (data.forma_pago == 'transferencia' && data.forma_pago == 'transferencia_propia' &&  data.forma_pago == 'transferencia_ext' ) {
+                if (data.forma_pago == 'transferencia' && data.forma_pago == 'transferencia_propia' &&  data.forma_pago == 'transferencia_ext'  &&  data.forma_pago == 'transferencia_b_u') {
                     this.Cmp.id_proveedor_cta_bancaria.enable();
                     this.Cmp.id_proveedor_cta_bancaria.allowBlank = false;
                 }else {
@@ -2196,7 +2196,18 @@ header("content-type: text/javascript; charset=UTF-8");
                     //this.Cmp.id_proveedor_cta_bancaria.setValue('');
                     this.Cmp.id_proveedor_cta_bancaria.store.baseParams.id_depto_lb = this.Cmp.id_depto_lb.getValue();
                     this.Cmp.id_proveedor_cta_bancaria.store.baseParams.permiso = 'todos';
-                    //this.Cmp.id_proveedor_cta_bancaria.modificado=true;
+
+                }else if (this.Cmp.forma_pago.getValue() == 'transferencia_b_u') {
+                    this.Cmp.id_proveedor_cta_bancaria.store.baseParams.lbrTP = '';
+                    this.Cmp.id_proveedor_cta_bancaria.enable();
+                    this.Cmp.id_proveedor_cta_bancaria.allowBlank = false;
+
+                    this.Cmp.id_proveedor_cta_bancaria.store.baseParams.id_proveedor = 28; //proveedor banco union
+                    this.Cmp.id_proveedor_cta_bancaria.tdata.id_padre = this.idContenedor;
+                    this.Cmp.id_proveedor_cta_bancaria.modificado = true;
+
+                    this.Cmp.id_proveedor_cta_bancaria.store.baseParams.id_depto_lb = this.Cmp.id_depto_lb.getValue();
+                    this.Cmp.id_proveedor_cta_bancaria.store.baseParams.permiso = 'todos';
                 }
 
             } else {
@@ -2529,6 +2540,17 @@ header("content-type: text/javascript; charset=UTF-8");
                 me.Cmp.id_proveedor_cta_bancaria.store.baseParams.id_proveedor = 27; //proveedor banco central
                 me.Cmp.id_proveedor_cta_bancaria.tdata.id_padre = this.idContenedor;
                 me.Cmp.id_proveedor_cta_bancaria.modificado = true;
+
+            }else if(this.Cmp.forma_pago.getValue() == 'transferencia_b_u'){
+                    me.Cmp.id_proveedor_cta_bancaria.store.baseParams.lbrTP = '';
+                    me.Cmp.id_proveedor_cta_bancaria.enable();
+                    me.Cmp.id_proveedor_cta_bancaria.allowBlank = false;
+                    me.Cmp.id_proveedor_cta_bancaria.setValue('');
+
+
+                    me.Cmp.id_proveedor_cta_bancaria.store.baseParams.id_proveedor = 28; //proveedor banco union
+                    me.Cmp.id_proveedor_cta_bancaria.tdata.id_padre = this.idContenedor;
+                    me.Cmp.id_proveedor_cta_bancaria.modificado = true;
 
             }else{
                 me.Cmp.id_proveedor_cta_bancaria.store.baseParams.lbrTP = '';
