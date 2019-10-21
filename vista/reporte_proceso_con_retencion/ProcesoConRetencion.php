@@ -12,6 +12,29 @@ header("content-type: text/javascript; charset=UTF-8");
     Phx.vista.ProcesoConRetencion = Ext.extend(Phx.frmInterfaz, {
         Atributos : [
             {
+                config:{
+                    name: 'tipo_reporte',
+                    fieldLabel: 'Tipo de Reporte',
+                    allowBlank : false,
+                    triggerAction : 'all',
+                    lazyRender : true,
+                    mode : 'local',
+                    store : new Ext.data.ArrayStore({
+                        fields : ['codigo', 'nombre'],
+                        data : [['reporte_nor', 'Reporte normal'], ['reporte_pro', 'Reporte con Prorrateo']]
+                    }),
+                    anchor : '30%',
+                    valueField : 'codigo',
+                    displayField : 'nombre',
+                    gwidth:100
+                },
+                type:'ComboBox',
+                id_grupo:1,
+                bottom_filter: true,
+                grid:true,
+                form:true
+            },
+			{
             config:{
                 name: 'fecha_ini',
                 fieldLabel: 'Fecha Inicio',
