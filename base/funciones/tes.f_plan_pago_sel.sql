@@ -1251,7 +1251,64 @@ BEGIN
 			return v_consulta;
 
 		end;
+	
+	    /*********************************
+        #TRANSACCION:  'TES_PROCREPRO_SEL'
+        #DESCRIPCION:	Proceso con retencion 7% a Prorrateo
+        #AUTOR:		YMR
+        #FECHA:		18-10-2019 15:43:23
+        ***********************************/
 
+    elsif(p_transaccion='TES_PROCREPRO_SEL')then
+
+            begin
+            
+            v_consulta:='SELECT  pro.desc_proveedor AS proveedor, 
+                                     c.numero AS nro_contrato, 
+                                     op.num_tramite, 
+                                     pp.nro_cuota, 
+                                     pp.tipo, 
+                                     pp.fecha_dev, 
+                                     mo.moneda, 
+                                     cc.codigo_cc::varchar, 
+                                     (par.codigo::varchar||''-''||par.nombre_partida::varchar)::varchar AS partida, 
+                                     vcp.codigo_categoria::varchar, 
+                                     com.c31, 
+                                     pror.monto_ejecutar_mo AS monto,
+                                     pror.monto_ejecutar_mo * 0.07 AS monto_retgar_mo, 
+                                     pror.monto_ejecutar_mo * 0.93 AS liquido_pagable 
+                              FROM   tes.tobligacion_pago op 
+                                     left join leg.tcontrato c  ON c.id_contrato = op.id_contrato 
+                                     inner join tes.tplan_pago pp ON pp.id_obligacion_pago = op.id_obligacion_pago 
+                                     left join tes.tobligacion_det od ON od.id_obligacion_pago = op.id_obligacion_pago 
+                                     join param.vcentro_costo cc ON cc.id_centro_costo = od.id_centro_costo 
+                                     join pre.tpartida par ON par.id_partida = od.id_partida 
+                                     join param.vproveedor pro ON pro.id_proveedor = op.id_proveedor 
+                                     join pre.tpresupuesto pr ON pr.id_centro_costo = cc.id_centro_costo 
+                                     join pre.vcategoria_programatica vcp ON vcp.id_categoria_programatica = pr.id_categoria_prog 
+                                     join param.tmoneda mo ON mo.id_moneda = op.id_moneda 
+                                     join conta.tint_comprobante com ON com.id_int_comprobante = pp.id_int_comprobante 
+                                     join tes.tprorrateo pror ON pror.id_plan_pago = pp.id_plan_pago AND
+         							 	  pror.id_obligacion_det = od.id_obligacion_det
+                              WHERE  pp.estado IN ( ''devengado'', ''devuelto'' ) 
+                                     AND pp.monto_retgar_mo != 0 
+                                     AND pp.fecha_dev >= '''||v_parametros.fecha_ini||''' 
+                                     AND pp.fecha_dev <= '''||v_parametros.fecha_fin||'''';
+                                     
+                              if (v_parametros.id_proveedor >0) then
+                                  v_consulta:= v_consulta || 'and c.id_proveedor = '||v_parametros.id_proveedor;
+                              end if;
+                              if (v_parametros.id_contrato >0) then
+                                  v_consulta:= v_consulta || 'and c.id_contrato = '||v_parametros.id_contrato;
+                              end if;
+                v_consulta:=v_consulta||' ORDER  BY op.id_proveedor, op.id_contrato, op.num_tramite, pp.nro_cuota ASC';
+                
+                raise notice '% .',v_consulta;
+                --Devuelve la respuesta
+                return v_consulta; 
+                
+
+            end;
 
     else
 

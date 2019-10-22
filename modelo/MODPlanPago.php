@@ -1121,7 +1121,44 @@ class MODPlanPago extends MODbase{
         return $this->respuesta;
     }
 
+	function listarProcesoConRetencionAProrrateo(){
+        //Definicion de variables para ejecucion del procedimientp
+        $this->procedimiento='tes.f_plan_pago_sel';
+        $this->transaccion='TES_PROCREPRO_SEL';
+        $this->tipo_procedimiento='SEL';//tipo de transaccion
 
+        $this->setParametro('fecha_ini','fecha_ini','date');
+        $this->setParametro('fecha_fin','fecha_fin','date');
+        $this->setParametro('id_proveedor','id_proveedor','integer');
+        $this->setParametro('id_contrato','id_contrato','integer');
+
+
+        $this->setCount(false);
+
+        $this->captura('proveedor', 'varchar');
+        $this->captura('nro_contrato', 'varchar');
+        $this->captura('num_tramite', 'varchar');
+        $this->captura('nro_cuota', 'NUMERIC');
+        $this->captura('tipo', 'varchar');
+        $this->captura('fecha_dev', 'DATE');
+        $this->captura('moneda', 'varchar');
+        $this->captura('codigo_cc', 'varchar');
+        $this->captura('partida', 'varchar');
+        $this->captura('codigo_categoria', 'varchar');
+        $this->captura('c31', 'varchar');
+        $this->captura('monto', 'NUMERIC');
+        $this->captura('monto_retgar_mo', 'NUMERIC');
+        $this->captura('liquido_pagable', 'NUMERIC');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+        // var_dump($this->respuesta);exit;
+        //Devuelve la respuesta
+        return $this->respuesta;
+
+
+    }
 
 }
 ?>
