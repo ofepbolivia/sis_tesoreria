@@ -77,7 +77,11 @@ class MODCuentaBancaria extends MODbase{
 		$this->captura('centro','varchar');
 		$this->captura('id_finalidads','varchar');
 		$this->captura('forma_pago','varchar');
-		
+		$this->captura('tipo_moneda','varchar');
+		$this->captura('origen','varchar');
+		$this->captura('id_proveedor_cta_bancaria','int4');
+		$this->captura('nro_cuenta_prov','varchar');
+
 		//Ejecuta la instruccion
         $this->armarConsulta();
         //var_dump($this->consulta);exit;
@@ -107,6 +111,7 @@ class MODCuentaBancaria extends MODbase{
 		$this->setParametro('id_finalidads','id_finalidads','varchar');
 
 		$this->setParametro('forma_pago','forma_pago','varchar');
+		$this->setParametro('id_proveedor_cta_bancaria','id_proveedor_cta_bancaria','int4');
 
 		
 
@@ -137,6 +142,7 @@ class MODCuentaBancaria extends MODbase{
 		
 		$this->setParametro('id_finalidads','id_finalidads','varchar');
 		$this->setParametro('forma_pago','forma_pago','varchar');
+		$this->setParametro('id_proveedor_cta_bancaria','id_proveedor_cta_bancaria','int4');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

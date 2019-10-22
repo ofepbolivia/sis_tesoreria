@@ -42,6 +42,18 @@ DECLARE
      v_total_pago_aplicado  numeric;
      v_saldo_anticipo  numeric;
      v_monto_ajuste numeric;
+	 v_id_contrato  				numeric;
+     v_id_gestion					numeric;
+     v_monto_ajuste_temp 			numeric;
+     v_monto_total_registrado_temp 	numeric;
+     v_monto_ant_descontado_temp 	numeric;
+     g_registros					record;
+     v_size_temp					numeric;
+     g_contratosh					record;	
+     v_gestion						numeric;
+     v_id_contrato_list				numeric [];
+     v_id_contrato_fk				numeric;
+     v_has_contratos				boolean;
 
 BEGIN
 
@@ -49,7 +61,7 @@ BEGIN
 
 --raise exception 'llega2 %',p_filtro;
 			--(may) 18-07-2019 los tipo pp especial_spi son para las internacionales -tramites SIP
-            IF p_filtro not in ('registrado','registrado_pagado','registrado_monto_ejecutar','especial_total','anticipo_sin_aplicar','total_registrado_pagado','devengado','pagado','ant_parcial','ant_parcial_descontado','ant_aplicado_descontado','dev_garantia','ant_aplicado_descontado_op_variable','especial','especial_spi') THEN
+            IF p_filtro not in ('registrado','registrado_pagado','registrado_monto_ejecutar','especial_total','anticipo_sin_aplicar','total_registrado_pagado','devengado','pagado','ant_parcial','ant_parcial_descontado','ant_aplicado_descontado','dev_garantia','ant_aplicado_descontado_op_variable','especial','especial_spi','dev_garantia_con','dev_garantia_con_ant') THEN
 
               		raise exception 'filtro no reconocido (%) para determinar el total faltante ', p_filtro;
 
@@ -460,7 +472,204 @@ BEGIN
 
                        return COALESCE(v_monto_total_registrado,0) + COALESCE(v_monto_ajuste,0) - COALESCE(v_monto_ant_descontado,0);
 
+				-------------------------------
+				--  DEVOLUCIONES DE GARANTIA POR CONTRATO
+				-------------------------------
+            
+             ELSEIF  p_filtro = 'dev_garantia_con' THEN
+            
+             --recupera los montos retenidos por garantia en las trasacciones de devengado unicamente
+				select op.id_contrato, op.id_gestion
+				into v_id_contrato, v_id_gestion
+				from tes.tobligacion_pago op
+				where op.id_obligacion_pago = p_id_obligacion_pago;	 
+                v_id_contrato_list := array_append(v_id_contrato_list, v_id_contrato);
+                v_size_temp := (SELECT coalesce(array_length(v_id_contrato_list, 1), 0));
+                v_has_contratos := true;  
+              WHILE v_has_contratos LOOP
+              
+                 select cc.id_contrato_fk
+                 into v_id_contrato_fk
+                 from leg.tcontrato cc
+                 where cc.id_contrato = v_id_contrato 
+                 and   cc.estado != 'anulado';
+                 
+                 if (v_id_contrato_fk is not null and (SELECT NOT v_id_contrato_fk = ANY (v_id_contrato_list)))then
+                    v_id_contrato_list := array_append(v_id_contrato_list, v_id_contrato_fk);
+                 end if;
+                                        
+                 FOR g_contratosh in (
+                                   		select cc.id_contrato
+                                        from leg.tcontrato cc
+                                        where cc.id_contrato_fk = v_id_contrato
+                                        and cc.estado != 'anulado'
+										) LOOP
+                    if (SELECT NOT g_contratosh.id_contrato = ANY (v_id_contrato_list)) then
+                        v_id_contrato_list := array_append(v_id_contrato_list, g_contratosh.id_contrato::numeric);
+                    end if;        
+                            
+                 END LOOP;        
+                 
+               /*if (v_size_temp = 4)THEN
+                 raise exception 'holasgg %',v_id_contrato_list::text;  
+               end if; */ 
+				--SELECT coalesce(array_length('{1,2,3,6,4}'::int[], 1), 0)  
+				if ((SELECT coalesce(array_length(v_id_contrato_list, 1), 0)) > v_size_temp ) then
+                	v_size_temp := v_size_temp+1;
+                	v_id_contrato := v_id_contrato_list[v_size_temp];
+                    
+                else
+                    v_has_contratos := false;
+                    --raise exception 'holas %',v_id_contrato_list::text;   
+                end if;  
 
+             END LOOP;
+             --raise exception 'holasFF %', v_id_contrato_list::text;       
+                FOR g_registros in (
+								select 	op.id_obligacion_pago
+								from 	tes.tobligacion_pago op
+								where 	op.id_contrato = any (v_id_contrato_list) 
+                                and     op.id_gestion = v_id_gestion
+							) LOOP
+								v_monto_ajuste_temp = 0;
+								v_monto_total_registrado_temp = 0;
+								v_monto_ant_descontado_temp = 0;
+								
+									   select 
+										op.monto_ajuste_ret_garantia_ga
+									   into
+										 v_monto_ajuste_temp
+									   from tes.tobligacion_pago op
+									   where op.id_obligacion_pago = g_registros.id_obligacion_pago;
+									   v_monto_ajuste = COALESCE(v_monto_ajuste,0) + COALESCE(v_monto_ajuste_temp,0);
+									   
+										select 
+										 sum(pp.monto_retgar_mo)
+										into
+										 v_monto_total_registrado_temp
+										from tes.tplan_pago pp
+										where  pp.estado_reg='activo'  
+											  and pp.tipo in('devengado','devengado_pagado','devengado_pagado_1c','devengado_pagado_1c_sp')
+											  and pp.id_obligacion_pago = g_registros.id_obligacion_pago;
+										v_monto_total_registrado = COALESCE(v_monto_total_registrado,0) + COALESCE(v_monto_total_registrado_temp,0);
+ 
+										select 
+										 sum(pp.monto)
+										into
+										 v_monto_ant_descontado_temp
+										from tes.tplan_pago pp
+										where  pp.estado_reg='activo'  
+											  and pp.tipo in('dev_garantia','dev_garantia_con','dev_garantia_con_ant') 
+											  and pp.id_obligacion_pago = g_registros.id_obligacion_pago;
+										v_monto_ant_descontado = COALESCE(v_monto_ant_descontado,0) + COALESCE(v_monto_ant_descontado_temp,0);
+								
+							END LOOP;
+                       
+                      
+                       return COALESCE(v_monto_total_registrado,0) + COALESCE(v_monto_ajuste,0) - COALESCE(v_monto_ant_descontado,0);
+            
+            -------------------------------
+             --  DEVOLUCIONES DE GARANTIA POR CONTRATO GESTION ANTERIOR
+             -------------------------------
+            
+             ELSEIF  p_filtro = 'dev_garantia_con_ant' THEN
+            
+                --recupera los montos retenidos por garantia en las trasacciones de devengado unicamente
+				select op.id_contrato, op.id_gestion
+				into v_id_contrato, v_id_gestion
+				from tes.tobligacion_pago op
+				where op.id_obligacion_pago = p_id_obligacion_pago;	
+                
+                select gg.gestion
+                into v_gestion
+                from param.tgestion gg
+                where gg.id_gestion = v_id_gestion;
+                
+                select gg.id_gestion
+                into v_id_gestion
+                from param.tgestion gg
+                where gg.gestion =(v_gestion - 1);
+                
+                v_id_contrato_list := array_append(v_id_contrato_list, v_id_contrato);
+                v_size_temp := (SELECT coalesce(array_length(v_id_contrato_list, 1), 0));
+                v_has_contratos := true;  
+                
+                WHILE v_has_contratos LOOP
+                
+                   select cc.id_contrato_fk
+                   into v_id_contrato_fk
+                   from leg.tcontrato cc
+                   where cc.id_contrato = v_id_contrato 
+                   and   cc.estado != 'anulado';
+                   
+                   if (v_id_contrato_fk is not null and (SELECT NOT v_id_contrato_fk = ANY (v_id_contrato_list)))then
+                      v_id_contrato_list := array_append(v_id_contrato_list, v_id_contrato_fk);
+                   end if;
+                                          
+                   FOR g_contratosh in (
+                                          select cc.id_contrato
+                                          from leg.tcontrato cc
+                                          where cc.id_contrato_fk = v_id_contrato
+                                          and cc.estado != 'anulado'
+                                          ) LOOP
+                      if (SELECT NOT g_contratosh.id_contrato = ANY (v_id_contrato_list)) then
+                          v_id_contrato_list := array_append(v_id_contrato_list, g_contratosh.id_contrato::numeric);
+                      end if;        
+                              
+                   END LOOP;        
+                     
+                  if ((SELECT coalesce(array_length(v_id_contrato_list, 1), 0)) > v_size_temp ) then
+                      v_size_temp := v_size_temp+1;
+                      v_id_contrato := v_id_contrato_list[v_size_temp];
+                  else
+                      v_has_contratos := false;   
+                  end if;  
+
+               END LOOP;
+                  
+                FOR g_registros in (
+								select 	op.id_obligacion_pago
+								from 	tes.tobligacion_pago op
+								where 	op.id_contrato = any (v_id_contrato_list)
+                                and     op.id_gestion = v_id_gestion
+							) LOOP
+								v_monto_ajuste_temp = 0;
+								v_monto_total_registrado_temp = 0;
+								v_monto_ant_descontado_temp = 0;
+								
+									   select 
+										op.monto_ajuste_ret_garantia_ga
+									   into
+										 v_monto_ajuste_temp
+									   from tes.tobligacion_pago op
+									   where op.id_obligacion_pago = g_registros.id_obligacion_pago;
+									   v_monto_ajuste = COALESCE(v_monto_ajuste,0) + COALESCE(v_monto_ajuste_temp,0);
+									   
+										select 
+										 sum(pp.monto_retgar_mo)
+										into
+										 v_monto_total_registrado_temp
+										from tes.tplan_pago pp
+										where  pp.estado_reg='activo'  
+											  and pp.tipo in('devengado','devengado_pagado','devengado_pagado_1c','devengado_pagado_1c_sp')
+											  and pp.id_obligacion_pago = g_registros.id_obligacion_pago;
+										v_monto_total_registrado = COALESCE(v_monto_total_registrado,0) + COALESCE(v_monto_total_registrado_temp,0);
+ 
+										select 
+										 sum(pp.monto)
+										into
+										 v_monto_ant_descontado_temp
+										from tes.tplan_pago pp
+										where  pp.estado_reg='activo'  
+											  and pp.tipo in('dev_garantia') 
+											  and pp.id_obligacion_pago = g_registros.id_obligacion_pago;
+										v_monto_ant_descontado = COALESCE(v_monto_ant_descontado,0) + COALESCE(v_monto_ant_descontado_temp,0);
+								
+							END LOOP;
+                       
+                      
+                       return COALESCE(v_monto_total_registrado,0) + COALESCE(v_monto_ajuste,0) - COALESCE(v_monto_ant_descontado,0);
+            
              -------------------------------
              --  Pagos especiales
              -------------------------------

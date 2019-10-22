@@ -135,7 +135,7 @@ BEGIN
             --if(v_id_usuario!=1)then
 				v_consulta:='select DISTINCT
                                 ctaban.id_cuenta_bancaria,
-                                tes.f_dif_debe_haber_libro(ctaban.id_cuenta_bancaria) as saldo,
+                                tes.f_dif_debe_haber_libro(ctaban.id_cuenta_bancaria)::numeric as saldo,
                                 ctaban.estado_reg,
                                 ctaban.fecha_baja,
                                 ctaban.nro_cuenta,
@@ -153,17 +153,27 @@ BEGIN
                                 ctaban.denominacion,
                                 ctaban.centro,
                                 array_to_string( ctaban.id_finalidad,'','',''null'')::varchar as id_finalidads,
-                                ctaban.forma_pago
+                                ctaban.forma_pago,
+                                mon.tipo_moneda,
+                                mon.origen,
+                                ctaban.id_proveedor_cta_bancaria,
+                                pctaban.nro_cuenta::varchar as nro_cuenta_prov
+
+
 						from tes.tcuenta_bancaria ctaban
                         inner join param.tinstitucion inst on inst.id_institucion = ctaban.id_institucion
                         inner join tes.tdepto_cuenta_bancaria deptctab on deptctab.id_cuenta_bancaria=ctaban.id_cuenta_bancaria
                         left join param.tmoneda mon on mon.id_moneda =  ctaban.id_moneda
-                        left join tes.tfinalidad fin on fin.id_finalidad=ANY(ctaban.id_finalidad) ';
+                        left join tes.tfinalidad fin on fin.id_finalidad=ANY(ctaban.id_finalidad)
+                        left join param.tproveedor_cta_bancaria pctaban on pctaban.id_proveedor_cta_bancaria = ctaban.id_proveedor_cta_bancaria ';
                 IF p_administrador !=1 THEN
                		v_consulta = v_consulta || 'inner join tes.tusuario_cuenta_banc usrbanc on usrbanc.id_cuenta_bancaria=ctaban.id_cuenta_bancaria ';
             	END IF;
                     v_consulta = v_consulta || 'inner join segu.tusuario usu1 on usu1.id_usuario = ctaban.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = ctaban.id_usuario_mod
+
+
+
 				        where ' ||v_filtro||'';
 
                 IF p_administrador !=1 THEN

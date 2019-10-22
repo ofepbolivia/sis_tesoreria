@@ -225,7 +225,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.Cmp.obs_monto_no_pagado.disable();
                 this.Cmp.obs_descuentos_ley.disable();
             }
-            this.Cmp.forma_pago.disable();
+            this.Cmp.forma_pago.enable();
 
         },
 
@@ -338,6 +338,11 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.Cmp.id_cuenta_bancaria.store.baseParams.id_depto_lb = this.Cmp.id_depto_lb.getValue();
                 this.Cmp.id_cuenta_bancaria.store.baseParams.permiso = 'todos';
                 this.Cmp.id_cuenta_bancaria.modificado=true;
+
+                this.Cmp.id_proveedor_cta_bancaria.setValue('');
+                this.Cmp.id_proveedor_cta_bancaria.store.baseParams.id_depto_lb = this.Cmp.id_depto_lb.getValue();
+                this.Cmp.id_proveedor_cta_bancaria.store.baseParams.permiso = 'todos';
+                this.Cmp.id_proveedor_cta_bancaria.modificado=true;
             },this);
 
             //Evento para filtrar los depósitos a partir de la cuenta bancaria
@@ -368,6 +373,24 @@ header("content-type: text/javascript; charset=UTF-8");
             //Evento para ocultar/motrar componentes por cheque o transferencia
             this.Cmp.forma_pago.on('change',function(groupRadio,radio){
                 this.ocultarCheCue(this,radio.inputValue);
+            },this);
+
+            //(may)para campo tipos multas
+            this.Cmp.otros_descuentos.on('change',function(a,b,c){
+                console.log('llegam',b )
+                if( b > 0 ){
+                    this.mostrarGrupo(5); //ocultar el grupo de multas
+                    this.mostrarComponente(this.Cmp.id_multa);
+                    this.Cmp.id_multa.allowBlank = false;
+                    this.Cmp.id_multa.modificado=true;
+                }else{
+                    this.Cmp.id_multa.setValue('');
+                    this.ocultarGrupo(5);
+                    this.ocultarComponente(this.Cmp.id_multa);
+                    this.Cmp.id_multa.allowBlank = true;
+                    this.Cmp.id_multa.modificado=true;
+                }
+
             },this);
 
 

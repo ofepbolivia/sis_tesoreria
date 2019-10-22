@@ -286,6 +286,14 @@ header("content-type: text/javascript; charset=UTF-8");
                         this.obtenerFaltante('dev_garantia');
                     }
 
+                    if (rec.data.variable == 'dev_garantia_con') {
+                        this.obtenerFaltante('dev_garantia_con');
+                    }
+
+                    if (rec.data.variable == 'dev_garantia_con_ant') {
+                        this.obtenerFaltante('dev_garantia_con_ant');
+                    }
+
                     if (rec.data.variable == 'especial') {
                         this.obtenerFaltante('especial');
                     }

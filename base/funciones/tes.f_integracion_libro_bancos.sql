@@ -12,6 +12,7 @@ DECLARE
  v_nombre_funcion   varchar;
  v_centro			varchar;
  v_tes_gen_cheque_depto_conta_lb_pri_cero		varchar;
+ v_cuenta										record;
 BEGIN
 
 
@@ -137,6 +138,33 @@ BEGIN
       elsif(v_registros.prioridad_conta = 2 and v_registros.prioridad_libro =1 )then
           v_resp= 'true';
       end if;
+
+--(breydi.vasquez) otro tipo de forma de pago
+    elsif (v_registros.forma_pago = 'transferencia_propia') then
+
+
+            IF(v_registros.centro ='otro') THEN
+           			v_respuesta_libro_bancos = tes.f_generar_cheque_trans_propia(p_id_usuario,p_id_int_comprobante, v_id_finalidad,NULL,COALESCE(v_registros.c31,''),'nacional');
+            END IF;
+
+
+           select cu.id_cuenta_bancaria,cu.centro, cu.nro_cuenta
+           	 into v_cuenta
+           from tes.tplan_pago p
+           inner join param.tproveedor_cta_bancaria cup on cup.id_proveedor_cta_bancaria = p.id_proveedor_cta_bancaria
+           inner join tes.tcuenta_bancaria cu on cu.nro_cuenta = cu.nro_cuenta
+           where p.id_int_comprobante = p_id_int_comprobante;
+
+           if v_cuenta.id_cuenta_bancaria is not null then
+             IF(v_cuenta.centro !='si')THEN
+
+                      v_respuesta_libro_bancos = tes.f_generar_deposito_cheque_trasn_propia(p_id_usuario,p_id_int_comprobante, v_id_finalidad,NULL,COALESCE(v_registros.c31,''),'nacional',v_cuenta.id_cuenta_bancaria);
+
+             ELSE
+                      v_respuesta_libro_bancos = tes.f_generar_cheque_trans_propia(p_id_usuario,p_id_int_comprobante, v_id_finalidad,NULL,COALESCE(v_registros.c31,''),'nacional');
+             end if;
+           end if;
+
     ELSE --(franklin.espinoza) otro tipo de forma de pago
     	if pxp.f_get_variable_global('ESTACION_inicio') = 'BUE' then
         	v_respuesta_libro_bancos = tes.f_generar_cheque_otras_fp(p_id_usuario,p_id_int_comprobante, v_id_finalidad,NULL,COALESCE(v_registros.c31,''),'nacional');

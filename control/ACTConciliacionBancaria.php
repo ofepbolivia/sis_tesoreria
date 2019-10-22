@@ -15,9 +15,11 @@ class ACTConciliacionBancaria extends ACTbase{
 		$this->objParam->defecto('ordenacion','id_conciliacion_bancaria');                
 		$this->objParam->defecto('dir_ordenacion','asc');
 		
-		if($this->objParam->getParametro('id_cuenta_bancaria')!=''){
-			$this->objParam->addFiltro("conci.id_cuenta_bancaria = ".$this->objParam->getParametro('id_cuenta_bancaria'));					
-		}		
+        $this->objParam->getParametro('id_cuenta_bancaria')!='' && $this->objParam->addFiltro("conci.id_cuenta_bancaria = ".$this->objParam->getParametro('id_cuenta_bancaria'));
+        
+        $this->objParam->getParametro('id_gestion')!='' && $this->objParam->addFiltro("conci.id_gestion = ".$this->objParam->getParametro('id_gestion'));
+
+				
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODConciliacionBancaria','listarConciliacionBancaria ');
@@ -105,7 +107,42 @@ class ACTConciliacionBancaria extends ACTbase{
 		$this->res=$this->objFunc->eliminarDetalleConciliacionBancaria($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
-			
+	function regDetalleRepo() {
+        $this->objFunc=$this->create('MODConciliacionBancaria');
+        $this->res=$this->objFunc->regDetalleRepo($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+    function detalleConciliaRepo() {
+		$this->objParam->defecto('ordenacion','id_conciliacion_bancaria_rep');                
+		$this->objParam->defecto('dir_ordenacion','asc');
+		
+        $this->objParam->getParametro('id_conciliacion_bancaria')!='' && $this->objParam->addFiltro("cbre.id_conciliacion_bancaria = ".$this->objParam->getParametro('id_conciliacion_bancaria'));
+        
+		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
+			$this->objReporte = new Reporte($this->objParam,$this);
+			$this->res = $this->objReporte->generarReporteListado('MODConciliacionBancaria','detalleConciliaRepo ');
+		} else{
+			$this->objFunc=$this->create('MODConciliacionBancaria');
+            if ($this->objParam->getParametro('id_conciliacion_bancaria') != '') {
+                $this->res=$this->objFunc->detalleConciliaRepo($this->objParam);                
+                $temp = Array();
+                $temp['total_1'] = $this->res->extraData['total_1'];
+                $temp['total_2'] = $this->res->extraData['total_2'];
+                $temp['total_3'] = $this->res->extraData['total_3'];
+                $temp['tipo_reg'] = 'summary';                
+                $this->res->total++;
+                $this->res->addLastRecDatos($temp);
+            }else{
+                $this->res=$this->objFunc->detalleConciliaRepo($this->objParam);
+            }
+		}
+		$this->res->imprimirRespuesta($this->res->generarJson());
+    }	
+    function finalizarConciliacion() {
+        $this->objFunc=$this->create('MODConciliacionBancaria');
+        $this->res=$this->objFunc->finalizarConciliacion($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }	
 }
 
 ?>

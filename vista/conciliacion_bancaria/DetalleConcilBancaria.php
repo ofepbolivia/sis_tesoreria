@@ -12,9 +12,16 @@ header("content-type: text/javascript; charset=UTF-8");
 	Phx.vista.DetalleConcilBancaria = Ext.extend(Phx.gridInterfaz, {
 		
 		constructor : function(config) {			
-			this.maestro = config.maestro;			
-			Phx.vista.DetalleConcilBancaria.superclass.constructor.call(this, config);			         
-			this.init();						
+			this.maestro = config.maestro;            
+			Phx.vista.DetalleConcilBancaria.superclass.constructor.call(this, config);                        
+			this.init();  
+            this.iniciarEventos();	          
+            var dataPadre = Phx.CP.getPagina(this.idContenedorPadre).getSelectedData();
+            if(dataPadre){                                
+                this.onEnablePanel(this, dataPadre);                
+            } else {
+                this.bloquearMenus();
+            }            					
 		},
 		   
 		Atributos : [{
@@ -102,7 +109,10 @@ header("content-type: text/javascript; charset=UTF-8");
 				fieldLabel: 'Importe',
 				allowBlank: false,
 				anchor: '50%',
-				gwidth: 90				
+				gwidth: 90,
+                renderer: (value, p, record) => { 
+                    return  String.format('<div style="text-align:right;">{0}</div>', Ext.util.Format.number(value,'0.000,00/i'));
+                }                				
 			},
 				type:'NumberField',				
 				id_grupo:1,
@@ -205,21 +215,50 @@ header("content-type: text/javascript; charset=UTF-8");
 	],
 	onReloadPage:function(m)
 	{		
-		this.maestro=m;						
+		this.maestro=m;						        
 		this.store.baseParams={id_conciliacion_bancaria:this.maestro.id_conciliacion_bancaria};
 		this.load({params:{start:0, limit:50}});			
 	},
+    iniciarEventos:function(){
+        this.cmpFecha = this.getComponente('fecha');
+    },
+    onButtonNew:function(){
+        Phx.vista.DetalleConcilBancaria.superclass.onButtonNew.call(this);			
+        var date = new Date();
+        this.cmpFecha.setValue(date.dateFormat('d/m/Y'));
+    },        
 	loadValoresIniciales:function()
 	{
 		Phx.vista.DetalleConcilBancaria.superclass.loadValoresIniciales.call(this);
-		this.getComponente('id_conciliacion_bancaria').setValue(this.maestro.id_conciliacion_bancaria);				
-	},	
-		sortInfo : {			
-			field : 'id_detalle_conciliacion_bancaria',
-			direction : 'ASC'
-		},
-		bdel : true,
-		bsave : false,
-		btest: false		
+		this.getComponente('id_conciliacion_bancaria').setValue(this.maestro.id_conciliacion_bancaria);                				
+	},
+    preparaMenu:function(n){
+         
+         Phx.vista.DetalleConcilBancaria.superclass.preparaMenu.call(this,n);          
+          if(this.maestro.estado ==  'finalizado'){
+               this.getBoton('new').disable();
+               this.getBoton('edit').disable();            
+               this.getBoton('del').disable();
+         }else{
+               this.getBoton('edit').enable();
+               this.getBoton('new').enable();
+               this.getBoton('del').enable();            
+         }   
+     }, 
+     liberaMenu: function() {
+         Phx.vista.DetalleConcilBancaria.superclass.liberaMenu.call(this); 
+           if(this.maestro&&(this.maestro.estado ==  'finalizado')){               
+               this.getBoton('edit').disable();
+               this.getBoton('new').disable();
+               this.getBoton('del').disable();
+         }
+    },        	
+    sortInfo : {			
+        field : 'id_detalle_conciliacion_bancaria',
+        direction : 'ASC'
+    },
+    bdel : true,
+    bsave : false,
+    btest: false		
 	}); 
 </script>

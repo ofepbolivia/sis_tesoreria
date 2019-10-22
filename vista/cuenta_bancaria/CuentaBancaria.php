@@ -432,6 +432,53 @@ Phx.vista.CuentaBancaria=Ext.extend(Phx.gridInterfaz,{
             id_grupo:1,
             grid:false,
             form:true
+        },
+
+        {
+            config:{
+                name: 'id_proveedor_cta_bancaria',
+                fieldLabel: 'Cuenta Bancaria',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 250,
+                emptyText:'Cuenta Bancaria',
+                store:new Ext.data.JsonStore(
+                    {
+                        url: '../../sis_parametros/control/ProveedorCtaBancaria/listarProveedorCtaBancaria',
+                        id: 'id_proveedor_cta_bancaria',
+                        root:'datos',
+                        sortInfo:{
+                            field:'nro_cuenta',
+                            direction:'ASC'
+                        },
+                        totalProperty:'total',
+                        fields: ['id_proveedor_cta_bancaria','nro_cuenta'],
+                        remoteSort: true,
+                        baseParams:{par_filtro:'nro_cuenta', id_proveedor : 2374}
+                    }),
+                tpl:'<tpl for="."><div class="x-combo-list-item"><p>{nro_cuenta}</p></div></tpl>',
+                valueField: 'id_proveedor_cta_bancaria',
+                hiddenValue: 'id_proveedor_cta_bancaria',
+                displayField: 'nro_cuenta',
+                gdisplayField:'nro_cuenta_prov',
+                listWidth:'280',
+                forceSelection:true,
+                typeAhead: false,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode:'remote',
+                pageSize:20,
+                queryDelay:500,
+
+                gwidth: 250,
+                minChars:2,
+                renderer:function (value, p, record){return String.format('{0}', record.data['nro_cuenta_prov']);}
+            },
+            type:'ComboBox',
+            filters:{pfiltro:'pctaban.nro_cuenta_prov',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:true
         }
 	],
 	
@@ -457,10 +504,12 @@ Phx.vista.CuentaBancaria=Ext.extend(Phx.gridInterfaz,{
 		{name:'usr_reg', type: 'string'},
 		{name:'usr_mod', type: 'string'},'id_moneda','codigo_moneda','id_finalidads',
         {name:'forma_pago', type: 'string'},
-        {name:'saldo', type: 'numeric'}
-		
+        {name:'saldo', type: 'numeric'},
+        {name:'id_proveedor_cta_bancaria', type: 'numeric'},
+        {name:'nro_cuenta_prov', type: 'string'}
+
 	],
-    arrayDefaultColumHidden:['forma_pago'],
+    arrayDefaultColumHidden:['forma_pago', 'id_proveedor_cta_bancaria'],
 				
 	sortInfo:{
 		field: 'id_cuenta_bancaria',

@@ -1,5 +1,5 @@
 <?php
-class RProcesoConRetencionXLS
+class RProcesoConRetencionXLSPro
 {
     private $docexcel;
     private $objWriter;
@@ -100,12 +100,12 @@ class RProcesoConRetencionXLS
 
         //titulos
 
-        $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0,2,'PROCESOS CON RETENCION DEL 7%' );
-        $this->docexcel->getActiveSheet()->getStyle('A2:L2')->applyFromArray($styleTitulos1);
-        $this->docexcel->getActiveSheet()->mergeCells('A2:L2');
+        $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0,2,'PROCESOS CON RETENCION DEL 7% A PRORRATEO' );
+        $this->docexcel->getActiveSheet()->getStyle('A2:O2')->applyFromArray($styleTitulos1);
+        $this->docexcel->getActiveSheet()->mergeCells('A2:O2');
         $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0,4,'Del: '.  $this->objParam->getParametro('fecha_ini').'   Al: '.  $this->objParam->getParametro('fecha_fin') );
-        $this->docexcel->getActiveSheet()->getStyle('A4:L4')->applyFromArray($styleTitulos3);
-        $this->docexcel->getActiveSheet()->mergeCells('A4:L4');
+        $this->docexcel->getActiveSheet()->getStyle('A4:O4')->applyFromArray($styleTitulos3);
+        $this->docexcel->getActiveSheet()->mergeCells('A4:O4');
 
         $this->docexcel->getActiveSheet()->getColumnDimension('B')->setWidth(80);
         $this->docexcel->getActiveSheet()->getColumnDimension('C')->setWidth(30);
@@ -116,16 +116,19 @@ class RProcesoConRetencionXLS
         $this->docexcel->getActiveSheet()->getColumnDimension('H')->setWidth(20);
         $this->docexcel->getActiveSheet()->getColumnDimension('I')->setWidth(15);
         $this->docexcel->getActiveSheet()->getColumnDimension('J')->setWidth(20);
-        $this->docexcel->getActiveSheet()->getColumnDimension('K')->setWidth(15);
+        $this->docexcel->getActiveSheet()->getColumnDimension('K')->setWidth(22);
         $this->docexcel->getActiveSheet()->getColumnDimension('L')->setWidth(20);
+        $this->docexcel->getActiveSheet()->getColumnDimension('M')->setWidth(20);
+        $this->docexcel->getActiveSheet()->getColumnDimension('N')->setWidth(20);
+        $this->docexcel->getActiveSheet()->getColumnDimension('O')->setWidth(20);
 
-        $this->docexcel->getActiveSheet()->getStyle('A5:L5')->getAlignment()->setWrapText(true);
-        $this->docexcel->getActiveSheet()->getStyle('A5:L5')->applyFromArray($styleTitulos2);
+        $this->docexcel->getActiveSheet()->getStyle('A5:O5')->getAlignment()->setWrapText(true);
+        $this->docexcel->getActiveSheet()->getStyle('A5:O5')->applyFromArray($styleTitulos2);
 
 
 
         //*************************************Cabecera*****************************************
-        $this->docexcel->getActiveSheet()->setCellValue('A5','N?');
+        $this->docexcel->getActiveSheet()->setCellValue('A5','Nº');
         $this->docexcel->getActiveSheet()->setCellValue('B5','PROVEEDOR');
         $this->docexcel->getActiveSheet()->setCellValue('C5','NRO. DE CONTRATO');
         $this->docexcel->getActiveSheet()->setCellValue('D5','NRO. DE TRAMITE');
@@ -133,10 +136,14 @@ class RProcesoConRetencionXLS
         $this->docexcel->getActiveSheet()->setCellValue('F5','TIPO DE CUOTA');
         $this->docexcel->getActiveSheet()->setCellValue('G5','FECHA DE PAGO');
         $this->docexcel->getActiveSheet()->setCellValue('H5','MONEDA');
-        $this->docexcel->getActiveSheet()->setCellValue('I5','MONTO A PAGAR');
-        $this->docexcel->getActiveSheet()->setCellValue('J5','MONTO RETENCION DE GARANTIA');
-        $this->docexcel->getActiveSheet()->setCellValue('K5','LIQUIDO PAGABLE');
+        $this->docexcel->getActiveSheet()->setCellValue('I5','CENTRO DE COSTO');
+        $this->docexcel->getActiveSheet()->setCellValue('J5','PARTIDA');
+        $this->docexcel->getActiveSheet()->setCellValue('K5','PROG-ACT');
         $this->docexcel->getActiveSheet()->setCellValue('L5','NRO. C31');
+        $this->docexcel->getActiveSheet()->setCellValue('M5','MONTO A PAGAR');
+        $this->docexcel->getActiveSheet()->setCellValue('N5','MONTO RETENCION DE GARANTIA');
+        $this->docexcel->getActiveSheet()->setCellValue('O5','LIQUIDO PAGABLE');
+
 
     }
     function generarDatos()
@@ -157,6 +164,12 @@ class RProcesoConRetencionXLS
                 'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
             )
         );
+        $styleArrayGroupPar = array(
+            'font'  => array('bold'  => true),
+            'alignment' => array('horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER),
+            'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN))
+        );
 
         $this->numero = 1;
         $fila = 6;
@@ -167,32 +180,61 @@ class RProcesoConRetencionXLS
         $sumatoria_monto_retgar_mo = 0;
         $sumatoria_liquido_pagable = 0;
 
+        $fila_ini_par = $fila;
+        $fila_fin_par = $fila;
+        $fila_ini = $fila;
+        $fila_fin = $fila;
+        $tmp_rec = $datos[0];
         foreach ($datos as $value)
         {
-//            if ($value['monto_retgar_mo']!= 0) {
+
+            if(($tmp_rec['nro_cuota'] != $value['nro_cuota']) or ($tmp_rec['num_tramite'] != $value['num_tramite'])){
+                $fila_fin_par = $fila-1;
+                $this->docexcel->setActiveSheetIndex(0)->mergeCells("E".($fila_ini_par).":E".($fila_fin_par));
+                $fila_ini_par = $fila;
+            }
+            if($tmp_rec['num_tramite'] != $value['num_tramite']){
+                $fila_fin = $fila-1;
+                $this->docexcel->setActiveSheetIndex(0)->mergeCells("D".($fila_ini).":D".($fila_fin));
+                $this->docexcel->setActiveSheetIndex(0)->getStyle("D".($fila_ini).":D".($fila_fin))->applyFromArray($styleArrayGroupPar);
+                $fila_ini = $fila;
+            }
+            if(!next($datos)){
+                $fila_fin = $fila;
+                $fila_fin_par = $fila;
+                $this->docexcel->setActiveSheetIndex(0)->mergeCells("D".($fila_ini).":D".($fila_fin));
+                $this->docexcel->setActiveSheetIndex(0)->mergeCells("E".($fila_ini_par).":E".($fila_fin_par));
+                $this->docexcel->setActiveSheetIndex(0)->getStyle("D".($fila_ini).":D".($fila_fin))->applyFromArray($styleArrayGroupPar);
+            }
             $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0, $fila, $this->numero);
             $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(1, $fila, $value['proveedor']);
-            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(2, $fila, $value['numero']);
+            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(2, $fila, $value['nro_contrato']);
             $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(3, $fila, $value['num_tramite']);
             $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(4, $fila, $value['nro_cuota']);
             $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(5, $fila, $value['tipo']);
             $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(6, $fila, $value['fecha_dev']);
             $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(7, $fila,$value['moneda']);
-            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(8, $fila, $value['monto']);
-            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(9, $fila, $value['monto_retgar_mo']);
-            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(10, $fila, $value['liquido_pagable']);
+            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(8, $fila,$value['codigo_cc']);
+            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(9, $fila,$value['partida']);
+            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(10, $fila,$value['codigo_categoria']);
             $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(11, $fila, $value['c31']);
+            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(12, $fila, $value['monto']);
+            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(13, $fila, $value['monto_retgar_mo']);
+            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(14, $fila, $value['liquido_pagable']);
+
 
             $this->docexcel->getActiveSheet()->getStyle("E$fila:E$fila")->applyFromArray($styleTitulos3);
             $this->docexcel->getActiveSheet()->getStyle("G$fila:G$fila")->applyFromArray($styleTitulos3);
-            $this->docexcel->getActiveSheet()->getStyle("I$fila:I$fila")->applyFromArray($styleTitulos3);
-            $this->docexcel->getActiveSheet()->getStyle("J$fila:J$fila")->applyFromArray($styleTitulos3);
-            $this->docexcel-> getActiveSheet () -> getStyle ( "I$fila:I$fila") -> getNumberFormat () -> setFormatCode (PHPExcel_Style_NumberFormat :: FORMAT_NUMBER_COMMA_SEPARATED1);
-            $this->docexcel-> getActiveSheet () -> getStyle ( "J$fila:J$fila") -> getNumberFormat () -> setFormatCode (PHPExcel_Style_NumberFormat :: FORMAT_NUMBER_COMMA_SEPARATED1);
-            $this->docexcel-> getActiveSheet () -> getStyle ( "K$fila:K$fila") -> getNumberFormat () -> setFormatCode (PHPExcel_Style_NumberFormat :: FORMAT_NUMBER_COMMA_SEPARATED1);
-
-            $this->docexcel->getActiveSheet()->getStyle("K$fila:K$fila")->applyFromArray($styleTitulos3);
+            $this->docexcel->getActiveSheet()->getStyle("M$fila:M$fila")->applyFromArray($styleTitulos3);
+            $this->docexcel->getActiveSheet()->getStyle("N$fila:N$fila")->applyFromArray($styleTitulos3);
+            $this->docexcel->getActiveSheet()->getStyle("O$fila:O$fila")->applyFromArray($styleTitulos3);
             $this->docexcel->getActiveSheet()->getStyle("L$fila:L$fila")->applyFromArray($styleTitulos3);
+
+            $this->docexcel-> getActiveSheet () -> getStyle ( "M$fila:M$fila") -> getNumberFormat () -> setFormatCode (PHPExcel_Style_NumberFormat :: FORMAT_NUMBER_COMMA_SEPARATED1);
+            $this->docexcel-> getActiveSheet () -> getStyle ( "N$fila:N$fila") -> getNumberFormat () -> setFormatCode (PHPExcel_Style_NumberFormat :: FORMAT_NUMBER_COMMA_SEPARATED1);
+            $this->docexcel-> getActiveSheet () -> getStyle ( "O$fila:O$fila") -> getNumberFormat () -> setFormatCode (PHPExcel_Style_NumberFormat :: FORMAT_NUMBER_COMMA_SEPARATED1);
+
+
 
             $fila++;
 
@@ -200,17 +242,16 @@ class RProcesoConRetencionXLS
             $sumatoria_monto = $sumatoria_monto + round ($value['monto'],2);
             $sumatoria_monto_retgar_mo = $sumatoria_monto_retgar_mo + round ($value['monto_retgar_mo'],2);
             $sumatoria_liquido_pagable = $sumatoria_liquido_pagable + round ($value['liquido_pagable'],2);
-//            }
-
+            $tmp_rec = $value;
         }
         $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(1,($fila),'TOTAL GENERAL');
-        $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(8,($fila),$sumatoria_monto);
-        $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(9,($fila),$sumatoria_monto_retgar_mo);
-        $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(10,($fila),$sumatoria_liquido_pagable);
-        $this->docexcel->getActiveSheet()->getStyle("A".($fila).":L".($fila))->applyFromArray($styleArrayTotalGral);
-        $this->docexcel-> getActiveSheet () -> getStyle ( "I$fila:I$fila") -> getNumberFormat () -> setFormatCode (PHPExcel_Style_NumberFormat :: FORMAT_NUMBER_COMMA_SEPARATED1);
-        $this->docexcel-> getActiveSheet () -> getStyle ( "J$fila:J$fila") -> getNumberFormat () -> setFormatCode (PHPExcel_Style_NumberFormat :: FORMAT_NUMBER_COMMA_SEPARATED1);
-        $this->docexcel-> getActiveSheet () -> getStyle ( "K$fila:K$fila") -> getNumberFormat () -> setFormatCode (PHPExcel_Style_NumberFormat :: FORMAT_NUMBER_COMMA_SEPARATED1);
+        $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(12,($fila),$sumatoria_monto);
+        $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(13,($fila),$sumatoria_monto_retgar_mo);
+        $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(14,($fila),$sumatoria_liquido_pagable);
+        $this->docexcel->getActiveSheet()->getStyle("A".($fila).":O".($fila))->applyFromArray($styleArrayTotalGral);
+        $this->docexcel-> getActiveSheet () -> getStyle ( "M$fila:M$fila") -> getNumberFormat () -> setFormatCode (PHPExcel_Style_NumberFormat :: FORMAT_NUMBER_COMMA_SEPARATED1);
+        $this->docexcel-> getActiveSheet () -> getStyle ( "N$fila:N$fila") -> getNumberFormat () -> setFormatCode (PHPExcel_Style_NumberFormat :: FORMAT_NUMBER_COMMA_SEPARATED1);
+        $this->docexcel-> getActiveSheet () -> getStyle ( "O$fila:O$fila") -> getNumberFormat () -> setFormatCode (PHPExcel_Style_NumberFormat :: FORMAT_NUMBER_COMMA_SEPARATED1);
 
         //var_dump($this->objParam); exit;
     }

@@ -12,6 +12,7 @@ require_once(dirname(__FILE__).'/../reportes/RSolicitudPlanPago.php');
 require_once(dirname(__FILE__).'/../../pxp/pxpReport/DataSource.php');
 require_once(dirname(__FILE__).'/../reportes/RConformidad.php');
 require_once(dirname(__FILE__).'/../reportes/RProcesoConRetencionXLS.php');
+require_once(dirname(__FILE__).'/../reportes/RProcesoConRetencionXLSPro.php');
 
 require_once(dirname(__FILE__) . '/../reportes/RConformidadTotal.php');
 
@@ -411,10 +412,16 @@ class ACTPlanPago extends ACTbase{
         //$this->objParam->getParametro('fecha_fin');
 
         $this->objFunc = $this->create('MODPlanPago');
-        $this->res = $this->objFunc->listarProcesoConRetencion($this->objParam);
-        //var_dump( $this->res);exit;
+
+        if($this->objParam->getParametro('tipo_reporte')=='reporte_nor'){
+            $this->res = $this->objFunc->listarProcesoConRetencion($this->objParam);
+        }elseif ($this->objParam->getParametro('tipo_reporte')=='reporte_pro'){
+            $this->res = $this->objFunc->listarProcesoConRetencionAProrrateo($this->objParam);
+        }
+
         //obtener titulo de reporte
         $titulo = 'Proceso Con Retencion';
+        //var_dump($this->res); exit;
         //Genera el nombre del archivo (aleatorio + titulo)
         $nombreArchivo = uniqid(md5(session_id()) . $titulo);
 
@@ -422,7 +429,12 @@ class ACTPlanPago extends ACTbase{
         $this->objParam->addParametro('nombre_archivo', $nombreArchivo);
         $this->objParam->addParametro('datos', $this->res->datos);
         //Instancia la clase de excel
-        $this->objReporteFormato = new RProcesoConRetencionXLS($this->objParam);
+        if($this->objParam->getParametro('tipo_reporte')=='reporte_nor'){
+            $this->objReporteFormato = new RProcesoConRetencionXLS($this->objParam);
+        }elseif ($this->objParam->getParametro('tipo_reporte')=='reporte_pro'){
+            $this->objReporteFormato = new RProcesoConRetencionXLSPro($this->objParam);
+        }
+
         $this->objReporteFormato->generarDatos();
         $this->objReporteFormato->generarReporte();
 

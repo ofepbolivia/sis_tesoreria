@@ -91,7 +91,8 @@ BEGIN
                 denominacion,
                 centro,
                 id_finalidad,
-                forma_pago
+                forma_pago,
+                id_proveedor_cta_bancaria
           	) values(
                 'activo',
                 v_parametros.fecha_baja,
@@ -106,7 +107,8 @@ BEGIN
                 v_parametros.denominacion,
                 v_parametros.centro,
                 string_to_array(v_parametros.id_finalidads,',')::integer[],
-                v_parametros.forma_pago
+                v_parametros.forma_pago,
+                v_parametros.id_proveedor_cta_bancaria
 
 			)RETURNING id_cuenta_bancaria into v_id_cuenta_bancaria;
 
@@ -177,7 +179,8 @@ BEGIN
                 id_moneda = v_parametros.id_moneda,
                 denominacion = v_parametros.denominacion,
                 id_finalidad = string_to_array(v_parametros.id_finalidads,',')::integer[],
-                forma_pago = v_parametros.forma_pago
+                forma_pago = v_parametros.forma_pago,
+                id_proveedor_cta_bancaria = v_parametros.id_proveedor_cta_bancaria
 			where id_cuenta_bancaria=v_parametros.id_cuenta_bancaria;
 
 			--Definicion de la respuesta

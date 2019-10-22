@@ -126,6 +126,8 @@ class MODPlanPago extends MODbase{
         $this->captura('nit','varchar');
 
         $this->captura('id_proveedor_cta_bancaria','integer');
+        $this->captura('id_multa','integer');
+        $this->captura('desc_multa','varchar');
 
         //Ejecuta la instruccion
         $this->armarConsulta();
@@ -156,7 +158,7 @@ class MODPlanPago extends MODbase{
 
         }
 
-        elseif (in_array($this->objParam->getParametro('tipo'), array("ant_parcial","anticipo","dev_garantia"))){
+        elseif (in_array($this->objParam->getParametro('tipo'), array("ant_parcial","anticipo","dev_garantia","dev_garantia_con","dev_garantia_con_ant"))){
             ///////////////////////////////////////////////
             // Cuotas de primer nivel que no tienen prorrateo
             /////////////////////////////////////////////
@@ -213,6 +215,7 @@ class MODPlanPago extends MODbase{
 
         $this->setParametro('monto_establecido','monto_establecido','numeric');
         $this->setParametro('id_proveedor_cta_bancaria','id_proveedor_cta_bancaria','int4');
+        $this->setParametro('id_multa','id_multa','int4');
 
 
 
@@ -274,6 +277,7 @@ class MODPlanPago extends MODbase{
 
         $this->setParametro('monto_establecido','monto_establecido','numeric');
         $this->setParametro('id_proveedor_cta_bancaria','id_proveedor_cta_bancaria','int4');
+        $this->setParametro('id_multa','id_multa','int4');
 
 
 
@@ -931,6 +935,8 @@ class MODPlanPago extends MODbase{
 
         $this->setParametro('fecha_ini','fecha_ini','date');
         $this->setParametro('fecha_fin','fecha_fin','date');
+        $this->setParametro('id_proveedor','id_proveedor','integer');
+        $this->setParametro('id_contrato','id_contrato','integer');
         $this->setCount(false);
 
         $this->captura('id_proveedor', 'integer');
@@ -947,6 +953,7 @@ class MODPlanPago extends MODbase{
         $this->captura('moneda', 'varchar');
         $this->captura('liquido_pagable', 'NUMERIC');
         $this->captura('c31', 'varchar');
+        $this->captura('numero', 'varchar');
 
         //Ejecuta la instruccion
         $this->armarConsulta();
@@ -1114,7 +1121,44 @@ class MODPlanPago extends MODbase{
         return $this->respuesta;
     }
 
+	function listarProcesoConRetencionAProrrateo(){
+        //Definicion de variables para ejecucion del procedimientp
+        $this->procedimiento='tes.f_plan_pago_sel';
+        $this->transaccion='TES_PROCREPRO_SEL';
+        $this->tipo_procedimiento='SEL';//tipo de transaccion
 
+        $this->setParametro('fecha_ini','fecha_ini','date');
+        $this->setParametro('fecha_fin','fecha_fin','date');
+        $this->setParametro('id_proveedor','id_proveedor','integer');
+        $this->setParametro('id_contrato','id_contrato','integer');
+
+
+        $this->setCount(false);
+
+        $this->captura('proveedor', 'varchar');
+        $this->captura('nro_contrato', 'varchar');
+        $this->captura('num_tramite', 'varchar');
+        $this->captura('nro_cuota', 'NUMERIC');
+        $this->captura('tipo', 'varchar');
+        $this->captura('fecha_dev', 'DATE');
+        $this->captura('moneda', 'varchar');
+        $this->captura('codigo_cc', 'varchar');
+        $this->captura('partida', 'varchar');
+        $this->captura('codigo_categoria', 'varchar');
+        $this->captura('c31', 'varchar');
+        $this->captura('monto', 'NUMERIC');
+        $this->captura('monto_retgar_mo', 'NUMERIC');
+        $this->captura('liquido_pagable', 'NUMERIC');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+        // var_dump($this->respuesta);exit;
+        //Devuelve la respuesta
+        return $this->respuesta;
+
+
+    }
 
 }
 ?>

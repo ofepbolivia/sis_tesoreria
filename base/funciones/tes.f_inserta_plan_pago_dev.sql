@@ -233,7 +233,7 @@ BEGIN
                         --   si es  un pago no variable  (si es una cuota de devengao_pagado, devegando_pagado_1c, pagado)
                         --  validar que no se haga el ultimo pago sin  terminar de descontar el anticipo,
 
-                        IF   (p_hstore->'tipo') in('devengado_pagado','devengado_pagado_1c','devengado_pagado_1c_sp')  THEN
+                        IF   (p_hstore->'tipo') in('devengado_pagado','devengado_pagado_1c', 'devengado_pagado_1c_sp')  THEN
                             -- saldo_x_pagar = determinar cuanto falta por pagar (sin considerar el devengado)
                             v_saldo_x_pagar = tes.f_determinar_total_faltante((p_hstore->'id_obligacion_pago')::integer,'total_registrado_pagado');
 
@@ -290,7 +290,7 @@ BEGIN
           END IF;
 
           --revision de anticipo
-          IF (p_hstore->'tipo') in('devengado','devengado_pagado','devengado_pagado_1c','devengado_pagado_1c_sp') THEN
+          IF (p_hstore->'tipo') in('devengado','devengado_pagado','devengado_pagado_1c', 'devengado_pagado_1c_sp') THEN
                --si es un proceso variable, verifica que el registro no sobrepase el total a pagar
                IF v_registros.pago_variable='no' THEN
                         -- Validamos anticipos mistos
@@ -569,7 +569,8 @@ BEGIN
             fecha_conclusion_pago,
             es_ultima_cuota,
             monto_establecido,
-            id_proveedor_cta_bancaria
+            id_proveedor_cta_bancaria,
+            id_multa
           	) values(
 			'activo',
 			v_nro_cuota,
@@ -620,7 +621,8 @@ BEGIN
             (p_hstore->'fecha_conclusion_pago')::date,
             true,
             v_monto_establecido,
-            (p_hstore->'id_proveedor_cta_bancaria')::integer
+            (p_hstore->'id_proveedor_cta_bancaria')::integer,
+            (p_hstore->'id_multa')::integer
            )RETURNING id_plan_pago into v_id_plan_pago;
 
            IF (v_fecha_ini_pp is not Null or v_fecha_fin_pp is not Null or v_fecha_conclusion is not Null) THEN
@@ -667,8 +669,8 @@ BEGIN
                END IF;
             END IF;
 
-			IF (p_hstore->'tipo' != 'devengado_pagado_1c_sp') THEN
-            --si el salto esta habilitado cambiamos la cuota al siguiente estado
+            IF (p_hstore->'tipo' != 'devengado_pagado_1c_sp') THEN
+              --si el salto esta habilitado cambiamos la cuota al siguiente estado
               IF p_salta  and v_registros.pago_variable = 'no' THEN
                     IF not tes.f_cambio_estado_plan_pago(p_id_usuario, v_id_plan_pago) THEN
                       raise exception 'error al cambiar de estado';
