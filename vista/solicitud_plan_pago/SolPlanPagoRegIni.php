@@ -18,8 +18,8 @@ header("content-type: text/javascript; charset=UTF-8");
 
 
             this.maestro=config.maestro;
-
-
+            //this.Cmp.desc_moneda
+            //console.log('moneda',this.maestro.id_moneda);
             this.Atributos.splice(12,0,
                 {
                     config:{
@@ -465,6 +465,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.Cmp.tipo.enable();
                 // this.blockGroup(1);//bloqueaos el grupo , detalle de pago
                 this.Cmp.id_obligacion_pago.setValue(this.maestro.id_obligacion_pago);
+                console.log('obligacion pago',this.Cmp.id_obligacion_pago.getValue());
                 this.Cmp.id_plan_pago_fk.setValue(data.id_plan_pago);
 
                 if( data.tipo == 'devengado'||data.tipo == 'devengado_pagado'){
@@ -505,6 +506,17 @@ header("content-type: text/javascript; charset=UTF-8");
                 Phx.vista.SolPlanPagoRegIni.superclass.onButtonNew.call(this);
                 this.Cmp.tipo.enable();
                 this.Cmp.id_obligacion_pago.setValue(this.maestro.id_obligacion_pago);
+                console.log('obligacion pago',this.maestro.tipo_moneda);
+                console.log('obligacion pago',this.maestro.moneda);
+                console.log('obligacion pago',this.maestro.id_moneda);
+                if(this.maestro.tipo_moneda=='Base'){
+                    if (this.maestro.moneda=='Bolivianos')
+                        this.Cmp.desc_moneda.setValue('Bs');
+                    else
+                        this.Cmp.desc_moneda.setValue('$');
+                }
+                else if ( this.maestro.moneda=='Dolares Americanos')
+                    this.Cmp.desc_moneda.setValue('$us');
                 // this.blockGroup(1)//bloqueaos el grupo , detalle de pago
                 //tipo pago (OPERACION)
 

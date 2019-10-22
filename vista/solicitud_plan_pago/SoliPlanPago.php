@@ -906,6 +906,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     name: 'desc_moneda',
                     fieldLabel: 'Moneda',
                     gwidth: 70,
+                    disabled: true,
                 },
                 type: 'Field',
                 id_grupo: 1,
@@ -914,7 +915,8 @@ header("content-type: text/javascript; charset=UTF-8");
                     type: 'string'
                 },
                 grid: true,
-                form: false
+                form: true,
+                
             },
 
 
