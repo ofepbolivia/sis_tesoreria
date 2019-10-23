@@ -615,8 +615,12 @@ BEGIN
                      v_monto_ejecutar_total_mo  = COALESCE(v_parametros.monto,0) -  COALESCE(v_parametros.monto_no_pagado,0) -  COALESCE(v_parametros.monto_anticipo,0);
                      v_porc_monto_retgar = COALESCE(v_parametros.monto_retgar_mo,0)/COALESCE(v_parametros.monto,0);
 
-                     IF   v_liquido_pagable  < 0  or v_monto_ejecutar_total_mo < 0  THEN
-                          raise exception ' Ni el  monto a ejecutar   ni el liquido pagable  puede ser menor a cero';
+					-- 23-10-2019(may) modificacion aviso de los montos liquido pagable y a ejecutar
+                     IF v_liquido_pagable  < 0 THEN
+                          raise exception 'El Líquido Pagable es de % y no puede ser menor a cero', v_liquido_pagable;
+                     END IF;
+                     IF v_monto_ejecutar_total_mo < 0 THEN
+                          raise exception 'El Monto a Ejecutar es de % y no puede ser menor a cero', v_monto_ejecutar_total_mo;
                      END IF;
 
                      --revision de anticipo
