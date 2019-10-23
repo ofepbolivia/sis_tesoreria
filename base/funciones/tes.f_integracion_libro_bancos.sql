@@ -144,7 +144,7 @@ BEGIN
 
 
             IF(v_registros.centro ='otro') THEN
-           			v_respuesta_libro_bancos = tes.f_generar_cheque_trans_propia(p_id_usuario,p_id_int_comprobante, v_id_finalidad,NULL,COALESCE(v_registros.c31,''),'nacional');
+           			v_respuesta_libro_bancos = tes.f_generar_cheque_trans_propia(p_id_usuario,p_id_int_comprobante, v_id_finalidad,NULL,COALESCE(v_registros.c31,''), 'nacional', null);
             END IF;
 
 
@@ -161,7 +161,7 @@ BEGIN
                       v_respuesta_libro_bancos = tes.f_generar_deposito_cheque_trasn_propia(p_id_usuario,p_id_int_comprobante, v_id_finalidad,NULL,COALESCE(v_registros.c31,''),'nacional',v_cuenta.id_cuenta_bancaria);
 
              ELSE
-                      v_respuesta_libro_bancos = tes.f_generar_cheque_trans_propia(p_id_usuario,p_id_int_comprobante, v_id_finalidad,NULL,COALESCE(v_registros.c31,''),'nacional');
+                      v_respuesta_libro_bancos = tes.f_generar_cheque_trans_propia(p_id_usuario,p_id_int_comprobante, v_id_finalidad,NULL,COALESCE(v_registros.c31,''), 'nacional', v_cuenta.id_cuenta_bancaria);
              end if;
            end if;
 
