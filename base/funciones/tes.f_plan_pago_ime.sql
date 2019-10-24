@@ -309,7 +309,7 @@ BEGIN
                             INTO v_sum_monto_pp
                             FROM tes.tplan_pago pp
                             WHERE pp.estado != 'anulado' and pp.estado != 'pago_exterior' and pp.estado != 'pagado'
-                            and pp.tipo not in ( 'dev_garantia', 'dev_garantia_con', 'dev_garantia_con_ant', 'anticipo', 'ant_parcial', 'ant_rendicion', 'ant_aplicado', 'rendicion','ret_rendicion' )
+                            and pp.tipo not in ('especial', 'dev_garantia', 'dev_garantia_con', 'dev_garantia_con_ant', 'anticipo', 'ant_parcial', 'ant_rendicion', 'ant_aplicado', 'rendicion','ret_rendicion' )
                             and pp.id_obligacion_pago = v_parametros.id_obligacion_pago;
 
                             SELECT sum(pe.monto)
@@ -644,7 +644,7 @@ BEGIN
                             FROM tes.tplan_pago pp
                             WHERE pp.estado != 'anulado' and pp.estado != 'pago_exterior' and pp.estado != 'pagado'
                             --and pp.tipo not in ( 'dev_garantia', 'dev_garantia_con', 'dev_garantia_con_ant')
-                            and pp.tipo not in ( 'dev_garantia', 'dev_garantia_con', 'dev_garantia_con_ant', 'anticipo', 'ant_parcial', 'ant_rendicion', 'ant_aplicado', 'rendicion','ret_rendicion' )
+                            and pp.tipo not in ('especial', 'dev_garantia', 'dev_garantia_con', 'dev_garantia_con_ant', 'anticipo', 'ant_parcial', 'ant_rendicion', 'ant_aplicado', 'rendicion','ret_rendicion' )
                             and pp.id_obligacion_pago = v_parametros.id_obligacion_pago;
 
                             --SELECT pp.monto_ejecutar_total_mo
@@ -1842,7 +1842,7 @@ BEGIN
                 INTO v_sum_monto_pp
                 FROM tes.tplan_pago pp
                 WHERE pp.estado != 'anulado' and pp.estado != 'pago_exterior' and pp.estado != 'pagado'
-                and pp.tipo not in ( 'dev_garantia', 'dev_garantia_con', 'dev_garantia_con_ant', 'anticipo', 'ant_parcial', 'ant_rendicion', 'ant_aplicado', 'rendicion','ret_rendicion' )
+                and pp.tipo not in ('especial', 'dev_garantia', 'dev_garantia_con', 'dev_garantia_con_ant', 'anticipo', 'ant_parcial', 'ant_rendicion', 'ant_aplicado', 'rendicion','ret_rendicion' )
                 --and pp.tipo not in ( 'dev_garantia', 'dev_garantia_con', 'dev_garantia_con_ant', 'anticipo', 'ant_parcial', 'ant_rendicion')
                 and pp.estado_reg != 'anulado'
                 and pp.id_obligacion_pago = v_id_obligacion_pago_pp;
