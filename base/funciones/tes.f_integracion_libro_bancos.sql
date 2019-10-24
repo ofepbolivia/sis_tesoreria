@@ -144,15 +144,16 @@ BEGIN
 
 
             IF(v_registros.centro ='otro') THEN
-           			v_respuesta_libro_bancos = tes.f_generar_cheque_trans_propia(p_id_usuario,p_id_int_comprobante, v_id_finalidad,NULL,COALESCE(v_registros.c31,''),'nacional');
+           			v_respuesta_libro_bancos = tes.f_generar_cheque_trans_propia(p_id_usuario,p_id_int_comprobante, v_id_finalidad,NULL,COALESCE(v_registros.c31,''), 'nacional', null);
             END IF;
 
 
            select cu.id_cuenta_bancaria,cu.centro, cu.nro_cuenta
-           	 into v_cuenta
+		            into v_cuenta
            from tes.tplan_pago p
-           inner join param.tproveedor_cta_bancaria cup on cup.id_proveedor_cta_bancaria = p.id_proveedor_cta_bancaria
-           inner join tes.tcuenta_bancaria cu on cu.nro_cuenta = cu.nro_cuenta
+           inner join tes.tplan_pago pp on pp.id_plan_pago=p.id_plan_pago_fk
+           inner join param.tproveedor_cta_bancaria cup on cup.id_proveedor_cta_bancaria = pp.id_proveedor_cta_bancaria
+           inner join tes.tcuenta_bancaria cu on cu.nro_cuenta = cup.nro_cuenta
            where p.id_int_comprobante = p_id_int_comprobante;
 
            if v_cuenta.id_cuenta_bancaria is not null then
@@ -161,7 +162,7 @@ BEGIN
                       v_respuesta_libro_bancos = tes.f_generar_deposito_cheque_trasn_propia(p_id_usuario,p_id_int_comprobante, v_id_finalidad,NULL,COALESCE(v_registros.c31,''),'nacional',v_cuenta.id_cuenta_bancaria);
 
              ELSE
-                      v_respuesta_libro_bancos = tes.f_generar_cheque_trans_propia(p_id_usuario,p_id_int_comprobante, v_id_finalidad,NULL,COALESCE(v_registros.c31,''),'nacional');
+                      v_respuesta_libro_bancos = tes.f_generar_cheque_trans_propia(p_id_usuario,p_id_int_comprobante, v_id_finalidad,NULL,COALESCE(v_registros.c31,''), 'nacional', v_cuenta.id_cuenta_bancaria);
              end if;
            end if;
 
