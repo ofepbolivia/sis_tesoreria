@@ -509,13 +509,18 @@ header("content-type: text/javascript; charset=UTF-8");
                 console.log('obligacion pago',this.maestro.tipo_moneda);
                 console.log('obligacion pago',this.maestro.moneda);
                 console.log('obligacion pago',this.maestro.id_moneda);
-                if(this.maestro.tipo_moneda=='Base'){
+                /*if(this.maestro.tipo_moneda=='Base'){
                     if (this.maestro.moneda=='Bolivianos')
                         this.Cmp.desc_moneda.setValue('Bs');
                     else
                         this.Cmp.desc_moneda.setValue('$');
-                }
-                else if ( this.maestro.moneda=='Dolares Americanos')
+                }*/
+                if (this.maestro.moneda=='Bolivianos')
+                    this.Cmp.desc_moneda.setValue('Bs');
+                else
+                    this.Cmp.desc_moneda.setValue('$');
+
+                /*else */if ( this.maestro.moneda=='Dolares Americanos')
                     this.Cmp.desc_moneda.setValue('$us');
                 // this.blockGroup(1)//bloqueaos el grupo , detalle de pago
                 //tipo pago (OPERACION)
