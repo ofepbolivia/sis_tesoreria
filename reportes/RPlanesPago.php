@@ -4,6 +4,8 @@ require_once dirname(__FILE__).'/../../pxp/pxpReport/Report.php';
  class CustomReportPlanPago extends TCPDF {
     
     private $dataSource;
+
+
     
     public function setDataSource(DataSource $dataSource) {
         $this->dataSource = $dataSource;
@@ -21,7 +23,7 @@ require_once dirname(__FILE__).'/../../pxp/pxpReport/Report.php';
 								
         $this->SetFontSize(16);
         $this->SetFont('','B'); 
-        $this->Cell(145, $height, 'Plan de Pagos', 0, 0, 'C', false, '', 1, false, 'T', 'C');        
+        $this->Cell(205, $height, 'Plan de Pagos', 0, 0, 'C', false, '', 1, false, 'T', 'C');
         
 		$x=$this->getX();
 		$y=$this->getY();
@@ -42,12 +44,13 @@ require_once dirname(__FILE__).'/../../pxp/pxpReport/Report.php';
 		$this->Cell(6, $height/4, $fecha[1], 1, 0, 'C', false, '', 1, false, 'T', 'C');
 		$this->Cell(7, $height/4, $fecha[0], 1, 0, 'C', false, '', 1, false, 'T', 'C');
 		$this->Ln();
-		
-		$this->Cell(185, $height/5, 'Expresado en '.$this->getDataSource()->getParameter('moneda'), 0, 0, 'C', false, '', 1, false, 'T', 'C');
+
+        $this->SetFontSize(7);
+		$this->Cell(205, $height/5, 'Expresado en '.$this->getDataSource()->getParameter('moneda'), 0, 0, 'C', false, '', 1, false, 'T', 'C');
 		$this->Ln();
-		$this->Cell(185, $height/5, 'Tipo de Cambio '.$this->getDataSource()->getParameter('tipo_cambio_conv'), 0, 0, 'C', false, '', 1, false, 'T', 'C');
+		$this->Cell(205, $height/5, 'Tipo de Cambio '.$this->getDataSource()->getParameter('tipo_cambio_conv'), 0, 0, 'C', false, '', 1, false, 'T', 'C');
 		$this->Ln();    
-		$this->Cell(185, $height/5, 'Pago Variable '.$this->getDataSource()->getParameter('pago_variable'), 0, 0, 'C', false, '', 1, false, 'T', 'C');
+		$this->Cell(205, $height/5, 'Pago Variable '.$this->getDataSource()->getParameter('pago_variable'), 0, 0, 'C', false, '', 1, false, 'T', 'C');
 		$this->Ln();		
     }
     
@@ -75,10 +78,13 @@ require_once dirname(__FILE__).'/../../pxp/pxpReport/Report.php';
 Class RPlanesPago extends Report {
 
     function write($fileName) {
-        $pdf = new CustomReportPlanPago('P', PDF_UNIT, "LETTER", true, 'UTF-8', false);
+        $pdf = new CustomReportPlanPago('L', PDF_UNIT, "LETTER", true, 'UTF-8', false);
+
         $pdf->setDataSource($this->getDataSource());
         // set document information
         $pdf->SetCreator(PDF_CREATOR);
+
+
         
         // set default monospaced font
         $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
@@ -101,21 +107,21 @@ Class RPlanesPago extends Report {
         
         $height = 5;
         $width1 = 15;
-        $width2 = 25;
-        $width3 = 32.5;
+        $width2 = 35;
+        $width3 = 41.1;
         $width4 = 75;
         
 		$white = array('LTRB' =>array('width' => 0.3, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(255, 255, 255)));
 		$black = array('T' =>array('width' => 0.3, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(0, 0, 0)));
 		$pdf->SetFontSize(8);
 		$pdf->SetFont('', 'B');
-        $pdf->Cell($width2, $height, 'Numero Tramite: ', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+        $pdf->Cell($width2, $height, 'Número Trámite: ', 0, 0, 'L', false, '', 0, false, 'T', 'C');
         $pdf->SetFont('', '');
         $pdf->SetFillColor(192,192,192, true);
         $pdf->Cell($width3*2, $height, $this->getDataSource()->getParameter('num_tramite'), $white, 0, 'L', true, '', 0, false, 'T', 'C');
         $pdf->SetFont('', 'B');
-		$pdf->Cell(5, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
-        $pdf->Cell($width2, $height, 'Tipo Obligacion: ', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+		$pdf->Cell(15, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+        $pdf->Cell($width2, $height, 'Tipo Obligación: ', 0, 0, 'L', false, '', 0, false, 'T', 'C');
         $pdf->SetFont('', '');
 								$pdf->SetFillColor(192,192,192, true);
         $pdf->Cell($width3*2, $height, $this->getDataSource()->getParameter('tipo_obligacion'), $white, 0, 'L', true, '', 0, false, 'T', 'C');
@@ -126,7 +132,7 @@ Class RPlanesPago extends Report {
         $pdf->SetFillColor(192,192,192, true);
         $pdf->Cell($width3*2, $height, $this->getDataSource()->getParameter('comprometido'), $white, 0, 'L', true, '', 0, false, 'T', 'C');
         $pdf->SetFont('', 'B');
-		$pdf->Cell(5, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+		$pdf->Cell(15, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
         $pdf->Cell($width2, $height, 'Estado: ', 0, 0, 'L', false, '', 0, false, 'T', 'C');
         $pdf->SetFont('', '');
 		$pdf->SetFillColor(192,192,192, true);
@@ -152,24 +158,31 @@ Class RPlanesPago extends Report {
         $pdf->SetFillColor(192,192,192, true);
         $pdf->Cell($width3*2, $height, $this->getDataSource()->getParameter('nombre_subsistema'), $white, 0, 'L', true, '', 0, false, 'T', 'C');
         $pdf->SetFont('', 'B');
-								$pdf->Cell(5, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+								$pdf->Cell(15, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
         $pdf->Cell($width2, $height, 'Departamento: ', 0, 0, 'L', false, '', 0, false, 'T', 'C');
         $pdf->SetFont('', '');
 								$pdf->SetFillColor(192,192,192, true);
         $pdf->Cell($width3*2, $height, $this->getDataSource()->getParameter('nombre_depto'), $white, 0, 'L', true, '', 0, false, 'T', 'C');
         $pdf->Ln();
-								$pdf->SetFont('', 'B');
+
+
+        $pdf->SetFont('', 'B');
         $pdf->Cell($width2, $height, 'Proveedor: ', 0, 0, 'L', false, '', 0, false, 'T', 'C');
         $pdf->SetFont('', '');
         $pdf->SetFillColor(192,192,192, true);
-        $pdf->Cell($width3*2, $height, $this->getDataSource()->getParameter('desc_proveedor'), $white, 0, 'L', true, '', 0, false, 'T', 'C');
+        //(may) 06-11-2019
+        //$pdf->Cell($width3*2, $height, $this->getDataSource()->getParameter('desc_proveedor'), $white, 0, 'L', true, '', 0, false, 'T', 'C');
+        $pdf->Cell(0, $height, $this->getDataSource()->getParameter('desc_proveedor'), $white, 0, 'L', true, '', 0, false, 'T', 'C');
         $pdf->Ln();
+
+
         $pdf->SetFont('', 'B');
         $pdf->Cell($width2, $height, 'Obs: ', 0, 0, 'L', false, '', 0, false, 'T', 'C');
         $pdf->SetFont('', '');
         $pdf->SetFillColor(192,192,192, true);
         $pdf->MultiCell(0, $height, $this->getDataSource()->getParameter('obs'), 1,'L', true ,1);
 		$pdf->Ln();
+
 		$this->writeDetalles($this->getDataSource(), $pdf,$tipo);
         								
         $pdf->Output($fileName, 'F');
@@ -178,7 +191,7 @@ Class RPlanesPago extends Report {
     function writeDetalles (DataSource $dataSource, TCPDF $pdf,$tipo) {
     	$blackAll = array('LTRB' =>array('width' => 0.3, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(0, 0, 0)));
         $widthMarginLeft = 1;
-        $width1 = 15;
+        $width1 = 18;
 		$width2 = 30;
         $width3 = 80;
         $pdf->Ln();
@@ -189,30 +202,32 @@ Class RPlanesPago extends Report {
         $pdf->setTextColor(0,0,0);
 								
 		$pdf->Cell($width1-5, $height, 'Cuota Nº', $blackAll, 0, 'l', true, '', 1, false, 'T', 'C');
-		$pdf->Cell($width1, $height, 'Estado', $blackAll, 0, 'L', true, '', 1, false, 'T', 'C');
-        $pdf->Cell($width1, $height, 'Tipo de Cuota', $blackAll, 0, 'L', true, '', 1, false, 'T', 'C');
-        $pdf->Cell($width1+$width2, $height, 'Nombre Pago', $blackAll, 0, 'L', true, '', 1, false, 'T', 'C');
+		$pdf->Cell($width1-3, $height, 'Estado', $blackAll, 0, 'L', true, '', 1, false, 'T', 'C');
+        $pdf->Cell($width1-3, $height, 'Tipo de Cuota', $blackAll, 0, 'L', true, '', 1, false, 'T', 'C');
+        $pdf->Cell($width1+$width2+11, $height, 'Nombre Pago', $blackAll, 0, 'L', true, '', 1, false, 'T', 'C');
         $pdf->Cell($width1, $height, 'Monto a pagar', $blackAll, 0, 'C', true, '', 1, false, 'T', 'C');
         $pdf->Cell($width1, $height, 'Monto no pagado', $blackAll, 0, 'C', true, '', 1, false, 'T', 'C');								
 		$pdf->Cell($width1, $height, 'Otros desc.', $blackAll, 0, 'C', true, '', 1, false, 'T', 'C');
 		$pdf->Cell($width1, $height, 'Monto a ejecutar', $blackAll, 0, 'C', true, '', 1, false, 'T', 'C');
 		$pdf->Cell($width1, $height, 'Liquido pagable', $blackAll, 0, 'C', true, '', 1, false, 'T', 'C');
 		$pdf->Cell($width1+10, $height, 'Cuenta Bancaria', $blackAll, 0, 'C', true, '', 1, false, 'T', 'C');
+		$pdf->Cell($width1+11, $height, 'Libro de Bancos', $blackAll, 0, 'C', true, '', 1, false, 'T', 'C');
 
         $pdf->Ln();
         $pdf->SetFontSize(7);
         foreach($dataSource->getDataset() as $row) {
 			$pdf->SetFont('', '');
 			$pdf->Cell($width1-5, $height, $row['nro_cuota'], $blackAll, 0, 'l', true, '', 1, false, 'T', 'C');
-			$pdf->Cell($width1, $height, $row['estado'], $blackAll, 0, 'L', true, '', 1, false, 'T', 'C');
-	        $pdf->Cell($width1, $height, $row['tipo_pago'], $blackAll, 0, 'L', true, '', 1, false, 'T', 'C');
-	        $pdf->Cell($width1+$width2, $height, $row['nombre_pago'], $blackAll, 0, 'L', true, '', 1, false, 'T', 'C');
+			$pdf->Cell($width1-3, $height, $row['estado'], $blackAll, 0, 'L', true, '', 1, false, 'T', 'C');
+	        $pdf->Cell($width1-3, $height, $row['tipo_pago'], $blackAll, 0, 'L', true, '', 1, false, 'T', 'C');
+	        $pdf->Cell($width1+$width2+11, $height, $row['nombre_pago'], $blackAll, 0, 'L', true, '', 1, false, 'T', 'C');
 	        $pdf->Cell($width1, $height, $row['monto'], $blackAll, 0, 'C', true, '', 1, false, 'T', 'C');
 	        $pdf->Cell($width1, $height, $row['monto_no_pagado'], $blackAll, 0, 'C', true, '', 1, false, 'T', 'C');								
 			$pdf->Cell($width1, $height, $row['obs_otros_descuentos'], $blackAll, 0, 'C', true, '', 1, false, 'T', 'C');
 			$pdf->Cell($width1, $height, $row['monto_ejecutar_total_mo'], $blackAll, 0, 'C', true, '', 1, false, 'T', 'C');
 			$pdf->Cell($width1, $height, $row['liquido_pagable'], $blackAll, 0, 'C', true, '', 1, false, 'T', 'C');
 			$pdf->Cell($width1+10, $height, $row['desc_cuenta_bancaria'], $blackAll, 0, 'C', true, '', 1, false, 'T', 'C');
+			$pdf->Cell($width1+11, $height, $row['nombre'], $blackAll, 0, 'C', true, '', 1, false, 'T', 'C');
             $pdf->Ln();
         }        									
     }      
