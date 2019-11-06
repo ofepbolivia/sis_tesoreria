@@ -536,7 +536,13 @@ BEGIN
                        END IF;
 
                         v_monto_ejecutar_total_mo   = COALESCE(v_parametros.monto,0);
-                        v_liquido_pagable  = COALESCE(v_parametros.monto,0);
+                        --v_liquido_pagable  = COALESCE(v_parametros.monto,0);
+                        --cambio de liquido pagable por tipo de estacion modificacion del 06/11/2019 por Alan
+                          if (v_registros_pp.tipo in  ('especial_spi'))then
+                         	  v_liquido_pagable = COALESCE(v_parametros.monto,0) - COALESCE(v_parametros.monto_no_pagado,0) - COALESCE(v_parametros.otros_descuentos,0) - COALESCE( v_parametros.monto_retgar_mo,0) - COALESCE(v_parametros.descuento_ley,0) - COALESCE(v_parametros.descuento_anticipo,0)- COALESCE(v_parametros.descuento_inter_serv,0);
+						              else
+                        	  v_liquido_pagable  = COALESCE(v_parametros.monto,0);
+                      	  end if;
 
                          --raise exception '% , %',v_monto_total,v_parametros.monto
                  ELSE
