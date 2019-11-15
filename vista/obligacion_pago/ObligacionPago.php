@@ -1067,13 +1067,21 @@ header("content-type: text/javascript; charset=UTF-8");
             }, this);
 
             this.Cmp.id_proveedor.on('select', function (cmb, rec, ind) {
+                //console.log('nombreVista', this.nombreVista)
+                //(may) modificacion campo contrato segun el tipo de obligacion
+                if (this.nombreVista == 'obligacionPagoUnico' || this.nombreVista == 'obligacionPagoEspecial'){
+                    this.ocultarComponente(this.Cmp.id_contrato);
+                    //this.Cmp.id_contrato.disable();
+                    this.Cmp.id_contrato.reset();
+                    this.Cmp.id_contrato.modificado = true;
+                 }else{
+                    this.Cmp.id_contrato.enable();
+                    this.Cmp.id_contrato.reset();
+                    this.Cmp.id_contrato.store.baseParams.filter = "[{\"type\":\"numeric\",\"comparison\":\"eq\", \"value\":\"" + cmb.getValue() + "\",\"field\":\"CON.id_proveedor\"}]";
+                    this.Cmp.id_contrato.modificado = true;
+                 }
 
-                this.Cmp.id_contrato.enable();
-                this.Cmp.id_contrato.reset();
-                this.Cmp.id_contrato.store.baseParams.filter = "[{\"type\":\"numeric\",\"comparison\":\"eq\", \"value\":\"" + cmb.getValue() + "\",\"field\":\"CON.id_proveedor\"}]";
 
-
-                this.Cmp.id_contrato.modificado = true;
 
             }, this);
 

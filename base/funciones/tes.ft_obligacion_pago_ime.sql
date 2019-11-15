@@ -163,6 +163,7 @@ DECLARE
      v_id_cotizacion			integer;
 
      v_id_tipo_proceso			integer;
+     v_tipo_anticipo			varchar;
 
 BEGIN
 
@@ -285,7 +286,12 @@ BEGIN
               v_id_contrato = v_parametros.id_contrato;
             END IF;
 
-
+			--(may)
+            IF pxp.f_get_variable_global('ESTACION_inicio') != 'BOL' THEN
+            	v_tipo_anticipo = '';
+            ELSE
+            	v_tipo_anticipo = v_parametros.tipo_anticipo;
+            END IF;
 
             --raise exception 'sss %',va_id_funcionario_gerente[1];
 
@@ -308,7 +314,8 @@ BEGIN
               id_plantilla = v_parametros.id_plantilla,
               id_usuario_ai = v_parametros._id_usuario_ai,
               usuario_ai = v_parametros._nombre_usuario_ai,
-              tipo_anticipo = v_parametros.tipo_anticipo,
+              --tipo_anticipo = v_parametros.tipo_anticipo,
+              tipo_anticipo = v_tipo_anticipo,
               id_funcionario_gerente = va_id_funcionario_gerente[1],
               id_contrato = v_id_contrato
 
@@ -589,7 +596,7 @@ BEGIN
 
 
 
-       -- raise exception '... % ...', v_parametros.id_obligacion_pago;
+        --raise exception '... % ...', v_parametros.id_obligacion_pago;
 
             v_resp = tes.f_finalizar_obligacion_total(v_parametros.id_obligacion_pago,p_id_usuario,v_parametros._id_usuario_ai,v_parametros._nombre_usuario_ai,v_parametros.forzar_fin);
 
@@ -1026,7 +1033,7 @@ BEGIN
 
 
 
-						--tipo de obligacion SIP para  internacionales pago_especial_spi
+						--(may)tipo de obligacion SIP para  internacionales pago_especial_spi
                         --pago para bol pago_especial
 
                          IF v_tipo_obligacion in  ('pago_especial') THEN
@@ -1046,11 +1053,14 @@ BEGIN
                                   v_tipo_plan_pago = 'devengado_pagado_1c';
                            END IF;
 
-                           -- para los pagos internacionales que solo es devengado_pagado_1c_sp
-                           IF v_tipo_obligacion in  ('spd') THEN
-                           	v_tipo_plan_pago = 'devengado_pagado_1c_sp';
-                           END IF;
+                           -- para los pagos internacionales que solo es devengado_pagado_1c
+                           --IF v_tipo_obligacion in  ('spd', 'pago_especial_spi') THEN
+                           --	v_tipo_plan_pago = 'devengado_pagado_1c';
+                           --END IF;
 						   --
+                           IF v_tipo_obligacion in  ('spd') THEN
+                           		v_tipo_plan_pago = 'devengado_pagado_1c_sp';
+                           END IF;
                          END IF;
 
 
@@ -1086,7 +1096,6 @@ BEGIN
 
 
                             -- si es un proceso de pago unico,  la primera cuota pasa de borrador al siguiente estado de manera automatica
-                            -- para los pagos internacionales es tipo de pago spd
                             IF  ((v_tipo_obligacion = 'pbr' or v_tipo_obligacion = 'ppm' or v_tipo_obligacion = 'pga' or v_tipo_obligacion = 'pce' or v_tipo_obligacion = 'pago_unico' or v_tipo_obligacion = 'spd') and   v_i = 1)   THEN
                                v_sw_saltar = TRUE;
                             else
@@ -1111,6 +1120,7 @@ BEGIN
 
            END IF;
 
+
           -----------------------------------------------------------------------------
           -- COMPROMISO PRESUPUESTARIO
           -- cuando pasa al estado registrado y el presupeusto no esta comprometido
@@ -1127,6 +1137,7 @@ BEGIN
 
                       --jrr: llamamos a la funcion que revierte de planillas en caso de que sea de recursos humanos
                       if (v_tipo_obligacion = 'rrhh') then
+
                            IF NOT plani.f_generar_pago_tesoreria(p_administrador,p_id_usuario,v_parametros._id_usuario_ai, v_parametros._nombre_usuario_ai,v_parametros.id_obligacion_pago,v_obs) THEN
                                raise exception 'Error al generar el pago de devengado';
                             END IF;
@@ -1146,6 +1157,7 @@ BEGIN
 
 
            END IF;
+
 
            --RAC 02/08/2017
            --verifica si el presupeusto fue comprometido en adquisicioens o no
@@ -1170,7 +1182,6 @@ BEGIN
                        where id_obligacion_pago  = v_parametros.id_obligacion_pago;
 
            END IF;
-
 
 
            -- cuando viene de adquisiciones no es necesario comprometer pero dejamos la bancera de compromiso barcada
@@ -1277,6 +1288,7 @@ BEGIN
                           from wf.f_obtener_estado_ant_log_wf(v_id_estado_wf);
 
                       elsif(v_parametros.operacion = 'inicio')then
+
                       --FEA 13/3/2017 Funcionalidad que devuelve al estado  borrador la obligacion de pago
                           select
                               ps_id_tipo_estado,
@@ -1358,13 +1370,12 @@ BEGIN
                          END IF;
 
 
-
                          --RAC 02/08/2017
                          --verifica si el presupeusto fue comprometido en adquisicioens o no
 
                          v_adq_comprometer_presupuesto = pxp.f_get_variable_global('adq_comprometer_presupuesto');
 
-                          IF (v_codigo_estado = 'borrador' or v_codigo_estado = 'vbpresupuestos')
+                          IF ( v_codigo_estado = 'borrador' or v_codigo_estado = 'vbpresupuestos')
                              and v_comprometido = 'si'
                              and  v_tipo_obligacion = 'adquisiciones'
                              and  v_adq_comprometer_presupuesto = 'no'
@@ -1453,6 +1464,7 @@ BEGIN
 
             FOR v_ind IN array_lower(v_ope_filtro, 1) .. array_upper(v_ope_filtro, 1)
             LOOP
+
                 v_monto_total= tes.f_determinar_total_faltante(v_parametros.id_obligacion_pago, v_ope_filtro[v_ind], v_parametros.id_plan_pago);
 
               IF v_sw THEN
