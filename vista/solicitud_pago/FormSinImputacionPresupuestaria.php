@@ -635,6 +635,30 @@ header("content-type: text/javascript; charset=UTF-8");
                 form: true
             },
             {
+                config:{
+                    name: 'fecha_costo_ini_pp',
+                    fieldLabel: 'Fecha Inicio',
+                    allowBlank: false,
+                    gwidth: 100,
+                    format: 'd/m/Y'
+                },
+                type:'DateField',
+                id_grupo:2,
+                form:true
+            },
+            {
+                config:{
+                    name: 'fecha_costo_fin_pp',
+                    fieldLabel: 'Fecha Fin',
+                    allowBlank: false,
+                    gwidth: 100,
+                    format: 'd/m/Y'
+                },
+                type:'DateField',
+                id_grupo:2,
+                form:true
+            },
+            {
                 config: {
                     name: 'fecha_conclusion_pago',
                     fieldLabel: 'Fecha Vencimiento de Pago',
