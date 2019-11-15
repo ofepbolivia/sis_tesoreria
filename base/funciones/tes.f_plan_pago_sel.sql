@@ -269,7 +269,6 @@ BEGIN
                         plapa.id_proveedor_cta_bancaria,
                         mul.id_multa,
                         mul.desc_multa
-
                         from tes.tplan_pago plapa
                         inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = plapa.id_proceso_wf
                         inner join tes.tobligacion_pago op on op.id_obligacion_pago = plapa.id_obligacion_pago
@@ -284,12 +283,9 @@ BEGIN
                         left join orga.vfuncionario fun on fun.id_funcionario = op.id_funcionario
                         left join orga.vfuncionario funwf on funwf.id_funcionario = ew.id_funcionario
                         left join param.tdepto depto on depto.id_depto = plapa.id_depto_lb
-
                         left join param.tdepto depc on depc.id_depto = plapa.id_depto_conta
                         left join conta.tint_comprobante tcon on tcon.id_int_comprobante = plapa.id_int_comprobante
                         left join sigep.tmulta mul on mul.id_multa = plapa.id_multa
-
-
                        where  plapa.estado_reg=''activo''  and '||v_filtro;
 
 			--Definicion de la respuesta
@@ -304,7 +300,7 @@ BEGIN
 
 		end;
 
-   /*********************************
+  /*********************************
  	#TRANSACCION:  'TES_PLAPA_CONT'
  	#DESCRIPCION:	Conteo de registros
  	#AUTOR:		admin
@@ -390,7 +386,6 @@ BEGIN
                         left join param.tdepto depto on depto.id_depto = plapa.id_depto_lb
                         left join tes.tts_libro_bancos lb on plapa.id_int_comprobante = lb.id_int_comprobante
                         left join conta.tint_comprobante tcon on tcon.id_int_comprobante = plapa.id_int_comprobante
-
                       where  plapa.estado_reg=''activo''   and '||v_filtro;
 
 			--Definicion de la respuesta
@@ -401,6 +396,7 @@ BEGIN
 			return v_consulta;
 
 		end;
+
 
 
 
@@ -451,12 +447,17 @@ BEGIN
 						cb.nombre_institucion ||'' (''||cb.nro_cuenta||'')'' as desc_cuenta_bancaria ,
                         plapa.sinc_presupuesto ,
                         plapa.monto_retgar_mb,
-                        plapa.monto_retgar_mo
+                        plapa.monto_retgar_mo,
+                        dep.nombre
+
 						from tes.tplan_pago plapa
                         left join param.tplantilla pla on pla.id_plantilla = plapa.id_plantilla
 						inner join segu.tusuario usu1 on usu1.id_usuario = plapa.id_usuario_reg
                         left join tes.vcuenta_bancaria cb on cb.id_cuenta_bancaria = plapa.id_cuenta_bancaria
                         left join segu.tusuario usu2 on usu2.id_usuario = plapa.id_usuario_mod
+
+                        left join param.tdepto dep on dep.id_depto = plapa.id_depto_lb
+
                        where  plapa.estado_reg=''activo''  and plapa.id_obligacion_pago='||v_parametros.id_obligacion_pago||' and ';
 
 			--Definicion de la respuesta
@@ -1251,8 +1252,8 @@ BEGIN
 			return v_consulta;
 
 		end;
-	
-	    /*********************************
+
+        /*********************************
         #TRANSACCION:  'TES_PROCREPRO_SEL'
         #DESCRIPCION:	Proceso con retencion 7% a Prorrateo
         #AUTOR:		YMR
@@ -1262,39 +1263,39 @@ BEGIN
     elsif(p_transaccion='TES_PROCREPRO_SEL')then
 
             begin
-            
-            v_consulta:='SELECT  pro.desc_proveedor AS proveedor, 
-                                     c.numero AS nro_contrato, 
-                                     op.num_tramite, 
-                                     pp.nro_cuota, 
-                                     pp.tipo, 
-                                     pp.fecha_dev, 
-                                     mo.moneda, 
-                                     cc.codigo_cc::varchar, 
-                                     (par.codigo::varchar||''-''||par.nombre_partida::varchar)::varchar AS partida, 
-                                     vcp.codigo_categoria::varchar, 
-                                     com.c31, 
+
+            v_consulta:='SELECT  pro.desc_proveedor AS proveedor,
+                                     c.numero AS nro_contrato,
+                                     op.num_tramite,
+                                     pp.nro_cuota,
+                                     pp.tipo,
+                                     pp.fecha_dev,
+                                     mo.moneda,
+                                     cc.codigo_cc::varchar,
+                                     (par.codigo::varchar||''-''||par.nombre_partida::varchar)::varchar AS partida,
+                                     vcp.codigo_categoria::varchar,
+                                     com.c31,
                                      pror.monto_ejecutar_mo AS monto,
-                                     pror.monto_ejecutar_mo * 0.07 AS monto_retgar_mo, 
-                                     pror.monto_ejecutar_mo * 0.93 AS liquido_pagable 
-                              FROM   tes.tobligacion_pago op 
-                                     left join leg.tcontrato c  ON c.id_contrato = op.id_contrato 
-                                     inner join tes.tplan_pago pp ON pp.id_obligacion_pago = op.id_obligacion_pago 
-                                     left join tes.tobligacion_det od ON od.id_obligacion_pago = op.id_obligacion_pago 
-                                     join param.vcentro_costo cc ON cc.id_centro_costo = od.id_centro_costo 
-                                     join pre.tpartida par ON par.id_partida = od.id_partida 
-                                     join param.vproveedor pro ON pro.id_proveedor = op.id_proveedor 
-                                     join pre.tpresupuesto pr ON pr.id_centro_costo = cc.id_centro_costo 
-                                     join pre.vcategoria_programatica vcp ON vcp.id_categoria_programatica = pr.id_categoria_prog 
-                                     join param.tmoneda mo ON mo.id_moneda = op.id_moneda 
-                                     join conta.tint_comprobante com ON com.id_int_comprobante = pp.id_int_comprobante 
+                                     pror.monto_ejecutar_mo * 0.07 AS monto_retgar_mo,
+                                     pror.monto_ejecutar_mo * 0.93 AS liquido_pagable
+                              FROM   tes.tobligacion_pago op
+                                     left join leg.tcontrato c  ON c.id_contrato = op.id_contrato
+                                     inner join tes.tplan_pago pp ON pp.id_obligacion_pago = op.id_obligacion_pago
+                                     left join tes.tobligacion_det od ON od.id_obligacion_pago = op.id_obligacion_pago
+                                     join param.vcentro_costo cc ON cc.id_centro_costo = od.id_centro_costo
+                                     join pre.tpartida par ON par.id_partida = od.id_partida
+                                     join param.vproveedor pro ON pro.id_proveedor = op.id_proveedor
+                                     join pre.tpresupuesto pr ON pr.id_centro_costo = cc.id_centro_costo
+                                     join pre.vcategoria_programatica vcp ON vcp.id_categoria_programatica = pr.id_categoria_prog
+                                     join param.tmoneda mo ON mo.id_moneda = op.id_moneda
+                                     join conta.tint_comprobante com ON com.id_int_comprobante = pp.id_int_comprobante
                                      join tes.tprorrateo pror ON pror.id_plan_pago = pp.id_plan_pago AND
          							 	  pror.id_obligacion_det = od.id_obligacion_det
-                              WHERE  pp.estado IN ( ''devengado'', ''devuelto'' ) 
-                                     AND pp.monto_retgar_mo != 0 
-                                     AND pp.fecha_dev >= '''||v_parametros.fecha_ini||''' 
+                              WHERE  pp.estado IN ( ''devengado'', ''devuelto'' )
+                                     AND pp.monto_retgar_mo != 0
+                                     AND pp.fecha_dev >= '''||v_parametros.fecha_ini||'''
                                      AND pp.fecha_dev <= '''||v_parametros.fecha_fin||'''';
-                                     
+
                               if (v_parametros.id_proveedor >0) then
                                   v_consulta:= v_consulta || 'and c.id_proveedor = '||v_parametros.id_proveedor;
                               end if;
@@ -1302,11 +1303,11 @@ BEGIN
                                   v_consulta:= v_consulta || 'and c.id_contrato = '||v_parametros.id_contrato;
                               end if;
                 v_consulta:=v_consulta||' ORDER  BY op.id_proveedor, op.id_contrato, op.num_tramite, pp.nro_cuota ASC';
-                
+
                 raise notice '% .',v_consulta;
                 --Devuelve la respuesta
-                return v_consulta; 
-                
+                return v_consulta;
+
 
             end;
 

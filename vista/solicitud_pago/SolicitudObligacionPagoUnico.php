@@ -129,8 +129,10 @@ header("content-type: text/javascript; charset=UTF-8");
 
             Phx.vista.SolicitudObligacionPagoUnico.superclass.onButtonEdit.call(this);
 
-            this.Cmp.id_contrato.store.baseParams.filter = "[{\"type\":\"numeric\",\"comparison\":\"eq\", \"value\":\""+ this.Cmp.id_proveedor.getValue()+"\",\"field\":\"CON.id_proveedor\"}]";
-            this.Cmp.id_contrato.modificado = true;
+            //(may)para pagos directos no tienen contrato
+            this.Cmp.id_contrato.disable();
+            //this.Cmp.id_contrato.store.baseParams.filter = "[{\"type\":\"numeric\",\"comparison\":\"eq\", \"value\":\""+ this.Cmp.id_proveedor.getValue()+"\",\"field\":\"CON.id_proveedor\"}]";
+            //this.Cmp.id_contrato.modificado = false;
 
             this.cmpFuncionario.store.baseParams.fecha = this.Cmp.fecha.getValue().dateFormat(this.Cmp.fecha.format);
 
