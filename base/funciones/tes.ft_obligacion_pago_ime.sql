@@ -165,6 +165,8 @@ DECLARE
      v_id_tipo_proceso			integer;
      v_tipo_anticipo			varchar;
 
+     v_parametros_op      record;
+
 BEGIN
 
     v_nombre_funcion = 'tes.ft_obligacion_pago_ime';
