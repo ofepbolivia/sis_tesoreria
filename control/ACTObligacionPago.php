@@ -766,7 +766,11 @@ class ACTObligacionPago extends ACTbase
         }
         $this->res->imprimirRespuesta($this->res->generarJson());
     }    
-
+    function clonarOP(){
+        $this->objFunc=$this->create('MODObligacionPago');
+        $this->res=$this->objFunc->clonarOP($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
 }
 
 ?>

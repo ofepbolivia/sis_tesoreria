@@ -2085,6 +2085,36 @@ BEGIN
 
 		end;
 
+    /*********************************
+    #TRANSACCION:  'TES_REPOP_IME'
+    #DESCRIPCION:	Replicar una Obligacion de Pago
+    #AUTOR:		Alan Kevin Felipez Gutierrez
+    #FECHA:		15-11-2019 17:01:32
+    ***********************************/
+
+    elsif(p_transaccion='TES_REPOP_IME')then
+
+        begin
+                  /*--------------------
+                  Replicar una Obligacion de Pago
+                  ----------------------*/
+            select op.*
+                  into v_parametros_op
+                  from tes.tobligacion_pago op
+                  where op.id_obligacion_pago = v_parametros.id_obligacion_pago;
+                  --raise exception 'llega obligacion pago: %',hstore(v_parametros_op);
+              v_resp = tes.f_inserta_obligacion_pago_replicado(p_administrador, p_id_usuario,hstore(v_parametros_op));
+
+
+
+              --Definicion de la respuesta
+              v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Obligacion de Pago Replicado');
+              v_resp = pxp.f_agrega_clave(v_resp,'id_obligacion_pago',v_parametros.id_obligacion_pago::varchar);
+
+              --Devuelve la respuesta
+              return v_resp;
+
+        end;
 
     else
 
