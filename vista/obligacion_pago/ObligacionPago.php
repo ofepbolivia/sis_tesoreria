@@ -195,7 +195,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 iconCls: 'blist',
                 disabled: true,
                 handler: this.clonarOP,
-                tooltip: 'Clonar el registro de un Pago'
+                tooltip: 'Clonar el registro de una Obligacion'
             });
 
             this.construyeVariablesContratos();
