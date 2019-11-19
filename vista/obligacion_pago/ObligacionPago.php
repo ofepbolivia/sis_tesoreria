@@ -190,6 +190,13 @@ header("content-type: text/javascript; charset=UTF-8");
                 tooltip: '<b>Observaciones</b><br/><b>Observaciones del WF</b>'
             });
 
+            this.addButton('clonarOP', {
+                text: 'Clonar Obligacion de Pago',
+                iconCls: 'blist',
+                disabled: true,
+                handler: this.clonarOP,
+                tooltip: 'Clonar el registro de un Pago'
+            });
 
             this.construyeVariablesContratos();
 
@@ -1286,7 +1293,7 @@ header("content-type: text/javascript; charset=UTF-8");
 
 
             Phx.vista.ObligacionPago.superclass.preparaMenu.call(this, n);
-
+            this.getBoton('clonarOP').enable();
             if (data['estado'] == 'borrador') {
                 this.getBoton('edit').enable();
                 if (this.getBoton('new'))
@@ -1440,7 +1447,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.getBoton('btnExtender').disable();
                 this.getBoton('btnCheckPresupeusto').disable();
                 this.getBoton('btnObs').disable();
-
+                this.getBoton('clonarOP').disable();
                 //Inhabilita el reporte de disponibilidad
                 this.getBoton('btnVerifPresup').disable();
             }
@@ -2123,6 +2130,23 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.idContenedor,
                 'Obs'
             )
+        },
+        clonarOP:function(){
+            if(confirm('¿Está seguro de clonar? ')){
+                var rec = this.sm.getSelected();
+                console.log('obligacion_pago',rec);
+                Phx.CP.loadingShow();
+                Ext.Ajax.request({
+                    url: '../../sis_tesoreria/control/ObligacionPago/clonarOP',
+                    params: {
+                        id_obligacion_pago: rec.data.id_obligacion_pago
+                    },
+                    success: this.successSinc,
+                    failure: this.conexionFailure,
+                    timeout: this.timeout,
+                    scope: this
+                });
+            }
         }
 
     })

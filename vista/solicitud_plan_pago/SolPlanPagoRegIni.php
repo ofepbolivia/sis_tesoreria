@@ -107,7 +107,13 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.bloquearMenus();
             }
 
-
+            this.addButton('clonarPP', {
+                text: 'Clonar Plan de Pago',
+                iconCls: 'blist',
+                disabled: false,
+                handler: this.clonarPP,
+                tooltip: 'Clonar el registro de una Cuota'
+            });
             /*this.addButton('btnVerifPresup', {
                   text : 'Disponibilidad',
                   iconCls : 'bassign',
@@ -657,12 +663,13 @@ header("content-type: text/javascript; charset=UTF-8");
             var tb =this.tbar;
             this.getBoton('ant_estado').disable();
             this.getBoton('sig_estado').disable();
+
             Phx.vista.SolPlanPagoRegIni.superclass.preparaMenu.call(this,n);
 
             //alert('pasa el constructor ....')
 
             //alert(data['estado'])
-
+            //this.getBoton('clonarPP').enable();
             if (data['estado'] == 'borrador'){
                 this.getBoton('edit').enable();
 
@@ -745,13 +752,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.getBoton('btnDocCmpVnt').disable();
 
                 this.getBoton('btnImportePP').disable();
-
-
-
-
-
-
-
+                //this.getBoton('clonarPP').disable();
             }
             return tb
         },
@@ -836,7 +837,23 @@ header("content-type: text/javascript; charset=UTF-8");
                 alert(reg.ROOT.datos.mensaje)
             }
         },
-
+        clonarPP:function(){
+            if(confirm('¿Está seguro de clonar? ')){
+                var rec = this.sm.getSelected();
+                console.log('plan_pago ',rec.data.id_plan_pago);
+                Phx.CP.loadingShow();
+                Ext.Ajax.request({
+                    url: '../../sis_tesoreria/control/PlanPago/clonarPP',
+                    params: {
+                        id_plan_pago: rec.data.id_plan_pago
+                    },
+                    success: this.successSinc,
+                    failure: this.conexionFailure,
+                    timeout: this.timeout,
+                    scope: this
+                });
+            }
+        },
 
 
         east:{
