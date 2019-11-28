@@ -675,13 +675,25 @@ BEGIN
 						        com.fecha
 						        end) as fecha
 						        ,mon.moneda,pp.monto,pro.monto_ejecutar_mo,
-                                od.id_centro_costo, pp.fecha_costo_ini, pp.fecha_costo_fin
+                                od.id_centro_costo, pp.fecha_costo_ini, pp.fecha_costo_fin,
+
+                                 /*Aumentando la descripcion del Centro de Costo 28/11/2019(Ismael Valdivia)*/
+                               	cc.codigo_cc,
+                                od.descripcion,
+                                op.obs as justificacion
+                                /*****************************************************************/
 
 						FROM tes.tobligacion_pago op
 						inner join obligacion_pago_concepto opc on op.id_obligacion_pago = opc.id_obligacion_pago
 						inner join tes.tplan_pago pp on op.id_obligacion_pago = pp.id_obligacion_pago and pp.estado_reg = ''activo''
 						left join tes.tprorrateo pro on pro.id_plan_pago = pp.id_plan_pago and  pro.id_obligacion_det = ANY(opc.id_obligacion_det) and pro.estado_reg = ''activo''
 						left join tes.tobligacion_det od on od.id_obligacion_det = pro.id_obligacion_det
+
+                        /*Aumentando la condicion para recuperar la descripcion del Centro de costo 28/11/2019(Ismael Valdivia)*/
+                        left join param.vcentro_costo cc on cc.id_centro_costo = od.id_centro_costo
+                        /***************************************************************************/
+
+
 						left join conta.torden_trabajo ot on od.id_orden_trabajo = ot.id_orden_trabajo
 						inner join param.vproveedor prov on prov.id_proveedor = op.id_proveedor
 						inner join param.tmoneda mon on op.id_moneda = mon.id_moneda
@@ -718,13 +730,22 @@ BEGIN
 						    group by od.id_obligacion_pago
 						)
 
-						SELECT count(pp.id_plan_pago)
+						SELECT count(pp.id_plan_pago),
+
+						/*Aumentando para obtener la suma total 28/11/2019 (Ismael Valdivia)*/
+                        sum (pro.monto_ejecutar_mo)
+                        /**************************************/
 
 						FROM tes.tobligacion_pago op
 						inner join obligacion_pago_concepto opc on op.id_obligacion_pago = opc.id_obligacion_pago
 						inner join tes.tplan_pago pp on op.id_obligacion_pago = pp.id_obligacion_pago and pp.estado_reg = ''activo''
 						left join tes.tprorrateo pro on pro.id_plan_pago = pp.id_plan_pago and  pro.id_obligacion_det = ANY(opc.id_obligacion_det) and pro.estado_reg = ''activo''
 						left join tes.tobligacion_det od on od.id_obligacion_det = pro.id_obligacion_det
+
+                        /*Aumentando la condicion para recuperar la descripcion del Centro de costo 28/11/2019(Ismael Valdivia)*/
+                        left join param.vcentro_costo cc on cc.id_centro_costo = od.id_centro_costo
+                        /***************************************************************************/
+
 						left join conta.torden_trabajo ot on od.id_orden_trabajo = ot.id_orden_trabajo
 						inner join param.vproveedor prov on prov.id_proveedor = op.id_proveedor
 						inner join param.tmoneda mon on op.id_moneda = mon.id_moneda
@@ -1335,3 +1356,6 @@ VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
 COST 100;
+
+ALTER FUNCTION tes.f_plan_pago_sel (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
+  OWNER TO postgres;

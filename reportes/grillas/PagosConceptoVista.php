@@ -20,7 +20,7 @@ header("content-type:text/javascript; charset=UTF-8");
 				params : {
 					start: 0,
 					limit: 1000,
-					id_gestion:this.maestro.id_gestion,					
+					id_gestion:this.maestro.id_gestion,
 					id_concepto:this.maestro.id_concepto
 				}
 			});
@@ -37,22 +37,8 @@ header("content-type:text/javascript; charset=UTF-8");
 		},
 		{
 			config : {
-				name : 'orden_trabajo',
-				fieldLabel : 'Orden de Trabajo',				
-				gwidth : 170
-			},
-			type : 'Field',
-			filters : {
-			    pfiltro : 'opc.desc_orden#ot.desc_orden',
-				type : 'string'
-			},
-			grid : true,
-			form : false
-		}, 
-		{
-			config : {
 				name : 'num_tramite',
-				fieldLabel : 'No Tramite',				
+				fieldLabel : 'No Tramite',
 				gwidth : 150
 			},
 			type : 'Field',
@@ -62,12 +48,55 @@ header("content-type:text/javascript; charset=UTF-8");
 			},
 			grid : true,
 			form : false
-		}, 
-		
+		},
+		{
+			config : {
+				name : 'orden_trabajo',
+				fieldLabel : 'Orden de Trabajo',
+				gwidth : 250
+			},
+			type : 'Field',
+			filters : {
+			    pfiltro : 'opc.desc_orden#ot.desc_orden',
+				type : 'string'
+			},
+			grid : true,
+			form : false
+		},
+		/*Aumentando estos dos campos 28/11/2019 (Ismael Valdivia)*/
+		{
+			config : {
+				name : 'justificacion',
+				fieldLabel : 'Justificación',
+				gwidth : 250
+			},
+			type : 'Field',
+			filters : {
+			    pfiltro : 'op.obs',
+				type : 'string'
+			},
+			grid : true,
+			form : false
+		},
+		{
+			config : {
+				name : 'descripcion',
+				fieldLabel : 'Descripción',
+				gwidth : 250
+			},
+			type : 'Field',
+			filters : {
+			    pfiltro : 'od.descripcion',
+				type : 'string'
+			},
+			grid : true,
+			form : false
+		},
+		/**********************************************************/
 		{
 			config : {
 				name : 'nro_cuota',
-				fieldLabel : 'No Cuota',				
+				fieldLabel : 'No Cuota',
 				gwidth : 80
 			},
 			type : 'Field',
@@ -77,12 +106,12 @@ header("content-type:text/javascript; charset=UTF-8");
 			},
 			grid : true,
 			form : false
-		}, 
-		
+		},
+
 		{
 			config : {
 				name : 'desc_proveedor',
-				fieldLabel : 'Proveedor',				
+				fieldLabel : 'Proveedor',
 				gwidth : 170
 			},
 			type : 'Field',
@@ -93,25 +122,41 @@ header("content-type:text/javascript; charset=UTF-8");
 			grid : true,
 			form : false
 		},
+		/*Remplazando el id_centro_costo por codigo_cc 28/11/2019 (Ismael Valdivia)*/
+		// {
+		// 	config : {
+		// 		name : 'id_centro_costo',
+		// 		fieldLabel : 'Centro Costo',
+		// 		gwidth : 150
+		// 	},
+		// 	type : 'Field',
+		// 	filters : {
+		// 	    pfiltro : 'od.id_centro_costo',
+		// 		type : 'string'
+		// 	},
+		// 	grid : true,
+		// 	form : false
+		// },
 		{
 			config : {
-				name : 'id_centro_costo',
-				fieldLabel : 'Centro Costo',				
-				gwidth : 150
+				name : 'codigo_cc',
+				fieldLabel : 'Centro Costo',
+				gwidth : 250
 			},
 			type : 'Field',
 			filters : {
-			    pfiltro : 'od.id_centro_costo',
+			    pfiltro : 'cc.codigo_cc',
 				type : 'string'
 			},
 			grid : true,
 			form : false
-		}, 		
+		},
+		/***********************************************/
 		{
 			config : {
 				name : 'estado',
-				fieldLabel : 'Estado',				
-				gwidth : 80,
+				fieldLabel : 'Estado',
+				gwidth : 100,
 				renderer:function(value, p, record) {
 					var aux;
 					if(record.data.estado == 'borrador'){
@@ -131,12 +176,29 @@ header("content-type:text/javascript; charset=UTF-8");
 			},
 			grid : true,
 			form : false
-		}, 		
+		},
+		{
+			config : {
+				name : 'fecha',
+				fieldLabel : 'Fecha de Pago ',
+				gwidth : 200,
+				renderer : function(value, p, record) {
+					return value ? value.dateFormat('d/m/Y') : ''
+				}
+			},
+			type : 'Field',
+			filters : {
+			    pfiltro : 'pp.fecha_tentativa#com.fecha',
+				type : 'date'
+			},
+			grid : true,
+			form : false
+		},
 		{
 			config : {
 				name : 'fecha_costo_ini',
-				fieldLabel : 'Fecha Inicio',				
-				gwidth : 80,
+				fieldLabel : 'Fecha Inicio Costo',
+				gwidth : 200,
 				renderer : function(value, p, record) {
 					return value ? value.dateFormat('d/m/Y') : ''
 				}
@@ -152,8 +214,8 @@ header("content-type:text/javascript; charset=UTF-8");
 		{
 			config : {
 				name : 'fecha_costo_fin',
-				fieldLabel : 'Fecha Fin',				
-				gwidth : 80,
+				fieldLabel : 'Fecha Fin Costo',
+				gwidth : 200,
 				renderer : function(value, p, record) {
 					return value ? value.dateFormat('d/m/Y') : ''
 				}
@@ -165,30 +227,23 @@ header("content-type:text/javascript; charset=UTF-8");
 			},
 			grid : true,
 			form : false
-		},		
-		{
-			config : {
-				name : 'fecha',
-				fieldLabel : 'Fecha',				
-				gwidth : 80,
-				renderer : function(value, p, record) {
-					return value ? value.dateFormat('d/m/Y') : ''
-				}
-			},
-			type : 'Field',
-			filters : {
-			    pfiltro : 'pp.fecha_tentativa#com.fecha',
-				type : 'date'
-			},
-			grid : true,
-			form : false
-		}, 
-		
+		},
+
 		{
 			config : {
 				name : 'moneda',
-				fieldLabel : 'Moneda',				
-				gwidth : 120
+				fieldLabel : 'Moneda',
+				gwidth : 120,
+				galign:'right',
+				renderer:function (value,p,record){
+					console.log("llega aqui el dato",record.data);
+					if(record.data.tipo_reg != 'summary'){
+						return  String.format('{0}', value);
+					}
+					else{
+						return '<b><p style="padding-top:10px; font-size:18px; color:blue;">Total Monto: </p></b>';
+					}
+			},
 			},
 			type : 'Field',
 			filters : {
@@ -197,56 +252,62 @@ header("content-type:text/javascript; charset=UTF-8");
 			},
 			grid : true,
 			form : false
-		}, 
-		
-		{
-			config : {
-				name : 'monto',
-				fieldLabel : 'Monto',				
-				gwidth : 100,				
-				renderer:function(value, p, record) {
-					var aux;
-					if(record.data.estado == 'borrador'){
-						aux='<b><font color="brown">';
-					}
-					else {
-						aux='<b><font color="green">';
-					}
-					aux = aux +value+'</font></b>';
-					return String.format('{0}', aux);
-				}
-			},
-			type : 'NumberField',
-			filters : {
-			    pfiltro : 'pp.monto',
-				type : 'numeric'
-			},			
-			grid : true,
-			form : false
 		},
-		
+		/*quitamos este campo para no causar confucion 28/11/2019 (Ismael Valdivia)*/
+		// {
+		// 	config : {
+		// 		name : 'monto',
+		// 		fieldLabel : 'Monto',
+		// 		gwidth : 100,
+		// 		renderer:function(value, p, record) {
+		// 			var aux;
+		// 			if(record.data.estado == 'borrador'){
+		// 				aux='<b><font color="brown">';
+		// 			}
+		// 			else {
+		// 				aux='<b><font color="green">';
+		// 			}
+		// 			aux = aux +value+'</font></b>';
+		// 			return String.format('{0}', aux);
+		// 		}
+		// 	},
+		// 	type : 'NumberField',
+		// 	filters : {
+		// 	    pfiltro : 'pp.monto',
+		// 		type : 'numeric'
+		// 	},
+		// 	grid : true,
+		// 	form : false
+		// },
+
 		{
 			config : {
 				name : 'monto_ejecutar_mo',
-				fieldLabel : 'Monto Ejecucion OT',				
-				gwidth : 130,				
+				fieldLabel : 'Monto Ejecucion OT',
+				gwidth : 200,
+				galign:'right',
 				renderer:function(value, p, record) {
 					var aux;
-					if(record.data.estado == 'borrador'){
-						aux='<b><font color="brown">';
+						if (record.data.tipo_reg != 'summary') {
+							if(record.data.estado == 'borrador'){
+								aux='<b><font color="brown">';
+							}
+							else {
+								aux='<b><font color="green">';
+							}
+						/*Aumentando el Formato de decimales 28/11/2019(Ismael Valdivia)*/
+							aux = aux +Ext.util.Format.number(value,'0,000.00')+'</font></b>';
+							return String.format('{0}', aux);
+					} else {
+							return  String.format('<div style="font-size:18px; text-align:rigth; color:#FF7323; padding-top:10px;"><b><font>{0}</font><b></div>', Ext.util.Format.number(record.data.total_monto_ot,'0,000.00'));
 					}
-					else {
-						aux='<b><font color="green">';
-					}
-					aux = aux +value+'</font></b>';
-					return String.format('{0}', aux);
 				}
 			},
 			type : 'NumberField',
 			filters : {
 			    pfiltro : 'pro.monto_ejecutar_mo',
 				type : 'numeric'
-			},			
+			},
 			grid : true,
 			form : false
 		}
@@ -277,10 +338,39 @@ header("content-type:text/javascript; charset=UTF-8");
 		},{
 			name : 'monto',
 			type : 'numeric'
-		},{
+		},
+		/*Remplazando esta parte 28/11/2019(Ismael Valdivia)*/
+		// {
+		// 	name : 'id_centro_costo',
+		// 	type : 'numeric'
+		// },
+		{
+			name : 'codigo_cc',
+			type : 'string'
+		},
+		{
+			name: 'tipo_reg',
+			type: 'string'
+		},
+		{
+			name: 'total_monto_ot',
+			type: 'numeric'
+		},
+		{
+			name: 'justificacion',
+			type: 'string'
+		},
+		{
+			name: 'descripcion',
+			type: 'string'
+		},
+		/*************************/
+		{
 			name : 'id_centro_costo',
 			type : 'numeric'
-		},{
+		},
+
+		{
 			name : 'monto_ejecutar_mo',
 			type : 'numeric'
 		}, {
@@ -305,5 +395,5 @@ header("content-type:text/javascript; charset=UTF-8");
 		bedit: false,
 		fwidth : '90%',
 		fheight : '80%'
-	}); 
+	});
 </script>

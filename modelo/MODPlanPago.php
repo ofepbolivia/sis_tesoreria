@@ -695,6 +695,7 @@ class MODPlanPago extends MODbase{
 
 
         $this->setParametro('id_concepto','id_concepto','int4');
+        $this->capturaCount('total_monto_ot','numeric');
 
 
         $this->captura('id_plan_pago','int4');
@@ -710,6 +711,11 @@ class MODPlanPago extends MODbase{
         $this->captura('id_centro_costo','int4');
         $this->captura('fecha_costo_ini','date');
         $this->captura('fecha_costo_fin','date');
+        /*Aumentando para recuperar el codigo del centro de costo 28/11/2019 (Ismael Valdivia)*/
+        $this->captura('codigo_cc','text');
+        $this->captura('descripcion','text');
+        $this->captura('justificacion','varchar');
+        /**************************************************************************************/
 
 
         //Ejecuta la instruccion
