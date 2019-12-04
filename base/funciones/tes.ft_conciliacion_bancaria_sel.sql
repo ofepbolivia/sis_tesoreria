@@ -146,7 +146,8 @@ BEGIN
             nro_cheque 			varchar,
             concepto			text,        
             total_haber 		numeric(18,2),
-            fecha				date                
+            fecha				date,
+            mes                 integer
         ) on commit drop;
     
     	v_periodo = v_parametros.id_periodo;
@@ -157,10 +158,11 @@ BEGIN
         where per.id_periodo = v_periodo;
     
     
-          with recursive det ( inst, nr_c, co, cou, saldo, mone, deno, nc) as (
+          with recursive det ( inst, nr_c, me, co, cou, saldo, mone, deno, nc) as (
               select 
-                  ins.nombre as nombre_institucion,
-                  cuba.nro_cuenta,
+                 ins.nombre as nombre_institucion,
+                 cuba.nro_cuenta,
+                 extract(month from cbre.fecha)::integer,
                  ('CHEQUES EN CIRCULACION '||upper(tes.f_month(cbre.fecha))||'/'||substr((''||extract(year from cbre.fecha)||'')::text,3,4)),
                  (select count(id_periodo)
                           from tes.tconciliacion_bancaria_rep
@@ -183,7 +185,7 @@ BEGIN
               inner join param.tmoneda mon on mon.id_moneda = cuba.id_moneda
               where  cbre.id_conciliacion_bancaria = v_parametros.id_conciliacion_bancaria)
 
-	  	insert into  tt_conciliacion_t3 (nombre_institucion, nro_cuenta, concepto, moneda, nro_cheque, denominacion, total_haber, fecha)
+	  	insert into  tt_conciliacion_t3 (nombre_institucion, nro_cuenta, concepto, moneda, nro_cheque, denominacion, total_haber, fecha, mes)
                       
           select 
               inst,
@@ -196,7 +198,8 @@ BEGIN
               ''||nc||''::varchar end,              
               deno,
           	  saldo,
-              v_fecha_repo
+              v_fecha_repo,
+              me::integer
           from det;
                 
               
@@ -218,8 +221,9 @@ BEGIN
                                       t3.concepto,
                                       t3.fecha,
                                       t3.moneda,
-					                  t3.denominacion
-            			order by t3.fecha desc ';
+					                  t3.denominacion,
+                                      t3.mes
+            			order by t3.mes desc ';
 			--Devuelve la respuesta
 			return v_consulta;
 
