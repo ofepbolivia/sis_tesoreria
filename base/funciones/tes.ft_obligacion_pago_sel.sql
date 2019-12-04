@@ -1059,7 +1059,9 @@ BEGIN
 
             '''||v_nombre_entidad||'''::varchar AS nombre_entidad,
             COALESCE('''||v_direccion_admin||'''::varchar, '''') AS direccion_admin,
-            '''||v_unidad_ejecutora||'''::varchar AS unidad_ejecutora,
+
+            coalesce(vcp.desc_unidad_ejecutora::varchar,''Boliviana de Aviación - BoA''::varchar) as unidad_ejecutora,
+            coalesce(vcp.codigo_unidad_ejecutora::varchar,''0''::varchar) as codigo_ue,
             COALESCE('''||v_firma_fun||'''::varchar, '''') AS firmas,
             COALESCE('''||v_record_op.obs||'''::varchar,'''') AS justificacion,
             COALESCE(tet.codigo::varchar,''00''::varchar) AS codigo_transf,
@@ -1109,7 +1111,8 @@ BEGIN
             ' GROUP BY vcp.id_categoria_programatica, tpar.codigo, ttc.codigo, vcp.codigo_programa,
             vcp.codigo_proyecto, vcp.codigo_actividad, vcp.codigo_fuente_fin, vcp.codigo_origen_fin,
     		tpar.nombre_partida, tcg.codigo, tcg.nombre, tmo.codigo, ts.num_tramite, tet.codigo,
-    		funcionario_solicitante, ts.fecha, tg.gestion, ts.codigo_poa, tuo.codigo, tuo.nombre_unidad, ts.tipo_obligacion, ts.fecha_certificacion_pres ';
+    		funcionario_solicitante, ts.fecha, tg.gestion, ts.codigo_poa, tuo.codigo, tuo.nombre_unidad, ts.tipo_obligacion, ts.fecha_certificacion_pres,
+    		vcp.desc_unidad_ejecutora, vcp.codigo_unidad_ejecutora ';
 			v_consulta =  v_consulta || 'ORDER BY tpar.codigo, tcg.nombre, vcp.id_categoria_programatica, ttc.codigo asc  ';
 			--Devuelve la respuesta
             RAISE NOTICE 'v_consulta %',v_consulta;

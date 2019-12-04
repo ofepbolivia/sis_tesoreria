@@ -460,6 +460,3 @@ VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
 COST 100;
-
-ALTER FUNCTION tes.f_inserta_obligacion_pago_replicado (p_administrador integer, p_id_usuario integer, p_hstore public.hstore, p_salta boolean)
-  OWNER TO postgres;
