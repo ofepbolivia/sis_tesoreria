@@ -2003,3 +2003,18 @@ ALTER TABLE tes.tcuenta_bancaria
 ALTER TABLE tes.tplan_pago
   ADD COLUMN id_multa INTEGER;
 /*****************************F-SCP-MAY-TES-0-16/10/2019*************/
+
+/*****************************I-SCP-MAY-TES-0-04/12/2019*************/
+ALTER TABLE tes.tobligacion_pago
+  ADD COLUMN id_obligacion_pago_inter INTEGER;
+
+COMMENT ON COLUMN tes.tobligacion_pago.id_obligacion_pago_inter
+IS 'Este campo sirve para relacionar la obligacion que se extiende en una internacional';
+
+
+ALTER TABLE tes.tplan_pago
+  ADD COLUMN id_plan_pago_inter INTEGER;
+
+COMMENT ON COLUMN tes.tplan_pago.id_plan_pago_inter
+IS 'Este campo sirve para relacionar un plan de pago que se extiende en una internacional';
+/*****************************F-SCP-MAY-TES-0-04/12/2019*************/
