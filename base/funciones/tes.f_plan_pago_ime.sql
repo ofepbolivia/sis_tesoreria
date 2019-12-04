@@ -207,6 +207,12 @@ DECLARE
     vtipo_pp					varchar;
 
 
+       --04/12/2019 (Alan) actualizar el funcionario gerente si es necesario
+    va_id_funcionario_gerente		INTEGER[];
+    v_fun_gerente					integer;
+    v_funcionario						integer;
+
+
 BEGIN
 
     v_nombre_funcion = 'tes.f_plan_pago_ime';
@@ -278,10 +284,25 @@ BEGIN
                             op.id_estado_wf,
                             op.estado,
                             op.id_depto,
-                            op.pago_variable
+                            op.pago_variable,
+                            op.id_funcionario_gerente, --04/12/2019 Alan
+                            op.id_funcionario
                           into v_registros
                            from tes.tobligacion_pago op
                            where op.id_obligacion_pago = v_parametros.id_obligacion_pago;
+
+                              --recuperamos el id_funcionario_gerente actual de la obligacion de pago
+                           SELECT
+                           pxp.aggarray(id_funcionario)
+                           into
+                               va_id_funcionario_gerente
+                           FROM orga.f_get_aprobadores_x_funcionario(now()::date,  v_registros.id_funcionario , 'todos', 'si', 'todos', 'ninguno') AS (id_funcionario integer);
+
+                           if v_registros.id_funcionario_gerente != va_id_funcionario_gerente[1] then
+                           		update tes.tobligacion_pago
+                                set id_funcionario_gerente =  va_id_funcionario_gerente[1]
+                                where id_obligacion_pago = v_parametros.id_obligacion_pago;
+                           end if;
 
                         select
                             pp.monto,
@@ -385,13 +406,26 @@ BEGIN
 	elsif(p_transaccion='TES_PLAPAPA_INS')then
 
         begin
-        	select tipo_obligacion into v_tipo_obligacion
+        	--select tipo_obligacion into v_tipo_obligacion
+        	  select tipo_obligacion, id_funcionario_gerente, id_funcionario into v_tipo_obligacion, v_fun_gerente, v_funcionario
             from tes.tobligacion_pago
             where id_obligacion_pago = v_parametros.id_obligacion_pago;
 
             if (v_tipo_obligacion = 'rrhh') then
             	raise exception 'No es posible insertar pagos a una obligacion de RRHH';
             end if;
+            --recuperamos el id_funcionario_gerente actual de la obligacion de pago
+             SELECT
+             pxp.aggarray(id_funcionario)
+             into
+                 va_id_funcionario_gerente
+             FROM orga.f_get_aprobadores_x_funcionario(now()::date,  v_funcionario , 'todos', 'si', 'todos', 'ninguno') AS (id_funcionario integer);
+
+             if v_fun_gerente != va_id_funcionario_gerente[1] then
+                  update tes.tobligacion_pago
+                  set id_funcionario_gerente =  va_id_funcionario_gerente[1]
+                  where id_obligacion_pago = v_parametros.id_obligacion_pago;
+             end if;
 
 
             v_resp = tes.f_inserta_plan_pago_pago(p_administrador, p_id_usuario,hstore(v_parametros));
@@ -411,13 +445,28 @@ BEGIN
 	elsif(p_transaccion='TES_PPANTPAR_INS')then
 
         begin
-        	select tipo_obligacion into v_tipo_obligacion
+        	--select tipo_obligacion into v_tipo_obligacion
+        	  select tipo_obligacion, id_funcionario_gerente, id_funcionario into v_tipo_obligacion, v_fun_gerente, v_funcionario
             from tes.tobligacion_pago
             where id_obligacion_pago = v_parametros.id_obligacion_pago;
 
             if (v_tipo_obligacion = 'rrhh') then
             	raise exception 'No es posible insertar pagos a una obligacion de RRHH';
             end if;
+
+              --recuperamos el id_funcionario_gerente actual de la obligacion de pago
+             SELECT
+             pxp.aggarray(id_funcionario)
+             into
+                 va_id_funcionario_gerente
+             FROM orga.f_get_aprobadores_x_funcionario(now()::date,  v_funcionario , 'todos', 'si', 'todos', 'ninguno') AS (id_funcionario integer);
+
+             if v_fun_gerente != va_id_funcionario_gerente[1] then
+                  update tes.tobligacion_pago
+                  set id_funcionario_gerente =  va_id_funcionario_gerente[1]
+                  where id_obligacion_pago = v_parametros.id_obligacion_pago;
+             end if;
+
             v_resp = tes.f_inserta_plan_pago_anticipo(p_administrador, p_id_usuario,hstore(v_parametros));
             --Devuelve la respuesta
             return v_resp;
@@ -515,11 +564,25 @@ BEGIN
             op.id_estado_wf,
             op.estado,
             op.id_depto,
-            op.pago_variable
+            op.pago_variable,
+            op.id_funcionario_gerente,
+            op.id_funcionario
           into v_registros
            from tes.tobligacion_pago op
            where op.id_obligacion_pago = v_parametros.id_obligacion_pago;
 
+             --recuperamos el id_funcionario_gerente actual de la obligacion de pago
+           SELECT
+           pxp.aggarray(id_funcionario)
+           into
+               va_id_funcionario_gerente
+           FROM orga.f_get_aprobadores_x_funcionario(now()::date,  v_registros.id_funcionario , 'todos', 'si', 'todos', 'ninguno') AS (id_funcionario integer);
+
+           if v_registros.id_funcionario_gerente != va_id_funcionario_gerente[1] then
+                update tes.tobligacion_pago
+                set id_funcionario_gerente =  va_id_funcionario_gerente[1]
+                where id_obligacion_pago = v_parametros.id_obligacion_pago;
+           end if;
 
           select
             pp.monto,

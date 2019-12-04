@@ -243,7 +243,10 @@ BEGIN
                            pxp.aggarray(id_funcionario)
                        into
                            va_id_funcionario_gerente
-                     FROM orga.f_get_aprobadores_x_funcionario(v_registros.fecha,  v_id_funcionario_sol , 'todos', 'si', 'todos', 'ninguno') AS (id_funcionario integer);
+                    -- FROM orga.f_get_aprobadores_x_funcionario(v_registros.fecha,  v_id_funcionario_sol , 'todos', 'si', 'todos', 'ninguno') AS (id_funcionario integer);
+                    --recuperar el funcionario_gerente actual
+                        FROM orga.f_get_aprobadores_x_funcionario(now()::date,  v_id_funcionario_sol , 'todos', 'si', 'todos', 'ninguno') AS (id_funcionario integer);
+
                         --NOTA el valor en la primera posicion del array es el genre de menor nivel
 
                 END IF;
