@@ -635,12 +635,18 @@ BEGIN
                     end loop;
                 end if;
             else
-            	if v_parametros.id_doc_compra_venta is not null then
+            	 --(5-12-2019)si es un  Extracto Bancario (comision bancaria) id=52 no ingresa
+            	IF ((p_hstore->'id_plantilla')::integer != 52) THEN
+                	if v_parametros.id_doc_compra_venta is not null then
                     	update conta.tdoc_compra_venta set
                         	id_plan_pago = v_id_plan_pago
                         where id_doc_compra_venta = (p_hstore->'id_doc_compra_venta')::varchar;
                     end if;
+                END IF;
+
             end if;
+
+
 
  		   IF (v_fecha_ini_pp is not Null or v_fecha_fin_pp is not Null) THEN
            update tes.tplan_pago set
@@ -718,3 +724,6 @@ VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
 COST 100;
+
+ALTER FUNCTION tes.ft_solicitud_inserta_plan_pago_dev (p_administrador integer, p_id_usuario integer, p_hstore public.hstore, p_salta boolean)
+  OWNER TO postgres;
