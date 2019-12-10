@@ -13,6 +13,7 @@ DECLARE
  v_centro			varchar;
  v_tes_gen_cheque_depto_conta_lb_pri_cero		varchar;
  v_cuenta										record;
+v_respuesta						varchar;
 BEGIN
 
 
@@ -165,6 +166,22 @@ BEGIN
                       v_respuesta_libro_bancos = tes.f_generar_cheque_trans_propia(p_id_usuario,p_id_int_comprobante, v_id_finalidad,NULL,COALESCE(v_registros.c31,''), 'nacional', v_cuenta.id_cuenta_bancaria);
              end if;
            end if;
+
+	--(breydi.vasquez)---- forma pago buenos aires debito_automatico 
+    elsif(v_registros.forma_pago = 'debito_automatico')  then   
+
+      if pxp.f_get_variable_global('ESTACION_inicio') = 'BUE' then
+		v_respuesta_libro_bancos = tes.f_generar_proceso_libro_banco_argentina(p_id_usuario,p_id_int_comprobante, v_id_finalidad,NULL,COALESCE(v_registros.c31,''),'nacional');          
+        v_respuesta = substring(v_respuesta_libro_bancos from '%#"tipo_respuesta":"_____"#"%' for '#');
+
+        if v_respuesta = 'tipo_respuesta":"EXITO"' then 
+
+	        v_resp = TRUE;
+        else 
+        	v_resp = FALSE;
+        end if;
+		
+	  end if;           
 
     ELSE --(franklin.espinoza) otro tipo de forma de pago
     	if pxp.f_get_variable_global('ESTACION_inicio') = 'BUE' then
