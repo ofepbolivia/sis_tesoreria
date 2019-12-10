@@ -381,7 +381,8 @@ header("content-type: text/javascript; charset=UTF-8");
 
             //Evento para ocultar/motrar componentes por cheque o transferencia
             this.Cmp.forma_pago.on('change', function (groupRadio, radio) {
-                this.ocultarCheCue(this, radio.inputValue);
+                console.log('radio',radio);
+                this.ocultarCheCue(this, radio);
             }, this);
 
 

@@ -148,13 +148,16 @@ header("content-type: text/javascript; charset=UTF-8");
                 handler: this.sigEstado,
                 tooltip: '<b>Apueba y Pasa al Siguiente Estado</b>'
             });
-            // this.addButton('SolDevPag', {
-            //   text: 'Generar Cbte',
-            // iconCls: 'bpagar',
-            // disabled: true,
-            //handler: this.onBtnDevPag,
-            //tooltip: '<b>Solicitar Devengado/Pago</b><br/>Genera en cotabilidad el comprobante Correspondiente, devengado o pago  '
-            //});
+            this.addButton('solDevPagPP', {
+                text: 'Solicitar devengado/pago',
+                iconCls: 'bpagar',
+                disabled: true,
+                handler: this.onBtnDevPag,
+                visibile: false,
+                tooltip: '<b>Solicitar Devengado/Pago</b><br/>Genera en contabilidad el Comprobante correspondiente, Devengado o Pago  '
+            });
+
+
 
             this.addButton('btnDocCmpVnt', {
                 text: 'Doc. Cmp/Vnt',
@@ -221,7 +224,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 handler: this.onBtnSolPlanPago,
                 tooltip: '<b>Solicitud Plan Pago</b><br/> Incrementa el presupuesto exacto para proceder con el pago'
             });
-
+            this.getBoton('solDevPagPP').hide();
 
         },
         tam_pag: 50,
@@ -1758,6 +1761,10 @@ header("content-type: text/javascript; charset=UTF-8");
         iniciarEventos: function () {
 
             this.Cmp.monto_no_pagado.on('change', this.calculaMontoPago, this);
+            this.Cmp.id_plantilla.on('select', function(combo, record, index){
+                console.log('plantilla',this.Cmp.forma_pago.getValue());
+
+            }, this);
 
         },
 
@@ -2079,7 +2086,7 @@ header("content-type: text/javascript; charset=UTF-8");
             var descuento_ley = 0.00;
 
             //TODO monto exento en pp de segundo nivel
-
+            console.log('plantilla',this.Cmp.forma_pago.getValue());
             console.log('this.tmp_porc_monto_excento_var', this.tmp_porc_monto_excento_var);
             if (this.tmp_porc_monto_excento_var) {
                 this.Cmp.monto_excento.setValue(this.Cmp.monto.getValue() * this.tmp_porc_monto_excento_var)
@@ -2203,7 +2210,18 @@ header("content-type: text/javascript; charset=UTF-8");
                     this.Cmp.id_proveedor_cta_bancaria.allowBlank = true;
                 }
             }
+           /* console.log('forma pago: ',data);
+            if (data.estado == 'borrador') {
+                this.Cmp.obs_monto_no_pagado.allowBlank = false;
 
+                if (data.forma_pago == 'transferencia' || data.forma_pago == 'debito_automatico') {
+                    this.Cmp.id_proveedor_cta_bancaria.enable();
+                    this.Cmp.id_proveedor_cta_bancaria.allowBlank = false;
+                } else {
+                    this.Cmp.id_proveedor_cta_bancaria.disable();
+                    this.Cmp.id_proveedor_cta_bancaria.allowBlank = true;
+                }
+            }*/
 
             Phx.vista.SoliPlanPago.superclass.onButtonEdit.call(this);
             if (this.Cmp.id_plantilla.getValue()) {
@@ -2536,8 +2554,8 @@ header("content-type: text/javascript; charset=UTF-8");
         },
 
         ocultarCheCue: function (me, pFormaPago) {
-            console.log('llega2m', pFormaPago)
-            if (pFormaPago == 'transferencia') {
+            console.log('llega2m', pFormaPago);
+            if (pFormaPago == 'transferencia' || pFormaPago =='debito_automatico') {
                 me.Cmp.id_proveedor_cta_bancaria.allowBlank = false;
                 me.Cmp.id_proveedor_cta_bancaria.enable()
             } else {
