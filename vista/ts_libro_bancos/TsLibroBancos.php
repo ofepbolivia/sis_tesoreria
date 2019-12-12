@@ -797,7 +797,7 @@ Phx.vista.TsLibroBancos=Ext.extend(Phx.gridInterfaz,{
 
 	],
 	sortInfo:{
-		field: 'fecha',
+		field: 'fecha_reg',
 		direction: 'DESC'
 	},
 	bdel:true,
