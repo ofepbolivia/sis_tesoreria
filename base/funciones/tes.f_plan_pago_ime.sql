@@ -342,7 +342,7 @@ BEGIN
 
                       IF v_registros.pago_variable='si' or v_registros.pago_variable='no' THEN
                       	--para los que se descuentan el IVA 13%
-						IF (v_codigo_tipo_relacion = 'IVA-CF') THEN
+						IF (v_codigo_tipo_relacion in ('IVA-CF','IVA-CF-PA' )) THEN
 
                             v_porcentaje13_monto = COALESCE(v_parametros.monto * 0.13, 0);
           					v_monto_establecido  = COALESCE(v_parametros.monto, 0) - COALESCE(v_porcentaje13_monto,0);
@@ -732,12 +732,12 @@ BEGIN
                         INTO v_codigo_tipo_relacion
                         FROM param.tplantilla p
                         inner join conta.tplantilla_calculo pc on pc.id_plantilla = p.id_plantilla
-                        WHERE  pc.codigo_tipo_relacion = 'IVA-CF'
+                        WHERE  pc.codigo_tipo_relacion in ('IVA-CF','IVA-CF-PA')
                         and p.id_plantilla = v_parametros.id_plantilla;
 
 
                       	--para los que se descuentan el IVA 13%
-						IF (v_codigo_tipo_relacion = 'IVA-CF') THEN
+						IF (v_codigo_tipo_relacion in ('IVA-CF','IVA-CF-PA')) THEN
 
                             v_porcentaje13_monto = COALESCE(v_parametros.monto * 0.13, 0);
           					v_monto_establecido  = COALESCE(v_parametros.monto, 0) - v_porcentaje13_monto;
@@ -1897,9 +1897,8 @@ BEGIN
 
           --(may) controla que el total del plan de pago no sea mayor a lo comprometido, controla en estado Borrador
           -- y tipo de devoluciones de garantia , ,
-          --(may)tipo de plantilla(documento) no ingresa al control v_id_plantilla Proforma Recibo de Alquiler = 23
 
-          IF (v_estado_aux = 'borrador' and vtipo_pp not in ( 'dev_garantia', 'dev_garantia_con', 'dev_garantia_con_ant') and v_id_plantilla not in (23)) THEN
+          IF (v_estado_aux = 'borrador' and vtipo_pp not in ( 'dev_garantia', 'dev_garantia_con', 'dev_garantia_con_ant')) THEN
 
           		--SELECT sum(pp.monto_establecido)
                 SELECT sum(pp.monto)
@@ -1927,11 +1926,11 @@ BEGIN
                 INTO v_codigo_tipo_relacion
                 FROM param.tplantilla p
                 inner join conta.tplantilla_calculo pc on pc.id_plantilla = p.id_plantilla
-                WHERE  pc.codigo_tipo_relacion = 'IVA-CF'
+                WHERE  pc.codigo_tipo_relacion in ('IVA-CF','IVA-CF-PA')
                 and p.id_plantilla = v_id_plantilla;
 
                 --para los que se descuentan el IVA 13%
-                IF (v_codigo_tipo_relacion = 'IVA-CF') THEN
+                IF (v_codigo_tipo_relacion in ('IVA-CF','IVA-CF-PA')) THEN
 
                     v_porcentaje13_monto = COALESCE(v_monto_pp * 0.13, 0);
                     v_monto_establecido  = COALESCE(v_monto_pp, 0) - COALESCE(v_porcentaje13_monto,0);
