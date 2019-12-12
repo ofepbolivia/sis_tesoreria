@@ -1897,8 +1897,9 @@ BEGIN
 
           --(may) controla que el total del plan de pago no sea mayor a lo comprometido, controla en estado Borrador
           -- y tipo de devoluciones de garantia , ,
+          --(may)tipo de plantilla(documento) no ingresa al control v_id_plantilla Proforma Recibo de Alquiler = 23
 
-          IF (v_estado_aux = 'borrador' and vtipo_pp not in ( 'dev_garantia', 'dev_garantia_con', 'dev_garantia_con_ant')) THEN
+          IF (v_estado_aux = 'borrador' and vtipo_pp not in ( 'dev_garantia', 'dev_garantia_con', 'dev_garantia_con_ant') and v_id_plantilla not in (23)) THEN
 
           		--SELECT sum(pp.monto_establecido)
                 SELECT sum(pp.monto)
