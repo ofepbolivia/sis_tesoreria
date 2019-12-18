@@ -342,7 +342,7 @@ BEGIN
 
                       IF v_registros.pago_variable='si' or v_registros.pago_variable='no' THEN
                       	--para los que se descuentan el IVA 13%
-						IF (v_codigo_tipo_relacion in ('IVA-CF','IVA-CF-PA' )) THEN
+						IF (v_codigo_tipo_relacion in ('IVA-CF','IVA-CF-PA','RC-IVA')) THEN
 
                             v_porcentaje13_monto = COALESCE(v_parametros.monto * 0.13, 0);
           					v_monto_establecido  = COALESCE(v_parametros.monto, 0) - COALESCE(v_porcentaje13_monto,0);
@@ -708,6 +708,7 @@ BEGIN
                             WHERE pp.estado != 'anulado' and pp.estado != 'pago_exterior' and pp.estado != 'pagado'
                             --and pp.tipo not in ( 'dev_garantia', 'dev_garantia_con', 'dev_garantia_con_ant')
                             and pp.tipo not in ('especial', 'dev_garantia', 'dev_garantia_con', 'dev_garantia_con_ant', 'anticipo', 'ant_parcial', 'ant_rendicion', 'ant_aplicado', 'rendicion','ret_rendicion' )
+                            and pp.id_plantilla not in (23) -- id23 = proforma recibo de alquiler
                             and pp.id_obligacion_pago = v_parametros.id_obligacion_pago;
 
                             --SELECT pp.monto_ejecutar_total_mo
@@ -732,12 +733,12 @@ BEGIN
                         INTO v_codigo_tipo_relacion
                         FROM param.tplantilla p
                         inner join conta.tplantilla_calculo pc on pc.id_plantilla = p.id_plantilla
-                        WHERE  pc.codigo_tipo_relacion in ('IVA-CF','IVA-CF-PA')
+                        WHERE  pc.codigo_tipo_relacion in ('IVA-CF','IVA-CF-PA', 'RC-IVA')
                         and p.id_plantilla = v_parametros.id_plantilla;
 
 
                       	--para los que se descuentan el IVA 13%
-						IF (v_codigo_tipo_relacion in ('IVA-CF','IVA-CF-PA')) THEN
+						IF (v_codigo_tipo_relacion in ('IVA-CF','IVA-CF-PA','RC-IVA')) THEN
 
                             v_porcentaje13_monto = COALESCE(v_parametros.monto * 0.13, 0);
           					v_monto_establecido  = COALESCE(v_parametros.monto, 0) - v_porcentaje13_monto;
@@ -1926,11 +1927,11 @@ BEGIN
                 INTO v_codigo_tipo_relacion
                 FROM param.tplantilla p
                 inner join conta.tplantilla_calculo pc on pc.id_plantilla = p.id_plantilla
-                WHERE  pc.codigo_tipo_relacion in ('IVA-CF','IVA-CF-PA')
+                WHERE  pc.codigo_tipo_relacion in ('IVA-CF','IVA-CF-PA', 'RC-IVA')
                 and p.id_plantilla = v_id_plantilla;
 
                 --para los que se descuentan el IVA 13%
-                IF (v_codigo_tipo_relacion in ('IVA-CF','IVA-CF-PA')) THEN
+                IF (v_codigo_tipo_relacion in ('IVA-CF','IVA-CF-PA', 'RC-IVA')) THEN
 
                     v_porcentaje13_monto = COALESCE(v_monto_pp * 0.13, 0);
                     v_monto_establecido  = COALESCE(v_monto_pp, 0) - COALESCE(v_porcentaje13_monto,0);
