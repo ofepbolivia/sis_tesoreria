@@ -282,7 +282,7 @@ BEGIN
           WHERE p.id_plantilla = (p_hstore->'id_plantilla')::numeric;
 
           --para los que se descuentan el IVA 13%
-		  IF (v_codigo_tipo_relacion = 'IVA-CF') THEN
+		  IF (v_codigo_tipo_relacion in ('IVA-CF', 'IVA-CF-PA')) THEN
           v_porcentaje13_monto = COALESCE((p_hstore->'monto')::numeric,0) * 0.13;
           v_monto_establecido  = COALESCE((p_hstore->'monto')::numeric,0) - v_porcentaje13_monto;
           ELSE
