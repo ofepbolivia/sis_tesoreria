@@ -364,6 +364,7 @@ $body$
                 --  Si el la referencia al contrato esta presente ..  copiar el documento de contrato
                 IF (p_hstore->'id_contrato')::integer  is not  NULL   and (p_hstore->'tipo_obligacion')::varchar != 'adquisiciones'  THEN
                      --con el ide de contrato obtenet el id_proceso_wf
+
                      SELECT
                        con.id_proceso_wf,
                        con.numero,
@@ -373,7 +374,7 @@ $body$
                       v_registros_con
                      FROM leg.tcontrato con
                      INNER JOIN wf.tproceso_wf pwf on pwf.id_proceso_wf = con.id_proceso_wf
-                     WHERE con.id_contrato = (p_hstore->'id_contrato')::integer;
+                     WHERE con.id_contrato = (p_hstore->'id_contrato')::integer;                    
 
                       -- octenemos el documentos constro del origen
 
@@ -384,7 +385,13 @@ $body$
                       FROM wf.tdocumento_wf d
                       INNER JOIN wf.ttipo_documento td on td.id_tipo_documento = d.id_tipo_documento
                       WHERE td.codigo = 'CONTRATO' and
-                            d.id_proceso_wf = v_registros_con.id_proceso_wf;
+                            d.id_proceso_wf = v_registros_con.id_proceso_wf
+
+                      -- ini: control verificacion de contrado adjuntado al tramite relacionado (breydi.vasquez: 13/12/2019)
+                      	if ( v_registros_documento.url is null or v_registros_documento.chequeado = 'no' ) then 
+                                raise exception 'El Contrato N°: %, no fue adjuntado al tramite legal: %  ', v_registros_con.numero,  v_registros_con.nro_tramite;
+                        end if;
+                      --- fin:                             
 
                        -- copiamos el link de referencia del contrato de la obligacion de pago
                          select
