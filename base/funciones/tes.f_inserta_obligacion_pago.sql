@@ -385,7 +385,7 @@ $body$
                       FROM wf.tdocumento_wf d
                       INNER JOIN wf.ttipo_documento td on td.id_tipo_documento = d.id_tipo_documento
                       WHERE td.codigo = 'CONTRATO' and
-                            d.id_proceso_wf = v_registros_con.id_proceso_wf
+                            d.id_proceso_wf = v_registros_con.id_proceso_wf;
 
                       -- ini: control verificacion de contrado adjuntado al tramite relacionado (breydi.vasquez: 13/12/2019)
                       	if ( v_registros_documento.url is null or v_registros_documento.chequeado = 'no' ) then 
