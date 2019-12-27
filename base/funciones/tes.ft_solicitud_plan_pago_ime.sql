@@ -504,12 +504,13 @@ BEGIN
              raise exception 'Solo puede modificar pagos en estado borrador';
            END IF;
 
-
-           --valida que los valores no sean negativos
-           IF  v_parametros.monto <0 or v_parametros.monto_no_pagado <0 or v_parametros.otros_descuentos  <0 THEN
-               raise exception 'No se admiten cifras negativas';
-           END IF;
-
+		   --(may)27-12-2019 se habilita para las internacionales para las notas de debito
+           IF pxp.f_get_variable_global('ESTACION_inicio') ='BOL' THEN
+               --valida que los valores no sean negativos
+               IF  v_parametros.monto <0 or v_parametros.monto_no_pagado <0 or v_parametros.otros_descuentos  <0 THEN
+                   raise exception 'No se admiten cifras negativas';
+               END IF;
+			END IF;
 
            -------------------------------------
            -- Si es una cuota de devengado
