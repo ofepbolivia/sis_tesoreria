@@ -166,7 +166,7 @@ DECLARE
      v_tipo_anticipo			varchar;
 
      v_parametros_op      record;
-
+     v_fecha_aux          integer;
 BEGIN
 
     v_nombre_funcion = 'tes.ft_obligacion_pago_ime';
@@ -184,7 +184,15 @@ BEGIN
 	if(p_transaccion='TES_OBPG_INS')then
 
         begin
- --raise exception 'v_parametros: %', v_parametros.tipo_obligacion;
+
+          /*
+          --(franklin.espinoza) 02/01/2020 reglas
+          v_fecha_aux = date_part('year',v_parametros.fecha);
+          if(v_fecha_aux = 2020)then
+            raise exception 'ESTIMADO USUARIO, NO ES POSIBLE HACER REGISTROS PARA LA GESTION 2020';
+          end if;*/
+
+          --raise 'Estimado Usuario: <br> A partir del Lunes 6 de Enero del 2020 podran crear procesos correspondientes a la gestión';
              v_resp = tes.f_inserta_obligacion_pago(p_administrador, p_id_usuario,hstore(v_parametros));
             --Devuelve la respuesta
             return v_resp;
