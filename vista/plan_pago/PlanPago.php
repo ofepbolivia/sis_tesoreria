@@ -2075,10 +2075,17 @@ header("content-type: text/javascript; charset=UTF-8");
             }
 
             this.Cmp.fecha_tentativa.enable();
-            this.Cmp.tipo.store.loadData(this.arrayStore.TODOS);
+            //08-01-2020 (may) modificacion para que pueda listar lo mismo que un new
+            //this.Cmp.tipo.store.loadData(this.arrayStore.TODOS);
+            this.Cmp.tipo.store.loadData(this.arrayStore.INICIAL);
             this.ocultarGrupo(2); //ocultar el grupo de ajustes
+
+            //08-01-2020 (may) solo en vbconta que todo sea visible para el boton del edit
             //segun el tipo define los campo visibles y no visibles
-            this.setTipoPago[data.tipo](this, data);
+            if (data.estado != 'vbconta') {
+                this.setTipoPago[data.tipo](this, data);
+            }
+
             this.tmp_porc_monto_excento_var = undefined;
 
 
