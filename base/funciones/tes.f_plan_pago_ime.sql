@@ -997,6 +997,7 @@ BEGIN
             descuento_inter_serv = COALESCE(v_parametros.descuento_inter_serv,0),
             obs_descuento_inter_serv = v_parametros.obs_descuento_inter_serv,
 			otros_descuentos = COALESCE( v_parametros.otros_descuentos,0),
+            tipo= v_parametros.tipo,
 			obs_monto_no_pagado = v_parametros.obs_monto_no_pagado,
 			obs_otros_descuentos = v_parametros.obs_otros_descuentos,
 			monto = v_parametros.monto,
