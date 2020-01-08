@@ -106,6 +106,10 @@ Phx.vista.ObligacionPagoConsulta = {
 			this.getBoton('btnChequeoDocumentosWf').enable();
 			this.getBoton('ajustes').disable();
 			this.getBoton('est_anticipo').disable();
+
+			// may habilita el boton Extension Pagos
+            this.getBoton('btnExtender').enable();
+            
 			//this.getBoton('extenderop').disable();
 			this.TabPanelSouth.get(1).enable();
 		    if(data.tipo_obligacion == 'adquisiciones'){
@@ -122,6 +126,10 @@ Phx.vista.ObligacionPagoConsulta = {
               	//Inhabilita el reporte de disponibilidad
               	this.getBoton('btnVerifPresup').disable();
               }
+
+
+
+
             }
           
      },

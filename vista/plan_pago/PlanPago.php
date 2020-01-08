@@ -2066,7 +2066,14 @@ header("content-type: text/javascript; charset=UTF-8");
             this.accionFormulario = 'EDIT';
             var data = this.getSelectedData();
             //deshabilita el cambio del tipo de pago
-            this.Cmp.tipo.disable();
+            //may 08-01-2020 solo para visto bueno conta puede modificar el tipo de cuota
+            console.log('llegamay', data.estado);
+            if (data.estado == 'vbconta') {
+                this.Cmp.tipo.enable();
+            }else{
+                this.Cmp.tipo.disable();
+            }
+
             this.Cmp.fecha_tentativa.enable();
             this.Cmp.tipo.store.loadData(this.arrayStore.TODOS);
             this.ocultarGrupo(2); //ocultar el grupo de ajustes
