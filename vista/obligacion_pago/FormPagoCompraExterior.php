@@ -560,7 +560,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     name: 'fecha',
                     fieldLabel: 'Fecha Sol',
                     qtip: 'Según esta fecha se escoje el formulario de solicitud',
-                    readOnly : true,
+                    readOnly : false,
                     allowBlank: false,
                     gwidth : 100,
                     anchor : '36.5%',
