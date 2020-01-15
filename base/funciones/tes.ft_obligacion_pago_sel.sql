@@ -107,7 +107,14 @@ BEGIN
                         FROM segu.tusuario tu
                         INNER JOIN orga.tfuncionario tf on tf.id_persona = tu.id_persona
                         WHERE tu.id_usuario = p_id_usuario ;
-                        v_filadd = v_filadd ||'(obpg.id_funcionario = '||v_id_funcionario||' or obpg.id_usuario_reg = '||p_id_usuario||') and ';
+
+                       --15-01-2020 (MAY) modificacion para que pueda ver tambien sus asistentes de un funcionario
+                       --v_filadd = v_filadd ||'(obpg.id_funcionario = '||v_id_funcionario||' or obpg.id_usuario_reg = '||p_id_usuario||') and ';
+
+                       v_filadd = v_filadd ||'(obpg.id_funcionario = '||v_id_funcionario||' or obpg.id_usuario_reg = '||p_id_usuario||' or
+                          (obpg.id_funcionario  IN (select * FROM orga.f_get_funcionarios_x_usuario_asistente(now()::date,'||p_id_usuario||') AS (id_funcionario INTEGER)))) and ';
+
+
                     elsif(v_parametros.tipo_interfaz  = 'PPM')then
 
                     	SELECT tf.id_funcionario
