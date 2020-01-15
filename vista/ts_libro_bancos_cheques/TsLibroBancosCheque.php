@@ -905,7 +905,7 @@ header("content-type: text/javascript; charset=UTF-8");
 			  if(data['sistema_origen'] != ''){
 				  this.getBoton('btnChequesTramite').enable();
 			  }	else{
-				  this.getBoton('btnChequesTramite').disable();
+				  this.getBoton('btnChequesTramite').enable();
 			  }
 			  
 		  }else{
