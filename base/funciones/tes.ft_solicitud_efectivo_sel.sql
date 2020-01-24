@@ -563,8 +563,9 @@ v_consulta:='select lb.fecha,
                         inner join tes.tts_libro_bancos lb on lb.id_int_comprobante=pc.id_int_comprobante
                         inner join tes.tproceso_caja ap on ap.id_caja = pc.id_caja and ap.tipo = ''apertura''
                         inner join wf.testado_wf wfe on wfe.id_proceso_wf = ap.id_proceso_wf and  wfe.id_funcionario is not null
-                        left join orga.vfuncionario_cargo apro on apro.id_funcionario = wfe.id_funcionario and ap.fecha >= apro.fecha_asignacion and
-                               apro.fecha_finalizacion is null
+                        -- left join orga.vfuncionario_cargo apro on apro.id_funcionario = wfe.id_funcionario and ap.fecha >= apro.fecha_asignacion and
+                        --       apro.fecha_finalizacion is null
+                        left join orga.vfuncionario_ultimo_cargo apro on apro.id_funcionario = wfe.id_funcionario and ap.fecha >= apro.fecha_asignacion
                         inner join tes.tcajero cjr on cjr.id_caja = cj.id_caja and lb.fecha between
                                cjr.fecha_inicio and cjr.fecha_fin
                         inner join orga.vfuncionario_cargo sol on sol.id_funcionario = cjr.id_funcionario and ap.fecha >= sol.fecha_asignacion and
