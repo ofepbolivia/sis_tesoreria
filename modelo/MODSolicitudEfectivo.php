@@ -304,7 +304,8 @@ class MODSolicitudEfectivo extends MODbase{
 		$this->captura('cajero','text');
 		$this->captura('cargo_cajero','varchar');
 		$this->captura('importe_cheque','numeric');
-		$this->captura('num_memo','varchar');
+        $this->captura('num_memo','varchar');
+        $this->captura('codigo_mone','varchar');
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();

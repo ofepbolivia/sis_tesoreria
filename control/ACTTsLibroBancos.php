@@ -429,7 +429,7 @@ class ACTTsLibroBancos extends ACTbase{
 			$dataSource->putParameter('importe_cheque', $datosMemoCajaChica[0]['importe_cheque']);
 			$dataSource->putParameter('importe_literal', $funciones->num2letrasCheque($datosMemoCajaChica[0]['importe_cheque']));
 			$dataSource->putParameter('num_memo', $datosMemoCajaChica[0]['num_memo']);
-			
+			$dataSource->putParameter('codigo_mone', $datosMemoCajaChica[0]['codigo_mone']);
 			//build the report
 			$reporte = new RMemoCajaChica();
 			$reporte->setDataSource($dataSource);

@@ -29,7 +29,8 @@ Class RMemoCajaChica {
 		$document->setValue('CARGOCAJERO', $this->getDataSource()->getParameter('cargo_cajero')); // On section/content
 		$document->setValue('IMPORTECHEQUE', $this->getDataSource()->getParameter('importe_cheque')); // On section/content
 		$document->setValue('IMPORTELITERAL', $this->getDataSource()->getParameter('importe_literal')); // On section/content
-		$document->setValue('BANCO', 'BANCO UNION S.A.'); // On section/content
+        $document->setValue('BANCO', 'BANCO UNION S.A.'); // On section/content
+        $document->setValue('CODIGO_MONE', $this->getDataSource()->getParameter('codigo_mone'));
 		
 		$document->saveAs($fileName);
 		        

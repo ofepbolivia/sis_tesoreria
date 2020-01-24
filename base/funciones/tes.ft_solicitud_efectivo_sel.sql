@@ -557,7 +557,8 @@ v_consulta:='select lb.fecha,
                                sol.desc_funcionario1 as cajero,
                                sol.descripcion_cargo as cargo_cajero,
                                lb.importe_cheque,
-                               pc.num_memo
+                               pc.num_memo,
+                               mo.codigo as codigo_mone
                         from tes.tproceso_caja pc
                         inner join tes.tcaja cj on cj.id_caja = pc.id_caja
                         inner join tes.tts_libro_bancos lb on lb.id_int_comprobante=pc.id_int_comprobante
@@ -570,6 +571,8 @@ v_consulta:='select lb.fecha,
                                cjr.fecha_inicio and cjr.fecha_fin
                         inner join orga.vfuncionario_cargo sol on sol.id_funcionario = cjr.id_funcionario and ap.fecha >= sol.fecha_asignacion and
                                sol.fecha_finalizacion is null
+                        inner join tes.tcuenta_bancaria cue on cue.id_cuenta_bancaria = lb.id_cuenta_bancaria
+                        inner join param.tmoneda mo on mo.id_moneda = cue.id_moneda                                                               
                         where pc.id_proceso_wf= '||v_parametros.id_proceso_wf;
 
             --Devuelve la respuesta
