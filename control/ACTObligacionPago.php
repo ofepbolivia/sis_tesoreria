@@ -731,14 +731,36 @@ class ACTObligacionPago extends ACTbase
 
     function TsLibroBancosExterior() {
 		$this->objParam->defecto('ordenacion','id_obligacion_pago');
-        $this->objParam->defecto('dir_ordenacion','asc');        
+        $this->objParam->defecto('dir_ordenacion','asc');
 
-        if ($this->objParam->getParametro('pes_estado') == 'exterior') {            	
+        //27-01-2020 (may) se añade dos pestañas mas para tramites PGA exterior y locales
+        /*
+        if ($this->objParam->getParametro('pes_estado') == 'exterior' || $this->objParam->getParametro('pes_estado') == 'pgaexterior') {
             $this->objParam->addFiltro("plbex.prioridad = 3");
         }else{
             $this->objParam->addFiltro("plbex.prioridad <> 3");
-        }        
-		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
+        }
+        */
+
+        if ($this->objParam->getParametro('pes_estado') == 'exterior' || $this->objParam->getParametro('pes_estado') == 'pgaexterior') {
+            if ($this->objParam->getParametro('pes_estado') == 'pgaexterior') {
+                $this->objParam->addFiltro("plbex.tipo_obligacion in (''pga'') ");
+                $this->objParam->addFiltro("plbex.prioridad = 3 ");
+            }else{
+                $this->objParam->addFiltro("plbex.prioridad = 3 ");
+            }
+
+        }else{
+            if ($this->objParam->getParametro('pes_estado') == 'pgainterior' ){
+                $this->objParam->addFiltro("plbex.tipo_obligacion in (''pga'') ");
+                $this->objParam->addFiltro("plbex.prioridad <> 3 ");
+            }else{
+                $this->objParam->addFiltro("plbex.prioridad <> 3 ");
+            }
+        }
+
+
+        if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODObligacionPago','TsLibroBancosExterior');
 		} else{

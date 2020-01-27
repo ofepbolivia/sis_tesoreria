@@ -30,9 +30,11 @@ Phx.vista.TsLibroBancosExterior=Ext.extend(Phx.gridInterfaz,{
     gruposBarraTareas:[        
         {name:'exterior',title:'<H1 align="center"><i class="fa fa-list-ul"></i>Exterior</h1>',grupo:0,height:0},
         {name:'interior',title:'<H1 align="center"><i class="fa fa-list-ul"></i>Locales</h1>',grupo:2,height:0},
-    ],     
-    bactGroups:  [0,2],        
-    bexcelGroups: [0,2],    
+        {name:'pgaexterior',title:'<H1 align="center"><i class="fa fa-list-ul"></i>PGA - Exterior</h1>',grupo:3,height:0},
+        {name:'pgainterior',title:'<H1 align="center"><i class="fa fa-list-ul"></i>PGA - Locales</h1>',grupo:4,height:0},
+    ],
+    bactGroups:  [0,2 ,3,4],
+    bexcelGroups: [0,2,3,4],
 
     actualizarSegunTab: function(name, indice){
         this.cmbGestion.show(true);        
@@ -224,7 +226,23 @@ Phx.vista.TsLibroBancosExterior=Ext.extend(Phx.gridInterfaz,{
 				grid:true,
                 form:true,				
                 bottom_filter: true
-		}
+		},
+        {
+            config:{
+                name: 'estado_pp',
+                fieldLabel: 'Estado',
+                allowBlank: true,
+                anchor: '100%',
+                gwidth: 100
+            },
+            type:'TextField',
+            filters:{pfiltro:'plbex.estado_pp',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:true,
+            bottom_filter: true
+        }
+
 	],
 	tam_pag:50,	
 	title:'procesos pagos exterior',	
@@ -243,7 +261,8 @@ Phx.vista.TsLibroBancosExterior=Ext.extend(Phx.gridInterfaz,{
 		{name:'fun_usuario_ai', type: 'string'},		
         {name:'monto', type: 'numeric'},
         {name:'moneda', type: 'string'},
-        {name:'cod_moneda', type: 'string'}
+        {name:'cod_moneda', type: 'string'},
+        {name:'estado_pp', type: 'string'}
 	],
 	sortInfo:{
 		field: 'fecha',

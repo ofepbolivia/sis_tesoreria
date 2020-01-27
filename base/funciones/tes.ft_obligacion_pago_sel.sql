@@ -1316,7 +1316,8 @@ BEGIN
                         plbex.usuario_ai,
                         plbex.monto,
                         mone.moneda,
-                        mone.codigo as cod_moneda
+                        mone.codigo as cod_moneda,
+                        plbex.estado_pp
                     from tes.v_pagos_libro_banco_exterior plbex
                     inner join param.tmoneda mone on mone.id_moneda = plbex.id_moneda
 					where plbex.fecha between '''||v_fecha_ini||''' and '''||v_fecha_fin||'''

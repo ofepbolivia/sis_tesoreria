@@ -1035,6 +1035,7 @@ class MODObligacionPago extends MODbase
         $this->captura('monto','numeric');
         $this->captura('moneda','varchar');
         $this->captura('cod_moneda','varchar');
+        $this->captura('estado_pp','varchar');
 		
 		//Ejecuta la instruccion
         $this->armarConsulta();        
