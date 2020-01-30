@@ -37,7 +37,7 @@ header("content-type: text/javascript; charset=UTF-8");
 			);
             this.addButton('btnRdetalleRep', 
             {
-                text: 'Procesar Detalle Cheques',
+                text: 'Procesar Detalle Conciliacion Bancaria',
                 iconCls: 'bsubir',
                 disabled: true,
                 handler: this.regDetRep,
@@ -309,7 +309,7 @@ header("content-type: text/javascript; charset=UTF-8");
 				fieldLabel: 'Diferencia Saldos Reales',
 				allowBlank: true,
 				anchor: '80%',
-				gwidth: 120,
+				gwidth: 140,
                 renderer: (value, p, record) => {  
                     if (value == 0 || value == null || value == undefined) {
                         return  String.format('<div style="text-align:right;font-weight:bold;color:green">{0}</div>', Ext.util.Format.number(value,'0.000,00/i'));
@@ -491,8 +491,8 @@ header("content-type: text/javascript; charset=UTF-8");
         {name:'jefe_tesoreria', type:'string'}
 	],
 		sortInfo : {			
-			field : 'id_conciliacion_bancaria',
-			direction : 'ASC'
+			field : 'id_periodo',
+			direction : 'desc'
 		},
 		bdel : true,
 		bsave : false,
@@ -517,8 +517,8 @@ header("content-type: text/javascript; charset=UTF-8");
             },this);            
 		},
         preparaMenu:function(n){
-		  var data = this.getSelectedData();		              
-                    
+		  var data = this.getSelectedData();		                        
+          
 		  Phx.vista.ConciliacionBancaria.superclass.preparaMenu.call(this,n); 
 
           if ( data.estado == 'finalizado' && data.jefe_tesoreria == 'no') {
@@ -544,6 +544,9 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.getBoton('btnfinalizado').enable();       
                 this.getBoton('btnRetroceso').setVisible(true);     
           }
+          if ( (data.diferencia < 0.00 ) ||  (data.diferencia > 0.00)) {
+                this.getBoton('btnfinalizado').disable();
+          }          
         },		
         iniciarEventos:function(){
             this.cmpFecha = this.getComponente('fecha');
@@ -565,13 +568,8 @@ header("content-type: text/javascript; charset=UTF-8");
 								params:{id_cuenta_bancaria:data.id_cuenta_bancaria,
 										id_periodo:data.id_periodo,
 										id_conciliacion_bancaria:data.id_conciliacion_bancaria},
-								success: function(resp){
-                                    Phx.CP.loadingHide();
-                                    var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
-                                    if(!reg.ROOT.error){
-                                        this.reload();
-                                    }
-                                },
+                                        success:this.successReproceso,
+
 								failure: this.conexionFailure,
 								timeout:this.timeout,
 								scope:this
@@ -579,6 +577,13 @@ header("content-type: text/javascript; charset=UTF-8");
             }else{
 				Ext.MessageBox.alert('Alerta', 'Antes debe seleccionar un item.');
 			}                            
+        },
+        successReproceso: function(resp){
+            Phx.CP.loadingHide();
+            var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+            if(!reg.ROOT.error){
+                this.reload();
+            }
         },
         Finalizar: function(){
             if(confirm('Esta seguro de finalizar')){

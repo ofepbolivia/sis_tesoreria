@@ -43,7 +43,11 @@ DECLARE
     v_depo_transito				numeric;
     v_debito_bancario			numeric;
     v_credito_bancario          numeric;
-    v_dupl_conci			    record;			    
+    v_dupl_conci			    record;	
+    v_fecha_ant_ini				date;
+    v_fecha_control_ini 		date;
+    v_periodo_ant				integer;
+    v_concili_ant				record;    		    
 BEGIN
 
     v_nombre_funcion = 'tes.ft_conciliacion_bancaria_ime';
@@ -59,6 +63,30 @@ BEGIN
 	if(p_transaccion='TES_CONCBAN_INS')then
 					
         begin
+
+        	-- control proceso conciliacion anterior aun no finalizada.  ini
+            select 
+            fecha_ini - interval '1' month
+            into v_fecha_control_ini
+            from param.tperiodo 
+            where id_periodo = v_parametros.id_periodo;
+
+            select id_periodo
+            into v_periodo_ant
+            from param.tperiodo
+            where fecha_ini = v_fecha_control_ini;
+            
+            select con.estado,param.f_literal_periodo(con.id_periodo) as mes, ges.gestion
+             into v_concili_ant
+            from tes.tconciliacion_bancaria con
+            inner join param.tgestion ges on ges.id_gestion =  con.id_gestion
+            where con.id_periodo = v_periodo_ant
+            and con.id_cuenta_bancaria = v_parametros.id_cuenta_bancaria;
+
+            if v_concili_ant.estado <> 'finalizado' then            
+            	raise exception 'Para registrar la conciliacion bancaria, Finalice previamente la conciliacion de: % de %',v_concili_ant.mes,v_concili_ant.gestion;
+            end if;
+            -- fin        
         
             --control duplicidad 
             select ges.gestion,
@@ -203,7 +231,7 @@ BEGIN
 
 		begin            
        	
-	      --Sentencia de la consulta de conteo de registros        
+	      
           v_periodo = v_parametros.id_periodo;
 
               select per.fecha_fin
@@ -218,7 +246,7 @@ BEGIN
              where id_conciliacion_bancaria = v_parametros.id_conciliacion_bancaria;             
          end if; 
       	 
-         for i in 1..3 loop
+         for i in 1..2 loop
          
               select per.fecha_ini, per.fecha_fin
                into  v_fecha_ini, v_fecha_fin
@@ -229,8 +257,8 @@ BEGIN
           	v_column = 'periodo_1';
           elsif i = 2 then
 	          v_column = 'periodo_2';
-          elsif i = 3 then
-	          v_column = 'periodo_3';
+          /*elsif i = 3 then
+	          v_column = 'periodo_3';*/
           end if;  
           
               v_consu = '
@@ -300,10 +328,18 @@ BEGIN
                                                   ''debito_automatico'',
                                                   ''transferencia_carta'')              
                     order by lb.fecha, lbp.indice, lb.nro_cheque asc';
-                    
+                                        
               EXECUTE(v_consu);
               
-              v_periodo = v_periodo - 1;
+              select per.fecha_ini - interval '1' month
+                     into v_fecha_ant_ini
+              from param.tperiodo per 
+              where per.id_periodo = v_periodo;
+              
+              select id_periodo
+              into v_periodo
+              from param.tperiodo 
+              where fecha_ini = v_fecha_ant_ini;              
               
           end loop;
           

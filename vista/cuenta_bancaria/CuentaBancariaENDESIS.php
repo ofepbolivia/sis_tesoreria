@@ -88,7 +88,7 @@ header("content-type:text/javascript; charset=UTF-8");
 			Phx.CP.loadWindows('../../../sis_tesoreria/vista/conciliacion_bancaria/ConciliacionBancaria.php', 'Conciliacion Bancaria', {
 				modal : true,
 				width : '80%',
-				height : '90%',
+				height : '98%',
 			}, rec.data, this.idContenedor, 'ConciliacionBancaria');
 		},
 		
