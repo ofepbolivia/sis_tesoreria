@@ -60,6 +60,8 @@ DECLARE
     id_partida_ejecucion_raiz   int4;
     v_moneda					varchar;
 
+    v_id_uo						integer;
+
 
 BEGIN
 
@@ -86,7 +88,6 @@ BEGIN
           ELSE
             v_historico = 'no';
           END IF;
-
 
 
          IF   v_parametros.tipo_interfaz in ('obligacionPagoTes','obligacionPagoUnico', 'PGA', 'PPM', 'PCE', 'PBR') THEN
@@ -195,6 +196,26 @@ BEGIN
             --no hay limitaciones ...
          ELSIF v_parametros.tipo_interfaz =  'ObligacionPagoConta' THEN
             --no hay limitaciones ...
+
+         --(28-01-2020) MAY nuevo filtro consulta obligaciones de pago para cada gerencia
+         ELSIF  v_parametros.tipo_interfaz =  'ObligacionPagoConsultaGerencia' THEN
+
+          		--busca id_uo del usuario
+                  SELECT uo.id_uo
+                  INTO v_id_uo
+                  FROM orga.tfuncionario f
+                  inner join segu.tusuario usu on usu.id_persona = f.id_persona
+                  inner join orga.tuo_funcionario func on func.id_funcionario = f.id_funcionario
+                  inner join orga.tuo uo on uo.estado_reg='activo' and uo.id_uo = tes.f_get_uo_gerencia_proceso(func.id_uo,null::integer,null::date)
+                  WHERE usu.id_usuario= p_id_usuario;
+
+
+             v_inner = '   inner JOIN orga.tuo_funcionario uof on uof.id_funcionario = obpg.id_funcionario and uof.tipo = ''oficial'' and uof.estado_reg = ''activo'' and (current_date <= uof.fecha_finalizacion or  uof.fecha_finalizacion is null)
+			               inner JOIN orga.tuo tuo on tuo.id_uo = tes.f_get_uo_gerencia_proceso(uof.id_uo,null::integer,null::date)  ';
+
+             v_filadd = ' tuo.id_uo = '||v_id_uo||'  and  ';
+
+
          ELSE
 
               -- SI LA INTERFACE VIENE DE ADQUISIONES
@@ -448,6 +469,25 @@ BEGIN
                 --no hay limitaciones ...
              ELSIF v_parametros.tipo_interfaz =  'ObligacionPagoConta' THEN
                 --no hay limitaciones ...
+
+            --(28-01-2020) MAY nuevo filtro consulta obligaciones de pago para cada gerencia
+         ELSIF  v_parametros.tipo_interfaz =  'ObligacionPagoConsultaGerencia' THEN
+
+          		--busca id_uo del usuario
+                  SELECT uo.id_uo
+                  INTO v_id_uo
+                  FROM orga.tfuncionario f
+                  inner join segu.tusuario usu on usu.id_persona = f.id_persona
+                  inner join orga.tuo_funcionario func on func.id_funcionario = f.id_funcionario
+                  inner join orga.tuo uo on uo.estado_reg='activo' and uo.id_uo = tes.f_get_uo_gerencia_proceso(func.id_uo,null::integer,null::date)
+                  WHERE usu.id_usuario= p_id_usuario;
+
+
+             v_inner = '   inner JOIN orga.tuo_funcionario uof on uof.id_funcionario = obpg.id_funcionario and uof.tipo = ''oficial'' and uof.estado_reg = ''activo'' and (current_date <= uof.fecha_finalizacion or  uof.fecha_finalizacion is null)
+			               inner JOIN orga.tuo tuo on tuo.id_uo = tes.f_get_uo_gerencia_proceso(uof.id_uo,null::integer,null::date)  ';
+
+             v_filadd = ' tuo.id_uo = '||v_id_uo||'  and  ';
+
              ELSE
 
                   -- SI LA NTERFACE VIENE DE ADQUISIONES
@@ -894,7 +934,7 @@ BEGIN
                     revertible			numeric DEFAULT 0.00,
                     revertir			numeric,
                     moneda 				varchar,
-                    desc_orden			varchar                    
+                    desc_orden			varchar
             ) on commit drop;
 
             insert into obligaciones (id_obligacion_det,
@@ -930,7 +970,7 @@ BEGIN
 
             --raise exception 'Moneda %', v_parametros.id_moneda ;
             select moneda into v_moneda
-            from param.tmoneda 
+            from param.tmoneda
             where id_moneda = v_parametros.id_moneda;
 
 			FOR v_obligaciones_partida in (select * from obligaciones)
@@ -1380,32 +1420,32 @@ BEGIN
 
             CREATE TEMPORARY TABLE ttemp_eval_det (
               id_partida_ejecucion	integer,
-              id_partida_ejecucion_fk   integer,                                                                                   
+              id_partida_ejecucion_fk   integer,
               moneda					varchar,
               comprometido				numeric,
               ejecutado					numeric,
               pagado					numeric,
               nro_tramite				varchar,
               tipo_movimiento			varchar,
-              nombre_partida			varchar, 
-              codigo					varchar, 
-              codigo_categoria			varchar, 
-              fecha						date, 
+              nombre_partida			varchar,
+              codigo					varchar,
+              codigo_categoria			varchar,
+              fecha						date,
               codigo_cc              	varchar,
               usr_reg					varchar,
               usr_mod 					varchar,
               fecha_reg					timestamp,
               fecha_mod                 timestamp,
               estado_reg				varchar
-            )ON COMMIT DROP ;            
-              
+            )ON COMMIT DROP ;
+
             WITH RECURSIVE path_rec(id_partida_ejecucion, id_partida_ejecucion_fk ) AS (
-            SELECT  
+            SELECT
               pe.id_partida_ejecucion,
               pe.id_partida_ejecucion_fk
-            FROM pre.tpartida_ejecucion pe 
+            FROM pre.tpartida_ejecucion pe
             WHERE pe.id_partida_ejecucion = v_parametros.id_partida_ejecucion_com
-                            	
+
             UNION
 
             SELECT
@@ -1413,26 +1453,26 @@ BEGIN
               pe2.id_partida_ejecucion_fk
             FROM pre.tpartida_ejecucion pe2
             inner join path_rec  pr on pe2.id_partida_ejecucion = pr.id_partida_ejecucion_fk
-                                    
-                            	     
+
+
             )
-            SELECT 
-            id_partida_ejecucion 
+            SELECT
+            id_partida_ejecucion
             into id_partida_ejecucion_raiz
-            FROM path_rec order by id_partida_ejecucion limit 1 offset 0; 
-              
+            FROM path_rec order by id_partida_ejecucion limit 1 offset 0;
+
             WITH RECURSIVE path_rec( id_partida_ejecucion,  id_partida_ejecucion_fk, monto, monto_mb, tipo_movimiento,
-                    id_moneda ) AS (                                              
-                SELECT  
+                    id_moneda ) AS (
+                SELECT
                   pe.id_partida_ejecucion,
                   pe.id_partida_ejecucion_fk,
                   pe.monto,
                   pe.monto_mb,
                   pe.tipo_movimiento,
                   pe.id_moneda
-                FROM pre.tpartida_ejecucion pe 
+                FROM pre.tpartida_ejecucion pe
                 WHERE pe.id_partida_ejecucion = id_partida_ejecucion_raiz
-                                            	
+
                 UNION
                 SELECT
                   pe2.id_partida_ejecucion,
@@ -1444,32 +1484,32 @@ BEGIN
                 FROM pre.tpartida_ejecucion pe2
                 inner join path_rec  pr on pe2.id_partida_ejecucion_fk = pr.id_partida_ejecucion
             )
-            insert into ttemp_eval_det (id_partida_ejecucion, id_partida_ejecucion_fk,                                                                                   
+            insert into ttemp_eval_det (id_partida_ejecucion, id_partida_ejecucion_fk,
                           comprometido, ejecutado, pagado, moneda, nro_tramite, tipo_movimiento,
                           nombre_partida, codigo, codigo_categoria, fecha, codigo_cc,
                           usr_reg, usr_mod, fecha_reg, fecha_mod, estado_reg)
              SELECT
              p.id_partida_ejecucion,
-             p.id_partida_ejecucion_fk, 
+             p.id_partida_ejecucion_fk,
              case when p.tipo_movimiento = 'comprometido'then
                 p.monto
-             else 
+             else
              0.00 end,
              case when p.tipo_movimiento = 'ejecutado'then
                 p.monto
-             else 
+             else
              0.00 end,
              case when p.tipo_movimiento = 'pagado'then
                 p.monto
-             else 
-             0.00 end,           
+             else
+             0.00 end,
               mo.moneda,
               pej.nro_tramite,
               p.tipo_movimiento,
               par.nombre_partida,
               par.codigo,
               cat.codigo_categoria,
-              pej.fecha,              
+              pej.fecha,
               vpre.codigo_cc,
               usu1.cuenta as usr_reg,
               usu2.cuenta as usr_mod,
@@ -1477,27 +1517,27 @@ BEGIN
               pej.fecha_mod,
               pej.estado_reg
             FROM path_rec p
-            inner join pre.tpartida_ejecucion pej on pej.id_partida_ejecucion = p.id_partida_ejecucion 
+            inner join pre.tpartida_ejecucion pej on pej.id_partida_ejecucion = p.id_partida_ejecucion
             inner join segu.tusuario usu1 on usu1.id_usuario = pej.id_usuario_reg
             inner join pre.tpresupuesto pre on pre.id_presupuesto = pej.id_presupuesto
             left join segu.tusuario usu2 on usu2.id_usuario = pej.id_usuario_mod
             INNER JOIN pre.vpresupuesto vpre ON vpre.id_presupuesto = pre.id_presupuesto
             inner join pre.vcategoria_programatica cat on cat.id_categoria_programatica = pre.id_categoria_prog
-            inner join pre.tpartida par on par.id_partida = pej.id_partida            
-            inner join param.tmoneda mo on mo.id_moneda = p.id_moneda;          
+            inner join pre.tpartida par on par.id_partida = pej.id_partida
+            inner join param.tmoneda mo on mo.id_moneda = p.id_moneda;
 
-            insert into ttemp_eval_det (id_partida_ejecucion,                                                                                   
-                          comprometido, ejecutado, pagado, nro_tramite)                          
+            insert into ttemp_eval_det (id_partida_ejecucion,
+                          comprometido, ejecutado, pagado, nro_tramite)
 			select 0,
                    sum(comprometido),
                    sum(ejecutado),
                    sum(pagado),
                    'TOTAL'::varchar
             FROM ttemp_eval_det;
-            
+
           v_consulta:=' select * from ttemp_eval_det
           			 where (tipo_movimiento = '''||v_parametros.tipo_interfaz||'''
-                      or tipo_movimiento is null) 
+                      or tipo_movimiento is null)
                       and ';
 
           --Definicion de la respuesta
@@ -1506,7 +1546,7 @@ BEGIN
           --Devuelve la respuesta
           raise notice '%',v_consulta;
           return v_consulta;
-      end;                
+      end;
 
    else
 
