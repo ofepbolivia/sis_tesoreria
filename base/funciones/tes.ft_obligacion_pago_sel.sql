@@ -294,7 +294,8 @@ BEGIN
                               conf.fecha_inicio::date,
                               conf.fecha_fin::date,
                               conf.observaciones,
-                              obpg.fecha_certificacion_pres
+                              obpg.fecha_certificacion_pres,
+                              obpg.presupuesto_aprobado
 
                               from tes.tobligacion_pago obpg
                               inner join segu.tusuario usu1 on usu1.id_usuario = obpg.id_usuario_reg
@@ -593,7 +594,8 @@ BEGIN
                               con.tipo||'' - ''||con.numero::varchar as desc_contrato,
                               con.id_contrato,
                               obpg.obs_presupuestos,
-                              obpg.uo_ex
+                              obpg.uo_ex,
+                              obpg.presupuesto_aprobado
 
                               from tes.tobligacion_pago obpg
                               inner join segu.tusuario usu1 on usu1.id_usuario = obpg.id_usuario_reg

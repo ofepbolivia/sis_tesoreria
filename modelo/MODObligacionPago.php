@@ -93,7 +93,7 @@ class MODObligacionPago extends MODbase
         $this->captura('fecha_fin', 'date');
         $this->captura('observaciones', 'varchar');
         $this->captura('fecha_certificacion_pres', 'date');
-
+        $this->captura('presupuesto_aprobado', 'varchar');
 
         //Ejecuta la instruccion
         $this->armarConsulta();
@@ -172,7 +172,7 @@ class MODObligacionPago extends MODbase
         $this->captura('id_contrato', 'integer');
         $this->captura('obs_presupuestos', 'varchar');
         $this->captura('uo_ex', 'varchar');
-
+        $this->captura('presupuesto_aprobado', 'varchar');
 
         //Ejecuta la instruccion
         $this->armarConsulta();
@@ -1098,6 +1098,23 @@ class MODObligacionPago extends MODbase
         //Devuelve la respuesta
         return $this->respuesta;
     }
+    function aprobarPresupuestoSolicitud(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento='tes.ft_obligacion_pago_ime';
+        $this->transaccion='TES_VALPRE_IME';
+        $this->tipo_procedimiento='IME';
+
+        //Define los parametros para la funcion
+        $this->setParametro('id_obligacion_pago','id_obligacion_pago','int4');
+        $this->setParametro('aprobar', 'aprobar', 'varchar');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }    
 }
 
 ?>

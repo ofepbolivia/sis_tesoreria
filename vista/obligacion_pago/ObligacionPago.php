@@ -257,6 +257,13 @@ header("content-type: text/javascript; charset=UTF-8");
                     anchor: '80%',
                     gwidth: 100,
                     maxLength: 50
+                    /*renderer:function(value, p, record){
+                        if(record.data.presupuesto_aprobado=='sin_presupuesto_cc'){                        
+                            return '<tpl style="background-color:#FA5E5E; margin-top:0px; position:absolute; width:100px; float:left;">'+record.data['estado']+'</tpl>';
+                        }else{
+                            return String.format('{0}', value);
+                        }
+                    }*/                  
                 },
                 type: 'TextField',
                 filters: {pfiltro: 'obpg.estado', type: 'string'},
@@ -985,7 +992,8 @@ header("content-type: text/javascript; charset=UTF-8");
             {name: 'fecha_inicio', type: 'date', dateFormat: 'Y-m-d'},
             {name: 'fecha_fin', type: 'date', dateFormat: 'Y-m-d'},
             {name: 'observaciones', type: 'string'},
-            {name: 'fecha_certificacion_pres', type: 'date', dateFormat: 'Y-m-d'}
+            {name: 'fecha_certificacion_pres', type: 'date', dateFormat: 'Y-m-d'},
+            {name: 'presupuesto_aprobado', type: 'string'}
 
         ],
 
@@ -2100,11 +2108,42 @@ header("content-type: text/javascript; charset=UTF-8");
                     json_procesos: Ext.util.JSON.encode(resp.procesos)
                 },
                 success: this.successWizard,
-                failure: this.conexionFailure, //chequea si esta en verificacion presupeusto para enviar correo de transferencia
+                failure: this.conexionFailPresupuesto, //chequea si esta en verificacion presupeusto para enviar correo de transferencia
                 argument: {wizard: wizard},
                 timeout: this.timeout,
                 scope: this
             });
+        },
+        conexionFailPresupuesto:function(resp, data){
+            Phx.CP.loadingHide();
+            var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));                                               
+            
+            Ext.Msg.show({
+                title:'<h1 style="font-size:15px;">Aviso!</h1>',
+                msg: '<p style="font-weight:bold; font-size:12px;">'+reg.ROOT.detalle.mensaje+'</p>',
+                buttons: Ext.Msg.OK,
+                width:450,
+                height:200,
+                icon: Ext.MessageBox.WARNING,
+                scope:this
+            });            
+
+            if (reg.ROOT.error){                
+                
+                if (reg.ROOT.detalle.mensaje.search('centro de costo ->') >= 0 ){
+                        Ext.Ajax.request({                
+                        url:'../../sis_tesoreria/control/ObligacionPago/aprobarPresupuestoSolicitud',
+                        params: { id_obligacion_pago: data.params.id_obligacion_pago, aprobar:'no'},                
+                        success: function(resp){
+                            var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+                            !reg.ROOT.error && this.reload();
+                        },
+                        failure: this.conexionFailure,
+                        timeout: this.timeout,
+                        scope: this
+                    });
+                }
+            }                        
         },
         successWizard: function (resp) {
             Phx.CP.loadingHide();

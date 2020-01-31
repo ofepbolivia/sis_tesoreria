@@ -101,6 +101,9 @@ class ACTObligacionPago extends ACTbase
 
         }
 
+        //filtro breydi.vasquez 07/01/2020 
+        $this->objParam->getParametro('tramite_sin_presupuesto_centro_c') != '' && $this->objParam->addFiltro("obpg.presupuesto_aprobado = ''sin_presupuesto_cc'' ");
+
         if ($this->objParam->getParametro('tipoReporte') == 'excel_grid' || $this->objParam->getParametro('tipoReporte') == 'pdf_grid') {
             $this->objReporte = new Reporte($this->objParam, $this);
             $this->res = $this->objReporte->generarReporteListado('MODObligacionPago', 'listarObligacionPago');
@@ -162,7 +165,8 @@ class ACTObligacionPago extends ACTbase
             $this->objParam->addFiltro("obpg.tipo_obligacion in (''spi'')");
         }
 
-
+        //filtro breydi.vasquez 07/01/2020 
+        $this->objParam->getParametro('tramite_sin_presupuesto_centro_c') != '' && $this->objParam->addFiltro("obpg.presupuesto_aprobado = ''sin_presupuesto_cc'' ");
         //
         
         if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
@@ -793,6 +797,12 @@ class ACTObligacionPago extends ACTbase
         $this->res=$this->objFunc->clonarOP($this->objParam);
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
+    
+    function aprobarPresupuestoSolicitud(){
+        $this->objFunc=$this->create('MODObligacionPago');
+        $this->res=$this->objFunc->aprobarPresupuestoSolicitud($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }    
 }
 
 ?>

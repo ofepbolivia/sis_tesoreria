@@ -304,7 +304,8 @@ $body$
                 id_contrato,
                 fecha_costo_ini_pp,
                 fecha_costo_fin_pp,
-                fecha_conclusion_pago
+                fecha_conclusion_pago,
+                presupuesto_aprobado
 
                 ) values(
                 (p_hstore->'id_proveedor')::integer,
@@ -341,7 +342,8 @@ $body$
                 (p_hstore->'id_contrato')::integer,
                 (p_hstore->'fecha_costo_ini_pp')::date,
                 (p_hstore->'fecha_costo_fin_pp')::date,
-                (p_hstore->'fecha_conclusion_pago')::date
+                (p_hstore->'fecha_conclusion_pago')::date,
+                'verificar'
 
                 )RETURNING id_obligacion_pago into v_id_obligacion_pago;
 

@@ -167,6 +167,8 @@ DECLARE
 
      v_parametros_op      record;
      v_fecha_aux          integer;
+
+     v_aprobado			  varchar;
 BEGIN
 
     v_nombre_funcion = 'tes.ft_obligacion_pago_ime';
@@ -2128,6 +2130,45 @@ BEGIN
               return v_resp;
 
         end;
+
+    /*********************************
+    #TRANSACCION:  'TES_VALPRE_IME'
+    #DESCRIPCION:	validar presupuesto a nivel centro de costo
+    #AUTOR:		breydi vasquez 
+    #FECHA:		08-01-2020
+    ***********************************/
+
+    elsif(p_transaccion='TES_VALPRE_IME')then
+
+        begin
+			select sol.presupuesto_aprobado
+            	into v_aprobado
+            from tes.tobligacion_pago sol
+            where sol.id_obligacion_pago = v_parametros.id_obligacion_pago;
+
+			if v_parametros.aprobar = 'si' and v_aprobado <> 'aprobado' then
+
+                  update tes.tobligacion_pago  set
+                  presupuesto_aprobado = 'aprobado'
+                  where id_obligacion_pago = v_parametros.id_obligacion_pago;
+
+            else
+            	if v_aprobado <> 'aprobado' then
+                  update tes.tobligacion_pago  set
+                  presupuesto_aprobado = 'sin_presupuesto_cc'
+                  where id_obligacion_pago = v_parametros.id_obligacion_pago;  
+                end if;          
+            end if;
+
+
+          --Definicion de la respuesta
+          v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Se Actualizo con exito');
+          v_resp = pxp.f_agrega_clave(v_resp,'id_obligacion_pago',v_parametros.id_obligacion_pago::varchar);
+
+          --Devuelve la respuesta
+          return v_resp;
+
+        end;        
 
     else
 

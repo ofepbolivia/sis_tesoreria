@@ -2018,3 +2018,11 @@ ALTER TABLE tes.tplan_pago
 COMMENT ON COLUMN tes.tplan_pago.id_plan_pago_inter
 IS 'Este campo sirve para relacionar un plan de pago que se extiende en una internacional';
 /*****************************F-SCP-MAY-TES-0-04/12/2019*************/
+
+/*****************************I-SCP-BVP-TES-0-31/01/2020*************/
+ALTER TABLE tes.tobligacion_pago
+  ADD COLUMN presupuesto_aprobado VARCHAR;
+
+COMMENT ON COLUMN tes.tobligacion_pago.presupuesto_aprobado
+IS 'Usado para control de presupuesto.';
+/*****************************F-SCP-BVP-TES-0-31/01/2020*************/
