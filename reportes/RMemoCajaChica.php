@@ -24,7 +24,7 @@ Class RMemoCajaChica {
 		$phpWord = new \PhpOffice\PhpWord\PhpWord();
 		$document = $phpWord->loadTemplate(dirname(__FILE__).'/template_memo_caja_chica.docx');
         setlocale(LC_ALL,"es_ES@euro","es_ES","esp");
-        
+        $fecha = $this->getDataSource()->getParameter('fecha');
         $numm = $this->getDataSource()->getParameter('num_memo');
         $cod = $this->getDataSource()->getParameter('codigo');
         $apro = $this->getDataSource()->getParameter('aprobador');
@@ -41,7 +41,15 @@ Class RMemoCajaChica {
 		$document->setValue('IMPORTELITERAL', $this->getDataSource()->getParameter('importe_literal')); // On section/content
         $document->setValue('BANCO', 'BANCO UNION S.A.'); // On section/content
         $document->setValue('CODIGO_MONE', $this->getDataSource()->getParameter('codigo_mone'));
-        ($apro == null || $apro == '')?$document->setValue('QR', ''): $document->setImg('QR', array('src' =>$this->generarImagen($numm, $cod, $apro, $car_apro), 'swh' => '100'));        
+        if ($fecha >= '24-01-2020') {
+            if($apro == null || $apro == ''){
+                $document->setValue('QR', '');
+            }else{                
+                $document->setImg('QR', array('src' =>$this->generarImagen($numm, $cod, $apro, $car_apro), 'swh' => '100'));
+            }
+        }else{
+            $document->setValue('QR', '');
+        }        
 		$document->saveAs($fileName);
 		        
     }
