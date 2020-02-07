@@ -573,7 +573,7 @@ BEGIN
                                                                         v_registros.id_moneda,
                                                                         v_registros.monto_pago_mo);
                                                                        
-                                   IF v_resp_pre = 'true' THEN                                   
+                                   IF v_resp_pre = 'false' THEN
                                       v_mensage_error = v_mensage_error||format('Presupuesto:  %s, partida (%s) %s <BR/>', v_registros.codigo_cc, v_registros.codigo,v_registros.nombre_partida);    
                                       v_sw_error = true;
                                    END IF;                                      
