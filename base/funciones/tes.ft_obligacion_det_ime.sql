@@ -399,9 +399,13 @@ BEGIN
            join pre.tpartida par on par.id_partida = o.id_partida
            where o.id_obligacion_det = v_parametros.id_obligacion_det;
 
-           IF (v_id_concepto_ingas2 != v_parametros.id_concepto_ingas)THEN
+           --raise exception 'llega % - %',v_id_concepto_ingas2,v_parametros.id_concepto_ingas;
+           --12-02-2020 (MAY) modificacion tiene que controlar la partida debe ser con la de inicio
+           --IF (v_id_concepto_ingas2 != v_parametros.id_concepto_ingas)THEN
+           IF (v_id_partida3 != v_id_partida)THEN
            		raise exception 'El concepto de gasto no corresponde a la partida registrada inicialmente, revisar que el nuevo concepto este dentro de la partida %',v_desc_partida ;
            END IF;
+           --por partidas
 
            --si se modifica el monto
            IF (v_monto != v_parametros.monto_pago_mo )THEN
