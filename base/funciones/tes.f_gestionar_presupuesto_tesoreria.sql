@@ -62,6 +62,8 @@ DECLARE
   v_mensage_error 		varchar;
   v_sw_error 			boolean;
   
+  v_aprobado			varchar;
+  v_pre_verificar_tipo_cc_control varchar;
 
   
 
@@ -501,11 +503,94 @@ BEGIN
          
           
           END LOOP;
+        -- breydi.vasquez           
+        v_pre_verificar_tipo_cc_control = pxp.f_get_variable_global('pre_verificar_tipo_cc_control');          
+                                       
+		if v_pre_verificar_tipo_cc_control = 'si' then                                
+
+          select presupuesto_aprobado
+              into v_aprobado
+          from tes.tobligacion_pago 
+          where id_obligacion_pago = p_id_obligacion_pago; 
+        
+          if (v_aprobado in ('verificar', 'sin_presupuesto_cc') and v_sw_error = false ) then  
+
+            FOR v_registros in (
+          						SELECT
+                                        opd.id_centro_costo,
+                                        op.id_gestion,
+                                        op.id_obligacion_pago,
+                                        opd.id_partida,
+                                        sum(opd.monto_pago_mb) as monto_pago_mb,
+                                        sum(opd.monto_pago_mo) as monto_pago_mo,
+                                        p.id_presupuesto,
+                                        op.id_moneda,
+                                        op.fecha,
+                                        op.num_tramite,
+                                        op.tipo_cambio_conv,
+                                        par.codigo,
+                                        par.nombre_partida,
+                                        p.codigo_cc,
+                                        par.sw_movimiento,
+                                        tp.movimiento
+                                                              
+                                    FROM  tes.tobligacion_pago  op
+                                    INNER JOIN tes.tobligacion_det opd  on  opd.id_obligacion_pago = op.id_obligacion_pago and opd.estado_reg = 'activo'
+                                    inner join pre.tpartida par on par.id_partida  = opd.id_partida
+                                    INNER JOIN pre.vpresupuesto_cc   p  on p.id_centro_costo = opd.id_centro_costo
+                                    INNER JOIN pre.ttipo_presupuesto tp on tp.codigo = p.tipo_pres 
+                                    WHERE  
+                                           op.id_obligacion_pago = p_id_obligacion_pago
+                                           and opd.estado_reg = 'activo' 
+                                           and opd.monto_pago_mo > 0
+                                    group by
+                                              opd.id_centro_costo,
+                                              op.id_gestion,
+                                              op.id_obligacion_pago,
+                                              opd.id_partida,
+                                              p.id_presupuesto,
+                                              op.id_moneda,
+                                              op.fecha,
+                                              op.num_tramite,
+                                              op.tipo_cambio_conv,
+                                              par.codigo,
+                                              par.nombre_partida,
+                                              p.codigo_cc,
+                                              par.sw_movimiento,
+      										  tp.movimiento) LOOP
+                                     
+                              IF v_registros.sw_movimiento = 'flujo'  THEN
+                              
+                                   IF v_registros.movimiento != 'administrativo'  THEN
+                                     raise exception 'partida de flujo solo son admitidas con presupeustos administrativos (% - % - %)', v_registros.codigo_cc, v_registros.codigo,v_registros.nombre_partida;
+                                   END IF;
+                              
+                              
+                              ELSE
+
+                                  v_resp_pre = pre.f_verificar_presupuesto_partida_centro_costo ( v_registros.id_presupuesto,
+                                                                        v_registros.id_partida,
+                                                                        v_registros.id_moneda,
+                                                                        v_registros.monto_pago_mo);
+                                                                       
+                                   IF v_resp_pre = 'false' THEN
+                                      v_mensage_error = v_mensage_error||format('Presupuesto:  %s, partida (%s) %s <BR/>', v_registros.codigo_cc, v_registros.codigo,v_registros.nombre_partida);    
+                                      v_sw_error = true;
+                                   END IF;                                      
+                                                                        
+                              
+                              END IF;                                                             
           
+          		END LOOP;
+                
+                   v_mensage_error = 'El centro de costo -> '||v_mensage_error;
+                   
+        	end if; 
+          end if;          
           
             
          IF v_sw_error THEN
-             raise exception 'No se tiene suficiente presupeusto para; <BR/>%', v_mensage_error;
+             raise exception 'No se tiene suficiente presupuesto para; <BR/>%', v_mensage_error;
          END IF;
              
              
