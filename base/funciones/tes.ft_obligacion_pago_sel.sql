@@ -215,6 +215,12 @@ BEGIN
 
              v_filadd = ' tuo.id_uo = '||v_id_uo||'  and  ';
 
+         --
+         --05-02-2020 (MAY) filtro para interfaz para procesos de gestion materiales en obligaciones de pago
+         ELSIF v_parametros.tipo_interfaz =  'ObligacionPagoGestionMat' THEN
+
+           		v_filadd= ' obpg.tipo_obligacion = ''adquisiciones'' and  obpg.tipo_solicitud = ''Boa'' and ';
+         --
 
          ELSE
 
@@ -487,6 +493,14 @@ BEGIN
 			               inner JOIN orga.tuo tuo on tuo.id_uo = tes.f_get_uo_gerencia_proceso(uof.id_uo,null::integer,null::date)  ';
 
              v_filadd = ' tuo.id_uo = '||v_id_uo||'  and  ';
+
+             --
+
+             --05-02-2020 (MAY) filtro para interfaz para procesos de gestion materiales en obligaciones de pago
+             ELSIF v_parametros.tipo_interfaz =  'ObligacionPagoGestionMat' THEN
+
+                    v_filadd= ' obpg.tipo_obligacion = ''adquisiciones'' and  obpg.tipo_solicitud = ''Boa'' and ';
+             --
 
              ELSE
 
