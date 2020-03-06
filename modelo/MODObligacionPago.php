@@ -1114,7 +1114,49 @@ class MODObligacionPago extends MODbase
 
         //Devuelve la respuesta
         return $this->respuesta;
-    }    
+    }
+    function reporteSolicitud()
+    {
+        //Definicion de variables para ejecucion del procedimientp
+        $this->procedimiento = 'tes.ft_obligacion_pago_sel';
+        $this->transaccion = 'TES_SOLREPOBP_SEL';
+        $this->tipo_procedimiento = 'SEL';//tipo de transaccion
+        $this->setCount(false);
+
+        $this->setParametro('id_obligacion_pago', 'id_obligacion_pago', 'int4');
+        $this->setParametro('id_proceso_wf', 'id_proceso_wf', 'int4');
+
+        //Definicion de la lista del resultado del query
+        $this->captura('id_obligacion_pago', 'int4');
+        $this->captura('estado', 'varchar');
+        $this->captura('numero', 'varchar');
+        $this->captura('num_tramite', 'varchar');
+        $this->captura('fecha_apro', 'date');
+        $this->captura('desc_moneda', 'varchar');
+        $this->captura('tipo', 'varchar');
+        $this->captura('desc_gestion', 'integer');
+        $this->captura('fecha_soli', 'date');
+        $this->captura('fecha_soli_gant', 'date');
+        $this->captura('desc_funcionario', 'text');
+        $this->captura('desc_uo', 'text');
+        $this->captura('desc_depto', 'varchar');
+        $this->captura('desc_funcionario_apro', 'text');
+        $this->captura('cargo_desc_funcionario', 'varchar');
+        $this->captura('cargo_desc_funcionario_apro', 'varchar');
+        $this->captura('fecha_reg', 'timestamp');
+        $this->captura('codigo_poa', 'varchar');
+        $this->captura('nombre_usuario_ai', 'varchar');
+        $this->captura('codigo_uo', 'varchar');
+        $this->captura('prioridad', 'integer');
+        $this->captura('id_moneda', 'integer');
+        $this->captura('obs', 'varchar');
+
+        $this->armarConsulta();
+        //echo($this->consulta);exit;
+        $this->ejecutarConsulta();
+
+        return $this->respuesta;
+    }
 }
 
 ?>

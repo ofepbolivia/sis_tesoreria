@@ -61,7 +61,12 @@ DECLARE
     v_moneda					varchar;
 
     v_id_uo						integer;
-
+    -- bvp
+	v_filtro					varchar;
+    v_proces_wf					integer;
+    v_nro_tramite				varchar;
+	v_id_estado_wf				integer;
+    v_fecha_sol					date;
 
 BEGIN
 
@@ -1561,6 +1566,117 @@ BEGIN
           raise notice '%',v_consulta;
           return v_consulta;
       end;
+
+/*********************************
+ 	#TRANSACCION:  'TES_SOLREPOBP_SEL'
+ 	#DESCRIPCION:	Consulta de datos para reporte solicitud
+ 	#AUTOR:		Breydi vasquez
+ 	#FECHA:		22/02/2020
+	***********************************/
+
+	elsif(p_transaccion='TES_SOLREPOBP_SEL')then
+
+    begin
+
+            IF  pxp.f_existe_parametro(p_tabla,'id_obligacion_pago') THEN
+
+                  v_filtro = 'obpg.id_obligacion_pago = '||v_parametros.id_obligacion_pago||' and ';
+
+                    select
+                    obp.id_proceso_wf
+                    into v_proces_wf
+                    from tes.tobligacion_pago obp
+                    where obp.id_obligacion_pago = v_parametros.id_obligacion_pago;
+
+               		select obp.num_tramite
+                     into v_nro_tramite
+                    from tes.tobligacion_pago obp
+                    where obp.id_obligacion_pago = v_parametros.id_obligacion_pago;
+
+            ELSE
+                  v_filtro = 'obpg.id_proceso_wf = '||v_parametros.id_proceso_wf||' and ';
+
+                  v_proces_wf = v_parametros.id_proceso_wf;
+
+               		select obp.num_tramite
+                     into v_nro_tramite
+                    from tes.tobligacion_pago obp
+                    where obp.id_proceso_wf = v_parametros.id_proceso_wf;
+
+            END IF;
+
+
+              select es.id_estado_wf
+                  into v_id_estado_wf
+              from wf.testado_wf es
+              where es.fecha_reg = (
+                      select
+                           max(ewf.fecha_reg)
+                         FROM  wf.testado_wf ewf
+                         INNER JOIN  wf.ttipo_estado te on ewf.id_tipo_estado = te.id_tipo_estado
+                         LEFT JOIN   segu.tusuario usu on usu.id_usuario = ewf.id_usuario_reg
+                         LEFT JOIN  orga.vfuncionario fun on fun.id_funcionario = ewf.id_funcionario
+                         LEFT JOIN  param.tdepto depto on depto.id_depto = ewf.id_depto
+                         WHERE
+                          ewf.id_proceso_wf = v_proces_wf
+                          and te.codigo = 'borrador'
+                          and te.etapa = 'Solicitante');
+
+              select
+                     ew.fecha_reg::date
+                     into v_fecha_sol
+                   FROM  wf.testado_wf ew
+                   where ew.id_estado_anterior = v_id_estado_wf;
+
+
+            --Sentencia de la consulta
+			v_consulta:='select
+                                obpg.id_obligacion_pago,
+                                obpg.estado,
+                                obpg.numero,
+                                obpg.num_tramite,
+                                obpg.fecha_conclusion_pago as fecha_apro,
+                                mon.codigo as desc_moneda,
+                                obpg.tipo_solicitud as tipo,
+                                ges.gestion as desc_gestion,
+                                obpg.fecha as fecha_soli,
+                                '''||coalesce(v_fecha_sol, now())||'''::date as fecha_soli_gant,
+                                fun.desc_funcionario1 as desc_funcionario,
+                                uo.codigo||''-''||uo.nombre_unidad as desc_uo,
+                                dep.codigo as desc_depto,
+                                funa.desc_funcionario1 as desc_funcionario_apro,
+                                fca.descripcion_cargo::varchar as cargo_desc_funcionario,
+                                fcag.descripcion_cargo::varchar as cargo_desc_funcionario_apro,
+                                obpg.fecha_reg,
+                                obpg.codigo_poa,
+                                COALESCE(obpg.usuario_ai,'''')::varchar as nombre_usuario_ai,
+                                uo.codigo as codigo_uo,
+                                dep.prioridad as dep_prioridad,
+                                obpg.id_moneda,
+                                obpg.obs
+                        from tes.tobligacion_pago obpg
+                        inner join segu.tusuario usu1 on usu1.id_usuario = obpg.id_usuario_reg
+                        inner join orga.vfuncionario fun on fun.id_funcionario = obpg.id_funcionario
+                        inner join orga.tuo uo on uo.id_uo = orga.f_get_uo_gerencia_ope(NULL, obpg.id_funcionario,obpg.fecha)
+                        inner join param.tmoneda mon on mon.id_moneda = obpg.id_moneda
+                        inner join param.tgestion ges on ges.id_gestion = obpg.id_gestion
+                        inner join param.tdepto dep on dep.id_depto = obpg.id_depto
+                        inner join orga.vfuncionario funa on funa.id_funcionario = obpg.id_funcionario_gerente
+                        left join segu.tusuario usu2 on usu2.id_usuario = obpg.id_usuario_mod
+                        inner join wf.testado_wf ew on ew.id_estado_wf = obpg.id_estado_wf
+                        inner join orga.vfuncionario_ultimo_cargo fca on fca.id_funcionario = fun.id_funcionario
+                        left join orga.vfuncionario_ultimo_cargo fcag on fcag.id_funcionario = obpg.id_funcionario_gerente
+                        where '||v_filtro;
+
+			--Definicion de la respuesta
+			v_consulta:=v_consulta||v_parametros.filtro;
+			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+
+            raise notice '%', v_consulta;
+
+			--Devuelve la respuesta
+			return v_consulta;
+    end;
 
    else
 
