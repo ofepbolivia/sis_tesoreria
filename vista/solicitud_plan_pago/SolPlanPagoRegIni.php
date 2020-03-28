@@ -275,14 +275,14 @@ header("content-type: text/javascript; charset=UTF-8");
             },this);
             //eventos de fechas de costo
             this.Cmp.fecha_costo_ini.on('change',function( o, newValue, oldValue ){
-                this.Cmp.fecha_costo_fin.setMinValue(newValue);
+                //this.Cmp.fecha_costo_fin.setMinValue(newValue);
                 this.Cmp.fecha_costo_fin.reset();
             }, this);
-            //eventos de fechas de costo
+            /*//eventos de fechas de costo
             this.Cmp.fecha_costo_fin.on('change',function(o, newValue, oldValue){
                 this.Cmp.fecha_costo_ini.setMaxValue(newValue);
             }, this);
-            //
+            //*/
             this.Cmp.tipo.on('change',function(o, newValue, oldValue){
                 this.Cmp.fecha_costo_ini.setMaxValue(newValue);
                 this.Cmp.fecha_costo_ini.reset();
@@ -561,7 +561,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.getBoton('del').enable();
                 this.getBoton('new').disable();
                 this.getBoton('SolPlanPago').enable();
-               if(data['desc_plantilla']=='Extracto Bancario'){
+               if(data['desc_plantilla']=='Extracto Bancario' ){
                     console.log('llega',data['desc_plantilla']);
                     this.getBoton('sig_estado').disable();
                     this.getBoton('sig_estado').setVisible(false);
