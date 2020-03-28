@@ -16,7 +16,7 @@ require_once(dirname(__FILE__) . '/../reportes/RPagosSinDocumentosXls.php');
 require_once(dirname(__FILE__) . '/../reportes/RCertificacionPresupuestaria.php');
 
 require_once(dirname(__FILE__) . '/../reportes/RepProcPago.php');
-
+require_once(dirname(__FILE__) . '/../reportes/RSolicitudCompraObp.php');
 
 class ACTObligacionPago extends ACTbase
 {
@@ -802,7 +802,248 @@ class ACTObligacionPago extends ACTbase
         $this->objFunc=$this->create('MODObligacionPago');
         $this->res=$this->objFunc->aprobarPresupuestoSolicitud($this->objParam);
         $this->res->imprimirRespuesta($this->res->generarJson());
-    }    
+    }
+
+    // Reporte tipo solicitud procesos de obligaciones de pago (Breydi vasquez) 21/02/2020
+
+    function obtenerCategoriaProg()
+    {
+        //crea el objetoFunSeguridad que contiene todos los metodos del sistema de seguridad
+        $this->objFunSeguridad = $this->create('sis_seguridad/MODSubsistema');
+        $objParam = new CTParametro($aPostData['p'], null, $aPostFiles);
+        $objParam->addParametro('codigo', 'pre_verificar_categoria');
+        $objFunc = new MODSubsistema($objParam);
+        $this->res = $objFunc->obtenerVariableGlobal($this->objParam);
+
+        return $this->res->getDatos();
+    }
+
+    function reporteSolicitud($create_file = false, $onlyData = false){
+
+        $dataSource = new DataSource();
+        $sw_cat = $this->obtenerCategoriaProg();
+        //var_dump($sw_cat); exit;
+
+        $this->objParam->addParametroConsulta('ordenacion', 'id_obligacion_pago');
+        $this->objParam->addParametroConsulta('dir_ordenacion', 'ASC');
+        $this->objParam->addParametroConsulta('cantidad', 1000);
+        $this->objParam->addParametroConsulta('puntero', 0);
+
+        $this->objFunc = $this->create('MODObligacionPago');
+
+        $resultSolicitud = $this->objFunc->reporteSolicitud();
+
+        $datosSolicitud = $resultSolicitud->getDatos();
+
+        //armamos el array parametros y metemos ahi los data sets de las otras tablas
+        $dataSource->putParameter('id_obligacion_pago', $datosSolicitud[0]['id_obligacion_pago']);
+        $dataSource->putParameter('estado', $datosSolicitud[0]['estado']);
+        $dataSource->putParameter('numero', $datosSolicitud[0]['numero']);
+        $dataSource->putParameter('num_tramite', $datosSolicitud[0]['num_tramite']);
+        $dataSource->putParameter('fecha_apro', $datosSolicitud[0]['fecha_apro']);
+        $dataSource->putParameter('desc_moneda', $datosSolicitud[0]['desc_moneda']);
+        $dataSource->putParameter('tipo', $datosSolicitud[0]['tipo']);
+        $dataSource->putParameter('desc_gestion', $datosSolicitud[0]['desc_gestion']);
+        $dataSource->putParameter('fecha_soli', $datosSolicitud[0]['fecha_soli']);
+        $dataSource->putParameter('fecha_soli_gant', $datosSolicitud[0]['fecha_soli_gant']);
+        $dataSource->putParameter('desc_funcionario', $datosSolicitud[0]['desc_funcionario']);
+        $dataSource->putParameter('desc_uo', $datosSolicitud[0]['desc_uo']);
+        $dataSource->putParameter('desc_depto', $datosSolicitud[0]['desc_depto']);
+        $dataSource->putParameter('desc_funcionario_apro', $datosSolicitud[0]['desc_funcionario_apro']);
+        $dataSource->putParameter('cargo_desc_funcionario', $datosSolicitud[0]['cargo_desc_funcionario']);
+        $dataSource->putParameter('cargo_desc_funcionario_apro', $datosSolicitud[0]['cargo_desc_funcionario_apro']);
+        $dataSource->putParameter('fecha_reg', $datosSolicitud[0]['fecha_reg']);
+        $dataSource->putParameter('codigo_poa', $datosSolicitud[0]['codigo_poa']);
+        $dataSource->putParameter('nombre_usuario_ai', $datosSolicitud[0]['nombre_usuario_ai']);
+        $dataSource->putParameter('codigo_uo', $datosSolicitud[0]['codigo_uo']);
+        $dataSource->putParameter('prioridad', $datosSolicitud[0]['prioridad']);
+        $dataSource->putParameter('justificacion', $datosSolicitud[0]['obs']);
+
+        //Reset all extra params:
+        $this->objParam->defecto('ordenacion', 'id_obligacion_det');
+        $this->objParam->defecto('cantidad', 1000);
+        $this->objParam->defecto('puntero', 0);
+
+        $this->objParam->addParametro('id_obligacion_pago', $datosSolicitud[0]['id_obligacion_pago']);
+
+        $modSolicitudDet = $this->create('MODObligacionDet');
+        //lista el detalle de la solicitud
+        $resultSolicitudDet = $modSolicitudDet->listarObligacionDet();
+
+        $solicitudDetAgrupado = $this->groupArray($resultSolicitudDet->getDatos(), 'codigo_partida', 'desc_centro_costo', $datosSolicitud[0]['id_moneda'], $datosSolicitud[0]['estado'], $onlyData);
+        $solicitudDetDataSource = new DataSource();
+
+        $solicitudDetDataSource->setDataSet($solicitudDetAgrupado);
+
+        //inserta el detalle de la colistud como origen de datos
+        $dataSource->putParameter('detalleDataSource', $solicitudDetDataSource);
+        $dataSource->putParameter('sw_cat', $sw_cat["valor"]);
+
+        if ($onlyData) {
+            return $dataSource;
+        }
+        $nombreArchivo = uniqid(md5(session_id()) . 'SolicitudCompraObp') . '.pdf';
+        $this->objParam->addParametro('orientacion', 'P');
+        $this->objParam->addParametro('tamano', 'LETTER');
+        $this->objParam->addParametro('titulo_archivo', 'OBLIGACION DE PAGO');
+        $this->objParam->addParametro('nombre_archivo', $nombreArchivo);
+
+        //construir el reporte
+        $reporte = new RSolicitudCompraObp($this->objParam);
+
+        $reporte->setDataSource($dataSource);
+        $reporte->write();
+
+        if (!$create_file) {
+            $mensajeExito = new Mensaje();
+            $mensajeExito->setMensaje('EXITO', 'Reporte.php', 'Reporte generado', 'Se generó con éxito el reporte: ' . $nombreArchivo, 'control');
+            $mensajeExito->setArchivoGenerado($nombreArchivo);
+            $this->res = $mensajeExito;
+            $this->res->imprimirRespuesta($this->res->generarJson());
+        } else {
+            return dirname(__FILE__) . '/../../reportes_generados/' . $nombreArchivo;
+        }
+
+    }
+
+    function groupArray($array, $groupkey, $groupkeyTwo, $id_moneda, $estado_sol, $onlyData)
+    {
+        if (count($array) > 0) {
+            //recupera las llaves del array
+            $keys = array_keys($array[0]);
+
+            $removekey = array_search($groupkey, $keys);
+            $removekeyTwo = array_search($groupkeyTwo, $keys);
+
+            if ($removekey === false)
+                return array("Clave \"$groupkey\" no existe");
+            if ($removekeyTwo === false)
+                return array("Clave \"$groupkeyTwo\" no existe");
+
+
+            //crea los array para agrupar y para busquedas
+            $groupcriteria = array();
+            $arrayResp = array();
+
+            //recorre el resultado de la consulta de oslicitud detalle
+            foreach ($array as $value) {
+                //por cada registro almacena el valor correspondiente en $item
+                $item = null;
+                foreach ($keys as $key) {
+                    $item[$key] = $value[$key];
+                }
+
+                //buscar si el grupo ya se incerto
+                $busca = array_search($value[$groupkey] . $value[$groupkeyTwo], $groupcriteria);
+
+                if ($busca === false) {
+                    //si el grupo no existe lo crea
+                    //en la siguiente posicicion de crupcriteria agrega el identificador del grupo
+                    $groupcriteria[] = $value[$groupkey] . $value[$groupkeyTwo];
+
+                    //en la siguiente posivion cre ArrayResp cre un btupo con el identificaor nuevo
+                    //y un bubgrupo para acumular los detalle de semejaste caracteristicas
+
+                    $arrayResp[] = array($groupkey . $groupkeyTwo => $value[$groupkey] . $value[$groupkeyTwo], 'groupeddata' => array(), 'presu_verificado' => "false");
+                    $arrayPresuVer[] =
+                        //coloca el indice en la ultima posicion insertada
+                    $busca = count($arrayResp) - 1;
+
+                }
+
+                //inserta el registro en el subgrupo correspondiente
+                $arrayResp[$busca]['groupeddata'][] = $item;
+
+            }
+
+
+            $cont_grup = 0;
+            foreach ($arrayResp as $value2) {
+                $grup_desc_centro_costo = "";
+                $cc_array = array();
+                foreach ($value2['groupeddata'] as $value_det) {
+
+
+                    if (!in_array($value_det["desc_centro_costo"], $cc_array)) {
+                        $grup_desc_centro_costo = $grup_desc_centro_costo . "\n" . $value_det["desc_centro_costo"];
+                        $cc_array[] = $value_det["desc_centro_costo"];
+                    }
+                    //sumamos el monto a comprometer
+
+                }
+                $arrayResp[$cont_grup]["grup_desc_centro_costo"] = trim($grup_desc_centro_costo);
+                $cont_grup++;
+            }
+            //solo verificar si el estado es borrador o pendiente
+            //suma y verifica el presupuesto
+
+            $estado_sin_presupuesto = array("borrador", "registrado", "vbpoa", "suppresu", "vbpresupuestos", "vbgaf", "vobogerencia");
+
+            if (in_array($estado_sol, $estado_sin_presupuesto) || $onlyData) {
+
+                $cont_grup = 0;
+                foreach ($arrayResp as $value2) {
+                    $cc_array = array();
+                    $total_pre = 0;
+                    $grup_desc_centro_costo = "";
+
+                    $busca = array_search($value2[$groupkey] . $value2[$groupkeyTwo], $groupcriteria);
+
+                    foreach ($value2['groupeddata'] as $value_det) {
+                        //sumamos el monto a comprometer
+                        $total_pre = $total_pre + $value_det["monto_pago_mo"];
+                        if (!in_array($value_det["desc_centro_costo"], $cc_array)) {
+                            $grup_desc_centro_costo = $grup_desc_centro_costo . "\n" . $value_det["desc_centro_costo"];
+                            $cc_array[] = $value_det["desc_centro_costo"];
+                        }
+                    }
+
+                    $value_det = $value2['groupeddata'][0];
+
+                    $this->objParam = new CTParametro(null, null, null);
+                    $this->objParam->addParametro('id_presupuesto', $value_det["id_centro_costo"]);
+                    $this->objParam->addParametro('id_partida', $value_det["id_partida"]);
+                    $this->objParam->addParametro('id_moneda', $id_moneda);
+                    $this->objParam->addParametro('monto_total', $total_pre);
+                    $this->objParam->addParametro('id_solicitud', $value_det['id_obligacion_pago']);
+                    $this->objParam->addParametro('sis_origen', 'OBP');
+
+                    $this->objFunc = $this->create('sis_presupuestos/MODPresupuesto');
+                    $resultSolicitud = $this->objFunc->verificarPresupuesto();
+
+                    $arrayResp[$cont_grup]["presu_verificado"] = $resultSolicitud->datos["presu_verificado"];
+                    $arrayResp[$cont_grup]["total_presu_verificado"] = $total_pre;
+                    $arrayResp[$cont_grup]["grup_desc_centro_costo"] = $grup_desc_centro_costo;
+
+                    $this->objParam1 = new CTParametro(null, null, null);
+                    $this->objParam1->addParametro('id_presupuesto', $value_det["id_centro_costo"]);
+                    $this->objParam1->addParametro('id_partida', $value_det["id_partida"]);
+                    $this->objParam1->addParametro('id_moneda', $id_moneda);
+
+                    $this->objFunc1 = $this->create('sis_presupuestos/MODPresupuesto');
+                    $resultSolicitud1 = $this->objFunc1->capturaPresupuesto();
+
+                    $arrayResp[$cont_grup]["captura_presupuesto"] = $resultSolicitud1->datos["captura_presupuesto"];
+                    $cont_grup++;
+
+
+                    if ($resultSolicitud->getTipo() == 'ERROR') {
+
+                        $resultSolicitud->imprimirRespuesta($resultSolicitud->generarMensajeJson());
+                        exit;
+                    }
+
+
+                }
+
+            }
+
+            return $arrayResp;
+
+        } else
+            return array();
+    }
+
 }
 
 ?>

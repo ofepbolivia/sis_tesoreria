@@ -223,42 +223,54 @@ class ACTTsLibroBancos extends ACTbase{
 		$fp=fopen($fichero_salida,w);
 		
 		$funciones = new funciones();
-		
-		$contenido = "<body onLoad='window.print();'>";
-		$contenido = $contenido. "<table border=0 style='line-height: 10px;'>";
-		$contenido = $contenido. "<td colspan='7'; style='text-align: left; width:35px; font-size:8pt'></td>";
-		$contenido = $contenido. "<td colspan='26'; style='text-align: left; width:25px; font-size:8pt'>".$nombre_lugar.", ".$fecha_cheque_literal."</td><tr>";
-		$contenido = $contenido. "<td colspan='25'; style='text-align: left; width:35px; font-size:8pt'></td>";	
-		$contenido = $contenido. "<td colspan='3'; style='text-align: left; width:35px; font-size:8pt'>".number_format($importe_cheque,2)."</td><tr>";
-		$contenido = $contenido. "<td colspan='33'; style='text-align: left; width:35px; font-size:8pt'></td><tr>";
-		/*$contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td>";
-		$contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td>";
-		$contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td>"; */
-		$contenido = $contenido. "<td colspan='31'; style='text-align: left; width:35px; font-size:8pt'>".$a_favor."</td><tr>";
-		$contenido = $contenido. "<td colspan='33'; style='text-align: left; width:35px; font-size:8pt'></td><tr>";
-		$contenido = $contenido. "<td colspan='33'; style='text-align: left; width:35px; font-size:8pt'></td><tr>";
-		$contenido = $contenido. "<td colspan='33'; style='text-align: left; width:35px; font-size:8pt'></td><tr>";
-		/*$contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td>";
-		$contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td>";
-		$contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td>";*/
-		$contenido = $contenido. "<td colspan='31'; style='text-align: left; width:35px; font-size:8pt'>".$funciones->num2letrasCheque($importe_cheque).'-----'."</td><tr>";
-		$contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
-		$contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
-		$contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
-		$contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
-		$contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
-		$contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
-		$contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
-		$contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
-		$contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
-		$contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
-		$contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
-		$contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
-		$contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
-		$contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
-		$contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
-		$contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td><tr>";
-		$contenido = $contenido. '</body>';
+        $contenido ='
+                    <style >
+                    *{
+                        padding: 0;
+                        margin: 0;
+                        box-sizing: border-box;
+                    }    
+                /*@media print {*/
+                    .contenedor {
+                        margin-left: auto;
+                        position: fixed;        
+                        top: 16px;
+                        height: 120px;
+                        width: 800px; 
+                        font-size: 8pt;                             
+                        line-height: 10px;                                                           
+                    }
+                    .lugar {
+                        position: relative;
+                        left: 110px;        
+                        text-align: left;
+                        top: -0.5px;
+                    }
+                    .monto{
+                        position: relative;    
+                        left: 402px;    
+                        top: -12px;        
+                    }
+                    .afavor {
+                        position: relative;
+                        top: 27px;
+                        left: 0.5px;                            
+                    }
+                    .montoletra {
+                        position: relative;
+                        top: 32px;
+                        left: 0.5px;                            
+                    }
+                /*}*/
+                    </style>
+                    <body onLoad="window.print();">
+                    <div class="contenedor">    
+                            <div class="lugar">'.$nombre_lugar.', '.$fecha_cheque_literal.'</div>
+                            <div class="afavor">'.$a_favor.'</div>
+                            <div class="monto">'.number_format($importe_cheque,2, ',', '.').'</div>
+                            <div class="montoletra">'.$funciones->num2letrasCheque($importe_cheque).'-----</div>    
+                    </div>
+                    </body>';
 
 		fwrite($fp, $contenido);
 		fclose($fp);

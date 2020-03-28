@@ -47,6 +47,10 @@ class MODObligacionDet extends MODbase{
 		$this->captura('descripcion','text');
 		$this->captura('id_orden_trabajo','int4');
 		$this->captura('desc_orden','varchar');
+        $this->captura('desc_centro_costo','text');
+        $this->captura('codigo_partida','varchar');
+        $this->captura('codigo_categoria','varchar');
+        $this->captura('nom_partida','varchar');
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
