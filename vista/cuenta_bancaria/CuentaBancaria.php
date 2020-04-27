@@ -454,7 +454,7 @@ Phx.vista.CuentaBancaria=Ext.extend(Phx.gridInterfaz,{
                         totalProperty:'total',
                         fields: ['id_proveedor_cta_bancaria','nro_cuenta'],
                         remoteSort: true,
-                        baseParams:{par_filtro:'nro_cuenta', id_proveedor : 2374}
+                        baseParams:{par_filtro:'nro_cuenta'}
                     }),
                 tpl:'<tpl for="."><div class="x-combo-list-item"><p>{nro_cuenta}</p></div></tpl>',
                 valueField: 'id_proveedor_cta_bancaria',
