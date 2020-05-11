@@ -171,6 +171,15 @@ header("content-type: text/javascript; charset=UTF-8");
                 }
             );
 
+            //08-05-2020 (may) Doc compra venta desde la cuota
+            this.addButton('btnDocCmpVnt', {
+                text: 'Doc. Cmp/Vnt',
+                iconCls: 'brenew',
+                disabled: true,
+                handler: this.loadDocCmpVnt,
+                tooltip: '<b>Documentos de Compra/Venta</b><br/>Muestra los documentos relacionados'
+            });
+
             this.addButton('btnPagoRel',
                 {
                     text: 'Pagos Rel.',
@@ -259,6 +268,17 @@ header("content-type: text/javascript; charset=UTF-8");
                 },
                 type: 'Field',
                 form: true
+            },
+            {
+                //configuracion del componente
+                config: {
+                    labelSeparator: '',
+                    inputType: 'hidden',
+                    name: 'id_int_comprobante'
+                },
+                type: 'Field',
+                form: true,
+                grid: false
             },
             {
                 //configuracion del componente
@@ -1612,6 +1632,7 @@ header("content-type: text/javascript; charset=UTF-8");
         id_store: 'id_plan_pago',
         fields: [
             {name: 'id_plan_pago', type: 'numeric'},
+            {name: 'id_int_comprobante', type: 'numeric'},
             'id_obligacion_pago',
             {name: 'estado_reg', type: 'string'},
             {name: 'nro_cuota', type: 'numeric'},
@@ -2294,6 +2315,20 @@ header("content-type: text/javascript; charset=UTF-8");
                 'DocumentoWf'
             );
         },
+
+        //08-05-2020 (may) Doc compra venta desde la cuota
+        loadDocCmpVnt: function () {
+            var rec = this.sm.getSelected();
+            console.log('rec', rec);
+            rec.data.disparador = 'obligacion';
+            console.log('despues', rec);
+            Phx.CP.loadWindows('../../../sis_contabilidad/vista/doc_compra_venta/DocCompraVentaCbte.php', 'Documentos del Cbte', {
+
+                width: '70%',
+                height: '80%'
+            }, rec.data, this.idContenedor, 'DocCompraVentaCbte');
+        },
+
 
         loadPagosRelacionados: function () {
             var rec = this.sm.getSelected();
