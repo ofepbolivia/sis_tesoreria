@@ -8,7 +8,7 @@ ALTER TABLE tes.tobligacion_pago
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
-    
+
 --tabla tes.obligacion_det
 
 ALTER TABLE tes.tobligacion_det
@@ -45,21 +45,21 @@ ALTER TABLE tes.tplan_pago
 
 /***********************************I-DEP-GSS-TES-121-24/04/2013****************************************/
 --tabla tes.tcuenta_bancaria
-    
+
 ALTER TABLE tes.tcuenta_bancaria
   ADD CONSTRAINT fk_tcuenta_bancaria__id_institucion FOREIGN KEY (id_institucion)
     REFERENCES param.tinstitucion(id_institucion)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
-  
+
 ALTER TABLE tes.tchequera
   ADD CONSTRAINT fk_tchequera__id_cuenta_bancaria FOREIGN KEY (id_cuenta_bancaria)
     REFERENCES tes.tcuenta_bancaria(id_cuenta_bancaria)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
-    
+
 
 /***********************************F-DEP-GSS-TES-121-24/04/2013****************************************/
 
@@ -74,7 +74,7 @@ ALTER TABLE tes.tobligacion_pago
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
-    
+
   --------------- SQL ---------------
 
 ALTER TABLE tes.tobligacion_pago
@@ -82,8 +82,8 @@ ALTER TABLE tes.tobligacion_pago
     REFERENCES param.tgestion(id_gestion)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
-    NOT DEFERRABLE;  
-    
+    NOT DEFERRABLE;
+
 --------------- SQL ---------------
 
 ALTER TABLE tes.tobligacion_pago
@@ -120,7 +120,7 @@ ALTER TABLE tes.tobligacion_pago
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
-    
+
 --------------- SQL ---------------
 
 ALTER TABLE tes.tobligacion_pago
@@ -129,7 +129,7 @@ ALTER TABLE tes.tobligacion_pago
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
-    
+
     --------------- SQL ---------------
 
 ALTER TABLE tes.tobligacion_pago
@@ -138,8 +138,8 @@ ALTER TABLE tes.tobligacion_pago
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
-    
-    
+
+
     --------------- SQL ---------------
 
 ALTER TABLE tes.tobligacion_pago
@@ -148,17 +148,17 @@ ALTER TABLE tes.tobligacion_pago
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
-    
+
     --------------- SQL ---------------
 
 CREATE INDEX tobligacion_pago_idx ON tes.tobligacion_pago
   USING btree (id_depto);
-  
+
   --------------- SQL ---------------
 
 CREATE INDEX tobligacion_pago_idx1 ON tes.tobligacion_pago
   USING btree (id_estado_wf);
-  
+
   --------------- SQL ---------------
 
 
@@ -169,9 +169,9 @@ CREATE INDEX tobligacion_pago_idx1 ON tes.tobligacion_pago
 
 
 
- 
- 
- 
+
+
+
 
 /***********************************I-DEP-RCM-TES-0-16/01/2014***************************************/
 ALTER TABLE tes.tcuenta_bancaria
@@ -210,7 +210,7 @@ ALTER TABLE tes.tplan_pago
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
-    
+
 --------------- SQL ---------------
 
 ALTER TABLE tes.tplan_pago
@@ -219,7 +219,7 @@ ALTER TABLE tes.tplan_pago
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
-    
+
 --------------- SQL ---------------
 
 ALTER TABLE tes.tplan_pago
@@ -228,9 +228,9 @@ ALTER TABLE tes.tplan_pago
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
-    
-    
-    
+
+
+
 --------------- SQL ---------------
 
 ALTER TABLE tes.tplan_pago
@@ -239,8 +239,8 @@ ALTER TABLE tes.tplan_pago
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
-    
-    
+
+
 --------------- SQL ---------------
 
 ALTER TABLE tes.tplan_pago
@@ -248,8 +248,8 @@ ALTER TABLE tes.tplan_pago
     REFERENCES tes.tcuenta_bancaria(id_cuenta_bancaria)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
-    NOT DEFERRABLE;    
-        
+    NOT DEFERRABLE;
+
 
 --------------- SQL ---------------
 
@@ -310,8 +310,8 @@ ALTER TABLE tes.tprorrateo
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
-    
-    
+
+
  --------------- SQL ---------------
 
 ALTER TABLE tes.tprorrateo
@@ -319,9 +319,9 @@ ALTER TABLE tes.tprorrateo
     REFERENCES tes.tplan_pago(id_plan_pago)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
-    NOT DEFERRABLE;   
-    
- 
+    NOT DEFERRABLE;
+
+
  --------------- SQL ---------------
 
 ALTER TABLE tes.tprorrateo
@@ -330,15 +330,15 @@ ALTER TABLE tes.tprorrateo
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
- 
- 
-    
+
+
+
 ALTER TABLE tes.tprorrateo
   ADD CONSTRAINT tprorrateo__id_int_transaccion FOREIGN KEY (id_int_transaccion)
     REFERENCES conta.tint_transaccion(id_int_transaccion)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
-    NOT DEFERRABLE;    
+    NOT DEFERRABLE;
 --------------- SQL ---------------
 
 ALTER TABLE tes.tprorrateo
@@ -354,7 +354,7 @@ ALTER TABLE tes.tprorrateo
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
-    
+
 --------------- SQL ---------------
 
 ALTER TABLE tes.tobligacion_det
@@ -362,9 +362,9 @@ ALTER TABLE tes.tobligacion_det
     REFERENCES tes.tobligacion_pago(id_obligacion_pago)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
-    NOT DEFERRABLE;    
- 
- 
+    NOT DEFERRABLE;
+
+
  --------------- SQL ---------------
 
 ALTER TABLE tes.tobligacion_det
@@ -373,8 +373,8 @@ ALTER TABLE tes.tobligacion_det
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
-    
-    
+
+
  --------------- SQL ---------------
 
 ALTER TABLE tes.tobligacion_det
@@ -382,8 +382,8 @@ ALTER TABLE tes.tobligacion_det
     REFERENCES param.tcentro_costo(id_centro_costo)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
-    NOT DEFERRABLE;   
-    
+    NOT DEFERRABLE;
+
 --------------- SQL ---------------
 
 ALTER TABLE tes.tobligacion_det
@@ -391,7 +391,7 @@ ALTER TABLE tes.tobligacion_det
     REFERENCES conta.tcuenta(id_cuenta)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
-    NOT DEFERRABLE; 
+    NOT DEFERRABLE;
 
 
 --------------- SQL ---------------
@@ -401,7 +401,7 @@ ALTER TABLE tes.tobligacion_det
     REFERENCES conta.tauxiliar(id_auxiliar)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
-    NOT DEFERRABLE;  
+    NOT DEFERRABLE;
 /***********************************F-DEP-RAC-TES-0-04/02/2014****************************************/
 
 
@@ -1301,8 +1301,8 @@ select pxp.f_insert_trol_procedimiento_gui ('OP - Cuenta Bancaria', 'TES_CHQ_ELI
 /***********************************I-DEP-RAC-TES-0-19/05/2014*****************************************/
 
 CREATE TRIGGER trig_actualiza_informacion_estado_pp
-  AFTER INSERT OR UPDATE OF estado, nro_cuota 
-  ON tes.tplan_pago FOR EACH ROW 
+  AFTER INSERT OR UPDATE OF estado, nro_cuota
+  ON tes.tplan_pago FOR EACH ROW
   EXECUTE PROCEDURE tes.f_trig_actualiza_informacion_estado_pp();
 
 /***********************************F-DEP-RAC-TES-0-19/05/2014*****************************************/
@@ -1811,13 +1811,13 @@ ALTER TABLE tes.tobligacion_pago
 
 /*
  --tabla tes.tusuario_cuenta_banc
-    
+
 ALTER TABLE	tes.tusuario_cuenta_banc
   ADD CONSTRAINT fk_tusuario_cuenta_banc__id_cuenta_bancaria FOREIGN KEY (id_cuenta_bancaria)
     REFERENCES tes.tcuenta_bancaria(id_cuenta_bancaria)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
-    NOT DEFERRABLE, 
+    NOT DEFERRABLE,
 
 ALTER TABLE	tes.tusuario_cuenta_banc
   ADD CONSTRAINT fk_tusuario_cuenta_banc__id_usuario FOREIGN KEY (id_usuario)
@@ -3232,15 +3232,15 @@ ALTER TABLE tes.tcajero
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
-    
+
 ALTER TABLE tes.tcajero
   ADD CONSTRAINT tcaja__id_funcionario FOREIGN KEY (id_funcionario)
     REFERENCES orga.tfuncionario(id_funcionario)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
-    
-/***********************************F-DEP-JRR-TES-10/08/2015****************************************/  
+
+/***********************************F-DEP-JRR-TES-10/08/2015****************************************/
 
 
 
@@ -3259,7 +3259,7 @@ ALTER TABLE tes.testacion_tipo_pago
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
-    
+
 ALTER TABLE tes.testacion_tipo_pago
   ADD CONSTRAINT testacion_tipo_pago__id_tipo_plan_pago FOREIGN KEY (id_tipo_plan_pago)
     REFERENCES tes.ttipo_plan_pago(id_tipo_plan_pago)
@@ -3268,7 +3268,7 @@ ALTER TABLE tes.testacion_tipo_pago
     NOT DEFERRABLE;
 
 
-/***********************************F-DEP-JRR-TES-0-25/08/2015****************************************/ 
+/***********************************F-DEP-JRR-TES-0-25/08/2015****************************************/
 
 
 
@@ -3276,21 +3276,21 @@ ALTER TABLE tes.testacion_tipo_pago
 
 
 
-/***********************************I-DEP-GSS-TES-0-20/01/2016****************************************/ 
+/***********************************I-DEP-GSS-TES-0-20/01/2016****************************************/
 ALTER TABLE tes.tsolicitud_rendicion_det
   ADD CONSTRAINT fk_tsolicitud_rendicion_det__id_proceso_caja FOREIGN KEY (id_proceso_caja)
     REFERENCES tes.tproceso_caja(id_proceso_caja)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
-    NOT DEFERRABLE; 
-	
+    NOT DEFERRABLE;
+
 ALTER TABLE tes.tsolicitud_rendicion_det
 	ADD CONSTRAINT fk_tsolicitud_rendicion_det__id_solicitud_efectivo FOREIGN KEY (id_solicitud_efectivo)
     REFERENCES tes.tsolicitud_efectivo(id_solicitud_efectivo)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
-	
+
 ALTER TABLE tes.tproceso_caja
   ADD CONSTRAINT tproceso_caja__id_caja FOREIGN KEY (id_caja)
     REFERENCES tes.tcaja(id_caja)
@@ -3304,9 +3304,9 @@ ALTER TABLE tes.tproceso_caja
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
-/***********************************F-DEP-GSS-TES-0-20/01/2016****************************************/ 
+/***********************************F-DEP-GSS-TES-0-20/01/2016****************************************/
 
-/***********************************I-DEP-GSS-TES-0-08/03/2016****************************************/ 
+/***********************************I-DEP-GSS-TES-0-08/03/2016****************************************/
 
 ALTER TABLE tes.tsolicitud_efectivo_det
   ADD CONSTRAINT fk_tsolicitud_efectivo_det__id_solicitud_efectivo FOREIGN KEY (id_solicitud_efectivo)
@@ -3370,7 +3370,7 @@ ALTER TABLE tes.tsolicitud_rendicion_det
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
-	
+
 /***********************************F-DEP-GSS-TES-0-08/03/2016****************************************/
 
 
@@ -3389,18 +3389,18 @@ CREATE INDEX tplan_pago_idx ON tes.tplan_pago
 
 CREATE INDEX tplan_pago_idx1 ON tes.tplan_pago
   USING btree (id_plantilla);
-  
-  
+
+
 --------------- SQL ---------------
 
 CREATE INDEX tplan_pago_id_obligacion_pago ON tes.tplan_pago
   USING btree (id_obligacion_pago);
-  
+
 --------------- SQL ---------------
 
 CREATE INDEX tplan_pago_id_int_comprobante ON tes.tplan_pago
   USING btree (id_int_comprobante);
-  
+
 --------------- SQL ---------------
 
 CREATE INDEX tobligacion_pago_id_contrato ON tes.tobligacion_pago
@@ -3411,13 +3411,13 @@ CREATE INDEX tobligacion_pago_id_contrato ON tes.tobligacion_pago
 
 CREATE INDEX tobligacion_pago_id_moneda ON tes.tobligacion_pago
   USING btree (id_moneda);
-  
+
 --------------- SQL ---------------
 
 CREATE INDEX tobligacion_pago_id_gestion ON tes.tobligacion_pago
   USING btree (id_gestion);
-  
-   
+
+
 
 /***********************************F-DEP-RAC-TES-0-23/03/2016****************************************/
 
@@ -3584,7 +3584,7 @@ AS
           character varying::text ])) AND
         (op.tipo_obligacion::text = ANY (ARRAY [ 'adquisiciones'::character
           varying::text, 'pago_directo'::character varying::text ])) AND
-        pp.estado_reg::text = 'activo'::text 
+        pp.estado_reg::text = 'activo'::text
   GROUP BY pp.id_plan_pago,
            pp.fecha_tentativa,
            pp.id_estado_wf,
@@ -3771,9 +3771,9 @@ AS
          COALESCE(cac.codigo, ''::character varying) AS codigo_categoria,
          COALESCE(cac.nombre, ''::character varying) AS nombre_categoria,
          pp.id_proceso_wf,
-         ((('<table border="1"><TR> 
-   <TH>Concepto</TH> 
-   <TH>Detalle</TH> 
+         ((('<table border="1"><TR>
+   <TH>Concepto</TH>
+   <TH>Detalle</TH>
    <TH>Importe ('::text || mon.codigo::text) || ')</TH>'::text) || pxp.html_rows
      (((((((((('<td>'::text || ci.desc_ingas::text) || '</td> <td>'::text) ||
      '<font hdden=true>'::text) || od.id_obligacion_det::character varying::text
@@ -3975,8 +3975,8 @@ FROM tes.tobligacion_pago op
 
 --------------- SQL ---------------
 
-CREATE VIEW tes.vplan_pago 
-AS 
+CREATE VIEW tes.vplan_pago
+AS
 SELECT   ppp.id_plan_pago,
          op.id_gestion,
          ges.gestion,
@@ -4029,7 +4029,7 @@ SELECT   ppp.id_plan_pago,
        LEFT JOIN leg.tcontrato con ON con.id_contrato = op.id_contrato
        JOIN orga.vfuncionario fun ON fun.id_funcionario = op.id_funcionario
 
-group by 
+group by
          ppp.id_plan_pago,
          op.id_gestion,
          ges.gestion,
@@ -4174,7 +4174,7 @@ AS
    JOIN tes.tcajero c ON c.id_caja = ca.id_caja AND c.tipo::text = 'responsable'::text
    JOIN orga.vfuncionario f ON f.id_funcionario = c.id_funcionario
   WHERE pc.fecha >= c.fecha_inicio AND pc.fecha <= c.fecha_fin OR pc.fecha >= c.fecha_inicio AND c.fecha_fin IS NULL;
-  
+
 
 -----
 
@@ -4350,7 +4350,7 @@ AS
        JOIN param.tplantilla plt ON plt.id_plantilla = ppp.id_plantilla
        LEFT JOIN leg.tcontrato con ON con.id_contrato = op.id_contrato AND
          con.id_gestion = ges.id_gestion
-       JOIN orga.vfuncionario fun ON fun.id_funcionario = op.id_funcionario;     
+       JOIN orga.vfuncionario fun ON fun.id_funcionario = op.id_funcionario;
 
 -----------
 
@@ -5681,3 +5681,57 @@ ALTER VIEW tes.v_pagos_libro_banco_exterior
   OWNER TO postgres;
 
 /***********************************F-DEP-MAY-TES-0-27/01/2020****************************************/
+
+/***********************************I-DEP-IRVA-TES-0-29/05/2020****************************************/
+DROP VIEW tes.v_pagos_libro_banco_exterior;
+CREATE OR REPLACE VIEW tes.v_pagos_libro_banco_exterior (
+    num_tramite,
+    fecha,
+    nro_cuenta,
+    nombre,
+    codigo,
+    nombre_estado,
+    obs,
+    desc_persona,
+    usuario_ai,
+    id_gestion,
+    id_obligacion_pago,
+    monto,
+    prioridad,
+    id_moneda,
+    estado_pp,
+    tipo_obligacion,
+    nombre_proveedor)
+AS
+SELECT op.num_tramite,
+    ef.fecha_reg AS fecha,
+    pl.nro_cuota AS nro_cuenta,
+    de.nombre,
+    te.codigo,
+    te.nombre_estado,
+    ef.obs,
+    us.desc_persona,
+    us2.desc_persona AS usuario_ai,
+    op.id_gestion,
+    op.id_obligacion_pago,
+    pl.monto,
+    de.prioridad,
+    op.id_moneda,
+    pl.estado AS estado_pp,
+    op.tipo_obligacion,
+    prove.rotulo_comercial AS nombre_proveedor
+FROM tes.tobligacion_pago op
+     JOIN param.tproveedor prove ON prove.id_proveedor = op.id_proveedor
+     JOIN tes.tplan_pago pl ON pl.id_obligacion_pago = op.id_obligacion_pago
+     JOIN param.tdepto de ON de.id_depto = pl.id_depto_lb
+     JOIN wf.tproceso_wf pf ON pf.id_proceso_wf = pl.id_proceso_wf
+     JOIN wf.testado_wf ef ON ef.id_proceso_wf = pf.id_proceso_wf
+     JOIN wf.ttipo_estado te ON te.id_tipo_estado = ef.id_tipo_estado AND
+         (te.codigo::text = 'supcostos'::text OR te.codigo::text = 'supconta'::text)
+     JOIN segu.vusuario us ON us.id_usuario = ef.id_usuario_reg
+     LEFT JOIN segu.vusuario us2 ON us2.id_usuario = ef.id_usuario_ai
+ORDER BY ef.fecha_reg;
+
+ALTER VIEW tes.v_pagos_libro_banco_exterior
+  OWNER TO postgres;
+/***********************************F-DEP-IRVA-TES-0-29/05/2020****************************************/

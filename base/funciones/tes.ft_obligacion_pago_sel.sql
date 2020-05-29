@@ -61,13 +61,13 @@ DECLARE
     v_moneda					varchar;
 
     v_id_uo						integer;
-    -- bvp
 	v_filtro					varchar;
+
+    -- bvp
     v_proces_wf					integer;
     v_nro_tramite				varchar;
 	v_id_estado_wf				integer;
     v_fecha_sol					date;
-
 BEGIN
 
 	v_nombre_funcion = 'tes.ft_obligacion_pago_sel';
@@ -261,7 +261,7 @@ BEGIN
         END IF;
 
 
-
+--raise exception 'ññeja %',v_filadd;
                   --Sentencia de la consulta
                   v_consulta:='select
                               '||v_strg_sol||',
@@ -1378,7 +1378,8 @@ BEGIN
                         plbex.monto,
                         mone.moneda,
                         mone.codigo as cod_moneda,
-                        plbex.estado_pp
+                        plbex.estado_pp,
+                        plbex.nombre_proveedor
                     from tes.v_pagos_libro_banco_exterior plbex
                     inner join param.tmoneda mone on mone.id_moneda = plbex.id_moneda
 					where plbex.fecha between '''||v_fecha_ini||''' and '''||v_fecha_fin||'''
@@ -1567,7 +1568,7 @@ BEGIN
           return v_consulta;
       end;
 
-/*********************************
+ /*********************************
  	#TRANSACCION:  'TES_SOLREPOBP_SEL'
  	#DESCRIPCION:	Consulta de datos para reporte solicitud
  	#AUTOR:		Breydi vasquez
@@ -1699,3 +1700,6 @@ VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
 COST 100;
+
+ALTER FUNCTION tes.ft_obligacion_pago_sel (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
+  OWNER TO postgres;

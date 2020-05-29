@@ -18,16 +18,16 @@ Phx.vista.TsLibroBancosExterior=Ext.extend(Phx.gridInterfaz,{
                 failure: this.conexionFailure,
                 timeout: this.timeout,
                 scope: this
-            });        
+            });
     	//llama al constructor de la clase padre
 		Phx.vista.TsLibroBancosExterior.superclass.constructor.call(this,config);
-		this.init();        
+		this.init();
         this.iniciarEventos();
 		this.load({params:{start:0, limit:this.tam_pag}});
-        this.store.baseParams.pes_estado = 'exterior'; 
-        this.finCons = true;        
+        this.store.baseParams.pes_estado = 'exterior';
+        this.finCons = true;
 	},
-    gruposBarraTareas:[        
+    gruposBarraTareas:[
         {name:'exterior',title:'<H1 align="center"><i class="fa fa-list-ul"></i>Exterior</h1>',grupo:0,height:0},
         {name:'interior',title:'<H1 align="center"><i class="fa fa-list-ul"></i>Locales</h1>',grupo:2,height:0},
         {name:'pgaexterior',title:'<H1 align="center"><i class="fa fa-list-ul"></i>PGA - Exterior</h1>',grupo:3,height:0},
@@ -37,14 +37,14 @@ Phx.vista.TsLibroBancosExterior=Ext.extend(Phx.gridInterfaz,{
     bexcelGroups: [0,2,3,4],
 
     actualizarSegunTab: function(name, indice){
-        this.cmbGestion.show(true);        
+        this.cmbGestion.show(true);
         console.log('name',this.initButtons);
             if(this.finCons){
                 this.store.baseParams.pes_estado = name;
                 this.load({params:{start:0, limit:this.tam_pag}});
             }
-        },    
-			
+        },
+
 	Atributos:[
 		{
 			//configuracion del componente
@@ -54,7 +54,7 @@ Phx.vista.TsLibroBancosExterior=Ext.extend(Phx.gridInterfaz,{
 					name: 'id_obligacion_pago'
 			},
 			type:'Field',
-			form:true 
+			form:true
 		},
 		{
 			config:{
@@ -62,7 +62,7 @@ Phx.vista.TsLibroBancosExterior=Ext.extend(Phx.gridInterfaz,{
 				fieldLabel: 'N° Tramite',
 				allowBlank: false,
 				anchor: '100%',
-				gwidth: 120			
+				gwidth: 120
 			},
 				type:'TextField',
 				filters:{pfiltro:'plbex.num_tramite',type:'string'},
@@ -71,6 +71,23 @@ Phx.vista.TsLibroBancosExterior=Ext.extend(Phx.gridInterfaz,{
 				form:true,
                 bottom_filter: true
 		},
+		/*Aumentando esta parte para mostrar proveedor*/
+		{
+			config:{
+				name: 'nombre_proveedor',
+				fieldLabel: 'Proveedor',
+				allowBlank: false,
+				anchor: '100%',
+				gwidth: 250
+			},
+				type:'TextField',
+				filters:{pfiltro:'plbex.nombre_proveedor',type:'string'},
+				id_grupo:1,
+				grid:true,
+				form:true,
+        bottom_filter: true
+		},
+		/************************************************/
 		{
 			config:{
 				name: 'fecha',
@@ -78,7 +95,7 @@ Phx.vista.TsLibroBancosExterior=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 80,
-                format: 'd/m/Y', 
+                format: 'd/m/Y',
                 renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
 			},
 				type:'DateField',
@@ -86,7 +103,7 @@ Phx.vista.TsLibroBancosExterior=Ext.extend(Phx.gridInterfaz,{
 				id_grupo:1,
 				grid:true,
 				form:false
-		},        
+		},
 		{
 			config:{
 				name: 'nro_cuenta',
@@ -111,7 +128,7 @@ Phx.vista.TsLibroBancosExterior=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: false,
 				anchor: '80%',
 				gwidth: 150,
-                renderer: function (value, p, record){                    
+                renderer: function (value, p, record){
                     return  String.format('<div style="text-align:right;">{0}</div>', Ext.util.Format.number(value,'0.000,00/i'));
                 }
 			},
@@ -128,9 +145,9 @@ Phx.vista.TsLibroBancosExterior=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: false,
 				anchor: '60%',
 				gwidth: 60,
-                renderer: function (value, p, record){                    
+                renderer: function (value, p, record){
                     if(value == 'Bs') return  String.format('<div style="text-align:center;color:green;">{0}</div>',value);
-                    else return  String.format('<div style="text-align:center;color:blue;">{0}</div>',value);                    
+                    else return  String.format('<div style="text-align:center;color:blue;">{0}</div>',value);
                 }
 			},
 				type:'TextField',
@@ -138,7 +155,7 @@ Phx.vista.TsLibroBancosExterior=Ext.extend(Phx.gridInterfaz,{
 				id_grupo:1,
 				grid:true,
 				form:true
-		},                
+		},
 		{
 			config:{
 				name: 'nombre',
@@ -211,20 +228,20 @@ Phx.vista.TsLibroBancosExterior=Ext.extend(Phx.gridInterfaz,{
 				grid:true,
 				form:false,
                 bottom_filter: true
-		},        
+		},
 		{
 			config:{
 				name: 'fun_usuario_ai',
 				fieldLabel: 'Funcionaro AI',
 				allowBlank: true,
 				anchor: '100%',
-				gwidth: 200		
+				gwidth: 200
 			},
 				type:'TextField',
 				filters:{pfiltro:'plbex.usuario_ai',type:'string'},
 				id_grupo:1,
 				grid:true,
-                form:true,				
+                form:true,
                 bottom_filter: true
 		},
         {
@@ -244,8 +261,8 @@ Phx.vista.TsLibroBancosExterior=Ext.extend(Phx.gridInterfaz,{
         }
 
 	],
-	tam_pag:50,	
-	title:'procesos pagos exterior',	
+	tam_pag:50,
+	title:'procesos pagos exterior',
 	ActList:'../../sis_tesoreria/control/ObligacionPago/TsLibroBancosExterior',
 	id_store:'id_obligacion_pago',
 	fields: [
@@ -255,14 +272,15 @@ Phx.vista.TsLibroBancosExterior=Ext.extend(Phx.gridInterfaz,{
 		{name:'nro_cuenta', type: 'string'},
 		{name:'codigo', type: 'string'},
 		{name:'nombre', type: 'string'},
-		{name:'nombre_estado', type: 'string'},		
+		{name:'nombre_estado', type: 'string'},
 		{name:'obs', type: 'string'},
-		{name:'desc_persona', type: 'string'},	
-		{name:'fun_usuario_ai', type: 'string'},		
+		{name:'desc_persona', type: 'string'},
+		{name:'fun_usuario_ai', type: 'string'},
         {name:'monto', type: 'numeric'},
         {name:'moneda', type: 'string'},
         {name:'cod_moneda', type: 'string'},
-        {name:'estado_pp', type: 'string'}
+				{name:'estado_pp', type: 'string'},
+        {name:'nombre_proveedor', type: 'string'}
 	],
 	sortInfo:{
 		field: 'fecha',
@@ -273,8 +291,8 @@ Phx.vista.TsLibroBancosExterior=Ext.extend(Phx.gridInterfaz,{
     btest:false,
     bedit:false,
     bnew:false,
-    cmbGestion: new Ext.form.ComboBox({            
-            fieldLabel: 'Gestion',            
+    cmbGestion: new Ext.form.ComboBox({
+            fieldLabel: 'Gestion',
             allowBlank: false,
             blankText: '... ?',
             emptyText: 'Gestion...',
@@ -305,12 +323,10 @@ Phx.vista.TsLibroBancosExterior=Ext.extend(Phx.gridInterfaz,{
             width: 80
         }),
     iniciarEventos: function(){
-        this.cmbGestion.on('select', function () {            
+        this.cmbGestion.on('select', function () {
             this.store.baseParams.id_gestion = this.cmbGestion.getValue();
             this.load({params:{start:0, limit:this.tam_pag}});
             }, this);
     }
 })
 </script>
-		
-		

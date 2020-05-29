@@ -618,7 +618,7 @@ class MODObligacionPago extends MODbase
         $this->captura('pagado', 'numeric');
         $this->captura('revertible', 'numeric');
         $this->captura('revertir', 'numeric');
-        $this->captura('moneda', 'varchar');          
+        $this->captura('moneda', 'varchar');
         $this->captura('desc_orden', 'varchar');
 
         //Ejecuta la instruccion
@@ -1020,7 +1020,7 @@ class MODObligacionPago extends MODbase
 		$this->procedimiento='tes.ft_obligacion_pago_sel';
 		$this->transaccion='TES_LIBAN_EXT_SEL';
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
-        
+
         $this->setParametro('id_gestion','id_gestion','int4');
 		$this->captura('id_obligacion_pago','int4');
         $this->captura('num_tramite','varchar');
@@ -1036,13 +1036,14 @@ class MODObligacionPago extends MODbase
         $this->captura('moneda','varchar');
         $this->captura('cod_moneda','varchar');
         $this->captura('estado_pp','varchar');
-		
+        $this->captura('nombre_proveedor','varchar');
+
 		//Ejecuta la instruccion
-        $this->armarConsulta();        
-        $this->ejecutarConsulta();        
-		
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
 		//Devuelve la respuesta
-		return $this->respuesta;        
+		return $this->respuesta;
     }
     function listarEvoluPresup()
     {
@@ -1054,14 +1055,14 @@ class MODObligacionPago extends MODbase
 
         $this->setParametro('id_partida_ejecucion_com', 'id_partida_ejecucion_com', 'int4');
         $this->setParametro('tipo_interfaz', 'tipo_interfaz', 'varchar');
-        
+
         //Definicion de la lista del resultado del query
         $this->captura('id_partida_ejecucion', 'int4');
         $this->captura('id_partida_ejecucion_fk', 'int4');
         $this->captura('moneda', 'varchar');
         $this->captura('comprometido', 'numeric');
         $this->captura('ejecutado', 'numeric');
-        $this->captura('pagado', 'numeric');        
+        $this->captura('pagado', 'numeric');
         $this->captura('nro_tramite', 'varchar');
         $this->captura('tipo_movimiento', 'varchar');
         $this->captura('nombre_partida', 'varchar');
@@ -1072,9 +1073,9 @@ class MODObligacionPago extends MODbase
         $this->captura('usr_reg', 'varchar');
         $this->captura('usr_mod', 'varchar');
         $this->captura('fecha_reg', 'timestamp');
-        $this->captura('fecha_mod', 'timestamp');    
+        $this->captura('fecha_mod', 'timestamp');
         $this->captura('estado_reg', 'varchar');
-       
+
         //Ejecuta la instruccion
         $this->armarConsulta();
         //echo($this->consulta);exit;
