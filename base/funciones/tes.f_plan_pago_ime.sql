@@ -212,6 +212,8 @@ DECLARE
     v_fun_gerente					integer;
     v_funcionario						integer;
 
+    v_prioridad					integer;
+
 
 BEGIN
 
@@ -2031,7 +2033,29 @@ BEGIN
 
 			   			 END IF;
               END IF;
+
+              /*---------------------------------------------------------
+              02-06-2020 (may)
+              para la estacion central BOL, cuando sean pagos internacionales realice una modificacion presupuestaria automaticamente
+              desde el estado de vbfin
+              -----------------------------------------------------------*/
+
+              select deplb.prioridad
+              into v_prioridad
+              from tes.tplan_pago pp
+              left join param.tdepto deplb ON deplb.id_depto = pp.id_depto_lb
+              where pp.id_plan_pago = v_id_plan_pago;
+
+
+
+              IF (v_prioridad = 3) THEN
+              	v_resp = tes.f_inserta_plan_pago_mod_presu(p_administrador, p_id_usuario,v_id_plan_pago);
+              END IF;
+
+              --
+
             END IF;
+
          END IF;
           ---
 
