@@ -92,7 +92,7 @@ $body$
              into v_correlativo
              from pre.tajuste taj
              where taj.nro_tramite = v_obligacion_pago.num_tramite;
-
+  --p_id_usuario = 17; HUGO TAPIA
              SELECT tf.id_funcionario
              INTO v_id_funcionario
              FROM segu.tusuario tu
@@ -261,11 +261,11 @@ $body$
                   ) values(
                     'activo',
                     va_codigo_estado_fin,
-                    case  when v_plan_pago.id_depto_lb = 27 then 'REVERSION AUTOMÁTICO DEL PRESUPUESTO CUOTA '||v_plan_pago.nro_cuota||', PAGADO VIA BUENOS AIRES'
-                          when v_plan_pago.id_depto_lb = 26 then 'REVERSION AUTOMÁTICO DEL PRESUPUESTO CUOTA '||v_plan_pago.nro_cuota||', PAGADO VIA MIAMI'
-                          when v_plan_pago.id_depto_lb = 28 then 'REVERSION AUTOMÁTICO DEL PRESUPUESTO CUOTA '||v_plan_pago.nro_cuota||', PAGADO VIA MADRID'
-                          when v_plan_pago.id_depto_lb = 39 then 'REVERSION AUTOMÁTICO DEL PRESUPUESTO CUOTA '||v_plan_pago.nro_cuota||', PAGADO VIA SAO PAULO'
-                          when v_plan_pago.id_depto_lb = 82 then 'REVERSION AUTOMÁTICO DEL PRESUPUESTO CUOTA '||v_plan_pago.nro_cuota||', PAGADO VIA LIMA'
+                    case  when v_plan_pago.id_depto_lb = 27 then 'REVERSIÓN AUTOMÁTICA DEL PRESUPUESTO CUOTA '||v_plan_pago.nro_cuota||', PAGADO VIA BUENOS AIRES'
+                          when v_plan_pago.id_depto_lb = 26 then 'REVERSIÓN AUTOMÁTICA DEL PRESUPUESTO CUOTA '||v_plan_pago.nro_cuota||', PAGADO VIA MIAMI'
+                          when v_plan_pago.id_depto_lb = 28 then 'REVERSIÓN AUTOMÁTICA DEL PRESUPUESTO CUOTA '||v_plan_pago.nro_cuota||', PAGADO VIA MADRID'
+                          when v_plan_pago.id_depto_lb = 39 then 'REVERSIÓN AUTOMÁTICA DEL PRESUPUESTO CUOTA '||v_plan_pago.nro_cuota||', PAGADO VIA SAO PAULO'
+                          when v_plan_pago.id_depto_lb = 82 then 'REVERSIÓN AUTOMÁTICA DEL PRESUPUESTO CUOTA '||v_plan_pago.nro_cuota||', PAGADO VIA LIMA'
                     end,
                     'rev_comprometido', --tipo ajuste
                     p_id_usuario,
@@ -323,12 +323,21 @@ $body$
                 and pro.id_plan_pago = p_id_plan_pago;
 
 
-			/*	-- inserta documentos en estado borrador si estan configurados
-               v_resp_doc =  wf.f_inserta_documento_wf(p_id_usuario, v_id_proceso_wf, v_id_estado_wf);
+			  ----------------------------------------------------
+              --  ACTUALIZA EL NUEVO ESTADO DE AJUSTES
+              ----------------------------------------------------
 
-               -- verificar documentos
-               v_resp_doc = wf.f_verifica_documento(p_id_usuario, v_id_estado_actual);
-*/
+              IF  pre.f_fun_inicio_ajuste_wf(p_id_usuario,
+                                                null,
+                                                null,
+                                                v_id_estado_actual,
+                                                v_id_proceso_wf,
+                                                va_codigo_estado[1]) THEN
+
+
+              END IF;
+
+              --
 
 
                  --Definicion de la respuesta
