@@ -137,7 +137,8 @@ $body$
                        INTO v_id_funcionario_aprobador
                        FROM segu.tusuario tu
                        INNER JOIN orga.tfuncionario tf on tf.id_persona = tu.id_persona
-                       WHERE tu.id_usuario = 727 ; -- =CASIANA ALVAREZ DE CAMACHO
+                       WHERE tu.id_usuario = 17 ; -- =HUGO TAPIA
+                       --WHERE tu.id_usuario = 727 ; -- =CASIANA ALVAREZ DE CAMACHO
 
 
                    select
@@ -257,7 +258,8 @@ $body$
                     id_proceso_wf,
                     id_estado_wf,
 
-                    correlativo
+                    correlativo,
+                    tipo_proceso
                   ) values(
                     'activo',
                     va_codigo_estado_fin,
@@ -280,7 +282,9 @@ $body$
                     v_id_proceso_wf,
                     v_id_estado_actual, --v_id_estado_wf,
 
-                    coalesce(v_correlativo+1, 1)
+                    coalesce(v_correlativo+1, 1),
+                    'exterior'
+
                 )RETURNING id_ajuste into v_id_ajuste;
 
 
