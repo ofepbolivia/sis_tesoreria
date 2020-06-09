@@ -566,13 +566,13 @@ v_consulta:='select lb.fecha,
                         inner join wf.testado_wf wfe on wfe.id_proceso_wf = ap.id_proceso_wf and  wfe.id_funcionario is not null
                         -- left join orga.vfuncionario_cargo apro on apro.id_funcionario = wfe.id_funcionario and ap.fecha >= apro.fecha_asignacion and
                         --       apro.fecha_finalizacion is null
-                        left join orga.vfuncionario_ultimo_cargo apro on apro.id_funcionario = wfe.id_funcionario and ap.fecha >= apro.fecha_asignacion
+                        left join orga.vfuncionario_cargo  apro on apro.id_funcionario = wfe.id_funcionario and ap.fecha between apro.fecha_asignacion and coalesce(apro.fecha_finalizacion, now())
                         inner join tes.tcajero cjr on cjr.id_caja = cj.id_caja and lb.fecha between
                                cjr.fecha_inicio and cjr.fecha_fin
-                        inner join orga.vfuncionario_cargo sol on sol.id_funcionario = cjr.id_funcionario and ap.fecha >= sol.fecha_asignacion and
-                               sol.fecha_finalizacion is null
+                        inner join orga.vfuncionario_cargo sol on sol.id_funcionario = cjr.id_funcionario and ap.fecha between sol.fecha_asignacion and
+                               coalesce(sol.fecha_finalizacion, now())
                         inner join tes.tcuenta_bancaria cue on cue.id_cuenta_bancaria = lb.id_cuenta_bancaria
-                        inner join param.tmoneda mo on mo.id_moneda = cue.id_moneda                                                               
+                        inner join param.tmoneda mo on mo.id_moneda = cue.id_moneda
                         where pc.id_proceso_wf= '||v_parametros.id_proceso_wf;
 
             --Devuelve la respuesta
