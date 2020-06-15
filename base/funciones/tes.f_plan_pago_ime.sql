@@ -2047,8 +2047,8 @@ BEGIN
               where pp.id_plan_pago = v_id_plan_pago;
 
 
-
-              IF (v_prioridad = 3) THEN
+              -- v_tipo_obligacion != 'pago_especial' estos tipo de obligacion no realizan su modificacion presupuestaria porq son sin imputacion
+              IF (v_prioridad = 3 and v_tipo_obligacion != 'pago_especial') THEN
               	v_resp = tes.f_inserta_plan_pago_mod_presu(p_administrador, p_id_usuario,v_id_plan_pago);
               END IF;
 
