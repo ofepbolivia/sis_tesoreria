@@ -12,7 +12,7 @@ $body$
  DESCRIPCION:   Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'tes.tconciliacion_bancaria'
  AUTOR: 		Breydi vasquez pacheco
  FECHA:	        19-02-2019
- COMENTARIOS:			
+ COMENTARIOS:
 ***************************************************************************/
 
 DECLARE
@@ -25,57 +25,57 @@ DECLARE
 	v_mensaje_error             text;
 	v_id_conciliacion_bancaria	integer;
     v_fecha_ini					date;
-    v_fecha_fin 				date;    
+    v_fecha_fin 				date;
     v_periodo					integer;
     v_fecha_repo				date;
     v_consulta					varchar;
    	v_consu			    		varchar;
     v_column 					varchar;
-    v_saldo_real_2				numeric;    
-    v_saldo_real_1				numeric;    
+    v_saldo_real_2				numeric;
+    v_saldo_real_1				numeric;
     resp 						numeric;
     fecha_r						timestamp;
     v_estacion					varchar;
     v_filtro					varchar;
     v_cont 						integer;
-	v_offset					integer; 
+	v_offset					integer;
     v_max						integer;
     v_depo_transito				numeric;
     v_debito_bancario			numeric;
     v_credito_bancario          numeric;
-    v_dupl_conci			    record;	
+    v_dupl_conci			    record;
     v_fecha_ant_ini				date;
     v_fecha_control_ini 		date;
     v_periodo_ant				integer;
-    v_concili_ant				record;    		    
+    v_concili_ant				record;
 BEGIN
 
     v_nombre_funcion = 'tes.ft_conciliacion_bancaria_ime';
     v_parametros = pxp.f_get_record(p_tabla);
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'TES_CONCBAN_INS'
  	#DESCRIPCION:	Insercion de registros
- 	#AUTOR:		Breydi vasquez pacheco	
+ 	#AUTOR:		Breydi vasquez pacheco
  	#FECHA:		19-02-2019
 	***********************************/
 
 	if(p_transaccion='TES_CONCBAN_INS')then
-					
+
         begin
 
         	-- control proceso conciliacion anterior aun no finalizada.  ini
-            select 
+            select
             fecha_ini - interval '1' month
             into v_fecha_control_ini
-            from param.tperiodo 
+            from param.tperiodo
             where id_periodo = v_parametros.id_periodo;
 
             select id_periodo
             into v_periodo_ant
             from param.tperiodo
             where fecha_ini = v_fecha_control_ini;
-            
+
             select con.estado,param.f_literal_periodo(con.id_periodo) as mes, ges.gestion
              into v_concili_ant
             from tes.tconciliacion_bancaria con
@@ -83,24 +83,24 @@ BEGIN
             where con.id_periodo = v_periodo_ant
             and con.id_cuenta_bancaria = v_parametros.id_cuenta_bancaria;
 
-            if v_concili_ant.estado <> 'finalizado' then            
+            if v_concili_ant.estado <> 'finalizado' then
             	raise exception 'Para registrar la conciliacion bancaria, Finalice previamente la conciliacion de: % de %',v_concili_ant.mes,v_concili_ant.gestion;
             end if;
-            -- fin        
-        
-            --control duplicidad 
+            -- fin
+
+            --control duplicidad
             select ges.gestion,
-                param.f_literal_periodo(co.id_periodo) as periodo	
-                    into v_dupl_conci    
+                param.f_literal_periodo(co.id_periodo) as periodo
+                    into v_dupl_conci
                 from tes.tconciliacion_bancaria co
                 inner join param.tgestion ges on ges.id_gestion = co.id_gestion
-                where co.id_gestion = v_parametros.id_gestion and 
+                where co.id_gestion = v_parametros.id_gestion and
                     co.id_cuenta_bancaria = v_parametros.id_cuenta_bancaria and
                     co.id_periodo = v_parametros.id_periodo;
 
-            if v_dupl_conci.gestion is not null then 
-                raise exception 'El periodo: % ya esta resgistrado para gestion: %.',v_dupl_conci.periodo, v_dupl_conci.gestion; 
-            else        
+            if v_dupl_conci.gestion is not null then
+                raise exception 'El periodo: % ya esta resgistrado para gestion: %.',v_dupl_conci.periodo, v_dupl_conci.gestion;
+            else
                 --Sentencia de la insercion
                 insert into tes.tconciliacion_bancaria(
                 estado_reg,
@@ -112,7 +112,7 @@ BEGIN
                 fecha,
                 observaciones,
                 saldo_banco,
-                estado,            
+                estado,
                 fecha_reg,
                 usuario_ai,
                 id_usuario_reg,
@@ -133,7 +133,7 @@ BEGIN
                 v_parametros._nombre_usuario_ai,
                 p_id_usuario,
                 v_parametros._id_usuario_ai,
-                null												
+                null
                 )RETURNING id_conciliacion_bancaria into v_id_conciliacion_bancaria;
 
 
@@ -150,7 +150,7 @@ BEGIN
                 'TES_DETCOBREP_INS');
 
                 --Definicion de la respuesta
-                v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Conciliacion almacenado(a) con exito (id_conciliacion_bancaria'||v_id_conciliacion_bancaria||')'); 
+                v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Conciliacion almacenado(a) con exito (id_conciliacion_bancaria'||v_id_conciliacion_bancaria||')');
                 v_resp = pxp.f_agrega_clave(v_resp,'id_conciliacion_bancaria',v_id_conciliacion_bancaria::varchar);
             end if;
             --Devuelve la respuesta
@@ -158,10 +158,10 @@ BEGIN
 
 		end;
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'TES_CONCBAN_MOD'
  	#DESCRIPCION:	Modificacion de registros
- 	#AUTOR:		Breydi vasquez pacheco	
+ 	#AUTOR:		Breydi vasquez pacheco
  	#FECHA:		19-02-2019
 	***********************************/
 
@@ -178,22 +178,22 @@ BEGIN
             observaciones = v_parametros.observaciones,
             saldo_banco = v_parametros.saldo_banco,
             id_usuario_mod = p_id_usuario,
-            fecha_mod = now()                       
+            fecha_mod = now()
 			where id_conciliacion_bancaria=v_parametros.id_conciliacion_bancaria;
-               
+
 			--Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Conciliacion modificado(a)'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Conciliacion modificado(a)');
             v_resp = pxp.f_agrega_clave(v_resp,'id_conciliacion_bancaria',v_parametros.id_conciliacion_bancaria::varchar);
-               
+
             --Devuelve la respuesta
             return v_resp;
-            
+
 		end;
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'TES_CONCBAN_ELI'
  	#DESCRIPCION:	Eliminacion de registros
- 	#AUTOR:		Breydi vasquez pacheco	
+ 	#AUTOR:		Breydi vasquez pacheco
  	#FECHA:		19-02-2019
 	***********************************/
 
@@ -203,18 +203,18 @@ BEGIN
            if exists(select 1 from tes.tdetalle_conciliacion_bancaria
                 where id_conciliacion_bancaria = v_parametros.id_conciliacion_bancaria) then
                     raise exception 'Elimine los registros del Detalle Conciliacion previamente y vuelva a intentarlo';
-            end if;         
+            end if;
 			--Sentencia de la eliminacion
 			delete from tes.tconciliacion_bancaria
             where id_conciliacion_bancaria=v_parametros.id_conciliacion_bancaria;
 
             delete from tes.tconciliacion_bancaria_rep
             where id_conciliacion_bancaria = v_parametros.id_conciliacion_bancaria;
-                           
+
             --Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Conciliacion eliminado(a)'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Conciliacion eliminado(a)');
             v_resp = pxp.f_agrega_clave(v_resp,'id_conciliacion_bancaria',v_parametros.id_conciliacion_bancaria::varchar);
-              
+
             --Devuelve la respuesta
             return v_resp;
 
@@ -229,43 +229,43 @@ BEGIN
 
 	elsif(p_transaccion='TES_DETCOBREP_INS')then
 
-		begin            
-       	
-	      
+		begin
+
+
           v_periodo = v_parametros.id_periodo;
 
               select per.fecha_fin
-                     into v_fecha_repo                
-              from param.tperiodo per 
+                     into v_fecha_repo
+              from param.tperiodo per
               where per.id_periodo = v_periodo;
-         
+
          if ( (select estado from tes.tconciliacion_bancaria where id_conciliacion_bancaria = v_parametros.id_conciliacion_bancaria) = 'inactivo')then
          	 raise exception 'La conciliacion ya fue Finalizada';
-         else 
-             delete from tes.tconciliacion_bancaria_rep 
-             where id_conciliacion_bancaria = v_parametros.id_conciliacion_bancaria;             
-         end if; 
-      	 
-         for i in 1..2 loop
-         
+         else
+             delete from tes.tconciliacion_bancaria_rep
+             where id_conciliacion_bancaria = v_parametros.id_conciliacion_bancaria;
+         end if;
+
+         for i in 1..3 loop
+
               select per.fecha_ini, per.fecha_fin
                into  v_fecha_ini, v_fecha_fin
               from param.tperiodo per 
               where per.id_periodo = v_periodo;
-              
+
           if i = 1 then
           	v_column = 'periodo_1';
           elsif i = 2 then
 	          v_column = 'periodo_2';
-          /*elsif i = 3 then
-	          v_column = 'periodo_3';*/
-          end if;  
-          
+          elsif i = 3 then
+	          v_column = 'periodo_3';
+          end if;
+
               v_consu = '
-                insert into  tes.tconciliacion_bancaria_rep 
+                insert into  tes.tconciliacion_bancaria_rep
                 (
                   id_conciliacion_bancaria,
-                  id_libro_bancos, 
+                  id_libro_bancos,
                   id_libro_bancos_fk,
                   id_periodo,
                   nro_cheque,
@@ -279,8 +279,8 @@ BEGIN
                   fecha_reg,
                   usuario_ai,
                   id_usuario_reg,
-                  id_usuario_mod         
-                )            
+                  id_usuario_mod
+                )
                    select
                     '||v_parametros.id_conciliacion_bancaria||',
                     lb.id_libro_bancos,
@@ -292,12 +292,12 @@ BEGIN
                     else
                         LB.importe_cheque
                     end as haber,
-                    lb.estado, 
+                    lb.estado,
                   (Select sum(lbr.importe_cheque)
                                    From tes.tts_libro_bancos lbr
                                    where lbr.fecha BETWEEN  '''||v_fecha_ini||''' and  LB.fecha
                                  and lbr.id_cuenta_bancaria = LB.id_cuenta_bancaria
-                                   and 
+                                   and
                                     lbr.estado in (''impreso'', ''entregado'' )
                                     and
                                    lbr.tipo in   (''cheque'',
@@ -326,26 +326,26 @@ BEGIN
                   LB.tipo in   (''cheque'',
                                                   ''deposito'',
                                                   ''debito_automatico'',
-                                                  ''transferencia_carta'')              
+                                                  ''transferencia_carta'')
                     order by lb.fecha, lbp.indice, lb.nro_cheque asc';
-                                        
+
               EXECUTE(v_consu);
-              
+
               select per.fecha_ini - interval '1' month
                      into v_fecha_ant_ini
-              from param.tperiodo per 
+              from param.tperiodo per
               where per.id_periodo = v_periodo;
-              
+
               select id_periodo
               into v_periodo
-              from param.tperiodo 
-              where fecha_ini = v_fecha_ant_ini;              
-              
-          end loop;
-          
+              from param.tperiodo
+              where fecha_ini = v_fecha_ant_ini;
 
-           v_estacion = pxp.f_get_variable_global('ESTACION_inicio');          
-          
+          end loop;
+
+
+           v_estacion = pxp.f_get_variable_global('ESTACION_inicio');
+
            IF v_estacion = 'BOL' THEN
               v_filtro =  'BOL';
             ELSIF v_estacion = 'BUE' THEN
@@ -357,14 +357,14 @@ BEGIN
             ELSIF v_estacion = 'MAD' THEN
               v_filtro =  'MAD';
             END IF;
-            
+
             select per.fecha_ini, per.fecha_fin
              into  v_fecha_ini, v_fecha_fin
-            from param.tperiodo per 
-            where per.id_periodo = v_parametros.id_periodo; 
-            
+            from param.tperiodo per
+            where per.id_periodo = v_parametros.id_periodo;
 
-            SELECT	
+
+            SELECT
                 count(lb.id_cuenta_bancaria)
                 into v_offset
                 FROM tes.tts_libro_bancos LB
@@ -379,22 +379,22 @@ BEGIN
                                          'sigep_swift' )
               and   LB.tipo in   (select  fpa.codigo
                                   from  param.tforma_pago fpa
-                                  where fpa.codigo not in 
+                                  where fpa.codigo not in
                                   ('transf_interna_debe','transf_interna_haber'
                                   ,'transferencia_interna')
                                   and (''||v_filtro||''=ANY(fpa.cod_inter))
                                   )
 
               and LB.id_finalidad in (select fina.id_finalidad
-                                      from tes.tfinalidad fina); 
+                                      from tes.tfinalidad fina);
 
-                   
-                if v_offset = 0 then 
+
+                if v_offset = 0 then
                     v_max = 0;
-                else                           
+                else
                     v_max = v_offset::integer - 1;
-                end if;                       
-                       
+                end if;
+
             SELECT
             (Select sum(lbr.importe_deposito) - sum(lbr.importe_cheque)
                From tes.tts_libro_bancos lbr
@@ -402,13 +402,13 @@ BEGIN
                lbr.id_cuenta_bancaria = LB.id_cuenta_bancaria
                and lbr.estado not in ('anulado','borrador')
                and ((lbr.fecha <= LB.fecha) or (lbr.fecha = LB.fecha and lbr.indice <= LB.indice))
-              )  into resp 
+              )  into resp
               FROM tes.tts_libro_bancos LB
               LEFT JOIN tes.tts_libro_bancos lbp on lbp.id_libro_bancos=LB.id_libro_bancos_fk
               WHERE
               LB.id_cuenta_bancaria = v_parametros.id_cuenta_bancaria
               and
-              lb.fecha between v_fecha_ini and v_fecha_fin 
+              lb.fecha between v_fecha_ini and v_fecha_fin
               and
               LB.estado in ('impreso',
                                        'entregado','cobrado',
@@ -418,7 +418,7 @@ BEGIN
 
               and   LB.tipo in   (select  fpa.codigo
                                   from  param.tforma_pago fpa
-                                  where fpa.codigo not in 
+                                  where fpa.codigo not in
                                   ('transf_interna_debe','transf_interna_haber'
                                   ,'transferencia_interna')
                                   and (''||v_filtro||''=ANY(fpa.cod_inter))
@@ -426,11 +426,11 @@ BEGIN
 
               and LB.id_finalidad in (select fina.id_finalidad
                                       from tes.tfinalidad fina)
-              order by lb.fecha, lb.indice, lb.nro_cheque asc 
+              order by lb.fecha, lb.indice, lb.nro_cheque asc
               offset v_max;
 
 
-          if resp is null  then 
+          if resp is null  then
                   Select sum(Coalesce(lbr.importe_deposito,0))-sum(coalesce(lbr.importe_cheque))
                    into resp
                    From tes.tts_libro_bancos lbr
@@ -438,45 +438,45 @@ BEGIN
                    and lbr.id_cuenta_bancaria = v_parametros.id_cuenta_bancaria
                    and lbr.estado not in ('anulado', 'borrador');
           end if;
-                     
-                   
+
+
           update tes.tconciliacion_bancaria set
           saldo_libros = resp
           where id_conciliacion_bancaria = v_parametros.id_conciliacion_bancaria;
-          
+
           select ( con.saldo_banco - (coalesce(sum(periodo_1),0) + coalesce(sum(periodo_2),0) + coalesce(sum(periodo_3),0) ))
           into v_saldo_real_2
-          from tes.tconciliacion_bancaria_rep cre 
+          from tes.tconciliacion_bancaria_rep cre
           inner join tes.tconciliacion_bancaria con on con.id_conciliacion_bancaria = cre.id_conciliacion_bancaria
           where  cre.id_conciliacion_bancaria = v_parametros.id_conciliacion_bancaria
           group by con.saldo_banco;
-          
+
           select coalesce(sum(importe),0)
 	          into v_debito_bancario
-          from tes.tdetalle_conciliacion_bancaria 
-          where  tipo = 'cheque' and id_conciliacion_bancaria = v_parametros.id_conciliacion_bancaria;        
+          from tes.tdetalle_conciliacion_bancaria
+          where  tipo = 'cheque' and id_conciliacion_bancaria = v_parametros.id_conciliacion_bancaria;
 
           select coalesce(sum(importe),0)
 	          into v_credito_bancario
-          from tes.tdetalle_conciliacion_bancaria 
-          where  tipo = 'deposito' and id_conciliacion_bancaria = v_parametros.id_conciliacion_bancaria;        
-                              
+          from tes.tdetalle_conciliacion_bancaria
+          where  tipo = 'deposito' and id_conciliacion_bancaria = v_parametros.id_conciliacion_bancaria;
+
           select coalesce(sum(importe),0)
 	          into v_depo_transito
-          from tes.tdetalle_conciliacion_bancaria 
-          where  tipo = 'transito' and id_conciliacion_bancaria = v_parametros.id_conciliacion_bancaria;        
-                    
+          from tes.tdetalle_conciliacion_bancaria
+          where  tipo = 'transito' and id_conciliacion_bancaria = v_parametros.id_conciliacion_bancaria;
+
           update tes.tconciliacion_bancaria set
           saldo_real_1 = resp - v_debito_bancario + v_credito_bancario,
-          saldo_real_2 = v_saldo_real_2 + v_depo_transito          
+          saldo_real_2 = v_saldo_real_2 + v_depo_transito
           where id_conciliacion_bancaria = v_parametros.id_conciliacion_bancaria;
-                     
+
 			--Definicion de la respuesta
-			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Conciliacion detalle rep almacenado(a) con exito '); 
+			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Conciliacion detalle rep almacenado(a) con exito ');
             --Devuelve la respuesta
             return v_resp;
-		end; 
-        
+		end;
+
       /*********************************
       #TRANSACCION:  'TES_FINCONCI_FIN'
       #DESCRIPCION: Finalizar conciliacion bancaria
@@ -488,39 +488,39 @@ BEGIN
 
           begin
 
-          if v_parametros.tipo_cambio = 'finalizacion' then         
+          if v_parametros.tipo_cambio = 'finalizacion' then
             update tes.tconciliacion_bancaria set
             estado = 'finalizado'
-            where id_conciliacion_bancaria = v_parametros.id_conciliacion_bancaria;            
+            where id_conciliacion_bancaria = v_parametros.id_conciliacion_bancaria;
           elsif v_parametros.tipo_cambio = 'retroceso' then
             update tes.tconciliacion_bancaria set
             estado = 'proceso'
-            where id_conciliacion_bancaria = v_parametros.id_conciliacion_bancaria;                      
+            where id_conciliacion_bancaria = v_parametros.id_conciliacion_bancaria;
           end if;
-			
+
 			--Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Conciliacion modificado(a)'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Conciliacion modificado(a)');
             v_resp = pxp.f_agrega_clave(v_resp,'id_conciliacion_bancaria',v_parametros.id_conciliacion_bancaria::varchar);
-               
+
             --Devuelve la respuesta
             return v_resp;
-          end;                
-         
+          end;
+
 	else
-     
+
     	raise exception 'Transaccion inexistente: %',p_transaccion;
 
 	end if;
 
 EXCEPTION
-				
+
 	WHEN OTHERS THEN
 		v_resp='';
 		v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
 		v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
 		v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
 		raise exception '%',v_resp;
-				        
+
 END;
 $body$
 LANGUAGE 'plpgsql'
