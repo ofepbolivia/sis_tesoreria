@@ -237,6 +237,12 @@ BEGIN
                raise exception 'LA FECHA FINAL NO PUEDE SER MENOR A LA FECHA INICIAL';
             END IF;
 
+            --17-06-2020 (may) para el usuario MAMANI CALLISAYA VERONICA=615 solo manejara con un solo comprobante devengado_pagado_1c que es de combustible
+            IF (p_id_usuario = 615 and v_parametros.tipo != 'devengado_pagado_1c') THEN
+            	RAISE EXCEPTION 'Usted únicamente puede realizar el pago con el tipo de cuota de Aplicación de Anticipo(Combustible).' ;
+            END IF;
+            --
+
             /*--control de fechas inicio y fin
             select date_part('year',op.fecha), to_char(op.fecha,'DD/MM/YYYY')::varchar as fecha, op.num_tramite
             into v_anio_op, v_fecha_op, v_num_tramite

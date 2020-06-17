@@ -232,15 +232,16 @@ header("content-type: text/javascript; charset=UTF-8");
 
             'INICIAL': [
                 ['devengado_pagado', 'Devengar y pagar (2 comprobantes)'],
-                //17-06-2020 (may) se anula opcion para un cbte
-                //['devengado_pagado_1c', 'Devengar y pagar (1 comprobante)'],
                 ['devengado', 'Devengar'],
                 //['devengado_rrhh','Devengar RH'],
                 ['dev_garantia', 'Devolucion de Garantia'], //es similr a un devengar y pagar pero no genera prorrateo directamente
                 ['dev_garantia_con', 'Devolucion de Garantia Gestion Actual'],
                 ['dev_garantia_con_ant', 'Devolucion de Garantia Gestion Anterior'],
                 ['anticipo', 'Anticipo Fact/Rec (No ejecuta presupuesto, necesita Documento)'],
-                ['ant_parcial', 'Anticipo Parcial(No ejecuta presupuesto, Con retenciones parciales en cada pago)']
+                ['ant_parcial', 'Anticipo Parcial(No ejecuta presupuesto, Con retenciones parciales en cada pago)'],
+                //17-06-2020 (may) se cambia nombre opcion para un cbte, para combustible usan un comprobante
+                //['devengado_pagado_1c', 'Devengar y pagar (1 comprobante)'],
+                ['devengado_pagado_1c', 'Aplicación de Anticipo (Combustible)']
             ],
 
             'ANT_PARCIAL': [
@@ -504,8 +505,7 @@ header("content-type: text/javascript; charset=UTF-8");
                         dato = (dato == '' && value == 'devengado') ? 'Devengar' : dato;
                         dato = (dato == '' && value == 'devengado_rrhh') ? 'Devengar' : dato;
                         dato = (dato == '' && value == 'devengado_pagado') ? 'Devengar y pagar (2 cbte)' : dato;
-                        //17-06-2020 (may) se anula opcion para un cbte
-                        //dato = (dato == '' && value == 'devengado_pagado_1c') ? 'Devengar y pagar (1 cbte)' : dato;
+
                         dato = (dato == '' && value == 'pagado') ? 'Pagar' : dato;
                         dato = (dato == '' && value == 'pagado_rrhh') ? 'Pagar' : dato;
                         dato = (dato == '' && value == 'anticipo') ? 'Anticipo Fact/Rec' : dato;
@@ -518,6 +518,9 @@ header("content-type: text/javascript; charset=UTF-8");
                         dato = (dato == '' && value == 'rendicion') ? 'Rendicion Ant.' : dato;
                         dato = (dato == '' && value == 'ret_rendicion') ? 'Detalle de Rendicion' : dato;
                         dato = (dato == '' && value == 'especial') ? 'Pago simple (s/p)' : dato;
+                        //17-06-2020 (may) se cambia nombre opcion para un cbte, para combustible usan un comprobante
+                        //dato = (dato == '' && value == 'devengado_pagado_1c') ? 'Devengar y pagar (1 cbte)' : dato;
+                        dato = (dato == '' && value == 'devengado_pagado_1c') ? 'Aplicación de Anticipo (Combustible)' : dato;
                         return String.format('{0}', dato);
                     },
 
@@ -2696,15 +2699,15 @@ header("content-type: text/javascript; charset=UTF-8");
 
 
             },
-            //17-06-2020 (may) se anula opcion para un cbte
-            /*'devengado_pagado_1c': function (me) {
+
+            'devengado_pagado_1c': function (me) {
                 //plantilla (TIPO DOCUMENTO)
                 me.setTipoPago['devengado_pagado'](me);
 
                 me.ocultarComponente(me.Cmp.id_proveedor_cta_bancaria);
                 me.mostrarComponente(me.Cmp.id_multa);
 
-            },*/
+            },
 
             'rendicion': function (me) {
                 //plantilla (TIPO DOCUMENTO)
