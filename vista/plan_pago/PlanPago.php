@@ -232,7 +232,8 @@ header("content-type: text/javascript; charset=UTF-8");
 
             'INICIAL': [
                 ['devengado_pagado', 'Devengar y pagar (2 comprobantes)'],
-                ['devengado_pagado_1c', 'Devengar y pagar (1 comprobante)'],
+                //17-06-2020 (may) se anula opcion para un cbte
+                //['devengado_pagado_1c', 'Devengar y pagar (1 comprobante)'],
                 ['devengado', 'Devengar'],
                 //['devengado_rrhh','Devengar RH'],
                 ['dev_garantia', 'Devolucion de Garantia'], //es similr a un devengar y pagar pero no genera prorrateo directamente
@@ -503,7 +504,8 @@ header("content-type: text/javascript; charset=UTF-8");
                         dato = (dato == '' && value == 'devengado') ? 'Devengar' : dato;
                         dato = (dato == '' && value == 'devengado_rrhh') ? 'Devengar' : dato;
                         dato = (dato == '' && value == 'devengado_pagado') ? 'Devengar y pagar (2 cbte)' : dato;
-                        dato = (dato == '' && value == 'devengado_pagado_1c') ? 'Devengar y pagar (1 cbte)' : dato;
+                        //17-06-2020 (may) se anula opcion para un cbte
+                        //dato = (dato == '' && value == 'devengado_pagado_1c') ? 'Devengar y pagar (1 cbte)' : dato;
                         dato = (dato == '' && value == 'pagado') ? 'Pagar' : dato;
                         dato = (dato == '' && value == 'pagado_rrhh') ? 'Pagar' : dato;
                         dato = (dato == '' && value == 'anticipo') ? 'Anticipo Fact/Rec' : dato;
@@ -2694,15 +2696,15 @@ header("content-type: text/javascript; charset=UTF-8");
 
 
             },
-
-            'devengado_pagado_1c': function (me) {
+            //17-06-2020 (may) se anula opcion para un cbte
+            /*'devengado_pagado_1c': function (me) {
                 //plantilla (TIPO DOCUMENTO)
                 me.setTipoPago['devengado_pagado'](me);
 
                 me.ocultarComponente(me.Cmp.id_proveedor_cta_bancaria);
                 me.mostrarComponente(me.Cmp.id_multa);
 
-            },
+            },*/
 
             'rendicion': function (me) {
                 //plantilla (TIPO DOCUMENTO)
