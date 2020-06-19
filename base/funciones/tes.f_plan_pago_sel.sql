@@ -601,9 +601,13 @@ BEGIN
 
 			--Sentencia de la consulta de conteo de registros
 			v_consulta:='select
-            			fun.desc_funcionario1, prov.desc_proveedor,
-            			to_char( pp.fecha_conformidad,''DD/MM/YYYY''),pp.conformidad,
-                        cot.numero_oc,op.numero, pp.nro_cuota,op.num_tramite::varchar,
+            			fun.desc_funcionario1,
+                        prov.desc_proveedor,
+            			to_char( pp.fecha_conformidad,''DD/MM/YYYY''),
+                        pp.conformidad,
+                        COALESCE(cot.numero_oc,cont.numero)::varchar as numero_oc,
+                        op.numero,
+                        pp.nro_cuota,op.num_tramite::varchar,
                          tes.f_get_detalle_html(op.id_obligacion_pago)::text,
                          (case when (pxp.list_unique(ci.tipo)) is null THEN
                             ''Servicio''
@@ -617,23 +621,19 @@ BEGIN
                          op.total_nro_cuota,
                          op.obs
 						from tes.tplan_pago pp
-						inner join tes.tobligacion_pago op
-							on pp.id_obligacion_pago = op.id_obligacion_pago
-						inner join param.vproveedor prov
-							on prov.id_proveedor = op.id_proveedor
-						inner join orga.vfuncionario fun
-							on fun.id_funcionario = op.id_funcionario
-						left join adq.tcotizacion cot
-							on cot.id_obligacion_pago = op.id_obligacion_pago
-                        inner join tes.tobligacion_det od
-                            on od.id_obligacion_pago = op.id_obligacion_pago
-                        inner join param.tconcepto_ingas ci
-                            on ci.id_concepto_ingas = od.id_concepto_ingas
+						inner join tes.tobligacion_pago op on pp.id_obligacion_pago = op.id_obligacion_pago
+						inner join param.vproveedor prov on prov.id_proveedor = op.id_proveedor
+						inner join orga.vfuncionario fun on fun.id_funcionario = op.id_funcionario
+						left join adq.tcotizacion cot on cot.id_obligacion_pago = op.id_obligacion_pago
+                        inner join tes.tobligacion_det od on od.id_obligacion_pago = op.id_obligacion_pago
+                        inner join param.tconcepto_ingas ci on ci.id_concepto_ingas = od.id_concepto_ingas
+
+                        left join leg.tcontrato cont on cont.id_contrato = op.id_contrato
 						where ';
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
-            v_consulta:=v_consulta||' group by fun.desc_funcionario1, prov.desc_proveedor, pp.fecha_conformidad,pp.conformidad, cot.numero_oc,op.numero, pp.nro_cuota,op.num_tramite,
+            v_consulta:=v_consulta||' group by fun.desc_funcionario1, prov.desc_proveedor, pp.fecha_conformidad,pp.conformidad, cot.numero_oc,op.numero,cont.numero, pp.nro_cuota,op.num_tramite,
                         pp.fecha_costo_ini, pp.fecha_costo_fin, pp.obs_monto_no_pagado, pp.observaciones_pago, op.total_nro_cuota, op.obs,op.id_obligacion_pago';
             raise notice '%',v_consulta;
 
