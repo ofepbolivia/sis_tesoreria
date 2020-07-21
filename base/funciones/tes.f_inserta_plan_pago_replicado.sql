@@ -256,7 +256,8 @@ BEGIN
             fecha_conclusion_pago,
             es_ultima_cuota,
             monto_establecido,
-            id_proveedor_cta_bancaria
+            id_proveedor_cta_bancaria,
+            id_depto_lb
           	) values(
 			'activo',
 			v_nro_cuota,
@@ -307,7 +308,8 @@ BEGIN
             (p_hstore->'fecha_conclusion_pago')::date,
             true,
             (p_hstore->'monto_establecido')::numeric,
-            (p_hstore->'id_proveedor_cta_bancaria')::integer
+            (p_hstore->'id_proveedor_cta_bancaria')::integer,
+            (p_hstore->'id_depto_lb')::integer
 
            )RETURNING id_plan_pago into v_id_plan_pago;
 
@@ -376,6 +378,3 @@ VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
 COST 100;
-
-ALTER FUNCTION tes.f_inserta_plan_pago_replicado (p_administrador integer, p_id_usuario integer, p_hstore public.hstore, p_salta boolean)
-  OWNER TO mperez;

@@ -234,6 +234,7 @@ header("content-type: text/javascript; charset=UTF-8");
 
                 // ['devengado_pagado_1c', 'Devengar y pagar (1 comprobante)'],
                 ['devengado_pagado_1c_sp', 'Devengar y pagar (1 comprobante)'],
+                ['devengado', 'Devengar'],
 
             ],
             'TODOS': [
@@ -737,7 +738,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 config: {
                     name: 'id_cuenta_bancaria',
                     fieldLabel: 'Cuenta Bancaria Pago (BOA)',
-                    allowBlank: false,
+                    allowBlank: true,
                     emptyText: 'Elija una Cuenta...',
                     store: new Ext.data.JsonStore(
                         {
@@ -804,7 +805,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     store: new Ext.data.JsonStore(
                         {
                             url: '../../sis_parametros/control/FormaPago/listarFormaPagofil',
-                            id: 'id_forma_pago',
+                            id: 'desc_forma_pago',
                             root: 'datos',
                             sortInfo: {
                                 field: 'orden',
@@ -817,7 +818,7 @@ header("content-type: text/javascript; charset=UTF-8");
                         }),
                     tpl: '<tpl for="."><div class="x-combo-list-item"><p>{desc_forma_pago}</p></div></tpl>',
                     valueField: 'codigo',
-                    hiddenValue: 'id_forma_pago',
+                    hiddenValue: 'forma_pago',
                     displayField: 'codigo',
                     gdisplayField: 'codigo',
                     listWidth: '280',
@@ -2592,6 +2593,10 @@ header("content-type: text/javascript; charset=UTF-8");
                 me.Cmp.monto_retgar_mo.setReadOnly(false);
                 me.mostrarGrupo(3); //mostra el grupo rango de costo
                 me.ocultarGrupo(2); //ocultar el grupo de ajustes
+
+
+                //plantilla (TIPO DOCUMENTO)
+               // me.setTipoPago['devengado_pagado'](me);
 
 
             },
