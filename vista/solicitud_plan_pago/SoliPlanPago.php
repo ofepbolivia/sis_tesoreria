@@ -234,7 +234,8 @@ header("content-type: text/javascript; charset=UTF-8");
 
                 // ['devengado_pagado_1c', 'Devengar y pagar (1 comprobante)'],
                 ['devengado_pagado_1c_sp', 'Devengar y pagar (1 comprobante)'],
-                ['devengado', 'Devengar'],
+                //['devengado', 'Devengar'],
+                ['especial_spi', 'Pago simple (sin efecto presupuestario)']
 
             ],
             'TODOS': [
