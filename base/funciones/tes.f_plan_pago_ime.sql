@@ -337,7 +337,7 @@ BEGIN
                             SELECT sum(pp.monto_establecido)
                             INTO v_sum_monto_pp
                             FROM tes.tplan_pago pp
-                            WHERE pp.estado != 'anulado' and pp.estado != 'pago_exterior' and pp.estado != 'pagado'
+                            WHERE pp.estado != 'anulado' and pp.estado != 'pago_exterior' and pp.estado != 'pagado' and pp.estado != 'pendiente'
                             and pp.tipo not in ('especial', 'dev_garantia', 'dev_garantia_con', 'dev_garantia_con_ant', 'anticipo', 'ant_parcial', 'ant_rendicion', 'ant_aplicado', 'rendicion','ret_rendicion' )
                             and pp.id_obligacion_pago = v_parametros.id_obligacion_pago;
 
@@ -713,7 +713,7 @@ BEGIN
                             SELECT sum(pp.monto_establecido)
                             INTO v_sum_monto_pp
                             FROM tes.tplan_pago pp
-                            WHERE pp.estado != 'anulado' and pp.estado != 'pago_exterior' and pp.estado != 'pagado'
+                            WHERE pp.estado != 'anulado' and pp.estado != 'pago_exterior' and pp.estado != 'pagado' and pp.estado != 'pendiente'
                             --and pp.tipo not in ( 'dev_garantia', 'dev_garantia_con', 'dev_garantia_con_ant')
                             and pp.tipo not in ('especial', 'dev_garantia', 'dev_garantia_con', 'dev_garantia_con_ant', 'anticipo', 'ant_parcial', 'ant_rendicion', 'ant_aplicado', 'rendicion','ret_rendicion' )
                             and pp.id_plantilla not in (23) -- id23 = proforma recibo de alquiler
@@ -1914,7 +1914,7 @@ BEGIN
                 SELECT sum(pp.monto)
                 INTO v_sum_monto_pp
                 FROM tes.tplan_pago pp
-                WHERE pp.estado != 'anulado' and pp.estado != 'pago_exterior' and pp.estado != 'pagado'
+                WHERE pp.estado != 'anulado' and pp.estado != 'pago_exterior' and pp.estado != 'pagado' and pp.estado != 'pendiente'
                 and pp.tipo not in ('especial', 'dev_garantia', 'dev_garantia_con', 'dev_garantia_con_ant', 'anticipo', 'ant_parcial', 'ant_rendicion', 'ant_aplicado', 'rendicion','ret_rendicion' )
                 --and pp.tipo not in ( 'dev_garantia', 'dev_garantia_con', 'dev_garantia_con_ant', 'anticipo', 'ant_parcial', 'ant_rendicion')
                 and pp.estado_reg != 'anulado'
