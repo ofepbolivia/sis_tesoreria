@@ -1038,6 +1038,8 @@ class MODObligacionPago extends MODbase
         $this->captura('estado_pp','varchar');
         $this->captura('nombre_proveedor','varchar');
 
+        $this->captura('id_plan_pago','int4');
+
 		//Ejecuta la instruccion
         $this->armarConsulta();
         $this->ejecutarConsulta();

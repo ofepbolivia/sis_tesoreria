@@ -56,6 +56,16 @@ Phx.vista.TsLibroBancosExterior=Ext.extend(Phx.gridInterfaz,{
 			type:'Field',
 			form:true
 		},
+        {
+			//configuracion del componente
+			config:{
+					labelSeparator:'',
+					inputType:'hidden',
+					name: 'id_plan_pago'
+			},
+			type:'Field',
+			form:true
+		},
 		{
 			config:{
 				name: 'num_tramite',
@@ -264,7 +274,7 @@ Phx.vista.TsLibroBancosExterior=Ext.extend(Phx.gridInterfaz,{
 	tam_pag:50,
 	title:'procesos pagos exterior',
 	ActList:'../../sis_tesoreria/control/ObligacionPago/TsLibroBancosExterior',
-	id_store:'id_obligacion_pago',
+	id_store:'id_plan_pago',
 	fields: [
 		{name:'id_obligacion_pago', type: 'numeric'},
 		{name:'num_tramite', type: 'string'},
@@ -280,7 +290,8 @@ Phx.vista.TsLibroBancosExterior=Ext.extend(Phx.gridInterfaz,{
         {name:'moneda', type: 'string'},
         {name:'cod_moneda', type: 'string'},
 				{name:'estado_pp', type: 'string'},
-        {name:'nombre_proveedor', type: 'string'}
+        {name:'nombre_proveedor', type: 'string'},
+        {name:'id_plan_pago', type: 'numeric'}
 	],
 	sortInfo:{
 		field: 'fecha',

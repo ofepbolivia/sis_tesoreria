@@ -5735,3 +5735,57 @@ ORDER BY ef.fecha_reg;
 ALTER VIEW tes.v_pagos_libro_banco_exterior
   OWNER TO postgres;
 /***********************************F-DEP-IRVA-TES-0-29/05/2020****************************************/
+
+/***********************************I-DEP-MAY-TES-0-24/09/2020****************************************/
+CREATE VIEW tes.v_pagos_libro_banco_exterior_2 (
+    num_tramite,
+    fecha,
+    nro_cuenta,
+    nombre,
+    codigo,
+    nombre_estado,
+    obs,
+    desc_persona,
+    usuario_ai,
+    id_gestion,
+    id_obligacion_pago,
+    monto,
+    prioridad,
+    id_moneda,
+    estado_pp,
+    tipo_obligacion,
+    nombre_proveedor,
+    id_plan_pago)
+AS
+SELECT op.num_tramite,
+    ef.fecha_reg AS fecha,
+    pl.nro_cuota AS nro_cuenta,
+    de.nombre,
+    te.codigo,
+    te.nombre_estado,
+    ef.obs,
+    us.desc_persona,
+    us2.desc_persona AS usuario_ai,
+    op.id_gestion,
+    op.id_obligacion_pago,
+    pl.monto,
+    de.prioridad,
+    op.id_moneda,
+    pl.estado AS estado_pp,
+    op.tipo_obligacion,
+    prove.rotulo_comercial AS nombre_proveedor,
+    pl.id_plan_pago
+FROM tes.tplan_pago pl
+     JOIN tes.tobligacion_pago op ON op.id_obligacion_pago = pl.id_obligacion_pago
+     JOIN param.tproveedor prove ON prove.id_proveedor = op.id_proveedor
+     JOIN param.tdepto de ON de.id_depto = pl.id_depto_lb
+     JOIN wf.tproceso_wf pf ON pf.id_proceso_wf = pl.id_proceso_wf
+     JOIN wf.testado_wf ef ON ef.id_proceso_wf = pf.id_proceso_wf
+     JOIN wf.ttipo_estado te ON te.id_tipo_estado = ef.id_tipo_estado
+     JOIN segu.vusuario us ON us.id_usuario = ef.id_usuario_reg
+     LEFT JOIN segu.vusuario us2 ON us2.id_usuario = ef.id_usuario_ai
+ORDER BY ef.fecha_reg;
+
+ALTER VIEW tes.v_pagos_libro_banco_exterior_2
+  OWNER TO "postgres";
+/***********************************F-DEP-MAY-TES-0-24/09/2020****************************************/

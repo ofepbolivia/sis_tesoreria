@@ -734,7 +734,8 @@ class ACTObligacionPago extends ACTbase
     }
 
     function TsLibroBancosExterior() {
-		$this->objParam->defecto('ordenacion','id_obligacion_pago');
+		//$this->objParam->defecto('ordenacion','id_obligacion_pago');
+		$this->objParam->defecto('ordenacion','id_plan_pago');
         $this->objParam->defecto('dir_ordenacion','asc');
 
         //27-01-2020 (may) se añade dos pestañas mas para tramites PGA exterior y locales

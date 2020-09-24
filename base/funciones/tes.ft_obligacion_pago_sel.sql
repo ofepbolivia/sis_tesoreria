@@ -574,9 +574,15 @@ BEGIN
 
           IF  v_parametros.tipo_interfaz !=  'ObligacionPagoConta' THEN
             --no hay limitaciones ...
-            IF   p_administrador != 1 THEN
+           IF   p_administrador != 1 THEN
+            	--(maylee.perez) para internacionales la vista de los procesos que van desde la estacion central
+                IF   v_parametros.tipo_interfaz  = 'obligacionPagoInterS' THEN
+                       v_filadd='';
+                ELSE
+
                    v_filadd = '(obpg.id_funcionario='||v_parametros.id_funcionario_usu::varchar||'  or obpg.id_usuario_reg='||p_id_usuario||' ) and ';
-            END IF;
+           		END IF;
+           END IF;
           END IF;
 
          IF  v_parametros.tipo_interfaz in ('obligacionPagoSol', 'obligacionPagoUnico','obligacionPagoEspecial', 'solicitudSinImputacionPresupuestaria') THEN
@@ -1379,8 +1385,10 @@ BEGIN
                         mone.moneda,
                         mone.codigo as cod_moneda,
                         plbex.estado_pp,
-                        plbex.nombre_proveedor
-                    from tes.v_pagos_libro_banco_exterior plbex
+                        plbex.nombre_proveedor,
+                        plbex.id_plan_pago
+
+                    from tes.v_pagos_libro_banco_exterior_2 plbex
                     inner join param.tmoneda mone on mone.id_moneda = plbex.id_moneda
 					where plbex.fecha between '''||v_fecha_ini||''' and '''||v_fecha_fin||'''
                     and ' ;
@@ -1389,6 +1397,7 @@ BEGIN
             v_consulta:=v_consulta||v_parametros.filtro;
             v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
 			raise notice '%',v_consulta;
+
 			--Devuelve la respuesta
 			return v_consulta;
 
@@ -1414,7 +1423,7 @@ BEGIN
 
 			--Sentencia de la consulta de conteo de registros
 			v_consulta:='select count(plbex.id_obligacion_pago)
-						from tes.v_pagos_libro_banco_exterior plbex
+						from tes.v_pagos_libro_banco_exterior_2 plbex
                         inner join param.tmoneda mone on mone.id_moneda = plbex.id_moneda
                         where plbex.fecha between '''||v_fecha_ini||''' and '''||v_fecha_fin||'''
                         and ';
