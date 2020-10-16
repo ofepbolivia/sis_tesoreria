@@ -1045,6 +1045,13 @@ class ACTObligacionPago extends ACTbase
             return array();
     }
 
+    //{develop: franklin.espinoza date: 12/10/2020, description: Guarda Preventivo,Compromiso,Devengado para procesos con Preventivo}
+    function guardarDocumentoSigep(){
+        $this->objFunc=$this->create('MODObligacionPago');
+        $this->res=$this->objFunc->guardarDocumentoSigep($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+
 }
 
 ?>

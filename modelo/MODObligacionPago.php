@@ -94,6 +94,7 @@ class MODObligacionPago extends MODbase
         $this->captura('observaciones', 'varchar');
         $this->captura('fecha_certificacion_pres', 'date');
         $this->captura('presupuesto_aprobado', 'varchar');
+        $this->captura('nro_preventivo', 'integer');
 
         //Ejecuta la instruccion
         $this->armarConsulta();
@@ -1158,6 +1159,25 @@ class MODObligacionPago extends MODbase
         //echo($this->consulta);exit;
         $this->ejecutarConsulta();
 
+        return $this->respuesta;
+    }
+
+    //{develop: franklin.espinoza date: 12/10/2020, description: Guarda Preventivo para procesos con Preventivo}
+    function guardarDocumentoSigep(){
+        //swEditable de variables para ejecucion del procedimiento
+        $this->procedimiento='tes.ft_obligacion_pago_ime';
+        $this->transaccion='TES_DOCSIGEP_IME';
+        $this->tipo_procedimiento='IME';
+
+        //Define los parametros para la funcion
+        $this->setParametro('id_obligacion_pago','id_obligacion_pago','integer');
+        $this->setParametro('nro_preventivo','nro_preventivo','integer');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
         return $this->respuesta;
     }
 }

@@ -327,7 +327,8 @@ BEGIN
                               conf.fecha_fin::date,
                               conf.observaciones,
                               obpg.fecha_certificacion_pres,
-                              obpg.presupuesto_aprobado
+                              obpg.presupuesto_aprobado,
+                              obpg.nro_preventivo
 
                               from tes.tobligacion_pago obpg
                               inner join segu.tusuario usu1 on usu1.id_usuario = obpg.id_usuario_reg

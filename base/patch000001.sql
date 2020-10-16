@@ -2078,3 +2078,13 @@ FROM tes.tobligacion_pago op
 WHERE pp.estado::text = 'pagado'::text OR pp.estado::text = 'devengado'::text
 ORDER BY cc.codigo_cc, pv.desc_proveedor;
 /*****************************F-SCP-IRVA-TES-0-14/08/2020*************/
+
+
+
+/*****************************I-SCP-FEA-TES-0-15/10/2020*************/
+ALTER TABLE tes.tobligacion_pago
+  ADD COLUMN nro_preventivo INTEGER;
+
+COMMENT ON COLUMN tes.tobligacion_pago.nro_preventivo
+IS 'dato sigep para procesos con preventivo, mandatorio para CIP.';
+/*****************************F-SCP-FEA-TES-0-15/10/2020*************/

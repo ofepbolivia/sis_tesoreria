@@ -993,7 +993,8 @@ header("content-type: text/javascript; charset=UTF-8");
             {name: 'fecha_fin', type: 'date', dateFormat: 'Y-m-d'},
             {name: 'observaciones', type: 'string'},
             {name: 'fecha_certificacion_pres', type: 'date', dateFormat: 'Y-m-d'},
-            {name: 'presupuesto_aprobado', type: 'string'}
+            {name: 'presupuesto_aprobado', type: 'string'},
+            {name: 'nro_preventivo', type: 'numeric'}
 
         ],
 
@@ -2186,6 +2187,100 @@ header("content-type: text/javascript; charset=UTF-8");
                     scope: this
                 });
             }
+        },
+        //franklin.espinoza 15/10/2020
+        onCargarDocumentoSigep:  function (){
+            var record = this.getSelectedData();
+            this.formDocumentoSigep();
+            this.formDocumento.getForm().findField('preventivo').setValue(record.nro_preventivo);
+            this.windowDocumento.show();
+        },
+        formDocumentoSigep: function () {
+
+            this.formDocumento = new Ext.form.FormPanel({
+                id: this.idContenedor + '_DOCSIGEP',
+                items: [
+                    new Ext.form.TextField({
+                        fieldLabel: 'Nro. Preventivo',
+                        name: 'preventivo',
+                        //height: 150,
+                        allowBlank: false,
+                        width: '90%',
+                        msgTarget : 'side'
+                    })
+                ],
+                autoScroll: false,
+                //height: this.fheight,
+                autoDestroy: true,
+                autoScroll: true
+            });
+
+
+            // Definicion de la ventana que contiene al formulario
+            this.windowDocumento = new Ext.Window({
+                // id:this.idContenedor+'_W',
+                title: 'Datos Documento Sigep',
+                modal: true,
+                width: 300,
+                height: 200,
+                bodyStyle: 'padding:5px;',
+                layout: 'fit',
+                hidden: true,
+                autoScroll: false,
+                maximizable: true,
+                buttons: [{
+                    text: 'Guardar',
+                    arrowAlign: 'bottom',
+                    handler: this.onSubmitDocumento,
+                    argument: {
+                        'news': false
+                    },
+                    scope: this
+
+                },
+                    {
+                        text: 'Declinar',
+                        handler: this.onDeclinarDocumento,
+                        scope: this
+                    }],
+                items: this.formDocumento,
+                // autoShow:true,
+                autoDestroy: true,
+                closeAction: 'hide'
+            });
+        },
+
+        onSubmitDocumento: function () {
+            var record = this.getSelectedData();
+            Phx.CP.loadingShow();
+            Ext.Ajax.request({
+                url: '../../sis_tesoreria/control/ObligacionPago/guardarDocumentoSigep',
+                success: this.successDocumento,
+                failure: this.failureDocumento,
+                params: {
+                    'id_obligacion_pago' : record.id_obligacion_pago,
+                    'nro_preventivo' : this.formDocumento.getForm().findField('preventivo').getValue()
+                },
+                timeout: this.timeout,
+                scope: this
+            });
+
+        },
+
+        successDocumento: function (resp) {
+            this.windowDocumento.hide();
+            Phx.vista.ObligacionPago.superclass.successDel.call(this, resp);
+
+        },
+
+        failureDocumento: function (resp) {
+            Phx.CP.loadingHide();
+            Phx.vista.ObligacionPago.superclass.conexionFailure.call(this, resp);
+
+        },
+
+        onDeclinarDocumento: function () {
+            this.windowDocumento.hide();
         }
 
     })

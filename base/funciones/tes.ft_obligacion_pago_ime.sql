@@ -2168,7 +2168,33 @@ BEGIN
           --Devuelve la respuesta
           return v_resp;
 
-        end;        
+        end;
+
+    /*********************************
+ 	#TRANSACCION:  'TES_DOCSIGEP_IME'
+ 	#DESCRIPCION:	Registrar Nro. Preventivo,
+ 	#AUTOR:		franklin.espinoza
+ 	#FECHA:		15/10/2020 10:28:30
+	***********************************/
+
+	elsif p_transaccion = 'TES_DOCSIGEP_IME' then
+
+		begin
+
+        	-----------------------------------
+            --REGISTRO DE DOCUMENTO SIGEP
+            -----------------------------------
+            update tes.tobligacion_pago  set
+              nro_preventivo = v_parametros.nro_preventivo
+            where id_obligacion_pago = v_parametros.id_obligacion_pago;
+
+            --Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Se Actualizo con exito');
+            v_resp = pxp.f_agrega_clave(v_resp,'id_obligacion_pago',v_parametros.id_obligacion_pago::varchar);
+
+            --Devuelve la respuesta
+            return v_resp;
+		end;
 
     else
 
