@@ -142,7 +142,7 @@ Phx.vista.CuentaBancaria=Ext.extend(Phx.gridInterfaz,{
 				typeAhead:true,
 				triggerAction:'all',
 				mode:'local',
-				store:['si','no']
+				store:['si','no','otro']
 			},
 			valorInicial:'no',
 			type:'ComboBox',
