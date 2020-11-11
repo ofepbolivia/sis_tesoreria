@@ -1258,7 +1258,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     // anchor: '80%',
                     width: 280,
                     gwidth: 300,
-                    maxLength: 300
+                    maxLength: 500
                 },
                 type: 'TextArea',
                 filters: {pfiltro: 'plapa.obs_monto_no_pagado', type: 'string'},
