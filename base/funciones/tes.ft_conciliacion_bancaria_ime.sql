@@ -48,6 +48,7 @@ DECLARE
     v_fecha_control_ini 		date;
     v_periodo_ant				integer;
     v_concili_ant				record;
+    v_saldo_2_null				numeric;
 BEGIN
 
     v_nombre_funcion = 'tes.ft_conciliacion_bancaria_ime';
@@ -250,7 +251,7 @@ BEGIN
 
               select per.fecha_ini, per.fecha_fin
                into  v_fecha_ini, v_fecha_fin
-              from param.tperiodo per 
+              from param.tperiodo per
               where per.id_periodo = v_periodo;
 
           if i = 1 then
@@ -450,6 +451,15 @@ BEGIN
           inner join tes.tconciliacion_bancaria con on con.id_conciliacion_bancaria = cre.id_conciliacion_bancaria
           where  cre.id_conciliacion_bancaria = v_parametros.id_conciliacion_bancaria
           group by con.saldo_banco;
+
+          if v_saldo_real_2 is null then
+            select saldo_banco
+              into v_saldo_2_null
+            from tes.tconciliacion_bancaria
+            where  id_conciliacion_bancaria = v_parametros.id_conciliacion_bancaria;
+
+            v_saldo_real_2 = v_saldo_2_null;
+          end if;
 
           select coalesce(sum(importe),0)
 	          into v_debito_bancario
