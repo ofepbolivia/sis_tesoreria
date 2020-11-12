@@ -76,7 +76,7 @@ BEGIN
                             ''''::text  as desc_funcionario_cargo,
                             1 as prioridad
                          FROM orga.vfuncionario fun WHERE fun.id_funcionario in (
-                         select * from orga.f_get_aprobadores_x_funcionario(CURRENT_DATE,'|| v_id_funcionario ||',''todos'',''todos'',''2,3,4'') as
+                         select * from orga.f_get_aprobadores_x_funcionario(CURRENT_DATE,'|| v_id_funcionario ||',''todos'',''todos'',''2,3,4,6,7'') as
 						 (id_funcionario integer)) and '||p_filtro||'
                          limit '|| p_limit::varchar||' offset '||p_start::varchar;
 
@@ -88,7 +88,7 @@ BEGIN
                   v_consulta='select
                                   COUNT(fun.id_funcionario) as total
                                  FROM orga.vfuncionario fun WHERE fun.id_funcionario in (
-                                 select * from orga.f_get_aprobadores_x_funcionario(CURRENT_DATE,'|| v_id_funcionario ||',''todos'',''todos'',''2,3,4'') as
+                                 select * from orga.f_get_aprobadores_x_funcionario(CURRENT_DATE,'|| v_id_funcionario ||',''todos'',''todos'',''2,3,4,6,7'') as
 						 (id_funcionario integer)) and '||p_filtro;
 
                    FOR g_registros in execute (v_consulta)LOOP
@@ -117,3 +117,6 @@ VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
 COST 100 ROWS 1000;
+
+ALTER FUNCTION tes.f_lista_funcionario_jefe_superior_wf_sel (p_id_usuario integer, p_id_tipo_estado integer, p_fecha date, p_id_estado_wf integer, p_count boolean, p_limit integer, p_start integer, p_filtro varchar)
+  OWNER TO postgres;
