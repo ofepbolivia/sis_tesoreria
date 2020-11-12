@@ -635,6 +635,25 @@ header("content-type: text/javascript; charset=UTF-8");
                 grid: true,
                 form: true
             },
+
+            {
+                config: {
+                    name: 'nro_preventivo',
+                    fieldLabel: 'C31 Preventivo',
+                    allowBlank: true,
+                    anchor: '80%',
+                    gwidth: 100,
+                    maxLength: 131074,
+                    maxValue: 100
+                },
+                type: 'NumberField',
+                filters: {pfiltro: 'obpg.nro_preventivo', type: 'numeric'},
+                bottom_filter: true,
+                id_grupo: 1,
+                grid: true,
+                form: false
+            },
+
             {
                 config: {
                     name: 'tipo_cambio_conv',
@@ -2200,11 +2219,11 @@ header("content-type: text/javascript; charset=UTF-8");
             this.formDocumento = new Ext.form.FormPanel({
                 id: this.idContenedor + '_DOCSIGEP',
                 items: [
-                    new Ext.form.TextField({
+                    new Ext.form.NumberField({
                         fieldLabel: 'Nro. Preventivo',
                         name: 'preventivo',
                         //height: 150,
-                        allowBlank: false,
+                        allowBlank: true,
                         width: '90%',
                         msgTarget : 'side'
                     })
