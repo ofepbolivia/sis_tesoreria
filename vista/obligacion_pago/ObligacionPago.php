@@ -1930,8 +1930,8 @@ header("content-type: text/javascript; charset=UTF-8");
 
         onBtnVerifPresup: function () {
             var rec = this.sm.getSelected();
-            //Se define el nombre de la columna de la llave primaria
-            rec.data.tabla_id = this.tabla_id;
+            //Se define el nombre de la columna de la llave primaria this.tabla_id
+            rec.data.tabla_id = rec.data.id_obligacion_pago;
             rec.data.tabla = this.tabla;
 
             Phx.CP.loadWindows('../../../sis_presupuestos/vista/verificacion_presup/VerificacionPresup.php', 'Disponibilidad Presupuestaria', {
