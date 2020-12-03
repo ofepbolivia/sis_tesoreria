@@ -153,7 +153,7 @@ class ACTObligacionPago extends ACTbase
 
         }
 
-        //para internacionales SP, SPD, SPI
+        //(may)para internacionales SP, SPD, SPI
         if ($this->objParam->getParametro('tipo_interfaz') == 'obligacionPagoS') {
             $this->objParam->addFiltro("obpg.tipo_obligacion in (''sp'')");
         }
@@ -163,6 +163,11 @@ class ACTObligacionPago extends ACTbase
 
         if ($this->objParam->getParametro('tipo_interfaz') == 'obligacionPagoInterS') {
             $this->objParam->addFiltro("obpg.tipo_obligacion in (''spi'')");
+        }
+
+        //03/12/2020 (may) para pagos POC
+        if ($this->objParam->getParametro('tipo_interfaz') == 'obligacionPagoPOC') {
+            $this->objParam->addFiltro("obpg.tipo_obligacion in (''pago_poc'')");
         }
 
         //filtro breydi.vasquez 07/01/2020 
@@ -1051,6 +1056,71 @@ class ACTObligacionPago extends ACTbase
         $this->res=$this->objFunc->guardarDocumentoSigep($this->objParam);
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
+
+    //02-12-2020 (may) para insertar la relacion de un proceso
+    function insertarRelacionProceso(){
+
+        $this->objFunc=$this->create('MODObligacionPago');
+        if($this->objParam->insertar('id_relacion_proceso_pago')){
+            $this->res=$this->objFunc->insertarRelacionProceso($this->objParam);
+        } else{
+            $this->res=$this->objFunc->modificarRelacionProceso($this->objParam);
+        }
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+
+    //02-12-2020 (may) para eliminar la relacion de un proceso
+    function eliminarRelacionProceso(){
+        $this->objFunc=$this->create('MODObligacionPago');
+        $this->res=$this->objFunc->eliminarRelacionProceso($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+
+    //02-12-2020 (may) para listar la relacion de un proceso
+    function listarRelacionProceso(){
+        $this->objParam->defecto('ordenacion','id_relacion_proceso_pago');
+        $this->objParam->defecto('dir_ordenacion','asc');
+
+
+        if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
+            $this->objReporte = new Reporte($this->objParam,$this);
+            $this->res = $this->objReporte->generarReporteListado('MODObligacionPago','listarRelacionProceso');
+        } else{
+            $this->objFunc=$this->create('MODObligacionPago');
+
+            $this->res=$this->objFunc->listarRelacionProceso($this->objParam);
+        }
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+
+    //02-12-2020 (may) para listar compo de nros de tramite
+    function listarObligacioPagoCombos(){
+        $this->objParam->defecto('ordenacion','id_obligacion_pago');
+
+        $this->objParam->defecto('dir_ordenacion','asc');
+        if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
+            $this->objReporte = new Reporte($this->objParam, $this);
+            $this->res = $this->objReporte->generarReporteListado('MODObligacionPago','listarObligacioPagoCombos');
+        } else{
+            $this->objFunc=$this->create('MODObligacionPago');
+            $this->res=$this->objFunc->listarObligacioPagoCombos();
+        }
+
+        /*if($this->objParam->getParametro('_adicionar')!=''){
+
+            $respuesta = $this->res->getDatos();
+
+            array_unshift ( $respuesta, array(  'id_proveedor'=>'0',
+                'rotulo_comercial'=>'Todos', 'desc_proveedor'=>'Todos'
+            ));
+            //		var_dump($respuesta);
+            $this->res->setDatos($respuesta);
+        }*/
+
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+
+
 
 }
 

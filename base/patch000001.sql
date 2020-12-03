@@ -2088,3 +2088,37 @@ ALTER TABLE tes.tobligacion_pago
 COMMENT ON COLUMN tes.tobligacion_pago.nro_preventivo
 IS 'dato sigep para procesos con preventivo, mandatorio para CIP.';
 /*****************************F-SCP-FEA-TES-0-15/10/2020*************/
+
+
+/*****************************I-SCP-MAY-TES-0-03/12/2020*************/
+CREATE TABLE tes.trelacion_proceso_pago (
+  id_relacion_proceso_pago SERIAL,
+  id_obligacion_pago INTEGER,
+  observaciones VARCHAR(500),
+  id_obligacion_pago_ini INTEGER,
+  CONSTRAINT trelacion_proceso_pago_pkey PRIMARY KEY(id_relacion_proceso_pago)
+) INHERITS (pxp.tbase)
+WITH (oids = false);
+
+COMMENT ON COLUMN tes.trelacion_proceso_pago.id_relacion_proceso_pago
+IS 'identificador';
+
+COMMENT ON COLUMN tes.trelacion_proceso_pago.id_obligacion_pago
+IS 'identificador tabla tes.tobligacion_pago';
+
+COMMENT ON COLUMN tes.trelacion_proceso_pago.observaciones
+IS 'observaciones de la relacion de un pago';
+
+COMMENT ON COLUMN tes.trelacion_proceso_pago.id_obligacion_pago_ini
+IS 'ientificador tes.tobligacion_pago de los nuevos prfocesos al que se registrara';
+
+ALTER TABLE tes.trelacion_proceso_pago
+  OWNER TO postgres;
+
+
+ALTER TABLE tes.tobligacion_det
+ADD COLUMN id_obligacion_pago_relacion INTEGER;
+
+COMMENT ON COLUMN tes.tobligacion_det.id_obligacion_pago_relacion
+IS 'identificador de la tabla tes.tobligacion_pago de donde sale la relacion';
+/*****************************F-SCP-MAY-TES-0-03/12/2020*************/

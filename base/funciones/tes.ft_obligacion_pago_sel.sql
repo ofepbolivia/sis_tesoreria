@@ -1689,6 +1689,137 @@ BEGIN
 			return v_consulta;
     end;
 
+    /*********************************
+ 	#TRANSACCION:  'TES_RELACOB_SEL'
+ 	#DESCRIPCION:	Consulta de datos
+ 	#AUTOR:		maylee.perez
+    #FECHA:		02/11/2020 10:28:30
+	***********************************/
+
+	elsif(p_transaccion='TES_RELACOB_SEL')then
+
+    	begin
+
+            --Sentencia de la consulta
+			v_consulta:='select
+                            rp.id_relacion_proceso_pago,
+                            rp.observaciones,
+                            rp.id_obligacion_pago,
+                            op.num_tramite::varchar,
+
+                            rp.estado_reg,
+                            rp.fecha_reg,
+                            rp.id_usuario_reg,
+                            rp.id_usuario_mod,
+                            rp.fecha_mod,
+                            usu1.cuenta as usr_reg,
+                            usu2.cuenta as usr_mod
+
+                      from tes.trelacion_proceso_pago rp
+                         inner join segu.tusuario usu1 on usu1.id_usuario = rp.id_usuario_reg
+                         left join segu.tusuario usu2 on usu2.id_usuario = rp.id_usuario_mod
+
+                         join tes.tobligacion_pago op on op.id_obligacion_pago = rp.id_obligacion_pago
+
+                      where  rp.estado_reg = ''activo'' and ';
+
+
+			--Definicion de la respuesta
+			v_consulta:=v_consulta||v_parametros.filtro;
+			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+            raise notice '... %', v_consulta;
+			--Devuelve la respuesta
+			return v_consulta;
+
+		end;
+
+	/*********************************
+ 	#TRANSACCION:  'TES_RELACOB_CONT'
+ 	#DESCRIPCION:	Conteo de registros
+ 	#AUTOR:		maylee.perez
+    #FECHA:		02/11/2020 10:28:30
+	***********************************/
+
+	elsif(p_transaccion='TES_RELACOB_CONT')then
+
+		begin
+			--Sentencia de la consulta de conteo de registros
+			v_consulta:='select count(rp.id_relacion_proceso_pago)
+					     from tes.trelacion_proceso_pago rp
+                         inner join segu.tusuario usu1 on usu1.id_usuario = rp.id_usuario_reg
+                         left join segu.tusuario usu2 on usu2.id_usuario = rp.id_usuario_mod
+
+                         join tes.tobligacion_pago op on op.id_obligacion_pago = rp.id_obligacion_pago
+
+                      where  rp.estado_reg = ''activo'' and ';
+
+			--Definicion de la respuesta
+			v_consulta:=v_consulta||v_parametros.filtro;
+
+			--Devuelve la respuesta
+			return v_consulta;
+
+		end;
+
+        /*********************************
+        #TRANSACCION:  'TES_COMBOP_SEL'
+        #DESCRIPCION: Consulta de datos de combo obligaciones de pago
+        #AUTOR:		maylee.perez
+    	#FECHA:		02/11/2020 10:28:30
+        ***********************************/
+
+
+        elseif(p_transaccion='TES_COMBOP_SEL')then
+
+            begin
+
+
+              --Sentencia de la consulta
+               v_consulta:=' Select opa.id_obligacion_pago,
+               						opa.num_tramite
+
+				  from tes.tobligacion_pago opa
+                  where opa.id_gestion = 19
+     			  and opa.tipo_obligacion in (''pago_especial'', ''pago_directo'')
+                  and  ';
+
+      --raise exception 'llega %',v_parametros.filtro;
+            --Definicion de la respuesta
+            v_consulta:=v_consulta||v_parametros.filtro;
+            v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+
+            --Devuelve la respuesta
+            return v_consulta;
+
+          end;
+
+        /*********************************
+        #TRANSACCION:  'TES_COMBOP_CONT'
+        #DESCRIPCION: Conteo de registros de combo obligaciones de pago
+        #AUTOR:		maylee.perez
+    	#FECHA:		02/11/2020 10:28:30
+        ***********************************/
+
+        elsif(p_transaccion='TES_COMBOP_CONT')then
+
+          begin
+            --Sentencia de la consulta de conteo de registros
+            v_consulta:='select count(opa.id_obligacion_pago)
+                    from tes.tobligacion_pago opa
+                    where opa.id_gestion = 19
+                    and opa.tipo_obligacion in (''pago_especial'', ''pago_directo'')
+                    and  ';
+
+
+
+            --Definicion de la respuesta
+            v_consulta:=v_consulta||v_parametros.filtro;
+
+            --Devuelve la respuesta
+            return v_consulta;
+
+          end;
+
    else
 
 		raise exception 'Transaccion inexistente';

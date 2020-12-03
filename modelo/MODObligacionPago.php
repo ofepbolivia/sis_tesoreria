@@ -1180,6 +1180,120 @@ class MODObligacionPago extends MODbase
         //Devuelve la respuesta
         return $this->respuesta;
     }
+
+    //02-12-2020 (may) para insertar la relacion de un proceso
+    function insertarRelacionProceso(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento='tes.ft_obligacion_pago_ime';
+        $this->transaccion='TES_RELACOB_IME';
+        $this->tipo_procedimiento='IME';
+
+        //Define los parametros para la funcion
+        $this->setParametro('observaciones','observaciones','varchar');
+        $this->setParametro('id_obligacion_pago','id_obligacion_pago','int4');
+
+        $this->setParametro('id_proceso_wf','id_proceso_wf','int4');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+    //02-12-2020 (may) para modificar la relacion de un proceso
+    function modificarRelacionProceso(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento='tes.ft_obligacion_pago_ime';
+        $this->transaccion='TES_RELACOB_MOD';
+        $this->tipo_procedimiento='IME';
+
+        //Define los parametros para la funcion
+        $this->setParametro('id_relacion_proceso_pago','id_relacion_proceso_pago','int4');
+        $this->setParametro('observaciones','observaciones','varchar');
+        $this->setParametro('id_obligacion_pago','id_obligacion_pago','int4');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+
+     //02-12-2020 (may) para eliminar la relacion de un proceso
+    function eliminarRelacionProceso(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento='tes.ft_obligacion_pago_ime';
+        $this->transaccion='TES_RELACOB_ELI';
+        $this->tipo_procedimiento='IME';
+
+        //Define los parametros para la funcion
+        $this->setParametro('id_relacion_proceso_pago','id_relacion_proceso_pago','int4');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+
+    //02-12-2020 (may) para listar la relacion de un proceso
+    function listarRelacionProceso(){
+        //Definicion de variables para ejecucion del procedimientp
+        $this->procedimiento='tes.ft_obligacion_pago_sel';
+        $this->transaccion='TES_RELACOB_SEL';
+        $this->tipo_procedimiento='SEL';//tipo de transaccion
+
+        $this->setParametro('id_proceso_wf','id_proceso_wf','integer');
+        //$this->setParametro('id_estado_wf','id_estado_wf','integer');
+        //$this->setParametro('num_tramite','num_tramite','varchar');
+        //$this->setParametro('todos','todos','integer');
+
+        //Definicion de la lista del resultado del query
+        $this->captura('id_relacion_proceso_pago','int4');
+        $this->captura('observaciones','varchar');
+        $this->captura('id_obligacion_pago','int4');
+        $this->captura('num_tramite','varchar');
+
+        $this->captura('estado_reg','varchar');
+        $this->captura('fecha_reg','timestamp');
+        $this->captura('id_usuario_reg','int4');
+        $this->captura('id_usuario_mod','int4');
+        $this->captura('fecha_mod','timestamp');
+        $this->captura('usr_reg','varchar');
+        $this->captura('usr_mod','varchar');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+
+    //02-12-2020 (may) para listar compo de nros de tramite
+    function listarObligacioPagoCombos(){
+        //Definicion de variables para ejecucion del procedimientp
+        $this->procedimiento='tes.ft_obligacion_pago_sel';
+        $this->transaccion='TES_COMBOP_SEL';
+        $this->tipo_procedimiento='SEL';//tipo de transaccion
+
+        //Definicion de la lista del resultado del query
+        //$this->setParametro('id_obligacion_pago','id_obligacion_pago','int4');
+        $this->captura('id_obligacion_pago','int4');
+        $this->captura('num_tramite','varchar');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        //echo $this->consulta; exit;
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+
 }
 
 ?>

@@ -99,7 +99,7 @@ $body$
             IF   (p_hstore->'tipo_obligacion')::varchar = 'adquisiciones'    THEN
                  raise exception 'Los pagos de adquisiciones tienen que ser habilitados desde el sistema de adquisiciones';
 
-            ELSIF   (p_hstore->'tipo_obligacion')::varchar  in ('pago_directo','pago_unico','pago_especial', 'pga', 'ppm', 'pce', 'pbr', 'sp', 'spd','spi', 'pago_especial_spi')    THEN
+            ELSIF   (p_hstore->'tipo_obligacion')::varchar  in ('pago_directo','pago_unico','pago_especial', 'pga', 'ppm', 'pce', 'pbr', 'sp', 'spd','spi', 'pago_especial_spi', 'pago_poc')    THEN
 
 
                      IF (p_hstore->'tipo_obligacion')::varchar  = 'pago_directo' and p_administrador != 2 THEN
@@ -120,7 +120,7 @@ $body$
                      ELSIF(p_administrador = 2 OR (p_hstore->'tipo_obligacion')::varchar  = 'pbr') THEN
                           v_tipo_documento = 'BR';
                           v_codigo_proceso_macro = 'BR';
-                     --para las intenacionales SP, SPD, SPI
+                     --(may)para las internacionales SP, SPD, SPI
                      ELSIF(p_administrador = 2 OR (p_hstore->'tipo_obligacion')::varchar  = 'sp') THEN
                           v_tipo_documento = 'SP';
                           v_codigo_proceso_macro = 'SP';
@@ -130,9 +130,15 @@ $body$
                      ELSIF(p_administrador = 2 OR (p_hstore->'tipo_obligacion')::varchar  = 'spi') THEN
                           v_tipo_documento = 'SPI';
                           v_codigo_proceso_macro = 'SPI';
-                      ELSIF(p_administrador = 2 OR (p_hstore->'tipo_obligacion')::varchar  = 'pago_especial_spi') THEN
+                     ELSIF(p_administrador = 2 OR (p_hstore->'tipo_obligacion')::varchar  = 'pago_especial_spi') THEN
                           v_tipo_documento = 'SP';
                           v_codigo_proceso_macro = 'SP';
+                     --
+                     --(may) para pagos PCO
+                     ELSIF(p_administrador = 2 OR (p_hstore->'tipo_obligacion')::varchar  = 'pago_poc') THEN
+                          v_tipo_documento = 'POC';
+                          v_codigo_proceso_macro = 'POC';
+                     --
                      ELSE
                           v_tipo_documento =  pxp.f_get_variable_global('tes_tipo_documento_especial'); --'PE';
                           v_codigo_proceso_macro = pxp.f_get_variable_global('tes_codigo_macro_especial');--'TES-PD';

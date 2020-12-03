@@ -169,6 +169,14 @@ DECLARE
      v_fecha_aux          integer;
 
      v_aprobado			  varchar;
+
+     --(may) 02-12-2020
+     v_id_relacion_proceso_pago			integer;
+     v_id_obligacion_pago_secundario	integer;
+     v_id_obligacion_pago_original		record;
+     v_id_obligacion_det_rel 			integer;
+
+
 BEGIN
 
     v_nombre_funcion = 'tes.ft_obligacion_pago_ime';
@@ -2196,6 +2204,188 @@ BEGIN
             return v_resp;
 		end;
 
+		/*********************************
+        #TRANSACCION:  'TES_RELACOB_IME'
+        #DESCRIPCION:	Relacionar obligacion de pago
+        #AUTOR:		maylee.perez
+        #FECHA:		02/11/2020 10:28:30
+        ***********************************/
+
+        elsif p_transaccion = 'TES_RELACOB_IME' then
+
+            begin
+
+            	SELECT op.id_obligacion_pago
+                INTO v_id_obligacion_pago_secundario
+                FROM tes.tobligacion_pago op
+                WHERE op.id_proceso_wf = v_parametros.id_proceso_wf ;
+
+                -- Sentencia de la insercion
+        	--raise exception 'lega2 %',v_parametros.id_obligacion_pago;
+                insert into tes.trelacion_proceso_pago(
+                  observaciones,
+                  id_obligacion_pago, -- obligacion que se relaciona
+                  id_obligacion_pago_ini,
+
+                  estado_reg,
+                  fecha_reg,
+                  id_usuario_reg,
+                  id_usuario_mod,
+                  fecha_mod
+                )
+                values(
+                  v_parametros.observaciones,
+                  v_parametros.id_obligacion_pago,
+                  v_id_obligacion_pago_secundario,
+
+                  'activo',
+                  now(),
+                  p_id_usuario,
+                  null,
+                  null
+
+                )RETURNING id_relacion_proceso_pago into v_id_relacion_proceso_pago;
+
+
+
+            --raise exception 'lega2 %',v_id_obligacion_pago_secundario;
+
+                FOR v_id_obligacion_pago_original IN( SELECT odet.*
+                                                      FROM tes.tobligacion_det odet
+                                                      WHERE odet.id_obligacion_pago = v_parametros.id_obligacion_pago
+                                                      )LOOP
+
+
+                                  --Sentencia de la insercion
+                                  insert into tes.tobligacion_det(
+                                    estado_reg,
+                                    --id_cuenta,
+                                    id_partida,
+                                    --id_auxiliar,
+                                    id_concepto_ingas,
+                                    monto_pago_mo,
+                                    id_obligacion_pago,
+                                    id_centro_costo,
+                                    monto_pago_mb,
+                                    descripcion,
+                                    fecha_reg,
+                                    id_usuario_reg,
+                                    fecha_mod,
+                                    id_usuario_mod,
+                                    id_orden_trabajo,
+                                    id_obligacion_pago_relacion
+                                  )
+                                  values(
+                                    'activo',
+                                    --v_parametros.id_cuenta,
+                                    v_id_obligacion_pago_original.id_partida,
+                                    --v_parametros.id_auxiliar,
+                                    v_id_obligacion_pago_original.id_concepto_ingas,
+                                    0, --v_id_obligacion_pago_original.monto_pago_mo,
+                                    v_id_obligacion_pago_secundario,
+                                    v_id_obligacion_pago_original.id_centro_costo,
+                                    0, --v_id_obligacion_pago_original.monto_pago_mb,
+                                    v_id_obligacion_pago_original.descripcion,
+                                    now(),
+                                    p_id_usuario,
+                                    null,
+                                    null,
+                                    v_id_obligacion_pago_original.id_orden_trabajo,
+                                    v_id_obligacion_pago_original.id_obligacion_pago
+
+                                    )RETURNING id_obligacion_det into v_id_obligacion_det;
+
+
+                END LOOP;
+
+
+                --Definicion de la respuesta
+                v_resp = pxp.f_agrega_clave(v_resp,'mensaje',' Se registro con exito');
+                v_resp = pxp.f_agrega_clave(v_resp,'id_relacion_proceso_pago',v_id_relacion_proceso_pago::varchar);
+
+                --Devuelve la respuesta
+                return v_resp;
+            end;
+
+        /*********************************
+        #TRANSACCION:  'TES_RELACOB_MOD'
+        #DESCRIPCION:	Modificacion obligacion de pago
+        #AUTOR:		maylee.perez
+        #FECHA:		02/11/2020 10:28:30
+        ***********************************/
+
+        elsif(p_transaccion='TES_RELACOB_MOD')then
+
+            begin
+
+                    --Sentencia de la modificacion
+                    update tes.trelacion_proceso_pago set
+                    observaciones = v_parametros.observaciones,
+                    id_obligacion_pago = v_parametros.id_obligacion_pago,
+
+                    id_usuario_mod = p_id_usuario,
+                    fecha_mod = now()
+
+                    where id_relacion_proceso_pago=v_parametros.id_relacion_proceso_pago;
+
+
+                --Definicion de la respuesta
+                v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Observaciones modificado(a)');
+                v_resp = pxp.f_agrega_clave(v_resp,'id_relacion_proceso_pago',v_parametros.id_relacion_proceso_pago::varchar);
+
+                --Devuelve la respuesta
+                return v_resp;
+
+            end;
+		/*********************************
+        #TRANSACCION:  'TES_RELACOB_ELI'
+        #DESCRIPCION:	Eliminacion de registros
+        #AUTOR:		maylee.perez
+        #FECHA:		02/11/2020 10:28:30
+        ***********************************/
+
+        elsif(p_transaccion='TES_RELACOB_ELI')then
+
+            begin
+
+           -- raise exception 'legaeli %', v_parametros.id_relacion_proceso_pago;
+                --Sentencia de la modificacion
+                update tes.trelacion_proceso_pago  set
+                  estado_reg = 'inactivo',
+                  id_usuario_mod = p_id_usuario,
+                  fecha_mod = now()
+                where id_relacion_proceso_pago=v_parametros.id_relacion_proceso_pago;
+
+                --obligacion de pago del de donde se saco la relacion
+                SELECT rpp.id_obligacion_pago
+                INTO v_id_obligacion_pago
+                FROM tes.trelacion_proceso_pago rpp
+                WHERE rpp.id_relacion_proceso_pago = v_parametros.id_relacion_proceso_pago;
+
+
+                FOR v_id_obligacion_det_rel IN( SELECT odet.id_obligacion_det
+                                                      FROM tes.tobligacion_det odet
+                                                      WHERE odet.id_obligacion_pago_relacion = v_id_obligacion_pago
+                                                      )LOOP
+
+                 --raise exception 'llega2 %',v_id_obligacion_det_rel;
+                            delete from tes.tobligacion_det od
+                            where od.id_obligacion_det = v_id_obligacion_det_rel;
+
+
+                END LOOP;
+
+
+                --Definicion de la respuesta
+                v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Observaciones eliminado(a)');
+                v_resp = pxp.f_agrega_clave(v_resp,'id_relacion_proceso_pago',v_parametros.id_relacion_proceso_pago::varchar);
+
+                --Devuelve la respuesta
+                return v_resp;
+
+            end;
+
+        
     else
 
     raise exception 'Transaccion inexistente: %',p_transaccion;
