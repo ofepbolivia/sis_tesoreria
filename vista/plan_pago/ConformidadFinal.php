@@ -912,7 +912,8 @@ header("content-type: text/javascript; charset=UTF-8");
                         name: 'conformidad_final',
                         height: 60,
                         allowBlank: false,
-                        width: '95%'
+                        width: '95%',
+                        maxLength: 5000
                     }),
                     new Ext.form.DateField({
                         fieldLabel: 'Fecha Inicio',
@@ -935,7 +936,8 @@ header("content-type: text/javascript; charset=UTF-8");
                         name: 'observaciones',
                         height: 50,
                         allowBlank: true,
-                        width: '95%'
+                        width: '95%',
+                        maxLength: 5000
                     })
 
                 ],

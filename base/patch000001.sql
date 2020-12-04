@@ -2122,3 +2122,8 @@ ADD COLUMN id_obligacion_pago_relacion INTEGER;
 COMMENT ON COLUMN tes.tobligacion_det.id_obligacion_pago_relacion
 IS 'identificador de la tabla tes.tobligacion_pago de donde sale la relacion';
 /*****************************F-SCP-MAY-TES-0-03/12/2020*************/
+
+/*****************************I-SCP-MAY-TES-0-04/12/2020*************/
+ALTER TABLE tes.tconformidad
+  ALTER COLUMN observaciones TYPE VARCHAR(5000);
+/*****************************F-SCP-MAY-TES-0-04/12/2020*************/
