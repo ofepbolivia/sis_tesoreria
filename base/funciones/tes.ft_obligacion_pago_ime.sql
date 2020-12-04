@@ -2185,7 +2185,7 @@ BEGIN
  	#FECHA:		15/10/2020 10:28:30
 	***********************************/
 
-	elsif p_transaccion = 'TES_DOCSIGEP_IME' then
+	elsif(p_transaccion = 'TES_DOCSIGEP_IME') then
 
 		begin
 
@@ -2211,7 +2211,7 @@ BEGIN
         #FECHA:		02/11/2020 10:28:30
         ***********************************/
 
-        elsif p_transaccion = 'TES_RELACOB_IME' then
+        elsif(p_transaccion = 'TES_RELACOB_IME') then
 
             begin
 
@@ -2385,7 +2385,7 @@ BEGIN
 
             end;
 
-        
+
     else
 
     raise exception 'Transaccion inexistente: %',p_transaccion;
