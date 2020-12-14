@@ -38,7 +38,8 @@ DECLARE
     v_strg_sol			varchar;
     v_filadd 			varchar;
     v_id_funcionario			integer;
-
+    v_consulta_sup		varchar= ' ';
+    v_consulta_sup_1	varchar= ' ';
 
 BEGIN
 
@@ -91,7 +92,7 @@ BEGIN
             IF  lower(v_parametros.tipo_interfaz) = 'planpagovb' THEN
 
                 IF p_administrador !=1 THEN
-                   v_filtro = '(ew.id_funcionario='||v_parametros.id_funcionario_usu::varchar||'  or (ew.id_depto  in ('|| COALESCE(array_to_string(va_id_depto,','),'0')||')) or (ew.id_funcionario  IN (select * FROM orga.f_get_funcionarios_x_usuario_asistente(now()::date,'||p_id_usuario||') AS (id_funcionario INTEGER)))  ) 
+                   v_filtro = '(ew.id_funcionario='||v_parametros.id_funcionario_usu::varchar||'  or (ew.id_depto  in ('|| COALESCE(array_to_string(va_id_depto,','),'0')||')) or (ew.id_funcionario  IN (select * FROM orga.f_get_funcionarios_x_usuario_asistente(now()::date,'||p_id_usuario||') AS (id_funcionario INTEGER)))  )
                    and  (lower(plapa.estado)!=''borrador'') and lower(plapa.estado)!=''pagado'' and lower(plapa.estado)!=''devengado'' and lower(plapa.estado)!=''anticipado'' and lower(plapa.estado)!=''aplicado'' and lower(plapa.estado)!=''anulado'' and lower(plapa.estado)!=''devuelto'' and ';
                  ELSE
                      v_filtro = ' (lower(plapa.estado)!=''borrador''  and lower(plapa.estado)!=''pendiente''  and lower(plapa.estado)!=''pagado'' and lower(plapa.estado)!=''devengado'' and lower(plapa.estado)!=''anticipado'' and lower(plapa.estado)!=''aplicado'' and lower(plapa.estado)!=''anulado'' and lower(plapa.estado)!=''devuelto'') and ';
@@ -1332,6 +1333,91 @@ BEGIN
 
 
             end;
+
+            /*********************************
+            #TRANSACCION:  'TES_REXCONT_SEL'
+            #DESCRIPCION:	consulta reporte Resumen por contrato
+            #AUTOR:		breydi vasquez
+            #FECHA:		10-12-2020
+            ***********************************/
+
+        elsif(p_transaccion='TES_REXCONT_SEL')then
+
+                begin
+
+                if (v_parametros.id_proveedor >0) then
+                    v_consulta_sup = ' and cc.id_proveedor = '||v_parametros.id_proveedor;
+                end if;
+                if (v_parametros.id_contrato >0) then
+                	v_consulta_sup_1 = ' and cc.id_contrato = '||v_parametros.id_contrato;
+                end if;
+
+                v_consulta:= '
+
+                SELECT	TO_JSON(ROW_TO_JSON(jsonD) :: TEXT) #>> ''{}'' as jsonData
+                FROM (
+                SELECT ARRAY_TO_JSON(ARRAY_AGG(tvalue_data)) as data
+                FROM(
+
+                with  dev (id,prov, n, t, m, mr, li ) AS
+                  (select
+                          cc.id_contrato,
+                          pro.desc_proveedor,
+                          cc.numero,
+                          pla.tipo ,
+                          sum(pla.monto) as monto,
+                          sum(pla.monto_retgar_mo),
+                          sum(pla.liquido_pagable)
+                      FROM tes.tobligacion_pago obli
+                      inner join tes.tplan_pago pla on pla.id_obligacion_pago = obli.id_obligacion_pago
+                      inner join param.vproveedor pro on pro.id_proveedor = obli.id_proveedor
+                      left join   leg.tcontrato cc on cc.id_contrato = obli.id_contrato
+                      WHERE pla.fecha_dev >= '''||v_parametros.fecha_ini||''' and pla.fecha_dev <= '''||v_parametros.fecha_fin||'''
+                      and (pla.estado in (''devengado'') and monto_retgar_mo != 0 or pla.estado in (''devuelto''))
+                      and pla.tipo = ''dev_garantia''
+                      '|| v_consulta_sup ||'
+                      '|| v_consulta_sup_1 ||'
+
+                      GROUP BY
+                      cc.id_contrato,
+                      pro.desc_proveedor,
+                      cc.numero,
+                      pla.tipo
+                      )
+                  select
+                          pro.desc_proveedor as proveedor,
+                          cc.numero,
+                          pla.tipo,
+                          sum(pla.monto) as monto,
+                          sum(pla.monto_retgar_mo) as monto_retgar_mo,
+                          sum(pla.liquido_pagable) as liquido_pagable,
+                          coalesce(dd.m, 0) as dev_garantia,
+                          (sum(pla.monto_retgar_mo) - coalesce(dd.m, 0)) as total_devol
+                      FROM tes.tobligacion_pago obli
+                      inner join tes.tplan_pago pla on pla.id_obligacion_pago = obli.id_obligacion_pago
+                      inner join param.vproveedor pro on pro.id_proveedor = obli.id_proveedor
+                      left join   leg.tcontrato cc on cc.id_contrato = obli.id_contrato
+                      left join dev dd on dd.id = cc.id_contrato
+                      WHERE pla.fecha_dev >= '''||v_parametros.fecha_ini||''' and pla.fecha_dev <= '''||v_parametros.fecha_fin||'''
+                      and (pla.estado in (''devengado'') and monto_retgar_mo != 0 or pla.estado in (''devuelto''))
+                      and pla.tipo = ''devengado_pagado''
+                      '|| v_consulta_sup ||'
+                      '|| v_consulta_sup_1 ||'
+
+                      GROUP BY
+                      pro.desc_proveedor,
+                      cc.numero,
+                      dd.m,
+                      pla.tipo
+                      ORDER BY proveedor
+                  ) tvalue_data
+                ) jsonD ';
+
+                raise notice '% .',v_consulta;
+                --Devuelve la respuesta
+                return v_consulta;
+
+                end;
 
     else
 
