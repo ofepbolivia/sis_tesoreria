@@ -21,7 +21,8 @@ header("content-type: text/javascript; charset=UTF-8");
                     mode : 'local',
                     store : new Ext.data.ArrayStore({
                         fields : ['codigo', 'nombre'],
-                        data : [['reporte_nor', 'Reporte normal'], ['reporte_pro', 'Reporte con Prorrateo']]
+                        data : [['reporte_nor', 'Reporte normal'], ['reporte_pro', 'Reporte con Prorrateo'],
+                                ['reporte_resu', 'Reporte Resumen por Contrato']]
                     }),
                     anchor : '30%',
                     valueField : 'codigo',
@@ -218,7 +219,7 @@ header("content-type: text/javascript; charset=UTF-8");
             this.cmpContrato = this.getComponente('id_contrato');
 
             this.Cmp.id_proveedor.on('select',function(c,r,i) {
-                
+
                 this.Cmp.id_contrato.reset();
                 this.Cmp.id_contrato.store.baseParams.pruebass = r.data.id_proveedor;
                 this.Cmp.id_contrato.modificado = true;

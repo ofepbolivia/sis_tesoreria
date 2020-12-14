@@ -1168,5 +1168,30 @@ class MODPlanPago extends MODbase{
 
     }
 
+    function listarProcesoResumenXContrato() {
+  			//Definicion de variables para ejecucion del procedimientp
+  			$this->procedimiento='tes.f_plan_pago_sel';
+  			$this->transaccion='TES_REXCONT_SEL';
+  			$this->tipo_procedimiento='SEL';//tipo de transaccion
+
+  			//Definicion de la lista del resultado del query
+        $this->setParametro('fecha_ini','fecha_ini','date');
+        $this->setParametro('fecha_fin','fecha_fin','date');
+        $this->setParametro('id_proveedor','id_proveedor','integer');
+        $this->setParametro('id_contrato','id_contrato','integer');
+  			$this->setCount(false);
+
+  			$this->captura('jsonData','text');
+
+  			//Ejecuta la instruccion
+  			$this->armarConsulta();
+  			 // echo $this->consulta;exit;
+  			$this->ejecutarConsulta();
+
+  			//Devuelve la respuesta
+  			return $this->respuesta;
+
+  	}
+
 }
 ?>

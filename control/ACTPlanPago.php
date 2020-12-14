@@ -13,6 +13,7 @@ require_once(dirname(__FILE__).'/../../pxp/pxpReport/DataSource.php');
 require_once(dirname(__FILE__).'/../reportes/RConformidad.php');
 require_once(dirname(__FILE__).'/../reportes/RProcesoConRetencionXLS.php');
 require_once(dirname(__FILE__).'/../reportes/RProcesoConRetencionXLSPro.php');
+require_once(dirname(__FILE__).'/../reportes/RProcesoResumenXContratoXLS.php');
 
 require_once(dirname(__FILE__) . '/../reportes/RConformidadTotal.php');
 
@@ -424,6 +425,8 @@ class ACTPlanPago extends ACTbase{
             $this->res = $this->objFunc->listarProcesoConRetencion($this->objParam);
         }elseif ($this->objParam->getParametro('tipo_reporte')=='reporte_pro'){
             $this->res = $this->objFunc->listarProcesoConRetencionAProrrateo($this->objParam);
+        }elseif ($this->objParam->getParametro('tipo_reporte')=='reporte_resu') {
+            $this->res = $this->objFunc->listarProcesoResumenXContrato($this->objParam);
         }
 
         //obtener titulo de reporte
@@ -440,6 +443,8 @@ class ACTPlanPago extends ACTbase{
             $this->objReporteFormato = new RProcesoConRetencionXLS($this->objParam);
         }elseif ($this->objParam->getParametro('tipo_reporte')=='reporte_pro'){
             $this->objReporteFormato = new RProcesoConRetencionXLSPro($this->objParam);
+        }elseif ($this->objParam->getParametro('tipo_reporte')=='reporte_resu') {
+            $this->objReporteFormato = new RProcesoResumenXContratoXLS($this->objParam);
         }
 
         $this->objReporteFormato->generarDatos();
