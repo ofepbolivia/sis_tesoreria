@@ -25,9 +25,9 @@ Phx.vista.UsuarioCuentaBanc=Ext.extend(Phx.gridInterfaz,{
         {
            this.bloquearMenus();
         }
-		
+
 	},
-			
+
 	Atributos:[
 		{
 			//configuracion del componente
@@ -37,7 +37,7 @@ Phx.vista.UsuarioCuentaBanc=Ext.extend(Phx.gridInterfaz,{
 					name: 'id_usuario_cuenta_banc'
 			},
 			type:'Field',
-			form:true 
+			form:true
 		},
 		{
 			//configuracion del componente
@@ -47,7 +47,7 @@ Phx.vista.UsuarioCuentaBanc=Ext.extend(Phx.gridInterfaz,{
 					name: 'id_cuenta_bancaria'
 			},
 			type:'Field',
-			form:true 
+			form:true
 		},
 		{
    			config:{
@@ -73,7 +73,7 @@ Phx.vista.UsuarioCuentaBanc=Ext.extend(Phx.gridInterfaz,{
    				valueField: 'id_usuario',
    				displayField: 'desc_person',
    				gdisplayField:'desc_persona',//dibuja el campo extra de la consulta al hacer un inner join con orra tabla
-   				tpl:'<tpl for="."><div class="x-combo-list-item"><p>{desc_person}</p><p>CI:{ci}</p> </div></tpl>',
+   				tpl:'<tpl for="."><div class="x-combo-list-item"><p><b>Usuario: </b>{desc_person}</p><p><b>Cuenta: <span style="color:green;">{cuenta}</p></b> </div></tpl>',
    				hiddenName: 'id_usuario',
    				forceSelection:true,
    				typeAhead: true,
@@ -85,24 +85,25 @@ Phx.vista.UsuarioCuentaBanc=Ext.extend(Phx.gridInterfaz,{
    				width:250,
    				gwidth:280,
    				minChars:2,
+					resizable: true,
    				turl:'../../../sis_seguridad/vista/usuario/Usuario.php',
    			    ttitle:'Usuarios',
    			   // tconfig:{width:1800,height:500},
    			    tdata:{},
    			    tcls:'usuario',
    			    pid:this.idContenedor,
-   			
+
    				renderer:function (value, p, record){return String.format('{0}', record.data['desc_persona']);}
    			},
    			//type:'TrigguerCombo',
    			type:'ComboBox',
    			bottom_filter: true,
    			id_grupo:0,
-   			filters:{	
+   			filters:{
    				        pfiltro:'nombre_completo1',
    						type:'string'
    					},
-   		   
+
    			grid:true,
    			form:true
         },
@@ -121,7 +122,7 @@ Phx.vista.UsuarioCuentaBanc=Ext.extend(Phx.gridInterfaz,{
 	       		    valueField: 'autentificacion',
 	       		   // displayField: 'descestilo',
 	       		    store:['todos','libro_bancos','fondo_avance']
-	       		    
+
 	       		},
 	       		type:'ComboBox',
 	       		bottom_filter: true,
@@ -130,9 +131,9 @@ Phx.vista.UsuarioCuentaBanc=Ext.extend(Phx.gridInterfaz,{
 	       		grid:true,
 	       		form:true
 	     },
-        
-       
-		
+
+
+
 		{
 			config:{
 				name: 'estado_reg',
@@ -148,7 +149,7 @@ Phx.vista.UsuarioCuentaBanc=Ext.extend(Phx.gridInterfaz,{
 				grid:true,
 				form:false
 		},
-		
+
 		{
 			config:{
 				name: 'usr_reg',
@@ -186,7 +187,7 @@ Phx.vista.UsuarioCuentaBanc=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
-							format: 'd/m/Y', 
+							format: 'd/m/Y',
 							renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
 			},
 				type:'DateField',
@@ -217,7 +218,7 @@ Phx.vista.UsuarioCuentaBanc=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
-							format: 'd/m/Y', 
+							format: 'd/m/Y',
 							renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
 			},
 				type:'DateField',
@@ -242,7 +243,7 @@ Phx.vista.UsuarioCuentaBanc=Ext.extend(Phx.gridInterfaz,{
 				form:false
 		}
 	],
-	tam_pag:50,	
+	tam_pag:50,
 	title:'Permisos',
 	ActSave:'../../sis_tesoreria/control/UsuarioCuentaBanc/insertarUsuarioCuentaBanc',
 	ActDel:'../../sis_tesoreria/control/UsuarioCuentaBanc/eliminarUsuarioCuentaBanc',
@@ -261,14 +262,14 @@ Phx.vista.UsuarioCuentaBanc=Ext.extend(Phx.gridInterfaz,{
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'id_usuario_mod', type: 'numeric'},
 		{name:'usr_reg', type: 'string'},
-		{name:'usr_mod', type: 'string'},'desc_persona'
-		
+		{name:'usr_mod', type: 'string'},'desc_persona','nombre_completo1'
+
 	],
 	sortInfo:{
-		field: 'id_usuario_cuenta_banc',
+		field: 'nombre_completo1',
 		direction: 'ASC'
 	},
-	
+
 	onReloadPage:function(m){
 		this.maestro=m;
         this.store.baseParams={id_cuenta_bancaria:this.maestro.id_cuenta_bancaria};
@@ -277,13 +278,11 @@ Phx.vista.UsuarioCuentaBanc=Ext.extend(Phx.gridInterfaz,{
     loadValoresIniciales:function()
     {
         Phx.vista.UsuarioCuentaBanc.superclass.loadValoresIniciales.call(this);
-        this.Cmp.id_cuenta_bancaria.setValue(this.maestro.id_cuenta_bancaria);   
+        this.Cmp.id_cuenta_bancaria.setValue(this.maestro.id_cuenta_bancaria);
     },
-	
+
 	bdel:true,
 	bsave:true
 	}
 )
 </script>
-		
-		
