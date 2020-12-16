@@ -58,7 +58,7 @@ Phx.vista.UsuarioCuentaBanc=Ext.extend(Phx.gridInterfaz,{
    				store: new Ext.data.JsonStore({
 
 					url: '../../sis_seguridad/control/Usuario/listarUsuario',
-					id: 'id_persona',
+					id: 'id_usuario',
 					root: 'datos',
 					sortInfo:{
 						field: 'desc_person',
