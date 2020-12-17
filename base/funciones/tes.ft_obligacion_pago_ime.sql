@@ -1903,7 +1903,9 @@ BEGIN
                       from tes.tplan_pago pp
                       where pp.id_obligacion_pago  = v_parametros.id_obligacion_pago and pp.estado_reg ='activo' and pp.estado = 'pendiente') THEN
 
-                 raise exception 'Tiene algun comprobnate pendiente de valiación, eliminelo o validaelo antes de volver a intentar';
+                 --raise exception 'Tiene algun comprobnate pendiente de valiación, eliminelo o validaelo antes de volver a intentar';
+                 --17-12-2020 (may) modificacion raise
+                 raise exception 'Tiene algun comprobante pendiente de validación, elimine o valide antes de volver a intentar.';
 
              END IF;
 
