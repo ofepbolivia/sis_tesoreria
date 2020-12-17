@@ -1898,10 +1898,13 @@ BEGIN
                raise exception 'no puede modificar el presupuesto de obligaciones finalizadas';
             END IF;
 
+            --17-12-2020(may) modificacion aumentando que los de tipo Pagar no ingrese a la condicion
             --validar que no tenga comprobantes  pendientes sin validar
             IF exists( select 1
                       from tes.tplan_pago pp
-                      where pp.id_obligacion_pago  = v_parametros.id_obligacion_pago and pp.estado_reg ='activo' and pp.estado = 'pendiente') THEN
+                      where pp.id_obligacion_pago  = v_parametros.id_obligacion_pago and pp.estado_reg ='activo' and pp.estado = 'pendiente'
+                      and pp.tipo != 'pagado'
+                      ) THEN
 
                  --raise exception 'Tiene algun comprobnate pendiente de valiación, eliminelo o validaelo antes de volver a intentar';
                  --17-12-2020 (may) modificacion raise
