@@ -624,6 +624,11 @@ header("content-type: text/javascript; charset=UTF-8");
 
                 }
 
+                //21-12-2020 (may) para vbpresu se habilita la modificacion del detalle para el solicitante
+                if(this.maestro.estado ==  'vbpresupuestos'){
+                    this.getBoton('edit').enable();
+                }
+
                 if(this.maestro&&(this.maestro.estado ==  'borrador' && this.maestro.tipo_obligacion=='adquisiciones' )){
 
                     this.getBoton('edit').enable();
