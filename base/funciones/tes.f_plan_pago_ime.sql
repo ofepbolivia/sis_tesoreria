@@ -1907,8 +1907,9 @@ BEGIN
 
           --(may) controla que el total del plan de pago no sea mayor a lo comprometido, controla en estado Borrador
           -- y tipo de devoluciones de garantia , ,
+          --(may) 11-01-2020 para los de tipo de cuota pagado (pagar) no realice el control
 
-          IF (v_estado_aux = 'borrador' and vtipo_pp not in ( 'dev_garantia', 'dev_garantia_con', 'dev_garantia_con_ant')) THEN
+          IF (v_estado_aux = 'borrador' and vtipo_pp not in ( 'dev_garantia', 'dev_garantia_con', 'dev_garantia_con_ant', 'pagado')) THEN
 
           		--SELECT sum(pp.monto_establecido)
                 SELECT sum(pp.monto)
