@@ -129,6 +129,8 @@ class MODPlanPago extends MODbase{
         $this->captura('id_multa','integer');
         $this->captura('desc_multa','varchar');
 
+        $this->captura('id_obligacion_pago_extendida','int4');
+
         //Ejecuta la instruccion
         $this->armarConsulta();
         $this->ejecutarConsulta();

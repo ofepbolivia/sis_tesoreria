@@ -241,7 +241,9 @@ header("content-type: text/javascript; charset=UTF-8");
                 ['ant_parcial', 'Anticipo Parcial(No ejecuta presupuesto, Con retenciones parciales en cada pago)'],
                 //17-06-2020 (may) se cambia nombre opcion para un cbte, para combustible usan un comprobante
                 //['devengado_pagado_1c', 'Devengar y pagar (1 comprobante)'],
-                ['devengado_pagado_1c', 'Aplicación de Anticipo (Combustible)']
+                ['devengado_pagado_1c', 'Aplicación de Anticipo (Combustible)'],
+                //03-12-2020 (may) se aumenta opcion Pagar para que se registre sin necesidad de relacionar su cuota
+                ['pagado', 'Pagar']
             ],
 
             'ANT_PARCIAL': [
@@ -377,7 +379,13 @@ header("content-type: text/javascript; charset=UTF-8");
                             return String.format('<b><font color="orange">{0}</font></b>', value);
                         }
                         else {
-                            return value;
+                            //15-01-2021 (may)
+                            if (record.data.id_obligacion_pago_extendida > 0) {
+                                return String.format('<b><font color="orange">{0}</font></b>', value);
+                            }else{
+                                return value;
+                            }
+
                         }
 
                     }
@@ -1719,7 +1727,8 @@ header("content-type: text/javascript; charset=UTF-8");
             {name: 'nit', type: 'string'},
             'id_proveedor_cta_bancaria',
             'id_multa',
-            'desc_multa'
+            'desc_multa',
+            'id_obligacion_pago_extendida'
         ],
 
         arrayDefaultColumHidden: ['id_fecha_reg', 'id_fecha_mod',
@@ -2794,7 +2803,10 @@ header("content-type: text/javascript; charset=UTF-8");
             },
 
             'pagado': function (me) {
-                me.Cmp.id_plantilla.disable();
+                //03/122020 (may) que sea enable porque no solo se utilizara cuando se relacione una cuota
+                //me.Cmp.id_plantilla.disable();
+                me.Cmp.id_plantilla.enable();
+
                 me.habilitarDescuentos(me);
                 me.mostrarComponentesPago(me);
                 me.mostrarComponente(me.Cmp.liquido_pagable);
