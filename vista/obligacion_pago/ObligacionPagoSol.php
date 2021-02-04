@@ -44,7 +44,8 @@ header("content-type: text/javascript; charset=UTF-8");
                 scope: this
             });
 
-            this.Atributos[this.getIndAtributo('id_depto')].config.url = '../../sis_parametros/control/Depto/listarDeptoFiltradoXUsuario';
+            // 04-02-2021 (may) Listado Depto para obligaciones de Pago
+            this.Atributos[this.getIndAtributo('id_depto')].config.url = '../../sis_parametros/control/Depto/listarDeptoFiltradoXUsuarioOP';
             this.Atributos[this.getIndAtributo('id_depto')].config.baseParams = {
                 estado: 'activo',
                 codigo_subsistema: 'TES',
