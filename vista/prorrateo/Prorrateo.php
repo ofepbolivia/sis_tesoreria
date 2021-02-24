@@ -52,6 +52,16 @@ Phx.vista.Prorrateo=Ext.extend(Phx.gridInterfaz,{
         },
         {
             config:{
+                name: 'id_obligacion_det',
+                fieldLabel: 'ID Obligacion Detalle',
+                gwidth: 50,
+            },
+            type:'Field',
+            grid:true,
+            form:false
+        },
+        {
+            config:{
                 name: 'monto_ejecutar_mo',
                 fieldLabel: 'Monto a Ejecutar',
                 allowBlank: true,
@@ -277,6 +287,9 @@ Phx.vista.Prorrateo=Ext.extend(Phx.gridInterfaz,{
         'total_prorrateado','codigo_partida','nombre_partida'
         
     ],
+
+    arrayDefaultColumHidden: ['id_obligacion_det'],
+    
     successSave: function(resp) {
         
         this.store.rejectChanges();
