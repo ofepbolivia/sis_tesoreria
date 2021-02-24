@@ -60,6 +60,7 @@ header("content-type: text/javascript; charset=UTF-8");
 	   				fieldLabel : 'Gestion',
 	   				allowBlank : false,
 	   				gdisplayField : 'gestion',//mapea al store del grid
+                    anchor:'50%',
 	   				gwidth : 100,
 		   			renderer : function (value, p, record){return String.format('{0}', record.data['gestion']);}
 	       	     },
@@ -81,6 +82,7 @@ header("content-type: text/javascript; charset=UTF-8");
 	   				allowBlank : true,
 	   				gdisplayField : 'periodo',//mapea al store del grid
 	   				gwidth : 100,
+                    anchor:'50%',
 	   				disabled:true,
 		   			renderer : function (value, p, record){return String.format('{0}', record.data['periodo']);}
 	       	     },
@@ -147,7 +149,7 @@ header("content-type: text/javascript; charset=UTF-8");
 				currencyChar:' ',
 				fieldLabel: 'Monto Factura',
 				allowBlank: false,
-				anchor: '35%',
+                anchor:'50%',
 				gwidth: 100,
 				maxLength:1245184
 			},
