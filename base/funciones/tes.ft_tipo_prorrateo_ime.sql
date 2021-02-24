@@ -200,7 +200,7 @@ BEGIN
             IF (v_tipo_prorrateo.codigo = 'PFIJO') THEN
 
             		FOR v_registros in (  SELECT *
-                                            FROM tes_temp_prorrateo_ruta
+                                            FROM gecom.tes_temp_prorrateo_ruta
                                             WHERE id_periodo = v_periodo.id_periodo
                                             and  ruta = 'si'
                                             ) LOOP
