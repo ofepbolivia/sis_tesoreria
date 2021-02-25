@@ -96,6 +96,27 @@ header("content-type: text/javascript; charset=UTF-8");
 	   			grid : true,
 	   			form : true
 	   	},
+        {
+            config:{
+                name:'id_proveedor',
+                hiddenName: 'id_proveedor',
+                origen:'PROVEEDOR',
+                fieldLabel:'Proveedor',
+                allowBlank:true,
+                tinit:false,
+                gwidth : 100,
+                anchor:'50%',
+                valueField: 'id_proveedor',
+                gdisplayField: 'desc_proveedor',
+                renderer:function(value, p, record){return String.format('{0}', record.data['desc_proveedor']);}
+            },
+            type:'ComboRec',//ComboRec
+            id_grupo:0,
+            filters:{pfiltro:'pro.desc_proveedor',type:'string'},
+            grid:true,
+            bottom_filter:true,
+            form:true
+        },
 		{
             config:{
                 name:'id_concepto_ingas',

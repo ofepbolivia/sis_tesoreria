@@ -183,13 +183,13 @@ BEGIN
             if (v_tipo_prorrateo.tiene_cuenta = 'si') then
             	if (v_tipo_prorrateo.tiene_lugar = 'si') then
             		v_res = orga.f_prorratear_x_empleado(v_parametros.id_periodo,v_parametros.monto,v_tipo_prorrateo.codigo,
-                    									v_parametros.id_lugar,v_parametros.id_oficina_cuenta);
+                    									v_parametros.id_lugar,v_parametros.id_oficina_cuenta,v_parametros.id_proveedor);
                 else
                 	v_res = orga.f_prorratear_x_empleado(v_parametros.id_periodo,v_parametros.monto,v_tipo_prorrateo.codigo,
-                    									NULL,v_parametros.id_oficina_cuenta);
+                    									NULL,v_parametros.id_oficina_cuenta,v_parametros.id_proveedor);
                 end if;
             else
-            	v_res = orga.f_prorratear_x_empleado(v_parametros.id_periodo,v_parametros.monto,v_tipo_prorrateo.codigo,NULL,NULL);
+            	v_res = orga.f_prorratear_x_empleado(v_parametros.id_periodo,v_parametros.monto,v_tipo_prorrateo.codigo,NULL,NULL,v_parametros.id_proveedor);
             end if;
 
             --raise exception 'llegabdvres %',v_res;
@@ -203,6 +203,7 @@ BEGIN
                                             FROM gecom.tes_temp_prorrateo_ruta
                                             WHERE id_periodo = v_periodo.id_periodo
                                             and  ruta = 'si'
+                                            and id_proveedor = v_parametros.id_proveedor
                                             ) LOOP
 
 
@@ -320,6 +321,7 @@ BEGIN
             for v_registros in (
                         select id_centro_costo,id_orden_trabajo,descripcion, sum(monto) as monto, id_tabla
                         from tes_temp_prorrateo
+                        where id_proveedor = v_parametros.id_proveedor
                         group by id_centro_costo,id_orden_trabajo,descripcion, id_tabla) loop
 
                 --numero telefonico
