@@ -1081,7 +1081,7 @@ BEGIN
                            --	v_tipo_plan_pago = 'devengado_pagado_1c';
                            --END IF;
 						   --
-                           IF v_tipo_obligacion in  ('spd') THEN
+                           IF v_tipo_obligacion in  ('spd', 'pgaext') THEN
                            		v_tipo_plan_pago = 'devengado_pagado_1c_sp';
                            END IF;
                          END IF;
@@ -1119,7 +1119,7 @@ BEGIN
 
 
                             -- si es un proceso de pago unico,  la primera cuota pasa de borrador al siguiente estado de manera automatica
-                            IF  ((v_tipo_obligacion = 'pbr' or v_tipo_obligacion = 'ppm' or v_tipo_obligacion = 'pga' or v_tipo_obligacion = 'pce' or v_tipo_obligacion = 'pago_unico' or v_tipo_obligacion = 'spd') and   v_i = 1)   THEN
+                            IF  ((v_tipo_obligacion = 'pbr' or v_tipo_obligacion = 'ppm' or v_tipo_obligacion = 'pga' or v_tipo_obligacion = 'pce' or v_tipo_obligacion = 'pago_unico' or v_tipo_obligacion = 'spd' or v_tipo_obligacion ='pgaext') and   v_i = 1)   THEN
                                v_sw_saltar = TRUE;
                             else
                                v_sw_saltar = FALSE;
@@ -2387,6 +2387,185 @@ BEGIN
 
                 --Devuelve la respuesta
                 return v_resp;
+
+            end;
+
+        /*********************************
+        #TRANSACCION:  'TES_EXTPGAE_IME'
+        #DESCRIPCION:  Extiende la obligacion de pago Exterior para la gestion siguiente
+        #AUTOR:	    maylee.perez
+        #FECHA:		25-02-2021 16:01:32
+        ***********************************/
+
+        elsif(p_transaccion='TES_EXTPGAE_IME')then
+
+            begin
+
+                --------------------------------------
+                -- verificar que no este extendida
+                --------------------------------------
+
+                Select *
+                into v_registros
+                from tes.tobligacion_pago op
+                where op.id_obligacion_pago = v_parametros.id_obligacion_pago;
+
+                --validar que el estado de la obligacion sea finaliza
+                IF v_registros.estado not in ('registrado','en_pago','finalizado') THEN
+                   raise exception 'No se permiten obligaciones de pago que no esten finalizadas';
+                END IF;
+
+                --validar que no tenga extenciones
+                IF v_registros.id_obligacion_pago_extendida is not null THEN
+                  raise exception 'Ña obligacion de pago ya fue extendida';
+                END IF;
+
+               ------------------------------
+               -- copiar obligacion de pago
+               ------------------------------
+
+                v_date = now()::Date;
+                v_anho = (date_part('year', v_registros.fecha))::integer;
+                v_anho = v_anho  + 1;
+
+
+                if(v_anho>date_part('year', v_date)) then
+                    v_date = (date_part('year', v_date)::varchar||'-1-1')::Date;
+                else
+                    v_date = (v_anho::varchar||'-1-1')::Date;
+                end if;
+
+                v_hstore_registros =   hstore(ARRAY[
+                                                 'fecha',v_date::varchar,
+                                                 'tipo_obligacion', 'pgaext',
+                                                 'id_funcionario',v_registros.id_funcionario::varchar,
+                                                 '_id_usuario_ai',v_parametros._id_usuario_ai::varchar,
+                                                 '_nombre_usuario_ai',v_parametros._nombre_usuario_ai::varchar,
+                                                 'id_depto',v_registros.id_depto::varchar,
+                                                 'obs','Extiende el tramite: '||v_registros.num_tramite||',  Obs:  '||v_registros.obs,
+                                                 'id_proveedor',v_registros.id_proveedor::varchar,
+                                                 --'tipo_obligacion',v_registros.tipo_obligacion::varchar,
+                                                 'id_moneda',v_registros.id_moneda::varchar,
+                                                 'tipo_cambio_conv',v_registros.tipo_cambio_conv::varchar,
+                                                 'pago_variable',v_registros.pago_variable::varchar,
+                                                 'total_nro_cuota',v_registros.total_nro_cuota::varchar,
+                                                 'fecha_pp_ini',v_registros.fecha_pp_ini::varchar,
+                                                 'rotacion',v_registros.rotacion::varchar,
+                                                 'id_plantilla',v_registros.id_plantilla::varchar,
+                                                 'tipo_anticipo',v_registros.tipo_anticipo::varchar,
+                                                 'id_contrato',v_registros.id_contrato::varchar
+                                                ]);
+
+
+                --bandera para ver si es un pago recurrente o unico=1, pga=2.
+                if(v_parametros.id_administrador = 2)then
+                   v_id_administrador = 2;
+                elsif (v_parametros.id_administrador = 3) then
+                   v_id_administrador = 3;
+                else
+                   v_id_administrador = p_administrador;
+                end if;
+
+                 v_resp = tes.f_inserta_obligacion_pago(v_id_administrador, p_id_usuario, hstore(v_hstore_registros));
+                 v_id_obligacion_pago_sg =  pxp.f_recupera_clave(v_resp, 'id_obligacion_pago');
+                 v_id_gestion_sg =  pxp.f_recupera_clave(v_resp, 'id_gestion');
+
+
+
+                 --------------------------------------------------------------------------------------------
+                 -- copiar detalle de obligacion , verifican la tabla id_presupuestos_ids si existe se copia...
+                 ------------------------------------------------------------------------------------------------
+                  FOR  v_registros_det in (
+                                          SELECT
+                                              od.id_obligacion_det,
+                                              od.id_concepto_ingas,
+                                              od.id_centro_costo,
+                                              od.id_partida,
+                                              od.descripcion,
+                                              od.monto_pago_mo ,
+                                              od.id_orden_trabajo,
+                                              od.monto_pago_mb
+                                            FROM  tes.tobligacion_det od
+                                            where  od.estado_reg = 'activo' and
+                                                   od.id_obligacion_pago = v_parametros.id_obligacion_pago) LOOP
+
+
+                        --recueprar centro de cotos para la siguiente gestion  (los centro de cosots y presupeustos tiene los mismo IDS)
+
+
+                          select
+                            pi.id_presupuesto_dos
+                          into
+                            v_id_centro_costo_dos
+                          from pre.tpresupuesto_ids pi
+                          where pi.id_presupuesto_uno = v_registros_det.id_centro_costo;
+
+                          IF v_id_centro_costo_dos is not NULL THEN
+
+                                  SELECT
+                                      ps_id_partida
+                                    into
+                                      v_id_partida
+                                  FROM conta.f_get_config_relacion_contable('CUECOMP', v_id_gestion_sg[1]::integer, v_registros_det.id_concepto_ingas, v_id_centro_costo_dos);
+
+
+                                  --Sentencia de la insercion
+                                  insert into tes.tobligacion_det(
+                                    estado_reg,
+                                    --id_cuenta,
+                                    id_partida,
+                                    --id_auxiliar,
+                                    id_concepto_ingas,
+                                    monto_pago_mo,
+                                    id_obligacion_pago,
+                                    id_centro_costo,
+                                    monto_pago_mb,
+                                    descripcion,
+                                    fecha_reg,
+                                    id_usuario_reg,
+                                    fecha_mod,
+                                    id_usuario_mod,
+                                    id_orden_trabajo
+                                  )
+                                  values
+                                  (
+                                    'activo',
+                                    --v_parametros.id_cuenta,
+                                    v_id_partida,
+                                    --v_parametros.id_auxiliar,
+                                    v_registros_det.id_concepto_ingas,
+                                    v_registros_det.monto_pago_mo,
+                                    v_id_obligacion_pago_sg[1]::integer,
+                                    v_id_centro_costo_dos,
+                                    v_registros_det.monto_pago_mb,
+                                    v_registros_det.descripcion,
+                                    now(),
+                                    p_id_usuario,
+                                    null,
+                                    null,
+                                    v_registros_det.id_orden_trabajo
+
+                                  )RETURNING id_obligacion_det into v_id_obligacion_det;
+
+                          END IF;
+
+                  END LOOP;
+
+                --actualiza obligacion extendida en la original
+
+                update tes.tobligacion_pago set
+                    id_obligacion_pago_extendida = v_id_obligacion_pago_sg[1]::integer,
+                    id_usuario_mod = p_id_usuario,
+                    fecha_mod = now()
+                where id_obligacion_pago = v_parametros.id_obligacion_pago;
+
+                -- Definicion de la respuesta
+                v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Se extendio la obligacion de pago a la siguiente gestion');
+                v_resp = pxp.f_agrega_clave(v_resp,'id_obligacion_pago',v_parametros.id_obligacion_pago::varchar);
+
+
+              --Devuelve la respuesta
+              return v_resp;
 
             end;
 

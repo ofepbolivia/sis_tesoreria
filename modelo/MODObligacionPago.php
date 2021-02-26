@@ -1294,6 +1294,26 @@ class MODObligacionPago extends MODbase
         return $this->respuesta;
     }
 
+    //25-02-2021 (may) Pago de Gestion Anterior Exterior
+    function extenderPGAE()
+    {
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento = 'tes.ft_obligacion_pago_ime';
+        $this->transaccion = 'TES_EXTPGAE_IME';
+        $this->tipo_procedimiento = 'IME';
+
+        //Define los parametros para la funcion
+        $this->setParametro('id_obligacion_pago', 'id_obligacion_pago', 'int4');
+        $this->setParametro('id_administrador', 'id_administrador', 'int4');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+
 }
 
 ?>

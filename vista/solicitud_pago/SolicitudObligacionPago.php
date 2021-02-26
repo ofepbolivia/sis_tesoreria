@@ -142,34 +142,24 @@ header("content-type: text/javascript; charset=UTF-8");
                     iconCls: 'brenew',
                     xtype: 'splitbutton',
                     grupo: [0, 4],
-                    tooltip: '<b>Ext. Pagos</b><br>Nos permite elegir extender un pago recurrente, único <br> o pago de una gestión anterior.',
+                    tooltip: '<b>Ext. Pagos</b><br>Nos permite elegir extender un pago de una gestión anterior.',
                     text: 'Ext. Pagos',
                     /*argument: {
                         'news': true,
                         def: 'reset'
                     },*/
                     scope: this,
-                    menu: [{
-                        text: 'Pago Recurrente (TES)',
-                        //iconCls: 'btag_accept',
-                        tooltip: '<b>Permite Extender un Pago Único, o Recurrente</b>',
-                        /*argument: {
-                            'news': true,
-                            def: 'csv'
-                        },*/
-                        handler: this.extenederOp,
-                        scope: this
-                    }, {
-                        text: 'Pago Gestiones Anteriores (PGA)',
-                        //iconCls: 'btemplate',
-                        /*argument: {
-                            'news': true,
-                            def: 'pdf'
-                        },*/
-                        tooltip: '<b>Permite Extender un Pago Gestión Anterior</b>',
-                        handler: this.extenderPGA,
-                        scope: this
-                    }]
+                    menu: [ {
+                                text: 'Pago Gestiones Anteriores (PGAE)',
+                                //iconCls: 'btemplate',
+                                /*argument: {
+                                    'news': true,
+                                    def: 'pdf'
+                                },*/
+                                tooltip: '<b>Permite Extender un Pago Gestión Anterior</b>',
+                                handler: this.extenderPGAE,
+                                scope: this
+                            }]
                 }
             );
 
@@ -1654,7 +1644,7 @@ header("content-type: text/javascript; charset=UTF-8");
             this.windowAjustes.hide();
 
         },
-        extenderPGA: function () {
+        extenderPGAE: function () {
             var me = this,
                 d = me.sm.getSelected().data;
 
@@ -1664,7 +1654,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     if (confirm('¿Está realmente seguro?')) {
                         Phx.CP.loadingShow();
                         Ext.Ajax.request({
-                            url: '../../sis_tesoreria/control/ObligacionPago/extenderOp',
+                            url: '../../sis_tesoreria/control/ObligacionPago/extenderPGAE',
                             success: function () {
                                 Phx.CP.loadingHide();
                                 me.reload();
@@ -1672,7 +1662,7 @@ header("content-type: text/javascript; charset=UTF-8");
                             failure: me.conexionFailure,
                             params: {
                                 'id_obligacion_pago': d.id_obligacion_pago,
-                                'id_administrador': 2
+                                'id_administrador': 3
                             },
                             timeout: me.timeout,
                             scope: me

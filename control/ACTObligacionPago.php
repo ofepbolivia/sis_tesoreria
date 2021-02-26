@@ -1120,6 +1120,14 @@ class ACTObligacionPago extends ACTbase
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
 
+    //25-02-2021 (may) Pago de Gestion Anterior Exterior
+    function extenderPGAE()
+    {
+        $this->objFunc = $this->create('MODObligacionPago');
+        $this->res = $this->objFunc->extenderPGAE($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+
 
 
 }

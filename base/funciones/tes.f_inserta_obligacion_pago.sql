@@ -99,7 +99,7 @@ $body$
             IF   (p_hstore->'tipo_obligacion')::varchar = 'adquisiciones'    THEN
                  raise exception 'Los pagos de adquisiciones tienen que ser habilitados desde el sistema de adquisiciones';
 
-            ELSIF   (p_hstore->'tipo_obligacion')::varchar  in ('pago_directo','pago_unico','pago_especial', 'pga', 'ppm', 'pce', 'pbr', 'sp', 'spd','spi', 'pago_especial_spi', 'pago_poc')    THEN
+            ELSIF   (p_hstore->'tipo_obligacion')::varchar  in ('pago_directo','pago_unico','pago_especial', 'pga', 'ppm', 'pce', 'pbr', 'sp', 'spd','spi', 'pago_especial_spi', 'pago_poc', 'pgaext')    THEN
 
 
                      IF (p_hstore->'tipo_obligacion')::varchar  = 'pago_directo' and p_administrador != 2 THEN
@@ -138,6 +138,11 @@ $body$
                      ELSIF(p_administrador = 2 OR (p_hstore->'tipo_obligacion')::varchar  = 'pago_poc') THEN
                           v_tipo_documento = 'POC';
                           v_codigo_proceso_macro = 'POC';
+                     --
+                     --(may) 25-02-2021 para pagos pagos gestion anterior exterior
+                     ELSIF(p_administrador = 3 OR (p_hstore->'tipo_obligacion')::varchar  = 'pgaext') THEN
+                          v_tipo_documento = 'PGAE';
+                          v_codigo_proceso_macro = 'PGAE';
                      --
                      ELSE
                           v_tipo_documento =  pxp.f_get_variable_global('tes_tipo_documento_especial'); --'PE';
@@ -316,7 +321,9 @@ $body$
                 ) values(
                 (p_hstore->'id_proveedor')::integer,
                 v_codigo_estado,
-                case when p_administrador = 2 then 'pga' else (p_hstore->'tipo_obligacion')::varchar end,
+                case when p_administrador = 2 then 'pga'
+                	 when p_administrador = 3 then 'pgaext'
+                	  else (p_hstore->'tipo_obligacion')::varchar end,
                 (p_hstore->'id_moneda')::integer,
                 (p_hstore->'obs')::varchar,
                 --v_parametros.porc_retgar,

@@ -95,7 +95,8 @@ BEGIN
           END IF;
 
 
-         IF   v_parametros.tipo_interfaz in ('obligacionPagoTes','obligacionPagoUnico', 'PGA', 'PPM', 'PCE', 'PBR') THEN
+         -- 25-02-2021 (may) se aumenta PGAE para pagos de gestion anterior del exterior
+         IF   v_parametros.tipo_interfaz in ('obligacionPagoTes','obligacionPagoUnico', 'PGA', 'PPM', 'PCE', 'PBR', 'PGAE') THEN
 
                  IF   p_administrador != 1 THEN
 
@@ -162,6 +163,9 @@ BEGIN
                 	v_filadd=v_filadd ||' obpg.tipo_obligacion = ''pce'' and';
          		ELSIF v_parametros.tipo_interfaz  = 'PBR' THEN
                 	v_filadd=v_filadd ||' obpg.tipo_obligacion = ''pbr'' and';
+                -- 25-02-2021 (may) se aumenta PGAE para pagos de gestion anterior del exterior
+                ELSIF v_parametros.tipo_interfaz  = 'PGAE' THEN
+                	v_filadd=v_filadd ||' obpg.tipo_obligacion = ''pgaext'' and';
                 ELSE
                    v_filadd=v_filadd ||' obpg.tipo_obligacion in (''pago_directo'',''rrhh'') and';
                 END IF;
@@ -381,8 +385,8 @@ BEGIN
                 v_historico = 'no';
               END IF;
 
-
-             IF   v_parametros.tipo_interfaz in ('obligacionPagoTes','obligacionPagoUnico', 'PGA', 'PPM', 'PCE', 'PBR') THEN
+             -- 25-02-2021 (may) se aumenta PGAE para pagos de gestion anterior del exterior
+             IF   v_parametros.tipo_interfaz in ('obligacionPagoTes','obligacionPagoUnico', 'PGA', 'PPM', 'PCE', 'PBR', 'PGAE') THEN
 
                      IF   p_administrador != 1 THEN
 
@@ -442,6 +446,9 @@ BEGIN
                 	   v_filadd=v_filadd ||' obpg.tipo_obligacion = ''pce'' and';
                     ELSIF v_parametros.tipo_interfaz  = 'PBR' THEN
                 	   v_filadd=v_filadd ||' obpg.tipo_obligacion = ''pbr'' and';
+                    -- 25-02-2021 (may) se aumenta PGAE para pagos de gestion anterior del exterior
+                    ELSIF v_parametros.tipo_interfaz  = 'PGAE' THEN
+                        v_filadd=v_filadd ||' obpg.tipo_obligacion = ''pgaext'' and';
                     ELSE
                        v_filadd=v_filadd ||' obpg.tipo_obligacion in (''pago_directo'',''rrhh'') and';
                     END IF;
