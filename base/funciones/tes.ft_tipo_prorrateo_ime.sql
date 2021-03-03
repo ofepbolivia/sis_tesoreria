@@ -45,6 +45,7 @@ DECLARE
     v_id_tipo_cc			integer;
     v_ordenes				integer;
     v_numero_celular		varchar;
+    v_num_tramite_op		varchar;
 
 BEGIN
 
@@ -194,6 +195,10 @@ BEGIN
 
             --raise exception 'llegabdvres %',v_res;
 
+            -- para verificar que si existe con un proceso
+           UPDATE gecom.tpago_telefonia SET
+           nro_tramite = 'si'
+           WHERE id_periodo = v_parametros.id_periodo;
 
         --(may) nueva condicion si ingresan a tabla rutas
 
