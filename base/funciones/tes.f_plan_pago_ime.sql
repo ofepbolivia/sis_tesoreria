@@ -334,7 +334,9 @@ BEGIN
                            WHERE p.id_plantilla = v_parametros.id_plantilla;
 
                             --SELECT sum(pp.monto)
-                            SELECT sum(pp.monto_establecido)
+                            --05-03-2021 (may)modificacion ya no del monto establecido debe ser del monto a ejecutar...por el 13% ya no hay
+                            --SELECT sum(pp.monto_establecido)
+                            SELECT sum(pp.monto_ejecutar_total_mo)
                             INTO v_sum_monto_pp
                             FROM tes.tplan_pago pp
                             WHERE pp.estado != 'anulado' and pp.estado != 'pago_exterior' and pp.estado != 'pagado' and pp.estado != 'pendiente'
@@ -349,8 +351,13 @@ BEGIN
                             and opa.id_obligacion_pago = v_parametros.id_obligacion_pago;
 
                       IF v_registros.pago_variable='si' or v_registros.pago_variable='no' THEN
+
+                       /*--
+                        05-03-2021 (may)  se modifica desde la fecha que se debe controlar que el monto comprometido no debe sobre pasar al MONTO A EJECUTAR
+                        				antes se realizaba con campo Monto sin iva
+                        --*/
                       	--para los que se descuentan el IVA 13%
-						IF (v_codigo_tipo_relacion in ('IVA-CF','IVA-CF-PA','RC-IVA')) THEN
+						/*IF (v_codigo_tipo_relacion in ('IVA-CF','IVA-CF-PA','RC-IVA')) THEN
 
                             v_porcentaje13_monto = COALESCE(v_parametros.monto * 0.13, 0);
           					v_monto_establecido  = COALESCE(v_parametros.monto, 0) - COALESCE(v_porcentaje13_monto,0);
@@ -362,7 +369,7 @@ BEGIN
                               raise exception ' El monto total de las cuotas es de % y excede al monto total certificado de % para el trámite %. Comunicarse con la Unidad de Presupuestos. ',v_sum_total_pp, v_sum_monto_pe, v_registros.num_tramite ;
                             END IF;
 
-						ELSE
+						ELSE*/
 
                             v_sum_total_pp = COALESCE(v_sum_monto_pp, 0) + COALESCE(v_parametros.monto, 0);
 
@@ -370,13 +377,13 @@ BEGIN
                             IF (COALESCE(v_sum_total_pp,0) > COALESCE(v_sum_monto_pe,0)) THEN
                               raise exception ' El monto total de las cuotas es de % y excede al monto total certificado de % para el trámite %. Comunicarse con la Unidad de Presupuestos. ',v_sum_total_pp, v_sum_monto_pe, v_registros.num_tramite ;
                             END IF;
-                      END IF;
-                            v_sum_total_pp = COALESCE(v_parametros.monto,0);
+                      --END IF;
+                          /*  v_sum_total_pp = COALESCE(v_parametros.monto,0);
 
                             IF (COALESCE(v_sum_total_pp,0) > COALESCE(v_sum_monto_pe,0)) THEN
                               raise exception ' El monto total de las cuotas es de % y excede al monto total certificado de % para el trámite %. Comunicarse con la Unidad de Presupuestos. ',v_sum_total_pp, v_sum_monto_pe, v_registros.num_tramite ;
                             END IF;
-
+							*/
 
 
                       END IF;
@@ -709,8 +716,8 @@ BEGIN
 
 
                       --(may)si es un pago variable, controla que el total del plan de pago no sea mayor a lo comprometido
-                      		--SELECT sum(pp.monto_ejecutar_total_mo)
-                            SELECT sum(pp.monto_establecido)
+                      		SELECT sum(pp.monto_ejecutar_total_mo)
+                            --SELECT sum(pp.monto_establecido)
                             INTO v_sum_monto_pp
                             FROM tes.tplan_pago pp
                             WHERE pp.estado != 'anulado' and pp.estado != 'pago_exterior' and pp.estado != 'pagado' and pp.estado != 'pendiente'
@@ -720,7 +727,9 @@ BEGIN
                             and pp.id_obligacion_pago = v_parametros.id_obligacion_pago;
 
                             --SELECT pp.monto_ejecutar_total_mo
-                            SELECT pp.monto_establecido
+                            --05-03-2021 (may)modificacion ya no del monto establecido debe ser del monto a ejecutar...por el 13% ya no hay
+                            --SELECT pp.monto_establecido
+                            SELECT pp.monto_ejecutar_total_mo
                             INTO v_sum_monto_solo_pp
                             FROM tes.tplan_pago pp
                             WHERE pp.id_plan_pago= v_parametros.id_plan_pago;
@@ -745,8 +754,12 @@ BEGIN
                         and p.id_plantilla = v_parametros.id_plantilla;
 
 
+                      	/*--
+                        05-03-2021 (may)  se modifica desde la fecha que se debe controlar que el monto comprometido no debe sobre pasar al MONTO A EJECUTAR
+                        				antes se realizaba con campo Monto sin iva
+                        --*/
                       	--para los que se descuentan el IVA 13%
-						IF (v_codigo_tipo_relacion in ('IVA-CF','IVA-CF-PA','RC-IVA')) THEN
+						/*IF (v_codigo_tipo_relacion in ('IVA-CF','IVA-CF-PA','RC-IVA')) THEN
 
                             v_porcentaje13_monto = COALESCE(v_parametros.monto * 0.13, 0);
           					v_monto_establecido  = COALESCE(v_parametros.monto, 0) - v_porcentaje13_monto;
@@ -759,7 +772,7 @@ BEGIN
                               raise exception ' El monto total de las cuotas es de % y excede al monto total certificado de % para el trámite %. Comunicarse con la Unidad de Presupuestos. ',v_sum_total_pp, v_sum_monto_pe, v_registros.num_tramite ;
                            END IF;
 
-                       ELSE
+                       ELSE*/
 
                       	 v_monto_establecido  = COALESCE(v_parametros.monto);
                          v_sum_total_pp = (COALESCE(v_sum_monto_pp,0) - COALESCE(v_sum_monto_solo_pp, 0)) + COALESCE(v_parametros.monto, 0);
@@ -768,7 +781,7 @@ BEGIN
                            IF (COALESCE(v_sum_total_pp,0) > COALESCE(v_sum_monto_pe,0)) THEN
                               raise exception ' El monto total de las cuotas es de % y excede al monto total certificado de % para el trámite %. Comunicarse con la Unidad de Presupuestos. ',v_sum_total_pp, v_sum_monto_pe, v_registros.num_tramite ;
                            END IF;
-                       END IF;
+                       --END IF;
 
 
                      END IF;
@@ -1911,8 +1924,11 @@ BEGIN
 
           IF (v_estado_aux = 'borrador' and vtipo_pp not in ( 'dev_garantia', 'dev_garantia_con', 'dev_garantia_con_ant', 'pagado')) THEN
 
+
           		--SELECT sum(pp.monto_establecido)
-                SELECT sum(pp.monto)
+                --05-03-2021 (may)modificacion ya no del monto establecido debe ser del monto a ejecutar...por el 13% ya no hay
+                --SELECT sum(pp.monto)
+                SELECT sum(pp.monto_ejecutar_total_mo)
                 INTO v_sum_monto_pp
                 FROM tes.tplan_pago pp
                 WHERE pp.estado != 'anulado' and pp.estado != 'pago_exterior' and pp.estado != 'pagado' and pp.estado != 'pendiente'
@@ -1940,8 +1956,12 @@ BEGIN
                 WHERE  pc.codigo_tipo_relacion in ('IVA-CF','IVA-CF-PA', 'RC-IVA')
                 and p.id_plantilla = v_id_plantilla;
 
+                /*--
+                05-03-2021 (may)  se modifica desde la fecha que se debe controlar que el monto comprometido no debe sobre pasar al MONTO A EJECUTAR
+                                antes se realizaba con campo Monto sin iva
+                --*/
                 --para los que se descuentan el IVA 13%
-                IF (v_codigo_tipo_relacion in ('IVA-CF','IVA-CF-PA', 'RC-IVA')) THEN
+                /*IF (v_codigo_tipo_relacion in ('IVA-CF','IVA-CF-PA', 'RC-IVA')) THEN
 
                     v_porcentaje13_monto = COALESCE(v_monto_pp * 0.13, 0);
                     v_monto_establecido  = COALESCE(v_monto_pp, 0) - COALESCE(v_porcentaje13_monto,0);
@@ -1952,7 +1972,7 @@ BEGIN
                       raise exception ' El monto total de las cuotas es de % y excede al monto total certificado de % para el trámite %. Comunicarse con la Unidad de Presupuestos. ',v_sum_total_pp, v_sum_monto_pe, v_numero_tramite;
                    END IF;
 
-               ELSE
+               ELSE*/
 
                  v_monto_establecido  = COALESCE(v_monto_pp, 0);
                  v_sum_total_pp = (COALESCE(v_sum_monto_pp,0));
@@ -1961,7 +1981,7 @@ BEGIN
                    IF (COALESCE(v_sum_total_pp,0) > COALESCE(v_sum_monto_pe, 0)) THEN
                       raise exception ' El monto total de las cuotas es de % y excede al monto total certificado de % para el trámite %. Comunicarse con la Unidad de Presupuestos. ',v_sum_total_pp, v_sum_monto_pe, v_numero_tramite;
                    END IF;
-               END IF;
+               --END IF;
 
           END IF;
 
