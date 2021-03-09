@@ -17,8 +17,8 @@ header("content-type: text/javascript; charset=UTF-8");
             this.init();
 			this.iniciarEventos();
             this.grid.getTopToolbar().disable();
-            this.grid.getBottomToolbar().disable();            
-			
+            this.grid.getBottomToolbar().disable();
+
 			this.addButton('btnClonar',
 				{
 					text: 'Clonar',
@@ -28,7 +28,7 @@ header("content-type: text/javascript; charset=UTF-8");
 					tooltip: '<b>Clonar</b><br/>Clonar Registro'
 				}
 			);
-			
+
 			this.addButton('btnCheque',
 				{
 					text: 'Cheque 1',
@@ -38,7 +38,7 @@ header("content-type: text/javascript; charset=UTF-8");
 					tooltip: '<b>Cheque</b><br/>Imprimmir cheque en tamaño antiguo'
 				}
 			);
-						
+
 			this.addButton('btnCheque2',
 				{
 					text: 'Cheque 2',
@@ -48,7 +48,7 @@ header("content-type: text/javascript; charset=UTF-8");
 					tooltip: '<b>Cheque</b><br/>Imprimmir cheque en tamaño nuevo'
 				}
 			);
-			
+
 			/*this.addButton('btnMemoramdum',
 				{
 					text: 'Memo',
@@ -58,7 +58,7 @@ header("content-type: text/javascript; charset=UTF-8");
 					tooltip: '<b>Memo</b><br/>Imprimir memoramdum de asignacion de fondo'
 				}
 			);*/
-			
+
 			this.addButton('btnNotificacion',
 				{
 					text: 'Notificacion',
@@ -68,7 +68,7 @@ header("content-type: text/javascript; charset=UTF-8");
 					tooltip: '<b>Notificacion</b><br/>Envia email de notificacion al solicitante'
 				}
 			);
-			
+
 			this.addButton('ant_estado',{
               argument: {estado: 'anterior'},
               text:'Anterior',
@@ -78,7 +78,7 @@ header("content-type: text/javascript; charset=UTF-8");
               tooltip: '<b>Pasar al Anterior Estado</b>'
 			  }
 			);
-			
+
 			this.addButton('fin_registro',
 				{	text:'Siguiente',
 					iconCls: 'badelante',
@@ -96,9 +96,9 @@ header("content-type: text/javascript; charset=UTF-8");
 					tooltip: '<b>Documentos de la Solicitud</b><br/>Subir los documetos requeridos en la solicitud seleccionada.'
 				}
 			);
-			
+
 			this.addButton('diagrama_gantt',{text:'',iconCls: 'bgantt',disabled:true,handler:this.diagramGantt,tooltip: '<b>Diagrama Gantt de proceso macro</b>'});
-			
+
 			this.addButton('btnVistaPrevia',
 			{
 				text: 'Cheque Vista Previa',
@@ -128,7 +128,7 @@ header("content-type: text/javascript; charset=UTF-8");
 				tooltip: '<b>Cambiar Cheque Fondo en Avance</b><br/>Cheques Asociados'
 			}
 			);
-			//this.Cmp.tipo.on('select', this.onTipoSelect, this);						
+			//this.Cmp.tipo.on('select', this.onTipoSelect, this);
         },
         Atributos:[
 		{
@@ -139,7 +139,7 @@ header("content-type: text/javascript; charset=UTF-8");
 					name: 'id_libro_bancos'
 			},
 			type:'Field',
-			form:true 
+			form:true
 		},
 		{
 			//configuracion del componente
@@ -149,7 +149,7 @@ header("content-type: text/javascript; charset=UTF-8");
 					name: 'id_cuenta_bancaria'
 			},
 			type:'Field',
-			form:true 
+			form:true
 		},
 		{
             config:{
@@ -176,30 +176,30 @@ header("content-type: text/javascript; charset=UTF-8");
 				allowBlank: false,
 				anchor: '80%',
 				gwidth: 90,
-				format: 'd/m/Y', 
+				format: 'd/m/Y',
 				renderer:function (value,p,record){
 					//return value?value.dateFormat('d/m/Y'):''
 					if(value == null)
 						value = '';
-					else 
+					else
 						value = value.dateFormat('d/m/Y');
-					
+
 					if(record.data['sistema_origen']=='KERP'){
 						if(record.data['num_tramite'].search('FA-')>=0){
-							return String.format('{0}', '<FONT COLOR="'+record.data['color']+'"><b>'+'F.A. '+value+'</b></FONT>');					
+							return String.format('{0}', '<FONT COLOR="'+record.data['color']+'"><b>'+'F.A. '+value+'</b></FONT>');
 						}
 						if(record.data['num_tramite'].search('REP-')>=0){
 							return String.format('{0}', '<FONT COLOR="'+record.data['color']+'"><b>'+'C.CH. '+value+'</b></FONT>');
-						}						
+						}
 						return String.format('{0}', '<FONT COLOR="'+record.data['color']+'"><b>'+value+'</b></FONT>');
 					}else{
 						if(record.data['sistema_origen']=='FONDOS_AVANCE'){
-							return String.format('{0}', '<FONT COLOR="'+record.data['color']+'"><b>'+'F.A. '+value+'</b></FONT>');					
+							return String.format('{0}', '<FONT COLOR="'+record.data['color']+'"><b>'+'F.A. '+value+'</b></FONT>');
 						}
 						else{
 						   return String.format('{0}', '<FONT COLOR="'+record.data['color']+'"><b>'+value+'</b></FONT>');
 						}
-					}										
+					}
 				}
 			},
 				type:'DateField',
@@ -223,7 +223,7 @@ header("content-type: text/javascript; charset=UTF-8");
 				id_grupo:1,
 				grid:true,
 				form:true
-		},		
+		},
 		{
 			config:{
 				name: 'detalle',
@@ -238,7 +238,7 @@ header("content-type: text/javascript; charset=UTF-8");
 				id_grupo:1,
 				grid:true,
 				form:true
-		},		
+		},
 		{
 			config:{
 				name: 'observaciones',
@@ -253,7 +253,7 @@ header("content-type: text/javascript; charset=UTF-8");
 				id_grupo:1,
 				grid:true,
 				form:true
-		},		
+		},
 		{
 			config:{
 				name: 'nro_liquidacion',
@@ -306,27 +306,27 @@ header("content-type: text/javascript; charset=UTF-8");
 				fieldLabel:'Tipo',
 				allowBlank:false,
 				emptyText:'Tipo...',
-				typeAhead: true,								
-				mode: 'local',				
-				gwidth: 100,                
-                hiddenName: 'id_forma_pago',                
+				typeAhead: true,
+				mode: 'local',
+				gwidth: 100,
+                hiddenName: 'id_forma_pago',
                 store: new Ext.data.JsonStore({
                          url: '../../sis_tesoreria/control/TsLibroBancos/consultaFormaPagoEgreso',
                          id: 'id_forma_pago',
-                         root: 'datos',                         
+                         root: 'datos',
                          sortInfo:{
                             field: 'orden',
-                            direction: 'ASC'                            
+                            direction: 'ASC'
                     },
                     totalProperty: 'total',
                     fields: ['id_forma_pago','variable','desc_forma_pago','tipo'],
                     // turn on remote sorting
                     remoteSort: true,
-                    baseParams:{par_filtro:'fpa.desc_forma_pago'}                    
+                    baseParams:{par_filtro:'fpa.desc_forma_pago'}
                     }),
                     tpl: '<tpl for="."><div class="x-combo-list-item"><b><p >{desc_forma_pago}<p style="color:green;">Tipo: {tipo}</p></b></div></tpl>',
                 valueField: 'variable',
-                displayField: 'desc_forma_pago', 
+                displayField: 'desc_forma_pago',
                 forceSelection:true,
                 typeAhead: false,
                 triggerAction: 'all',
@@ -340,11 +340,11 @@ header("content-type: text/javascript; charset=UTF-8");
                 anchor:'80%'
 			},
 			type:'ComboBox',
-			id_grupo:1,		
+			id_grupo:1,
 			grid:true,
 			form:true
 		},
-        /*        
+        /*
 		{
 			config:{
 				name:'tipo',
@@ -368,7 +368,7 @@ header("content-type: text/javascript; charset=UTF-8");
 			},
 			type:'ComboBox',
 			id_grupo:1,
-			filters:{	
+			filters:{
 					 type: 'list',
 					  pfiltro:'lban.tipo',
 					 options: ['cheque','debito_automatico','transferencia_carta']
@@ -399,7 +399,7 @@ header("content-type: text/javascript; charset=UTF-8");
 				fieldLabel: 'Importe Deposito',
 				allowBlank: false,
 				anchor: '80%',
-				gwidth: 100				
+				gwidth: 100
 			},
 				type:'NumberField',
 				filters:{pfiltro:'lban.importe_deposito',type:'numeric'},
@@ -453,7 +453,7 @@ header("content-type: text/javascript; charset=UTF-8");
 			},
 			type:'ComboBox',
 			id_grupo:1,
-			filters:{	
+			filters:{
 					 type: 'list',
 					  pfiltro:'lban.origen',
 					 options: ['CBB','SRZ','TJA','SRE','CIJ','TDD','UYU','ENDESIS','MIA','MAD']
@@ -475,7 +475,23 @@ header("content-type: text/javascript; charset=UTF-8");
 				id_grupo:1,
 				grid:true,
 				form:false
-		},	
+		},
+    {
+			config:{
+				name: 'notificado',
+				fieldLabel: 'Notificacion Enviada',
+				allowBlank: false,
+				anchor: '100%',
+				gwidth: 110,
+        renderer : function(value, p, record) {
+          (value=='si')?col = 'color:green;':col='';
+            return String.format('<div style="text-align:center;font-weight:bold;'+col+'">{0}</div>', record.data['notificado']);            
+        }
+			},
+				type:'TextField',
+				id_grupo:1,
+				grid:true
+		},
 		{
             config:{
                 name: 'num_tramite',
@@ -535,7 +551,7 @@ header("content-type: text/javascript; charset=UTF-8");
             id_grupo:0,
             grid:true,
             form:true
-        },	
+        },
 		{
 			config: {
 				name: 'id_libro_bancos_fk',
@@ -616,7 +632,7 @@ header("content-type: text/javascript; charset=UTF-8");
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
-							format: 'd/m/Y', 
+							format: 'd/m/Y',
 							renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
 			},
 				type:'DateField',
@@ -647,7 +663,7 @@ header("content-type: text/javascript; charset=UTF-8");
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
-							format: 'd/m/Y', 
+							format: 'd/m/Y',
 							renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
 			},
 				type:'DateField',
@@ -689,7 +705,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 grid:false,
                 form:true
             }
-		
+
 	],
         title : 'Cheques',
         ActSave:'../../sis_tesoreria/control/TsLibroBancos/insertarTsLibroBancos',
@@ -738,7 +754,7 @@ header("content-type: text/javascript; charset=UTF-8");
         {name:'id_forma_pago',type:'numeric'},
         {name:'desc_forma_pago',  type:'string'},
         {name:'tipo_i_g', type: 'string'}
-		
+
 	],
         sortInfo : {
             field : 'fecha DESC , nro_cheque',
@@ -747,10 +763,10 @@ header("content-type: text/javascript; charset=UTF-8");
         bdel : true,
         bsave : false,
 		fheight:'80%',
-		
+
 		iniciarEventos:function(){
-		
-			this.cmpTipo = this.getComponente('id_forma_pago');		
+
+			this.cmpTipo = this.getComponente('id_forma_pago');
 			this.cmpNroCheque = this.getComponente('nro_cheque');
 			this.cmpImporteDeposito = this.getComponente('importe_deposito');
 			this.cmpImporteCheque = this.getComponente('importe_cheque');
@@ -758,22 +774,22 @@ header("content-type: text/javascript; charset=UTF-8");
 			this.cmpIdFinalidad = this.getComponente('id_finalidad');
 			this.cmpAFavor = this.getComponente('a_favor');
 			this.cmpObservaciones = this.getComponente('observaciones');
-			this.cmpDetalle = this.getComponente('detalle');		
+			this.cmpDetalle = this.getComponente('detalle');
 			this.cmpNroLiquidacion = this.getComponente('nro_liquidacion');
 			this.cmpIdCuentaBancaria = this.getComponente('id_cuenta_bancaria');
 			this.cmpNroComprobante = this.getComponente('nro_comprobante');
 			this.cmpDepto = this.getComponente('id_depto');
 			this.cmpFecha = this.getComponente('fecha');
-						
+
 			this.ocultarComponente(this.cmpIdFinalidad);
 			this.ocultarComponente(this.cmpNroCheque);
 			this.ocultarComponente(this.cmpImporteDeposito);
 			this.ocultarComponente(this.cmpIdLibroBancosFk);
-			
+
 			this.cmpNroCheque.on('focus',function(componente){
                 if(this.cmpTipo.value.toLowerCase() == 'cheque') {
                     var cta_bancaria = this.cmpIdCuentaBancaria.getValue();
-                    
+
                     Ext.Ajax.request({
                         url:'../../sis_tesoreria/control/TsLibroBancos/listarTsLibroBancos',
                         params:{start:0, limit:this.tam_pag, m_id_cuenta_bancaria:cta_bancaria,m_nro_cheque:'si'},
@@ -787,20 +803,20 @@ header("content-type: text/javascript; charset=UTF-8");
                         scope:this
                     });
                 }
-				
+
 			},this);
-			
-			 this.cmpTipo.on('select',function(com,dat){                               
-                    this.cmpNroCheque.reset();                                    
-				  switch(dat.data.variable){	
+
+			 this.cmpTipo.on('select',function(com,dat){
+                    this.cmpNroCheque.reset();
+				  switch(dat.data.variable){
 					case 'cheque':
 						this.mostrarComponente(this.cmpNroCheque);
 						this.cmpImporteDeposito.setValue(0.00);
 						this.ocultarComponente(this.cmpImporteDeposito);
 						//this.cmpImporteCheque.setValue(0.00);
-						this.mostrarComponente(this.cmpImporteCheque);						
+						this.mostrarComponente(this.cmpImporteCheque);
 						break;
-					default:					
+					default:
 						this.mostrarComponente(this.cmpNroCheque);
 						this.cmpImporteDeposito.setValue(0.00);
 						this.ocultarComponente(this.cmpImporteDeposito);
@@ -810,61 +826,61 @@ header("content-type: text/javascript; charset=UTF-8");
 						break;
 				  }
 			  },this);
-			  
+
 			  this.cmpTipo.on('focus',function(com,dat){
 			  },this);
-			  
-		},		
-		
+
+		},
+
 		preparaMenu:function(n){
 			  var data = this.getSelectedData();
 			  //var tb =this.tbar;
-			  
-			  Phx.vista.TsLibroBancosCheque.superclass.preparaMenu.call(this,n); 
+
+			  Phx.vista.TsLibroBancosCheque.superclass.preparaMenu.call(this,n);
               if(data['tipo'] == 'transf_interna_debe' || data['tipo'] == 'transf_interna_haber'){
                     this.getBoton('btnClonar').disable();
                 }else{
                     this.getBoton('btnClonar').enable();
                 }
 			  if(data['id_proceso_wf'] !== null){
-			  if(data['tipo'] == 'cheque'){				  
+			  if(data['tipo'] == 'cheque'){
 				  this.getBoton('btnChequeoDocumentosWf').enable();
 				  this.getBoton('diagrama_gantt').enable();
 				  if(data['estado']=='borrador'){
 					//this.getBoton('btnMemoramdum').disable();
-					this.getBoton('btnNotificacion').disable();				  
+					this.getBoton('btnNotificacion').disable();
 					this.getBoton('btnCheque').disable();
-					this.getBoton('btnCheque2').disable();				
+					this.getBoton('btnCheque2').disable();
 					this.getBoton('btnVistaPrevia').disable();
 					this.getBoton('edit').enable();
 					this.getBoton('del').enable();
 					this.getBoton('ant_estado').disable();
-					this.getBoton('fin_registro').enable();					
+					this.getBoton('fin_registro').enable();
 				  }else{
 					this.getBoton('del').disable();
 					this.getBoton('btnVistaPrevia').enable();
 					if(data['estado']=='cobrado'){   //agreado
 						this.getBoton('btnCheque').disable();
-						this.getBoton('btnCheque2').disable();						
+						this.getBoton('btnCheque2').disable();
 						this.getBoton('ant_estado').enable();
 						this.getBoton('fin_registro').disable();
 					}
 					//if(data['estado']=='cobrado'||data['estado']=='reingresado'||data['estado']=='anulado'||data['estado']=='vbpagosindocumento') para que se les avilite los botones
 					else if(data['estado']=='reingresado'||data['estado']=='anulado'||data['estado']=='vbpagosindocumento'){
-						this.getBoton('edit').disable();							
+						this.getBoton('edit').disable();
 						this.getBoton('btnCheque').disable();
-						this.getBoton('btnCheque2').disable();						
+						this.getBoton('btnCheque2').disable();
 						this.getBoton('ant_estado').enable();
 						this.getBoton('fin_registro').disable();
 					}else{
-						this.getBoton('edit').enable();						
+						this.getBoton('edit').enable();
 						this.getBoton('btnCheque').enable();
-						this.getBoton('btnCheque2').enable();						
+						this.getBoton('btnCheque2').enable();
 						this.getBoton('ant_estado').enable();
 						this.getBoton('fin_registro').enable();
-					} 
-					//if(data['observaciones']=='FONDOS_AVANCE'){						
-					if(data['num_tramite'].search('REP-') >= 0 || data['num_tramite'].search('FA-') >= 0 || data['sistema_origen'] == 'FONDOS_AVANCE'){						
+					}
+					//if(data['observaciones']=='FONDOS_AVANCE'){
+					if(data['num_tramite'].search('REP-') >= 0 || data['num_tramite'].search('FA-') >= 0 || data['sistema_origen'] == 'FONDOS_AVANCE'){
 						//this.getBoton('btnMemoramdum').enable();
 						if(data['notificado']=='no')
 							this.getBoton('btnNotificacion').enable();
@@ -875,13 +891,13 @@ header("content-type: text/javascript; charset=UTF-8");
 						this.getBoton('btnNotificacion').disable();
 					}
 				  }
-				  
+
 			  }
-              else{                
-				  //this.getBoton('btnMemoramdum').disable();                  
-				  this.getBoton('btnNotificacion').disable();				  
+              else{
+				  //this.getBoton('btnMemoramdum').disable();
+				  this.getBoton('btnNotificacion').disable();
 				  this.getBoton('btnCheque').disable();
-				  this.getBoton('btnCheque2').disable();				
+				  this.getBoton('btnCheque2').disable();
 				  this.getBoton('btnVistaPrevia').disable();
 				  //this.getBoton('btnChequeoDocumentosWf').disable();
 				  if(data['estado']=='borrador'){
@@ -892,8 +908,8 @@ header("content-type: text/javascript; charset=UTF-8");
 				  }else{
 					this.getBoton('del').disable();
 					this.getBoton('fin_registro').disable();
-					if(data['estado']=='transferido'){	
-						this.getBoton('del').enable(); //agregadp para habilitar botondel					
+					if(data['estado']=='transferido'){
+						this.getBoton('del').enable(); //agregadp para habilitar botondel
 						this.getBoton('edit').disable();
 						this.getBoton('ant_estado').disable();
 					}else{
@@ -907,7 +923,7 @@ header("content-type: text/javascript; charset=UTF-8");
 			  }	else{
 				  this.getBoton('btnChequesTramite').enable();
 			  }
-			  
+
 		  }else{
 				this.getBoton('btnChequeoDocumentosWf').disable();
 				this.getBoton('fin_registro').disable();
@@ -915,17 +931,17 @@ header("content-type: text/javascript; charset=UTF-8");
 				this.getBoton('btnNotificacion').disable();
 				this.getBoton('ant_estado').disable();
 				this.getBoton('btnCheque').disable();
-				this.getBoton('btnCheque2').disable();				
+				this.getBoton('btnCheque2').disable();
 				this.getBoton('btnVistaPrevia').disable();
 				this.getBoton('edit').disable();
 				this.getBoton('del').disable();
 		  }
 		 },
-		
+
 		clonar:function(){
 			var data = this.getSelectedData();
 			this.onButtonNew();
-			
+
 			this.cmpTipo.setValue(data.tipo);
 			this.cmpAFavor.setValue(data.a_favor);
 			this.cmpObservaciones.setValue(data.observaciones);
@@ -933,15 +949,15 @@ header("content-type: text/javascript; charset=UTF-8");
 			this.cmpNroLiquidacion.setValue(data.nro_liquidacion);
 			this.cmpIdLibroBancosFk.setValue(data.id_libro_bancos_fk);
 			this.cmpIdFinalidad.setValue(data.id_finalidad);
-			
+
 			var record = this.cmpTipo.getStore();
-			record.data.variable = data.tipo;			
+			record.data.variable = data.tipo;
 			this.cmpTipo.fireEvent('select',this,record);
-			
+
 		},
-		
-		onChequeTramite:function(){ 
-			var rec=this.sm.getSelected();			
+
+		onChequeTramite:function(){
+			var rec=this.sm.getSelected();
 			Phx.CP.loadWindows('../../../sis_tesoreria/vista/ts_libro_bancos_cheques/FormRelacionarCheque.php',
 			'Relacionar Cheque a Tramite',
 			{
@@ -956,10 +972,10 @@ header("content-type: text/javascript; charset=UTF-8");
 						}
 						],
 			   scope:this
-			 })								   
+			 })
 		},
-		
-		relacionar:function(wizard,resp){			
+
+		relacionar:function(wizard,resp){
 			var me=this;
 			var data = this.getSelectedData();
 			Phx.CP.loadingShow();
@@ -967,35 +983,35 @@ header("content-type: text/javascript; charset=UTF-8");
 				url:'../../sis_tesoreria/control/TsLibroBancos/relacionarCheque',
 				params:{
 						id_libro_bancos_old : data.id_libro_bancos,
-						id_libro_bancos_new : resp.id_libro_bancos				
+						id_libro_bancos_new : resp.id_libro_bancos
 				 },
-				argument:{wizard:wizard},  
+				argument:{wizard:wizard},
 				success:this.successWizard,
 				failure: this.conexionFailure,
 				timeout:this.timeout,
 				scope:this
-			});		   
+			});
 		},
-		
+
 		successWizard:function(resp){
 			Phx.CP.loadingHide();
 			resp.argument.wizard.panel.destroy()
 			this.reload();
 		 },
-		
+
 		memoramdum : function(){
 			var data = this.getSelectedData();
 			var NumSelect=this.sm.getCount();
-			
+
 			if(NumSelect != 0)
-			{		 
+			{
 				var url = '';
 				if(data['num_tramite'].search('REP-')>=0){
 					//memo caja chica
 					url = '../../sis_tesoreria/control/TsLibroBancos/imprimirMemoCajaChica';
 				}else{
 					//memo fondo en avance
-					data='id='+ data.id_libro_bancos;  
+					data='id='+ data.id_libro_bancos;
 					window.open('http://sms.obairlines.bo/ReportesPXP/Home/MemorandumFondosEnAvance?'+data);
 				}
 			}
@@ -1003,16 +1019,16 @@ header("content-type: text/javascript; charset=UTF-8");
 			{
 				Ext.MessageBox.alert('Alerta', 'Antes debe seleccionar un item.');
 			}
-		},	
-			
+		},
+
 		imprimirCheque : function(){
-		
+
 			var data=this.sm.getSelected().data;
 			Phx.CP.loadingShow();
 			Ext.Ajax.request({
 				url:'../../sis_tesoreria/control/TsLibroBancos/imprimirCheque',
 				params:{
-					'a_favor':data.a_favor , 
+					'a_favor':data.a_favor ,
 					'importe_cheque' : data.importe_cheque ,
 					'fecha_cheque_literal' : data.fecha_cheque_literal,
 					'nombre_regional' : data.nombre_regional
@@ -1021,17 +1037,17 @@ header("content-type: text/javascript; charset=UTF-8");
 				failure: this.conexionFailure,
 				timeout:this.timeout,
 				scope:this
-			});	
+			});
 		},
-		
+
 		imprimirCheque2 : function(){
-		
+
 			var data=this.sm.getSelected().data;
 			Phx.CP.loadingShow();
 			Ext.Ajax.request({
 				url:'../../sis_tesoreria/control/TsLibroBancos/imprimirCheque2',
 				params:{
-					'a_favor':data.a_favor , 
+					'a_favor':data.a_favor ,
 					'importe_cheque' : data.importe_cheque ,
 					'fecha_cheque_literal' : data.fecha_cheque_literal,
 					'nombre_regional' : data.nombre_regional
@@ -1040,12 +1056,12 @@ header("content-type: text/javascript; charset=UTF-8");
 				failure: this.conexionFailure,
 				timeout:this.timeout,
 				scope:this
-			});	
+			});
 		},
-		
+
 		vistaPrevia : function(){
 			var NumSelect=this.sm.getCount();
-			
+
 			if(NumSelect!=0)
 			{
 				var data=this.sm.getSelected().data;
@@ -1053,7 +1069,7 @@ header("content-type: text/javascript; charset=UTF-8");
 				Ext.Ajax.request({
 				url:'../../sis_tesoreria/control/TsLibroBancos/vistaPrevia',
 				params:{
-					'a_favor':data.a_favor , 
+					'a_favor':data.a_favor ,
 					'importe_cheque' : data.importe_cheque ,
 					'fecha_cheque_literal' : data.fecha_cheque_literal,
 					'nombre_regional' : data.nombre_regional
@@ -1069,32 +1085,32 @@ header("content-type: text/javascript; charset=UTF-8");
 				Ext.MessageBox.alert('Estado', 'Antes debe seleccionar un item.');
 			}
 		},
-		
+
 		antEstado:function(res,eve)
-		{                   
+		{
 			var d= this.sm.getSelected().data;
 			Phx.CP.loadingShow();
 			var operacion = 'cambiar';
-			operacion=  res.argument.estado == 'inicio'?'inicio':operacion; 
-			
+			operacion=  res.argument.estado == 'inicio'?'inicio':operacion;
+
 			Ext.Ajax.request({
 				url:'../../sis_tesoreria/control/TsLibroBancos/anteriorEstadoLibroBancos',
 				params:{id_libro_bancos:d.id_libro_bancos,
                         id_proceso_wf:d.id_proceso_wf,
-                        id_estado_wf:d.id_estado_wf, 				
+                        id_estado_wf:d.id_estado_wf,
 						operacion: operacion},
 				success:this.successSinc,
 				failure: this.conexionFailure,
 				timeout:this.timeout,
 				scope:this
-			});     
+			});
 		},
-		
+
 		enviarNotificacion:function(res,eve)
-		{                   
+		{
 			var d= this.sm.getSelected().data;
 			Phx.CP.loadingShow();
-			
+
 			Ext.Ajax.request({
 				url:'../../sis_tesoreria/control/TsLibroBancos/enviarNotificacion',
 				params:{id_libro_bancos:d.id_libro_bancos,
@@ -1107,21 +1123,21 @@ header("content-type: text/javascript; charset=UTF-8");
 				failure: this.conexionFailure,
 				timeout:this.timeout,
 				scope:this
-			});     
+			});
 		},
-		
+
 		successSinc:function(resp){
             Phx.CP.loadingHide();
             var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
 			console.log(reg.ROOT.datos);
-            if(reg.ROOT.datos.resultado!='falla'){                
+            if(reg.ROOT.datos.resultado!='falla'){
                 this.reload();
              }else{
                 alert(reg.ROOT.datos.mensaje)
             }
 		},
-		  
-		sigEstado:function(){                   
+
+		sigEstado:function(){
 		  var rec=this.sm.getSelected();
 		  this.objWizard = Phx.CP.loadWindows('../../../sis_workflow/vista/estado_wf/FormEstadoWf.php',
 									'Estado de Wf',
@@ -1133,26 +1149,26 @@ header("content-type: text/javascript; charset=UTF-8");
 										   id_estado_wf:rec.data.id_estado_wf,
 										   id_proceso_wf:rec.data.id_proceso_wf,
 										   fecha_ini:rec.data.fecha_tentativa
-										  
+
 										}}, this.idContenedor,'FormEstadoWf',
 									{
 										config:[{
 												  event:'beforesave',
-												  delegate: this.onSaveWizard												  
+												  delegate: this.onSaveWizard
 												}],
-										
+
 										scope:this
-									 });        
-				   
-		 },	   
-		
+									 });
+
+		 },
+
 		onSaveWizard:function(wizard,resp){
 			Phx.CP.loadingShow();
-			
+
 			Ext.Ajax.request({
 				url:'../../sis_tesoreria/control/TsLibroBancos/siguienteEstadoLibroBancos',
 				params:{
-						
+
 					id_proceso_wf_act:  resp.id_proceso_wf_act,
 					id_estado_wf_act:   resp.id_estado_wf_act,
 					id_tipo_estado:     resp.id_tipo_estado,
@@ -1168,14 +1184,14 @@ header("content-type: text/javascript; charset=UTF-8");
 				scope:this
 			});
 		},
-		
+
 		successWizard:function(resp){
 			Phx.CP.loadingHide();
 			resp.argument.wizard.panel.destroy()
-			Phx.CP.getPagina(this.idContenedorPadre).reload();  
+			Phx.CP.getPagina(this.idContenedorPadre).reload();
 			//this.reload();
 		 },
-		 
+
 		 loadCheckDocumentosSolWf:function() {
 				var rec=this.sm.getSelected();
 				rec.data.nombreVista = this.nombreVista;
@@ -1190,7 +1206,7 @@ header("content-type: text/javascript; charset=UTF-8");
 						'DocumentoWf'
 			)
 		},
-		
+
 		onChequesAsociados:function() {
 				var rec=this.sm.getSelected();
 				rec.data.nombreVista = 'ChequesAsociados';
@@ -1205,8 +1221,8 @@ header("content-type: text/javascript; charset=UTF-8");
 						'TsLibroBancosCheque'
 			)
 		},
-		
-		diagramGantt:function (){         
+
+		diagramGantt:function (){
             var data=this.sm.getSelected().data.id_proceso_wf;
             Phx.CP.loadingShow();
             Ext.Ajax.request({
@@ -1216,16 +1232,16 @@ header("content-type: text/javascript; charset=UTF-8");
                 failure: this.conexionFailure,
                 timeout:this.timeout,
                 scope:this
-            });         
+            });
 		},
-		 
+
 		loadValoresIniciales:function(){
 			Phx.vista.TsLibroBancosCheque.superclass.loadValoresIniciales.call(this);
-			this.Cmp.id_cuenta_bancaria.setValue(this.maestro.id_cuenta_bancaria);		
+			this.Cmp.id_cuenta_bancaria.setValue(this.maestro.id_cuenta_bancaria);
 		},
-		
+
 		onButtonNew:function(){
-			Phx.vista.TsLibroBancosCheque.superclass.onButtonNew.call(this); 	    
+			Phx.vista.TsLibroBancosCheque.superclass.onButtonNew.call(this);
 			this.cmpIdLibroBancosFk.setValue(this.maestro.id_libro_bancos);
 			this.cmpIdFinalidad.setValue(this.maestro.id_finalidad);
 			this.cmpDetalle.setValue(this.maestro.detalle);
@@ -1236,24 +1252,24 @@ header("content-type: text/javascript; charset=UTF-8");
 			this.cmpFecha.enable();
 			this.cmpTipo.enable();
             var date = new Date();
-            this.cmpFecha.setValue(date.dateFormat('d/m/Y'));            
-				
+            this.cmpFecha.setValue(date.dateFormat('d/m/Y'));
+
 			var record = this.cmpTipo.getStore();
-			record.data.variable = 'cheque';			
+			record.data.variable = 'cheque';
 			this.cmpTipo.fireEvent('select',this,record);
-		},		
-		
-		successSave: function(resp) {		   
-		   Phx.vista.TsLibroBancosCheque.superclass.successSave.call(this,resp);        
-		   Phx.CP.getPagina(this.idContenedorPadre).reload();  
 		},
-		
+
+		successSave: function(resp) {
+		   Phx.vista.TsLibroBancosCheque.superclass.successSave.call(this,resp);
+		   Phx.CP.getPagina(this.idContenedorPadre).reload();
+		},
+
 		onButtonEdit:function(){
 			Phx.vista.TsLibroBancosCheque.superclass.onButtonEdit.call(this);
-			//this.cmpTipo.disable();            
-            			
-			var data = this.getSelectedData();			                       
-			if(data.tipo_i_g == 'Gasto'){            
+			//this.cmpTipo.disable();
+
+			var data = this.getSelectedData();
+			if(data.tipo_i_g == 'Gasto'){
 				this.mostrarComponente(this.cmpNroCheque);
             }
 			else{
@@ -1273,12 +1289,12 @@ header("content-type: text/javascript; charset=UTF-8");
 				this.cmpTipo.enable();
 			}
 		},
-		
+
         onReloadPage : function(m) {
             this.maestro = m;
 			this.store.baseParams={id_libro_bancos:this.maestro.id_libro_bancos, mycls:this.cls};
-			this.load({params:{start:0, limit:this.tam_pag}});	
-            
+			this.load({params:{start:0, limit:this.tam_pag}});
+
         }
     })
 </script>

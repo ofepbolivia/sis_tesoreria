@@ -8,17 +8,17 @@
 */
 
 class MODTsLibroBancos extends MODbase{
-	
+
 	function __construct(CTParametro $pParam){
 		parent::__construct($pParam);
 	}
-			
+
 	function listarTsLibroBancos(){
 		//Definicion de variables para ejecucion del procedimientp
 		$this->procedimiento='tes.ft_ts_libro_bancos_sel';
 		$this->transaccion='TES_LBAN_SEL';
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
-                
+
         $this->setParametro('mycls','mycls','varchar');
 		//Definicion de la lista del resultado del query
 		$this->captura('id_libro_bancos','int4');
@@ -62,7 +62,7 @@ class MODTsLibroBancos extends MODbase{
 		$this->captura('fondo_devolucion_retencion','varchar');
 		$this->captura('tramite','varchar');
 		$this->captura('comprobante_sigep','varchar');
-        $this->captura('fecha_pago','date');        
+        $this->captura('fecha_pago','date');
         $this->captura('id_forma_pago','int4');
         $this->captura('desc_forma_pago','varchar');
         $this->captura('tipo_i_g','varchar');
@@ -73,13 +73,13 @@ class MODTsLibroBancos extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
-		
+
 	function listarTsLibroBancosDepositosConSaldo(){
 		//Definicion de variables para ejecucion del procedimientp
 		$this->procedimiento='tes.ft_ts_libro_bancos_sel';
 		$this->transaccion='TES_LBANSAL_SEL';
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
-		
+
 		$this->setParametro('id_cuenta_bancaria','id_cuenta_bancaria','int4');
 		//Definicion de la lista del resultado del query
 		$this->captura('id_libro_bancos','int4');
@@ -94,17 +94,17 @@ class MODTsLibroBancos extends MODbase{
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
-		
+
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
-	
+
 	function reporteLibroBancos(){
 		//Definicion de variables para ejecucion del procedimientp
 		$this->procedimiento='tes.ft_ts_libro_bancos_sel';
 		$this->transaccion='TES_RELIBA_SEL';
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
-		
+
 		$this->setParametro('id_cuenta_bancaria','id_cuenta_bancaria','int4');
 		$this->setParametro('fecha_ini','fecha_ini','date');
 		$this->setParametro('fecha_fin','fecha_fin','date');
@@ -112,7 +112,7 @@ class MODTsLibroBancos extends MODbase{
 		$this->setParametro('tipo','tipo','varchar');
 		$this->setParametro('id_finalidad','id_finalidad','int4');
 		$this->setCount(false);
-		
+
 		//Definicion de la lista del resultado del query
 		$this->captura('fecha_reporte','text');
 		$this->captura('a_favor','varchar');
@@ -130,7 +130,7 @@ class MODTsLibroBancos extends MODbase{
 		$this->captura('total_haber','text');
 		$this->captura('indice','numeric');
 		$this->captura('fecha','date');
-		
+
 		//Ejecuta la instruccion
         $this->armarConsulta();
         //echo($this->consulta);exit;
@@ -139,15 +139,15 @@ class MODTsLibroBancos extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
-	
+
 	function insertarTsLibroBancos(){
 		//Definicion de variables para ejecucion del procedimiento
 		$this->procedimiento='tes.ft_ts_libro_bancos_ime';
 		$this->transaccion='TES_LBAN_INS';
 		$this->tipo_procedimiento='IME';
-        
-        
-        
+
+
+
 		//Define los parametros para la funcion
 		$this->setParametro('id_cuenta_bancaria','id_cuenta_bancaria','int4');
 		$this->setParametro('id_depto','id_depto','int4');
@@ -173,17 +173,17 @@ class MODTsLibroBancos extends MODbase{
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
-		
+
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
-			
+
 	function modificarTsLibroBancos(){
 		//Definicion de variables para ejecucion del procedimiento
 		$this->procedimiento='tes.ft_ts_libro_bancos_ime';
 		$this->transaccion='TES_LBAN_MOD';
         $this->tipo_procedimiento='IME';
-        				
+
 		//Define los parametros para la funcion
 		$this->setParametro('id_libro_bancos','id_libro_bancos','int4');
 		$this->setParametro('id_cuenta_bancaria','id_cuenta_bancaria','int4');
@@ -214,13 +214,13 @@ class MODTsLibroBancos extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
-			
+
 	function eliminarTsLibroBancos(){
 		//Definicion de variables para ejecucion del procedimiento
 		$this->procedimiento='tes.ft_ts_libro_bancos_ime';
 		$this->transaccion='TES_LBAN_ELI';
 		$this->tipo_procedimiento='IME';
-				
+
 		//Define los parametros para la funcion
 		$this->setParametro('id_libro_bancos','id_libro_bancos','int4');
 
@@ -231,20 +231,20 @@ class MODTsLibroBancos extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
-	
+
 	function anteriorEstadoLibroBancos(){
         //Definicion de variables para ejecucion del procedimiento
         $this->procedimiento='tes.ft_ts_libro_bancos_ime';
         $this->transaccion='TES_ANTELB_IME';
         $this->tipo_procedimiento='IME';
-                
+
         //Define los parametros para la funcion
         $this->setParametro('id_libro_bancos','id_libro_bancos','int4');
 		$this->setParametro('id_estado_wf','id_estado_wf','int4');
 		$this->setParametro('id_proceso_wf','id_proceso_wf','int4');
         $this->setParametro('operacion','operacion','varchar');
 		$this->setParametro('obs','obs','varchar');
-        
+
         //Ejecuta la instruccion
         $this->armarConsulta();
         $this->ejecutarConsulta();
@@ -252,13 +252,13 @@ class MODTsLibroBancos extends MODbase{
         //Devuelve la respuesta
         return $this->respuesta;
     }
-	
+
 	function siguienteEstadoLibroBancos(){
         //Definicion de variables para ejecucion del procedimiento
         $this->procedimiento='tes.ft_ts_libro_bancos_ime';
         $this->transaccion='TES_SIGELB_IME';
         $this->tipo_procedimiento='IME';
-        
+
         //Define los parametros para la funcion
         $this->setParametro('id_proceso_wf_act','id_proceso_wf_act','int4');
         $this->setParametro('id_estado_wf_act','id_estado_wf_act','int4');
@@ -276,17 +276,17 @@ class MODTsLibroBancos extends MODbase{
         //Devuelve la respuesta
         return $this->respuesta;
     }
-	
+
 	function fondoDevolucionRetencion(){
         //Definicion de variables para ejecucion del procedimiento
         $this->procedimiento='tes.ft_ts_libro_bancos_ime';
         $this->transaccion='TES_DEVRET_IME';
         $this->tipo_procedimiento='IME';
-                
+
         //Define los parametros para la funcion
         $this->setParametro('id_libro_bancos','id_libro_bancos','int4');
 		$this->setParametro('operacion','operacion','varchar');
-		
+
         //Ejecuta la instruccion
         $this->armarConsulta();
         $this->ejecutarConsulta();
@@ -294,17 +294,17 @@ class MODTsLibroBancos extends MODbase{
         //Devuelve la respuesta
         return $this->respuesta;
     }
-	
+
 	function transferirDeposito(){
         //Definicion de variables para ejecucion del procedimiento
         $this->procedimiento='tes.ft_ts_libro_bancos_ime';
         $this->transaccion='TES_TRALB_IME';
         $this->tipo_procedimiento='IME';
-        
+
         //Define los parametros para la funcion
         $this->setParametro('id_libro_bancos','id_libro_bancos','int4');
         $this->setParametro('id_libro_bancos_fk','id_libro_bancos_fk','int4');
-        $this->setParametro('tipo','tipo','varchar');		
+        $this->setParametro('tipo','tipo','varchar');
 		$this->setParametro('importe_transferencia','importe_transferencia','numeric');
 
         //Ejecuta la instruccion
@@ -320,7 +320,7 @@ class MODTsLibroBancos extends MODbase{
         $this->procedimiento='tes.ft_ts_libro_bancos_ime';
         $this->transaccion='TES_TRACUEN_IME';
         $this->tipo_procedimiento='IME';
-        
+
         //Define los parametros para la funcion
         $this->setParametro('id_depto_lb','id_depto_lb','int4');
 		$this->setParametro('id_cuenta_bancaria_origen','id_cuenta_bancaria_origen','int4');
@@ -331,7 +331,7 @@ class MODTsLibroBancos extends MODbase{
 		$this->setParametro('fecha','fecha','date');
         $this->setParametro('id_finalidad','id_finalidad','int4');
         $this->setParametro('tipo_cambio','tipo_cambio','numeric');
-		
+
         //Ejecuta la instruccion
         $this->armarConsulta();
         $this->ejecutarConsulta();
@@ -339,17 +339,17 @@ class MODTsLibroBancos extends MODbase{
         //Devuelve la respuesta
         return $this->respuesta;
     }
-	
+
 	function relacionarCheque(){
         //Definicion de variables para ejecucion del procedimiento
         $this->procedimiento='tes.ft_ts_libro_bancos_ime';
         $this->transaccion='TES_RELCHQ_IME';
         $this->tipo_procedimiento='IME';
-        
+
         //Define los parametros para la funcion
         $this->setParametro('id_libro_bancos_old','id_libro_bancos_old','int4');
         $this->setParametro('id_libro_bancos_new','id_libro_bancos_new','int4');
-		
+
         //Ejecuta la instruccion
         $this->armarConsulta();
         $this->ejecutarConsulta();
@@ -357,7 +357,7 @@ class MODTsLibroBancos extends MODbase{
         //Devuelve la respuesta
         return $this->respuesta;
     }
-	
+
 	function listarDepositosENDESIS(){
 		//Definicion de variables para ejecucion del procedimientp
 		$this->procedimiento='migra.ft_ts_libro_bancos_endesis_sel';
@@ -365,10 +365,10 @@ class MODTsLibroBancos extends MODbase{
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
 		$this->setCount(false);
 		$this->setTipoRetorno('record');
-		
+
 		$this->setParametro('id_cuenta_bancaria','id_cuenta_bancaria','int4');
 		$this->setParametro('fecha','fecha','date');
-		
+
 		$this->captura('id_cuenta_bancaria_mov','int4');
 		$this->captura('id_cuenta_bancaria','int4');
 		$this->captura('fecha','date');
@@ -392,89 +392,89 @@ class MODTsLibroBancos extends MODbase{
 		$this->captura('fecha_cheque_literal','text');
 		$this->captura('emparejado','varchar');
 		$this->captura('origen_cbte','varchar');
-		
+
 		//Ejecuta la instruccion
 		$this->armarConsulta();
-		//echo $this->consulta;exit; 
+		//echo $this->consulta;exit;
 		$this->ejecutarConsulta();
-		
+
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
-	
+
 	function obtenerDatosSolicitanteFondoAvance(){
 		//Definicion de variables para ejecucion del procedimientp
 		$this->procedimiento='tes.ft_ts_libro_bancos_sel';
 		$this->transaccion='TES_SOLFONAVA_SEL';
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
-		
+
 		$this->setCount(false);
 		$this->setParametro('id_libro_bancos','id_libro_bancos','int4');
 		//Definicion de la lista del resultado del query
 		$this->captura('email','varchar');
 		$this->captura('nombre_completo','text');
-		
+		$this->captura('func_cc','text');
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
-		
+
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
-	
+
 	function ConciliacionBancaria() {
 		$this->procedimiento='tes.ft_ts_libro_bancos_sel';
 		$this->transaccion='TES_CONCBAN_SEL';
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
-		
+
 		$this->setCount(false);
 		$this->setParametro('id_libro_bancos','id_libro_bancos','int4');
 		//Definicion de la lista del resultado del query
 		$this->captura('email','varchar');
 		$this->captura('nombre_completo','text');
-		
+
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
-		
+
 		//Devuelve la respuesta
-		return $this->respuesta;				
+		return $this->respuesta;
     }
     function consultaFormaPago() {
 		$this->procedimiento='tes.ft_ts_libro_bancos_sel';
 		$this->transaccion='TES_FORMPAGO_SEL';
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
-        
+
         $this->setParametro('vista','vista','varchar');
 		//Definicion de la lista del resultado del query
         $this->captura('id_forma_pago','int4');
         $this->captura('desc_forma_pago', 'varchar');
         $this->captura('variable','varchar');
         $this->captura('tipo','varchar');
-		
+
 		//Ejecuta la instruccion
         $this->armarConsulta();
         //echo($this->consulta);exit;
 		$this->ejecutarConsulta();
-		
+
 		//Devuelve la respuesta
-		return $this->respuesta;        
+		return $this->respuesta;
     }
     function codPais() {
 		$this->procedimiento='tes.ft_ts_libro_bancos_sel';
 		$this->transaccion='TES_CODPAI_SEL';
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
-        $this->setCount(false);                
+        $this->setCount(false);
 		//Definicion de la lista del resultado del query
         $this->captura('codigo','varchar');
-		
+
 		//Ejecuta la instruccion
         $this->armarConsulta();
         //echo($this->consulta);exit;
 		$this->ejecutarConsulta();
-		
+
 		//Devuelve la respuesta
-		return $this->respuesta;        
-    }       	
+		return $this->respuesta;
+    }
 }
 ?>
