@@ -413,9 +413,9 @@ class MODTsLibroBancos extends MODbase{
 		//Definicion de la lista del resultado del query
 		$this->captura('email','varchar');
 		$this->captura('nombre_completo','text');
-		$this->captura('func_cc','text');
+		$this->captura('func_cc','varchar');
 		//Ejecuta la instruccion
-		$this->armarConsulta();
+		$this->armarConsulta();		
 		$this->ejecutarConsulta();
 
 		//Devuelve la respuesta

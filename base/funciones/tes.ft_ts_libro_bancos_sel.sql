@@ -398,7 +398,7 @@ BEGIN
 
                 v_consulta:= 'Select emp.email_empresa,
                                   emp.desc_funcionario1,
-                                  '''||v_func_cc||''' as func_cc
+                                  '''||v_func_cc||'''::varchar as func_cc
                               from tes.tts_libro_bancos t
                               inner join cd.tcuenta_doc cd on cd.id_int_comprobante=t.id_int_comprobante
                               inner join orga.vfuncionario_persona emp on emp.id_funcionario=cd.id_funcionario
