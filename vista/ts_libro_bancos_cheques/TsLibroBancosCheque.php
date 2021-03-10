@@ -480,17 +480,18 @@ header("content-type: text/javascript; charset=UTF-8");
 			config:{
 				name: 'notificado',
 				fieldLabel: 'Notificacion Enviada',
-				allowBlank: false,
+				allowBlank: true,
 				anchor: '100%',
 				gwidth: 110,
         renderer : function(value, p, record) {
           (value=='si')?col = 'color:green;':col='';
-            return String.format('<div style="text-align:center;font-weight:bold;'+col+'">{0}</div>', record.data['notificado']);            
+            return String.format('<div style="text-align:center;font-weight:bold;'+col+'">{0}</div>', record.data['notificado']);
         }
 			},
 				type:'TextField',
 				id_grupo:1,
-				grid:true
+				grid:true,
+        form:false
 		},
 		{
             config:{
