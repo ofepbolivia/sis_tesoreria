@@ -102,7 +102,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 hiddenName: 'id_proveedor',
                 origen:'PROVEEDOR',
                 fieldLabel:'Proveedor',
-                allowBlank:false,
+                allowBlank:true,
                 tinit:false,
                 gwidth : 100,
                 anchor:'50%',

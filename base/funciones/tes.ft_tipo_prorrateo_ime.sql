@@ -323,17 +323,12 @@ BEGIN
             END IF;
 
 
-            for v_registros in (
+           for v_registros in (
                         select id_centro_costo,id_orden_trabajo,descripcion, sum(monto) as monto, id_tabla
                         from tes_temp_prorrateo
-                        where id_proveedor = v_parametros.id_proveedor
+                        --where (id_proveedor = v_parametros.id_proveedor and id_proveedor is null)
                         group by id_centro_costo,id_orden_trabajo,descripcion, id_tabla) loop
 
-                --numero telefonico
-                SELECT num.numero
-                into v_numero_celular
-                FROM gecom.tnumero_celular num
-                where num.id_numero_celular = v_registros.id_tabla;
 
                 if (v_parametros.tiene_tipo_cambio = 'si') then
                 	v_fin_campos = ',' || v_parametros.nombre_monto_mb;
@@ -398,7 +393,7 @@ BEGIN
                     ' || v_parametrizacion.ps_id_partida || ',
                     ' || v_parametrizacion.ps_id_cuenta || ',
                     ' || v_parametrizacion.ps_id_auxiliar || ',
-                    ''' || coalesce (v_registros.descripcion, '') || '('|| v_numero_celular ||')' || ''',
+                    ''' || coalesce (v_registros.descripcion, '') || ''',
                     ' || v_registros.monto || v_fin_valores || '
 
                   )';
