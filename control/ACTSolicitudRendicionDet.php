@@ -66,13 +66,16 @@ class ACTSolicitudRendicionDet extends ACTbase{
 		
 		$this->objFunc=$this->create('MODSolicitudRendicionDet');	
 		if($this->objParam->insertar('id_doc_compra_venta')){
+
 			$this->res=$this->objFunc->insertarRendicionDocCompleto($this->objParam);			
 		} else{
+
 			//TODO			
 			//$this->res=$this->objFunc->modificarSolicitud($this->objParam);
 			//trabajar en la modificacion compelta de solicitud ....			
 			$this->res=$this->objFunc->modificarRendicionDocCompleto($this->objParam);
 		}
+
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
 						
@@ -133,6 +136,14 @@ class ACTSolicitudRendicionDet extends ACTbase{
 			
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}*/
+
+    //15-03-2021 (may) get rendicion relacionar factura
+    function getRendicionDetRel(){
+        $this->objFunc=$this->create('MODSolicitudRendicionDet');
+        $this->res=$this->objFunc->getRendicionDetRel($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+
 }
 
 ?>

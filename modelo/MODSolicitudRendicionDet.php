@@ -315,11 +315,39 @@ class MODSolicitudRendicionDet extends MODbase{
 		//Abre conexion con PDO
 		$cone = new conexion();
 		$link = $cone->conectarpdo();
-		$copiado = false;			
+		$copiado = false;
 		try {
 			$link->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);		
 		  	$link->beginTransaction();
-			
+
+            $boton_rendicion = $this->aParam->getParametro('boton_rendicion');
+            
+            if ($boton_rendicion=='si') {
+
+                $this->procedimiento='tes.ft_solicitud_rendicion_det_ime';
+                $this->transaccion='TES_REND_INS';
+                $this->tipo_procedimiento='IME';
+
+
+                $this->setParametro('id_solicitud_efectivo_fk','id_solicitud_efectivo','int4');
+                $this->setParametro('id_documento_respaldo','id_doc_compra_venta','int4');
+                $this->setParametro('estado_reg','estado_reg','varchar');
+                $this->setParametro('monto','importe_neto','numeric');
+                $this->setParametro('tipo_solicitud','tipo_solicitud','varchar');
+
+                $this->armarConsulta();
+                $stmt = $link->prepare($this->consulta);
+                $stmt->execute();
+                $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                $resp_procedimiento = $this->divRespuesta($result['f_intermediario_ime']);
+                if ($resp_procedimiento['tipo_respuesta']=='ERROR') {
+                    throw new Exception("Error al ejecutar en la bd", 3);
+                }
+                $this->resetParametros();
+            }
+
+
 			/////////////////////////
 			//  inserta cabecera de la solicitud de compra
 			///////////////////////
@@ -603,6 +631,24 @@ class MODSolicitudRendicionDet extends MODbase{
 
 		//Devuelve la respuesta
 		return $this->respuesta;
-	}	
+	}
+
+    //15-03-2021 (may) get rendicion relacionar factura
+    function getRendicionDetRel(){
+        //Definicion de variables para ejecucion del procedimientp
+        $this->procedimiento='tes.ft_solicitud_rendicion_det_ime';
+        $this->transaccion='TES_RENRELFA_GET';
+        $this->tipo_procedimiento='IME';//tipo de transaccion
+
+        $this->setParametro('id_doc_compra_venta','id_doc_compra_venta','int4');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+
 }
 ?>
