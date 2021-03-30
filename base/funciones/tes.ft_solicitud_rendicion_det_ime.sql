@@ -82,7 +82,7 @@ BEGIN
 
              IF v_id_solicitud_efectivo_rend is null THEN
 
-               select id_caja, id_funcionario into v_solicitud_efectivo
+               select id_caja, id_funcionario,fecha into v_solicitud_efectivo
                from tes.tsolicitud_efectivo
                where id_solicitud_efectivo=v_parametros.id_solicitud_efectivo_fk;
 
