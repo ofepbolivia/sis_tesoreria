@@ -68,7 +68,7 @@ Phx.vista.UsuarioCuentaBanc=Ext.extend(Phx.gridInterfaz,{
 					fields: ['id_usuario','desc_person','cuenta'],
 					// turn on remote sorting
 					remoteSort: true,
-					baseParams:{par_filtro:'PERSON.nombre_completo2#cuenta'}
+					baseParams:{par_filtro:'PERSON.nombre_completo2#usu1.cuenta'}
 				}),
    				valueField: 'id_usuario',
    				displayField: 'desc_person',
