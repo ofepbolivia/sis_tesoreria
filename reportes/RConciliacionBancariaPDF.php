@@ -7,6 +7,7 @@ class RConciliacionBancariaPDF extends  ReportePDF{
     var $numeracion;
     var $ancho_sin_totales;
     var $cantidad_columnas_estaticas;
+    var $sub_titulo='SALDO REAL';
 
     function Header(){
         $this->Ln(3);
@@ -28,6 +29,14 @@ class RConciliacionBancariaPDF extends  ReportePDF{
 				$periodo = $value['periodo'];
 				$gestion = $value['gestion'];
 		}
+    if ($gestion == 2021){
+      if ($periodo!='Enero' && $periodo!='Febrero'){
+          $this->sub_titulo = 'SALDO CORRECTO';
+        }
+    }elseif ($gestion > 2021) {
+      $this->sub_titulo = 'SALDO CORRECTO';
+    }
+
 		$height = 2;
 		$witdh  = 30;
 		$this->Ln(5);
@@ -114,7 +123,7 @@ class RConciliacionBancariaPDF extends  ReportePDF{
 
 	$saldo_real1 = $saldo_ext_banca - $cheque + $deposito;
 	$saldo_real2 = (($saldo_erp - $sum_3ra_tabla + $transito) <0)?0:($saldo_erp - $sum_3ra_tabla + $transito);
-  
+
 	$con = 2 + $n;
 	$con1 = 2 + $n1;
 	$con2 = 1 + $n2;
@@ -190,7 +199,7 @@ $html = '<table border="1" cellpadding="2">
    <td align="right">'.number_format($sum_abono,2,',','.').'</td>
  </tr>
  <tr align="center">
-   <td colspan="4"><b>SALDO REAL</b></td>
+   <td colspan="4"><b>'.$this->sub_titulo.'</b></td>
    <td align="right"><b>'.number_format($saldo_real1,2,',','.').'</b></td>
  </tr>
  <tr>
@@ -247,7 +256,7 @@ $html = '<table border="1" cellpadding="2">
    <td align="right">'.number_format($sum_transito,2,',','.').'</td>
  </tr>
  <tr align="center">
-   <td colspan="4"><b>SALDO REAL</b></td>
+   <td colspan="4"><b>'.$this->sub_titulo.'</b></td>
    <td align="right"><b>'.number_format($saldo_real2,2,',','.').'</b></td>
  </tr>
   <tr>
