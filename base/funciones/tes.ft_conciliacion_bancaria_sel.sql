@@ -170,9 +170,9 @@ BEGIN
                           and id_periodo = cbre.id_periodo) as contador,
                  case when cbre.periodo_1 is not null then
                   cbre.periodo_1
-                  when cbre.periodo_2 is not null then
+                  when cbre.periodo_2 is not null and v_fecha_repo < '01/03/2021'::date then
                   cbre.periodo_2
-                  when cbre.periodo_3 is not null and v_fecha_repo < '01/01/2020'::date then 
+                  when cbre.periodo_3 is not null and v_fecha_repo < '01/01/2020'::date then
                   cbre.periodo_3
                   end as saldo,
                   mon.moneda,
