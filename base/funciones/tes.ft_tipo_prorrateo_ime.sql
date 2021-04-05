@@ -193,9 +193,9 @@ BEGIN
             	v_res = orga.f_prorratear_x_empleado(v_parametros.id_periodo,v_parametros.monto,v_tipo_prorrateo.codigo,NULL,NULL,v_parametros.id_proveedor);
             end if;
 
-            --raise exception 'llegabdvres %',v_res;
 
-            -- para verificar que si existe con un proceso
+
+           -- para verificar que si existe con un proceso
            UPDATE gecom.tpago_telefonia SET
            nro_tramite = 'si'
            WHERE id_periodo = v_parametros.id_periodo;
@@ -278,6 +278,7 @@ BEGIN
                            where num.id_numero_celular = v_registros.id_tabla;
 
 
+
                           EXECUTE '
                           INSERT INTO
                               ' || v_parametros.nombre_tabla || '
@@ -320,94 +321,190 @@ BEGIN
 
             	END LOOP;
 
-            END IF;
+                for v_registros in (
+                              select id_centro_costo,id_orden_trabajo,descripcion, sum(monto) as monto, id_tabla
+                              from tes_temp_prorrateo
+                              where id_proveedor = v_parametros.id_proveedor
+                              group by id_centro_costo,id_orden_trabajo,descripcion, id_tabla) loop
 
 
-           for v_registros in (
-                        select id_centro_costo,id_orden_trabajo,descripcion, sum(monto) as monto, id_tabla
-                        from tes_temp_prorrateo
-                        --where (id_proveedor = v_parametros.id_proveedor and id_proveedor is null)
-                        group by id_centro_costo,id_orden_trabajo,descripcion, id_tabla) loop
+                      if (v_parametros.tiene_tipo_cambio = 'si') then
+                          v_fin_campos = ',' || v_parametros.nombre_monto_mb;
+                          v_fin_valores = ',' || (v_registros.monto * v_parametros.tipo_cambio);
+                      else
+                          v_fin_campos = '';
+                          v_fin_valores = '';
+                      end if;
+                      v_id_partida = null;
+
+                      select p.id_partida into v_id_partida
+                      from pre.tpartida p
+                      inner join pre.tconcepto_partida cp on cp.id_partida = p.id_partida
+                      inner join pre.tpresup_partida pp on pp.id_partida = p.id_partida
+                      where  p.id_gestion = v_periodo.id_gestion and cp.id_concepto_ingas = v_parametros.id_concepto_ingas
+                      and pp.id_presupuesto = v_registros.id_centro_costo and pp.estado_reg = 'activo';
+                      if (v_registros.id_centro_costo is null) then
+                          raise exception 'llega';
+                      end if;
+                      if (v_id_partida is null) then
+                          v_id_centro_costo_aux = NULL;
+                          v_id_centro_costo_aux = tes.f_get_uo_presupuesta_prorrateo(v_parametros.id_concepto_ingas,v_registros.id_centro_costo);
+
+                          if (v_id_centro_costo_aux is null) then
+                              raise exception 'No existe un centro de  costo: % relacionado a la partida',v_registros.id_centro_costo;
+                          else
+                              v_registros.id_centro_costo = v_id_centro_costo_aux;
+                          end if;
+                      end if;
 
 
-                if (v_parametros.tiene_tipo_cambio = 'si') then
-                	v_fin_campos = ',' || v_parametros.nombre_monto_mb;
-                    v_fin_valores = ',' || (v_registros.monto * v_parametros.tipo_cambio);
-                else
-                	v_fin_campos = '';
-                    v_fin_valores = '';
-                end if;
-                v_id_partida = null;
 
-                select p.id_partida into v_id_partida
-                from pre.tpartida p
-                inner join pre.tconcepto_partida cp on cp.id_partida = p.id_partida
-                inner join pre.tpresup_partida pp on pp.id_partida = p.id_partida
-                where  p.id_gestion = v_periodo.id_gestion and cp.id_concepto_ingas = v_parametros.id_concepto_ingas
-                and pp.id_presupuesto = v_registros.id_centro_costo and pp.estado_reg = 'activo';
-                if (v_registros.id_centro_costo is null) then
-                	raise exception 'llega';
-                end if;
-                if (v_id_partida is null) then
-                	v_id_centro_costo_aux = NULL;
-                	v_id_centro_costo_aux = tes.f_get_uo_presupuesta_prorrateo(v_parametros.id_concepto_ingas,v_registros.id_centro_costo);
+                      SELECT * into v_parametrizacion
+                      FROM conta.f_get_config_relacion_contable('CUECOMP', v_periodo.id_gestion,
+                      v_parametros.id_concepto_ingas, v_registros.id_centro_costo);
 
-                    if (v_id_centro_costo_aux is null) then
-                    	raise exception 'No existe un centro de  costo: % relacionado a la partida',v_registros.id_centro_costo;
+
+                      --numero telefonico
+                       SELECT num.numero
+                       into v_numero_celular
+                       FROM gecom.tnumero_celular num
+                       where num.id_numero_celular = v_registros.id_tabla;
+
+
+                      EXECUTE '
+                      INSERT INTO
+                          ' || v_parametros.nombre_tabla || '
+                        (
+                          id_usuario_reg,
+                          fecha_reg,
+                          ' || v_parametros.nombre_id || ',
+                          id_concepto_ingas,
+                          id_centro_costo,
+                          id_orden_trabajo,
+                          id_partida,
+                          id_cuenta,
+                          id_auxiliar,
+                          descripcion,
+                          ' || v_parametros.nombre_monto ||v_fin_campos || '
+                        )
+                        VALUES (
+                          ' || p_id_usuario || ',
+                          now(),
+                          ' || v_parametros.id_valor || ',
+                          ' || v_parametros.id_concepto_ingas || ',
+                          ' || v_registros.id_centro_costo || ',
+                          ' || v_registros.id_orden_trabajo || ',
+                          ' || v_parametrizacion.ps_id_partida || ',
+                          ' || v_parametrizacion.ps_id_cuenta || ',
+                          ' || v_parametrizacion.ps_id_auxiliar || ',
+                          ''' || coalesce (v_registros.descripcion, '') || '('|| v_numero_celular ||')' || ''',
+                          ' || v_registros.monto || v_fin_valores || '
+
+                        )';
+
+
+
+                        if (pxp.f_existe_parametro(p_tabla,'nombre_funcion_ejecutar')) then
+                              v_query = 'select ' || v_parametros.nombre_funcion_ejecutar ||
+                                       '(' || v_parametros.id_valor || ')';
+
+                              execute v_query into v_res;
+                        end if;
+
+                  end loop;
+
+
+            ELSE
+
+            	for v_registros in (
+                            select id_centro_costo,id_orden_trabajo,descripcion, sum(monto) as monto, id_tabla
+                            from tes_temp_prorrateo
+                            --where (id_proveedor = v_parametros.id_proveedor and id_proveedor is null)
+                            group by id_centro_costo,id_orden_trabajo,descripcion, id_tabla) loop
+
+
+                    if (v_parametros.tiene_tipo_cambio = 'si') then
+                        v_fin_campos = ',' || v_parametros.nombre_monto_mb;
+                        v_fin_valores = ',' || (v_registros.monto * v_parametros.tipo_cambio);
                     else
-                    	v_registros.id_centro_costo = v_id_centro_costo_aux;
+                        v_fin_campos = '';
+                        v_fin_valores = '';
                     end if;
-                end if;
+                    v_id_partida = null;
+
+                    select p.id_partida into v_id_partida
+                    from pre.tpartida p
+                    inner join pre.tconcepto_partida cp on cp.id_partida = p.id_partida
+                    inner join pre.tpresup_partida pp on pp.id_partida = p.id_partida
+                    where  p.id_gestion = v_periodo.id_gestion and cp.id_concepto_ingas = v_parametros.id_concepto_ingas
+                    and pp.id_presupuesto = v_registros.id_centro_costo and pp.estado_reg = 'activo';
+                    if (v_registros.id_centro_costo is null) then
+                        raise exception 'llega';
+                    end if;
+                    if (v_id_partida is null) then
+                        v_id_centro_costo_aux = NULL;
+                        v_id_centro_costo_aux = tes.f_get_uo_presupuesta_prorrateo(v_parametros.id_concepto_ingas,v_registros.id_centro_costo);
+
+                        if (v_id_centro_costo_aux is null) then
+                            raise exception 'No existe un centro de  costo: % relacionado a la partida',v_registros.id_centro_costo;
+                        else
+                            v_registros.id_centro_costo = v_id_centro_costo_aux;
+                        end if;
+                    end if;
 
 
 
-            	SELECT * into v_parametrizacion
-                FROM conta.f_get_config_relacion_contable('CUECOMP', v_periodo.id_gestion,
-                v_parametros.id_concepto_ingas, v_registros.id_centro_costo);
+                    SELECT * into v_parametrizacion
+                    FROM conta.f_get_config_relacion_contable('CUECOMP', v_periodo.id_gestion,
+                    v_parametros.id_concepto_ingas, v_registros.id_centro_costo);
 
 
 
-                EXECUTE '
-                INSERT INTO
-                    ' || v_parametros.nombre_tabla || '
-                  (
-                    id_usuario_reg,
-                    fecha_reg,
-                    ' || v_parametros.nombre_id || ',
-                    id_concepto_ingas,
-                    id_centro_costo,
-                    id_orden_trabajo,
-                    id_partida,
-                    id_cuenta,
-                    id_auxiliar,
-                    descripcion,
-                    ' || v_parametros.nombre_monto ||v_fin_campos || '
-                  )
-                  VALUES (
-                    ' || p_id_usuario || ',
-                    now(),
-                    ' || v_parametros.id_valor || ',
-                    ' || v_parametros.id_concepto_ingas || ',
-                    ' || v_registros.id_centro_costo || ',
-                    ' || v_registros.id_orden_trabajo || ',
-                    ' || v_parametrizacion.ps_id_partida || ',
-                    ' || v_parametrizacion.ps_id_cuenta || ',
-                    ' || v_parametrizacion.ps_id_auxiliar || ',
-                    ''' || coalesce (v_registros.descripcion, '') || ''',
-                    ' || v_registros.monto || v_fin_valores || '
+                    EXECUTE '
+                    INSERT INTO
+                        ' || v_parametros.nombre_tabla || '
+                      (
+                        id_usuario_reg,
+                        fecha_reg,
+                        ' || v_parametros.nombre_id || ',
+                        id_concepto_ingas,
+                        id_centro_costo,
+                        id_orden_trabajo,
+                        id_partida,
+                        id_cuenta,
+                        id_auxiliar,
+                        descripcion,
+                        ' || v_parametros.nombre_monto ||v_fin_campos || '
+                      )
+                      VALUES (
+                        ' || p_id_usuario || ',
+                        now(),
+                        ' || v_parametros.id_valor || ',
+                        ' || v_parametros.id_concepto_ingas || ',
+                        ' || v_registros.id_centro_costo || ',
+                        ' || v_registros.id_orden_trabajo || ',
+                        ' || v_parametrizacion.ps_id_partida || ',
+                        ' || v_parametrizacion.ps_id_cuenta || ',
+                        ' || v_parametrizacion.ps_id_auxiliar || ',
+                        ''' || coalesce (v_registros.descripcion, '') || ''',
+                        ' || v_registros.monto || v_fin_valores || '
 
-                  )';
+                      )';
 
 
 
-                  if (pxp.f_existe_parametro(p_tabla,'nombre_funcion_ejecutar')) then
-                  		v_query = 'select ' || v_parametros.nombre_funcion_ejecutar ||
-                        		 '(' || v_parametros.id_valor || ')';
+                      if (pxp.f_existe_parametro(p_tabla,'nombre_funcion_ejecutar')) then
+                            v_query = 'select ' || v_parametros.nombre_funcion_ejecutar ||
+                                     '(' || v_parametros.id_valor || ')';
 
-                        execute v_query into v_res;
-                  end if;
+                            execute v_query into v_res;
+                      end if;
 
-        	end loop;
+                end loop;
+
+
+
+            END IF;
            
             --Definicion de la respuesta
             

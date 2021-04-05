@@ -175,6 +175,22 @@ DECLARE
      v_id_obligacion_pago_secundario	integer;
      v_id_obligacion_pago_original		record;
      v_id_obligacion_det_rel 			integer;
+     v_obligacion_pago					record;
+	 v_documentos						record;
+     v_facturas							record;
+     v_registros_pp_json				record;
+     v_estado_pago						record;
+     v_estado							varchar;
+     v_id_plan_pago						integer;
+     v_hstore_registros_pp				hstore;
+     v_id_obligacion_pago_sg_pp 		varchar[];
+     v_id_gestion_sg_pp					varchar[];
+     v_prorrateo						record;
+     v_id_doc_compra_venta				integer;
+     v_num_tramite_sg					varchar;
+     v_id_prorrateo						integer;
+     v_id_obligacion_det_pro			integer;
+     v_id_plan_pago_pro					integer;
 
 
 BEGIN
@@ -2417,7 +2433,7 @@ BEGIN
 
                 --validar que no tenga extenciones
                 IF v_registros.id_obligacion_pago_extendida is not null THEN
-                  raise exception 'Ña obligacion de pago ya fue extendida';
+                  raise exception 'La obligacion de pago ya fue extendida';
                 END IF;
 
                ------------------------------
@@ -2438,6 +2454,7 @@ BEGIN
                 v_hstore_registros =   hstore(ARRAY[
                                                  'fecha',v_date::varchar,
                                                  'tipo_obligacion', 'pgaext',
+                                                 'estado', 'en_pago'::varchar,
                                                  'id_funcionario',v_registros.id_funcionario::varchar,
                                                  '_id_usuario_ai',v_parametros._id_usuario_ai::varchar,
                                                  '_nombre_usuario_ai',v_parametros._nombre_usuario_ai::varchar,
@@ -2470,6 +2487,79 @@ BEGIN
                  v_id_obligacion_pago_sg =  pxp.f_recupera_clave(v_resp, 'id_obligacion_pago');
                  v_id_gestion_sg =  pxp.f_recupera_clave(v_resp, 'id_gestion');
 
+                 -----
+
+                 SELECT op.id_proceso_wf, op.id_estado_wf, op.estado, op.num_tramite
+                 INTO v_id_proceso_wf, v_id_estado_wf, v_estado, v_num_tramite_sg
+                 FROM tes.tobligacion_pago op
+                 WHERE op.id_obligacion_pago = v_id_obligacion_pago_sg[1]::integer;
+
+                 update tes.tobligacion_pago set
+                 estado = 'en_pago'::varchar
+                 where id_obligacion_pago = v_id_obligacion_pago_sg[1]::integer;
+
+                SELECT es.* , op.estado
+                INTO v_estado_pago
+                FROM tes.tobligacion_pago op
+                inner join wf.testado_wf es on es.id_estado_wf = op.id_estado_wf
+                inner join wf.ttipo_estado ts on ts.id_tipo_estado= es.id_tipo_estado
+                WHERE op.id_obligacion_pago = v_id_obligacion_pago_sg[1]::integer;
+
+
+				---------------------------------------
+                -- REGISTA EL SIGUIENTE ESTADO DEL WF.
+                ---------------------------------------
+
+				IF v_estado_pago.estado::varchar = 'en_pago' THEN
+                	IF v_estado = 'borrador' THEN
+
+                       --   para un estado siguiente
+                             SELECT  ps_id_tipo_estado,
+                                     ps_codigo_estado
+                                     --ps_disparador,
+                                     --ps_regla,
+                                     --ps_prioridad
+
+                                 into
+                                    va_id_tipo_estado,
+                                    va_codigo_estado
+                                    --va_disparador,
+                                    --va_regla,
+                                    --va_prioridad
+
+                                FROM wf.f_obtener_estado_wf(
+                                 v_id_proceso_wf,
+                                  NULL,
+                                 v_estado_pago.id_tipo_estado,
+                                 'siguiente',
+                                 p_id_usuario);
+
+                       v_id_estado_actual =  wf.f_registra_estado_wf(  va_id_tipo_estado[1],
+                                                                       v_estado_pago.id_funcionario,
+                                                                       v_estado_pago.id_estado_wf,
+                                                                       v_id_proceso_wf,
+                                                                       p_id_usuario,
+                                                                       v_estado_pago.id_usuario_ai,
+                                                                       v_estado_pago.usuario_ai,
+                                                                       v_estado_pago.id_depto,
+                                                                       v_estado_pago.obs);
+
+                       -- actualiza estado en la solicitud
+                          update tes.tobligacion_pago   set
+                             id_estado_wf =  v_id_estado_actual,
+                             estado = va_codigo_estado[1],
+                             id_usuario_mod = p_id_usuario,
+                             --id_usuario_ai = p_id_usuario_ai,
+                             --usuario_ai = p_usuario_ai,
+                             fecha_mod = now()
+
+                          where id_proceso_wf = v_id_proceso_wf;
+
+                    END IF;
+
+                END IF;
+                 -----
+
 
 
                  --------------------------------------------------------------------------------------------
@@ -2493,21 +2583,23 @@ BEGIN
                         --recueprar centro de cotos para la siguiente gestion  (los centro de cosots y presupeustos tiene los mismo IDS)
 
 
-                          select
+                          /*select
                             pi.id_presupuesto_dos
                           into
                             v_id_centro_costo_dos
                           from pre.tpresupuesto_ids pi
                           where pi.id_presupuesto_uno = v_registros_det.id_centro_costo;
-
                           IF v_id_centro_costo_dos is not NULL THEN
+                          ELSE
+                          	raise exception 'No existe el Centro de Costo - Presupuesto';
+                          END IF;
 
                                   SELECT
                                       ps_id_partida
                                     into
                                       v_id_partida
                                   FROM conta.f_get_config_relacion_contable('CUECOMP', v_id_gestion_sg[1]::integer, v_registros_det.id_concepto_ingas, v_id_centro_costo_dos);
-
+							*/
 
                                   --Sentencia de la insercion
                                   insert into tes.tobligacion_det(
@@ -2531,12 +2623,12 @@ BEGIN
                                   (
                                     'activo',
                                     --v_parametros.id_cuenta,
-                                    v_id_partida,
+                                    v_registros_det.id_partida,
                                     --v_parametros.id_auxiliar,
                                     v_registros_det.id_concepto_ingas,
                                     v_registros_det.monto_pago_mo,
                                     v_id_obligacion_pago_sg[1]::integer,
-                                    v_id_centro_costo_dos,
+                                    v_registros_det.id_centro_costo,
                                     v_registros_det.monto_pago_mb,
                                     v_registros_det.descripcion,
                                     now(),
@@ -2547,7 +2639,7 @@ BEGIN
 
                                   )RETURNING id_obligacion_det into v_id_obligacion_det;
 
-                          END IF;
+
 
                   END LOOP;
 
@@ -2558,6 +2650,135 @@ BEGIN
                     id_usuario_mod = p_id_usuario,
                     fecha_mod = now()
                 where id_obligacion_pago = v_parametros.id_obligacion_pago;
+
+
+                ------------------------------
+                --01-04-2021
+                --INSERTA DOCUMENTOS
+                ------------------------------
+
+
+                select op.*
+                into v_obligacion_pago
+                from tes.tobligacion_pago op
+                where op.id_obligacion_pago = v_parametros.id_obligacion_pago ;
+
+
+
+                for v_documentos in (select wf.*
+                							from  wf.tdocumento_wf wf
+                                            where wf.id_proceso_wf = v_obligacion_pago.id_proceso_wf) loop
+                --v_id_documento_wf_op = 30;
+               		INSERT INTO
+                                wf.tdocumento_wf
+                              (
+                                id_usuario_reg,
+                                fecha_reg,
+                                estado_reg,
+                                id_tipo_documento,
+                                id_proceso_wf,
+                                num_tramite,
+                                chequeado,
+                                url,
+                                extension,
+                                obs,
+                                chequeado_fisico,
+                                id_usuario_upload,
+                                fecha_upload,
+                                id_documento_wf_ori,
+                                id_estado_ini
+                              )
+                              VALUES (
+                                p_id_usuario,
+                                now(),
+                               'activo',
+                                v_documentos.id_tipo_documento,
+                                v_documentos.id_proceso_wf,
+                                v_documentos.num_tramite,
+                                v_documentos.chequeado,
+                                v_documentos.url,
+                                v_documentos.extension,
+                                v_documentos.obs,
+                                v_documentos.chequeado_fisico,
+                                v_documentos.id_usuario_upload,
+                                v_documentos.fecha_upload,
+                                v_documentos.id_documento_wf,
+                                v_id_estado_actual
+                               );
+
+          		 END LOOP;
+
+                 -----------------------------------------------------------------------------------------------
+                 --01-04-2021
+                 -- copiar plan de pago
+                 ------------------------------------------------------------------------------------------------
+
+
+                  FOR  v_registros_pp_json in ( SELECT pp.*
+                                              FROM tes.tplan_pago pp
+                                              WHERE pp.id_obligacion_pago =  v_parametros.id_obligacion_pago) LOOP
+
+                           v_hstore_registros_pp =   hstore(ARRAY[
+               								 'nro_cuota',v_registros_pp_json.nro_cuota::varchar,
+                                              'estado', 'borrador'::varchar,
+                                             'tipo_pago',v_registros_pp_json.tipo_pago::varchar,
+                                             'monto_ejecutar_total_mo',v_registros_pp_json.monto_ejecutar_total_mo::varchar,
+                                             'id_plantilla',v_registros_pp_json.id_plantilla::varchar,
+                                             'descuento_anticipo',v_registros_pp_json.descuento_anticipo::varchar,
+                                             'otros_descuentos',v_registros_pp_json.otros_descuentos::varchar,
+                                             'tipo',v_registros_pp_json.tipo::varchar,
+                                              --'tipo',(v_registros_pp_json->>'tipo')::varchar,
+                                             'monto',v_registros_pp_json.monto::varchar,
+                                             'nombre_pago',v_registros_pp_json.nombre_pago::varchar,
+                                             'forma_pago',v_registros_pp_json.forma_pago::varchar,
+                                             'fecha_reg',v_registros_pp_json.fecha_reg::varchar,
+                                             'id_usuario_reg',v_registros_pp_json.id_usuario_reg::varchar,
+                                             --'fecha_tentativa',(v_registros_pp_json->>'fecha_tentativa')::varchar,
+                                             --'fecha_costo_ini',(v_registros_pp_json->>'fecha_costo_ini')::varchar,
+                                             --'fecha_costo_fin',(v_registros_pp_json->>'fecha_costo_fin')::varchar,
+                                             'es_ultima_cuota',v_registros_pp_json.es_ultima_cuota::varchar,
+                                             'id_usuario_ai',v_registros_pp_json.id_usuario_ai::varchar,
+                                             'usuario_ai',v_registros_pp_json.usuario_ai::varchar,
+                                             'monto_no_pagado',v_registros_pp_json.monto_no_pagado::varchar,
+                                             'monto_retgar_mo',v_registros_pp_json.monto_retgar_mo::varchar,
+                                             'descuento_ley',v_registros_pp_json.descuento_ley::varchar,
+                                             'porc_descuento_ley',v_registros_pp_json.porc_descuento_ley::varchar,
+                                             'id_obligacion_pago',v_id_obligacion_pago_sg[1]::varchar,
+                                             'id_depto_lb',v_registros_pp_json.id_depto_lb::varchar,
+                                             'obs_monto_no_pagado',v_registros_pp_json.obs_monto_no_pagado::varchar
+                                            ]);
+
+            	END LOOP;
+
+                v_resp = tes.f_inserta_plan_pago_dev(p_administrador, p_id_usuario,hstore(v_hstore_registros_pp));
+                v_id_obligacion_pago_sg_pp =  pxp.f_recupera_clave(v_resp, 'id_plan_pago');
+                v_id_gestion_sg_pp =  pxp.f_recupera_clave(v_resp, 'id_gestion');
+
+
+                 ------------------------------
+                 --01-04-2021
+                 --INSERTA FACTURAS
+                 ------------------------------
+
+                for v_facturas in (select dcv.*
+                                  from  conta.tdoc_compra_venta dcv
+                                  left join tes.tplan_pago pp on pp.id_plan_pago =   dcv.id_plan_pago
+                                  where pp.id_obligacion_pago =  v_parametros.id_obligacion_pago) loop
+
+
+                                   UPDATE conta.tdoc_compra_venta SET
+                                   id_plan_pago = v_id_obligacion_pago_sg_pp[1]::integer,
+                                   nro_tramite = v_num_tramite_sg
+                                   WHERE id_doc_compra_venta = v_facturas.id_doc_compra_venta;
+
+                                   UPDATE conta.tdoc_compra_venta_ext SET
+                                   nro_tramite_relacion = v_obligacion_pago.num_tramite
+                                   WHERE id_doc_compra_venta = v_facturas.id_doc_compra_venta;
+
+
+
+
+                 END LOOP;
 
                 -- Definicion de la respuesta
                 v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Se extendio la obligacion de pago a la siguiente gestion');
