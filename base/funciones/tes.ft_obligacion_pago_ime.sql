@@ -191,6 +191,9 @@ DECLARE
      v_id_prorrateo						integer;
      v_id_obligacion_det_pro			integer;
      v_id_plan_pago_pro					integer;
+     v_montos_devengados_pro			record;
+     v_monto_pago_mo_det				numeric;
+     v_monto_pago_mb_det				numeric;
 
 
 BEGIN
@@ -2416,7 +2419,6 @@ BEGIN
         elsif(p_transaccion='TES_EXTPGAE_IME')then
 
             begin
-
                 --------------------------------------
                 -- verificar que no este extendida
                 --------------------------------------
@@ -2436,6 +2438,170 @@ BEGIN
                   raise exception 'La obligacion de pago ya fue extendida';
                 END IF;
 
+            ---
+
+			IF EXISTS (SELECT pp.*
+                        FROM tes.tplan_pago pp
+                        WHERE pp.id_obligacion_pago =  v_parametros.id_obligacion_pago
+                        and pp.estado = 'devengado' ) THEN
+
+
+
+                         ------------------------------
+                         -- copiar obligacion de pago
+                         ------------------------------
+
+                          v_date = now()::Date;
+                          v_anho = (date_part('year', v_registros.fecha))::integer;
+                          v_anho = v_anho  + 1;
+
+
+                          if(v_anho>date_part('year', v_date)) then
+                              v_date = (date_part('year', v_date)::varchar||'-1-1')::Date;
+                          else
+                              v_date = (v_anho::varchar||'-1-1')::Date;
+                          end if;
+
+                          v_hstore_registros =   hstore(ARRAY[
+                                                           'fecha',v_date::varchar,
+                                                           'tipo_obligacion', 'pgaext',
+                                                           'estado', 'borrador'::varchar,
+                                                           'id_funcionario',v_registros.id_funcionario::varchar,
+                                                           '_id_usuario_ai',v_parametros._id_usuario_ai::varchar,
+                                                           '_nombre_usuario_ai',v_parametros._nombre_usuario_ai::varchar,
+                                                           'id_depto',v_registros.id_depto::varchar,
+                                                           'obs','Extiende el tramite: '||v_registros.num_tramite||',  Obs:  '||v_registros.obs,
+                                                           'id_proveedor',v_registros.id_proveedor::varchar,
+                                                           --'tipo_obligacion',v_registros.tipo_obligacion::varchar,
+                                                           'id_moneda',v_registros.id_moneda::varchar,
+                                                           'tipo_cambio_conv',v_registros.tipo_cambio_conv::varchar,
+                                                           'pago_variable',v_registros.pago_variable::varchar,
+                                                           'total_nro_cuota',v_registros.total_nro_cuota::varchar,
+                                                           'fecha_pp_ini',v_registros.fecha_pp_ini::varchar,
+                                                           'rotacion',v_registros.rotacion::varchar,
+                                                           'id_plantilla',v_registros.id_plantilla::varchar,
+                                                           'tipo_anticipo',v_registros.tipo_anticipo::varchar,
+                                                           'id_contrato',v_registros.id_contrato::varchar
+                                                          ]);
+
+
+                          --bandera para ver si es un pago recurrente o unico=1, pga=2.
+                          if(v_parametros.id_administrador = 2)then
+                             v_id_administrador = 2;
+                          elsif (v_parametros.id_administrador = 3) then
+                             v_id_administrador = 3;
+                          else
+                             v_id_administrador = p_administrador;
+                          end if;
+
+                           v_resp = tes.f_inserta_obligacion_pago(v_id_administrador, p_id_usuario, hstore(v_hstore_registros));
+                           v_id_obligacion_pago_sg =  pxp.f_recupera_clave(v_resp, 'id_obligacion_pago');
+                           v_id_gestion_sg =  pxp.f_recupera_clave(v_resp, 'id_gestion');
+
+                           -----
+
+                           SELECT op.id_proceso_wf, op.id_estado_wf, op.estado, op.num_tramite
+                           INTO v_id_proceso_wf, v_id_estado_wf, v_estado, v_num_tramite_sg
+                           FROM tes.tobligacion_pago op
+                           WHERE op.id_obligacion_pago = v_id_obligacion_pago_sg[1]::integer;
+
+
+                           -----
+
+                           --------------------------------------------------------------------------------------------
+                           -- copiar detalle de obligacion , verifican la tabla id_presupuestos_ids si existe se copia...
+                           ------------------------------------------------------------------------------------------------
+                            FOR  v_registros_det in (
+                                                    SELECT
+                                                        od.id_obligacion_det,
+                                                        od.id_concepto_ingas,
+                                                        od.id_centro_costo,
+                                                        od.id_partida,
+                                                        od.descripcion,
+                                                        od.monto_pago_mo ,
+                                                        od.id_orden_trabajo,
+                                                        od.monto_pago_mb
+                                                      FROM  tes.tobligacion_det od
+                                                      where  od.estado_reg = 'activo' and
+                                                             od.id_obligacion_pago = v_parametros.id_obligacion_pago) LOOP
+
+
+
+
+
+                                            SELECT pro.monto_ejecutar_mo, pro.monto_ejecutar_mb
+                                            INTO v_montos_devengados_pro
+                                            FROM tes.tprorrateo pro
+                                            inner join tes.tobligacion_det od on od.id_obligacion_det = pro.id_obligacion_det
+                                            inner join tes.tplan_pago pp on pp.id_plan_pago = pro.id_plan_pago
+                                            WHERE od.id_obligacion_pago = v_parametros.id_obligacion_pago
+                                            and od.id_obligacion_det = v_registros_det.id_obligacion_det
+                                            and pp.estado = 'devengado';
+
+
+                                            v_monto_pago_mo_det = (COALESCE(v_registros_det.monto_pago_mo, 0) - COALESCE(v_montos_devengados_pro.monto_ejecutar_mo, 0));
+                                            v_monto_pago_mb_det = (COALESCE(v_registros_det.monto_pago_mb, 0) - COALESCE(v_montos_devengados_pro.monto_ejecutar_mb, 0));
+
+
+
+
+                                            --Sentencia de la insercion
+                                            insert into tes.tobligacion_det(
+                                              estado_reg,
+                                              --id_cuenta,
+                                              id_partida,
+                                              --id_auxiliar,
+                                              id_concepto_ingas,
+                                              monto_pago_mo,
+                                              id_obligacion_pago,
+                                              id_centro_costo,
+                                              monto_pago_mb,
+                                              descripcion,
+                                              fecha_reg,
+                                              id_usuario_reg,
+                                              fecha_mod,
+                                              id_usuario_mod,
+                                              id_orden_trabajo
+                                            )
+                                            values
+                                            (
+                                              'activo',
+                                              --v_parametros.id_cuenta,
+                                              v_registros_det.id_partida,
+                                              --v_parametros.id_auxiliar,
+                                              v_registros_det.id_concepto_ingas,
+                                              v_monto_pago_mo_det, --v_registros_det.monto_pago_mo,
+                                              v_id_obligacion_pago_sg[1]::integer,
+                                              v_registros_det.id_centro_costo,
+                                              v_monto_pago_mb_det, --v_registros_det.monto_pago_mb,
+                                              v_registros_det.descripcion,
+                                              now(),
+                                              p_id_usuario,
+                                              null,
+                                              null,
+                                              v_registros_det.id_orden_trabajo
+
+                                            )RETURNING id_obligacion_det into v_id_obligacion_det;
+
+
+
+                            END LOOP;
+
+                          --actualiza obligacion extendida en la original
+
+                          update tes.tobligacion_pago set
+                              id_obligacion_pago_extendida = v_id_obligacion_pago_sg[1]::integer,
+                              id_usuario_mod = p_id_usuario,
+                              fecha_mod = now()
+                          where id_obligacion_pago = v_parametros.id_obligacion_pago;
+
+
+
+           ELSE ---IF exist
+
+
+
+			---
                ------------------------------
                -- copiar obligacion de pago
                ------------------------------
@@ -2494,8 +2660,10 @@ BEGIN
                  FROM tes.tobligacion_pago op
                  WHERE op.id_obligacion_pago = v_id_obligacion_pago_sg[1]::integer;
 
+                 --UPDATE
                  update tes.tobligacion_pago set
-                 estado = 'en_pago'::varchar
+                 estado = 'en_pago'::varchar,
+                 total_pago = v_registros.total_pago::numeric
                  where id_obligacion_pago = v_id_obligacion_pago_sg[1]::integer;
 
                 SELECT es.* , op.estado
@@ -2779,6 +2947,10 @@ BEGIN
 
 
                  END LOOP;
+
+
+             END IF; --IF EXIST
+
 
                 -- Definicion de la respuesta
                 v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Se extendio la obligacion de pago a la siguiente gestion');
