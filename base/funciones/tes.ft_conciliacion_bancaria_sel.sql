@@ -55,7 +55,7 @@ BEGIN
           inner join orga.vfuncionario_cargo_lugar fc on fc.id_funcionario = f.id_funcionario
           where u.id_usuario = p_id_usuario
           and nombre_unidad = 'Tesorería'
-          and nombre_cargo = 'Jefe Tesorería';
+          and nombre_cargo = 'Tesorería';
 
     		--Sentencia de la consulta
 			v_consulta:=' select conci.id_conciliacion_bancaria,
