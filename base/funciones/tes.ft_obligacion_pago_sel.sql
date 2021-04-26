@@ -1131,6 +1131,9 @@ BEGIN
             ---
 
 			--Sentencia de la consulta de conteo de registros
+			--26-04-2021(may) modificacion parte FROM current_date
+            --inner JOIN orga.tuo_funcionario uof ON uof.id_funcionario = ts.id_funcionario and uof.tipo = ''oficial'' and uof.estado_reg = ''activo'' and (current_date <= uof.fecha_finalizacion or  uof.fecha_finalizacion is null)
+
 			v_consulta:='
             SELECT
             	vcp.id_categoria_programatica AS id_cp, ttc.codigo AS centro_costo,
@@ -1181,7 +1184,7 @@ BEGIN
 
             inner join orga.vfuncionario fun on fun.id_funcionario = ts.id_funcionario
 
-            inner JOIN orga.tuo_funcionario uof ON uof.id_funcionario = ts.id_funcionario and uof.tipo = ''oficial'' and uof.estado_reg = ''activo'' and (current_date <= uof.fecha_finalizacion or  uof.fecha_finalizacion is null)
+            inner JOIN orga.tuo_funcionario uof ON uof.id_funcionario = ts.id_funcionario and uof.tipo = ''oficial'' and uof.estado_reg = ''activo'' and (ts.fecha <= uof.fecha_finalizacion or  uof.fecha_finalizacion is null)
 			inner JOIN orga.tuo tuo on tuo.id_uo = orga.f_get_uo_gerencia(uof.id_uo,uof.id_funcionario,current_date)
 
             left JOIN pre.tpresupuesto_partida_entidad tppe ON tppe.id_partida = tpar.id_partida AND tppe.id_presupuesto = tp.id_presupuesto
