@@ -1192,7 +1192,9 @@ BEGIN
             left JOIN pre.tpresupuesto_partida_entidad tppe ON tppe.id_partida = tpar.id_partida AND tppe.id_presupuesto = tp.id_presupuesto
             left JOIN pre.tentidad_transferencia tet ON tet.id_entidad_transferencia = tppe.id_entidad_transferencia
 
-            WHERE tsd.estado_reg = ''activo'' AND ts.id_proceso_wf = '||v_parametros.id_proceso_wf;
+            WHERE tsd.estado_reg = ''activo''
+            AND uof.estado_reg = ''activo''
+            AND ts.id_proceso_wf = '||v_parametros.id_proceso_wf;
 
 			v_consulta =  v_consulta ||
             ' GROUP BY vcp.id_categoria_programatica, tpar.codigo, ttc.codigo, vcp.codigo_programa,
