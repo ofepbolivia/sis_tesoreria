@@ -1106,7 +1106,7 @@ BEGIN
                   IF(v_record.codigo = 'vbpoa' OR v_record.codigo = 'suppresu' OR v_record.codigo = 'vbpresupuestos' OR v_record.codigo = 'registrado')THEN
                     	SELECT vf.desc_funcionario1, vf.nombre_cargo, vf.oficina_nombre
                         INTO v_record_funcionario
-                        FROM orga.vfuncionario_cargo_lugar vf
+                        FROM orga.vfuncionario_cargo_lugar_todos vf
                         WHERE vf.id_funcionario = v_record.id_funcionario;
                         v_firmas[v_index] = v_record.codigo::VARCHAR||','||v_record.fecha_reg::VARCHAR||','||v_record_funcionario.desc_funcionario1::VARCHAR||','||v_record_funcionario.nombre_cargo::VARCHAR||','||v_record_funcionario.oficina_nombre;
                         v_index = v_index + 1;
