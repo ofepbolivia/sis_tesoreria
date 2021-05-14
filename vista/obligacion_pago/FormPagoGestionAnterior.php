@@ -33,6 +33,8 @@ header("content-type: text/javascript; charset=UTF-8");
             this.iniciarEventosDetalle();
             this.onNew();
 
+            this.construyeVariablesContratos();
+
         },
         buildComponentesDetalle: function(){
             this.detCmp = {
@@ -432,8 +434,8 @@ header("content-type: text/javascript; charset=UTF-8");
                         layout: 'column',
                         region: 'north',
                         autoScroll: true,
-                        labelAlign: 'top',
-                        labelWidth: 80,
+                        //labelAlign: 'top',
+                        //labelWidth: 80,
                         autoHeight: true,
                         collapseFirst : false,
                         collapsible: true,
@@ -473,7 +475,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                 columnWidth: .30,
                                 layout: 'fit',
                                 bodyStyle: 'padding-right:10px;',
-                                border: true,
+                                border: false,
                                 autoHeight: true,
                                 items: [
                                     {
@@ -501,7 +503,7 @@ header("content-type: text/javascript; charset=UTF-8");
                                 columnWidth: .25,
                                 layout: 'fit',
                                 //bodyStyle: 'padding-right:5px;',
-                                border: true,
+                                border: false,
                                 autoHeight: true,
                                 items: [
                                     {
@@ -564,7 +566,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     readOnly : true,
                     allowBlank: false,
                     gwidth : 100,
-                    anchor : '36.5%',
+                    anchor : '85%',
                     format: 'd/m/Y'
                 },
                 type: 'DateField',
@@ -579,7 +581,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     fieldLabel:'Funcionario',
                     allowBlank:false,
                     gwidth:200,
-                    anchor : '58.5%',
+                    anchor : '85%',
                     valueField: 'id_funcionario',
                     gdisplayField: 'desc_funcionario',
                     baseParams: { es_combo_solicitud : 'si' } },
@@ -593,7 +595,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     url: '../../sis_parametros/control/Depto/listarDeptoFiltradoXUsuario',
                     fieldLabel: 'Depto',
                     allowBlank: false,
-                    anchor : '58.5%',
+                    anchor : '85%',
                     origen: 'DEPTO',
                     tinit: false,
                     baseParams:{estado:'activo',codigo_subsistema:'TES',modulo:'OP'}//parametros adicionales que se le pasan al store
@@ -608,7 +610,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 config: {
                     name: 'id_moneda',
                     fieldLabel: 'Moneda',
-                        anchor: '57.5%',
+                    anchor: '85%',
                     tinit: false,
                     allowBlank: false,
                     origen: 'MONEDA'
@@ -622,7 +624,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     name: 'tipo_cambio_conv',
                     fieldLabel: 'Tipo Cambio',
                     allowBlank: false,
-                    anchor: '57.5%',
+                    anchor: '85%',
                     maxLength:131074
                 },
                 type:'NumberField',
@@ -634,7 +636,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 config: {
                     name: 'id_proveedor',
                     fieldLabel: 'Proveedor',
-                    anchor: '65%',
+                    anchor: '85%',
                     tinit: false,
                     allowBlank: false,
                     origen: 'PROVEEDOR',
@@ -646,12 +648,71 @@ header("content-type: text/javascript; charset=UTF-8");
                 form: true
             },
             {
+                config: {
+                    name: 'id_contrato',
+                    hiddenName: 'id_contrato',
+                    fieldLabel: 'Contrato',
+                    typeAhead: false,
+                    forceSelection: false,
+                    allowBlank: false,
+                    //disabled: true,
+                    emptyText: 'Contratos...',
+                    store: new Ext.data.JsonStore({
+                        url: '../../sis_workflow/control/Tabla/listarTablaCombo',
+                        id: 'id_contrato',
+                        root: 'datos',
+                        sortInfo: {
+                            field: 'id_contrato',
+                            direction: 'ASC'
+                        },
+                        totalProperty: 'total',
+                        fields: ['id_contrato','nro_tramite', 'numero', 'tipo', 'objeto', 'estado', 'desc_proveedor', 'monto', 'moneda', 'fecha_inicio', 'fecha_fin'],
+                        // turn on remote sorting
+                        remoteSort: true,
+                        baseParams: {
+                            par_filtro: 'con.nro_tramite#con.numero#con.tipo#con.monto#prov.desc_proveedor#con.objeto#con.monto',
+                            tipo_proceso: "CON",
+                            tipo_estado: "finalizado"
+                        }
+                    }),
+                    valueField: 'id_contrato',
+                    displayField: 'numero',
+                    gdisplayField: 'desc_contrato',
+                    triggerAction: 'all',
+                    lazyRender: true,
+                    resizable: true,
+                    mode: 'remote',
+                    pageSize: 20,
+                    queryDelay: 200,
+                    listWidth: 380,
+                    minChars: 2,
+                    gwidth: 100,
+                    anchor: '85%',
+                    renderer: function (value, p, record) {
+                        if (record.data['desc_contrato']) {
+                            return String.format('{0}', record.data['desc_contrato']);
+                        }
+                        return '';
+
+                    },
+                    tpl: '<tpl for="."><div class="x-combo-list-item"><p><b>Nro: {numero} ({tipo})</b></p><p>Obj: <strong>{objeto}</strong></p><p>Prov : {desc_proveedor}</p> <p>Nro.Trámite: {nro_tramite}</p><p>Monto: {monto} {moneda}</p><p>Rango: {fecha_inicio} al {fecha_fin}</p></div></tpl>'
+                },
+                type: 'ComboBox',
+                id_grupo: 1,
+                filters: {
+                    pfiltro: 'con.numero',
+                    type: 'numeric'
+                },
+                grid: true,
+                form: true
+            },
+            {
                 config:{
                     name: 'obs',
                     fieldLabel: 'Desc',
                     allowBlank: false,
                     qtip: 'Descripcion del objetivo del pago, o Si el proveedor es PASAJEROS PERJUDICADOS aqui va el nombre del pasajero',
-                    anchor: '90%',
+                    anchor: '85%',
                     maxLength:1000
                 },
                 type:'TextArea',
@@ -665,6 +726,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     resizable: true,
                     fieldLabel: 'Tipo Documento',
                     allowBlank: false,
+                    anchor: '85%',
                     emptyText:'Elija una plantilla...',
                     store:new Ext.data.JsonStore(
                         {
@@ -703,6 +765,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     fieldLabel: 'Fecha pago.',
                     qtip: 'Fecha tentativa para el pago',
                     allowBlank: false,
+                    anchor: '85%',
                     format: 'd/m/Y'
                 },
                 type:'DateField',
@@ -714,6 +777,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     name: 'fecha_costo_ini_pp',
                     fieldLabel: 'Fecha Inicio',
                     allowBlank: false,
+                    gwidth: 100,
                     format: 'd/m/Y'
                 },
                 type:'DateField',
@@ -725,6 +789,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     name: 'fecha_costo_fin_pp',
                     fieldLabel: 'Fecha Fin',
                     allowBlank: false,
+                    gwidth: 100,
                     format: 'd/m/Y'
                 },
                 type:'DateField',
@@ -882,6 +947,26 @@ header("content-type: text/javascript; charset=UTF-8");
 
             }, this);
 
+            // (may)
+            this.Cmp.id_proveedor.on('select', function (cmb, rec, ind) {
+                //console.log('nombreVista', this.nombreVista)
+                //(may) modificacion campo contrato segun el tipo de obligacion
+                if (this.nombreVista == 'obligacionPagoUnico' || this.nombreVista == 'obligacionPagoEspecial'){
+                    this.ocultarComponente(this.Cmp.id_contrato);
+                    //this.Cmp.id_contrato.disable();
+                    this.Cmp.id_contrato.reset();
+                    this.Cmp.id_contrato.modificado = true;
+                }else{
+                    this.Cmp.id_contrato.enable();
+                    this.Cmp.id_contrato.reset();
+                    this.Cmp.id_contrato.store.baseParams.filter = "[{\"type\":\"numeric\",\"comparison\":\"eq\", \"value\":\"" + cmb.getValue() + "\",\"field\":\"CON.id_proveedor\"}]";
+                    this.Cmp.id_contrato.modificado = true;
+                }
+
+
+
+            }, this);
+
         },
 
         obtenerTipoCambio:function(){
@@ -1011,6 +1096,34 @@ header("content-type: text/javascript; charset=UTF-8");
             }else{
 
                 alert('ocurrio al obtener la gestion')
+            }
+        },
+
+        //(may)
+        construyeVariablesContratos: function () {
+            Phx.CP.loadingShow();
+            Ext.Ajax.request({
+                url: '../../sis_workflow/control/Tabla/cargarDatosTablaProceso',
+                params: {"tipo_proceso": "CON", "tipo_estado": "finalizado", "limit": "100", "start": "0"},
+                success: this.successCotratos,
+                failure: this.conexionFailure,
+                timeout: this.timeout,
+                scope: this
+            });
+
+
+        },
+        successCotratos: function (resp) {
+            Phx.CP.loadingHide();
+            var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+            if (reg.datos) {
+
+                this.ID_CONT = reg.datos[0].atributos.id_tabla
+
+                this.Cmp.id_contrato.store.baseParams.id_tabla = this.ID_CONT;
+
+            } else {
+                alert('Error al cargar datos de contratos')
             }
         },
 
