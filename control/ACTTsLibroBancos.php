@@ -500,7 +500,7 @@ class ACTTsLibroBancos extends ACTbase{
 		 ///////////////////////////////////////////////////
 
 		    $correo=new CorreoExterno();
-		    $correo->addDestinatario($_SESSION['_MAIL_NITIFICACIONES_3']); //  este mail esta destinado al area de tesoreria
+		    // $correo->addDestinatario($_SESSION['_MAIL_NITIFICACIONES_3']); //  este mail esta destinado al area de tesoreria --- temporalmente quitado hasta tener un reponsable de envio de correos tesoretia 27/05/2021 breydi.vasquez
 	        $correo->addDestinatario($array[0]['email']);
 					// breydi.vasquez con copia para funcionario que dispara la notificacion
 					if($array[0]['func_cc']!='' && $array[0]['func_cc']!=null){
