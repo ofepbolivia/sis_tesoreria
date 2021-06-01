@@ -201,6 +201,18 @@ BEGIN
 
          ELSIF v_parametros.tipo_interfaz =  'ObligacionPagoConsulta' THEN
             --no hay limitaciones ...
+            --01-06-2021 (may) si existen aumentando campo partidas
+            --v_campo_partida = ', (par.codigo::varchar||''-''||par.nombre_partida::varchar)::varchar AS partida';
+
+            v_campo_partida = ', (SELECT list(distinct (par.codigo::varchar||''-''||par.nombre_partida::varchar))
+                                 FROM tes.tobligacion_det od
+                                  join pre.tpartida par ON par.id_partida = od.id_partida
+
+                                 WHERE par.estado_reg = ''activo''
+                                 and od.id_obligacion_pago = obpg.id_obligacion_pago
+                                  )::VARCHAR as partida ';
+
+
          ELSIF v_parametros.tipo_interfaz =  'ObligacionPagoApropiacion' THEN
             --no hay limitaciones ...
          ELSIF v_parametros.tipo_interfaz =  'ObligacionPagoConta' THEN

@@ -892,6 +892,21 @@ header("content-type: text/javascript; charset=UTF-8");
             },
             {
                 config: {
+                    name: 'partida',
+                    fieldLabel: 'Partida',
+                    allowBlank: true,
+                    anchor: '80%',
+                    gwidth: 280,
+                    maxLength: 50
+                },
+                type: 'Field',
+                //filters: {pfiltro: 'partida', type: 'string'},
+                id_grupo: 1,
+                grid: true,
+                form: false
+            },
+            {
+                config: {
                     name: 'fecha_reg',
                     fieldLabel: 'Fecha creación',
                     allowBlank: true,
@@ -1013,13 +1028,14 @@ header("content-type: text/javascript; charset=UTF-8");
             {name: 'observaciones', type: 'string'},
             {name: 'fecha_certificacion_pres', type: 'date', dateFormat: 'Y-m-d'},
             {name: 'presupuesto_aprobado', type: 'string'},
-            {name: 'nro_preventivo', type: 'numeric'}
+            {name: 'nro_preventivo', type: 'numeric'},
+            'partida'
 
         ],
 
         arrayDefaultColumHidden: ['id_fecha_reg', 'id_fecha_mod', 'fecha_mod', 'usr_reg', 'estado_reg', 'fecha_reg', 'usr_mod',
             'numero', 'tipo_obligacion', 'id_depto', 'id_contrato', 'tipo_cambio_conv', 'tipo_anticipo', 'obs', 'total_nro_cuota', 'id_plantilla', 'fecha_pp_ini',
-            'rotacion', 'porc_anticipo', 'obs_presupuestos'],
+            'rotacion', 'porc_anticipo', 'obs_presupuestos', 'partida'],
 
 
         rowExpander: new Ext.ux.grid.RowExpander({

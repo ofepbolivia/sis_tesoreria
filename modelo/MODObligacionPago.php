@@ -96,6 +96,8 @@ class MODObligacionPago extends MODbase
         $this->captura('presupuesto_aprobado', 'varchar');
         $this->captura('nro_preventivo', 'integer');
 
+        $this->captura('partida', 'varchar');
+
         //Ejecuta la instruccion
         $this->armarConsulta();
         $this->ejecutarConsulta();
