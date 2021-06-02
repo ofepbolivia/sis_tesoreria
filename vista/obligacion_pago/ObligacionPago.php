@@ -483,7 +483,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     hiddenName: 'id_contrato',
                     fieldLabel: 'Contrato',
                     typeAhead: false,
-                    forceSelection: false,
+                    forceSelection: true,
                     allowBlank: false,
                     disabled: true,
                     emptyText: 'Contratos...',
@@ -500,7 +500,9 @@ header("content-type: text/javascript; charset=UTF-8");
                         // turn on remote sorting
                         remoteSort: true,
                         baseParams: {
-                            par_filtro: 'con.nro_tramite#con.numero#con.tipo#con.monto#prov.desc_proveedor#con.objeto#con.monto',
+                            //02-06-2021 (may) modificacion para filtro, no hay con.nro_tramite
+                            //par_filtro: 'con.nro_tramite#con.numero#con.tipo#con.monto#prov.desc_proveedor#con.objeto#con.monto',
+                            par_filtro: 'con.numero#con.tipo#con.monto#prov.desc_proveedor#con.objeto#con.monto',
                             tipo_proceso: "CON",
                             tipo_estado: "finalizado"
                         }
