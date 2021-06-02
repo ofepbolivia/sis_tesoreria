@@ -68,6 +68,7 @@ DECLARE
     v_nro_tramite				varchar;
 	v_id_estado_wf				integer;
     v_fecha_sol					date;
+
 BEGIN
 
 	v_nombre_funcion = 'tes.ft_obligacion_pago_sel';
@@ -87,6 +88,7 @@ BEGIN
           v_filadd='';
           v_inner='';
           v_strg_sol = 'obpg.id_obligacion_pago';
+
 
           IF  pxp.f_existe_parametro(p_tabla,'historico') THEN
              v_historico =  v_parametros.historico;
@@ -201,18 +203,6 @@ BEGIN
 
          ELSIF v_parametros.tipo_interfaz =  'ObligacionPagoConsulta' THEN
             --no hay limitaciones ...
-            --01-06-2021 (may) si existen aumentando campo partidas
-            --v_campo_partida = ', (par.codigo::varchar||''-''||par.nombre_partida::varchar)::varchar AS partida';
-
-            v_campo_partida = ', (SELECT list(distinct (par.codigo::varchar||''-''||par.nombre_partida::varchar))
-                                 FROM tes.tobligacion_det od
-                                  join pre.tpartida par ON par.id_partida = od.id_partida
-
-                                 WHERE par.estado_reg = ''activo''
-                                 and od.id_obligacion_pago = obpg.id_obligacion_pago
-                                  )::VARCHAR as partida ';
-
-
          ELSIF v_parametros.tipo_interfaz =  'ObligacionPagoApropiacion' THEN
             --no hay limitaciones ...
          ELSIF v_parametros.tipo_interfaz =  'ObligacionPagoConta' THEN
@@ -344,7 +334,9 @@ BEGIN
                               conf.observaciones,
                               obpg.fecha_certificacion_pres,
                               obpg.presupuesto_aprobado,
-                              obpg.nro_preventivo
+                              obpg.nro_preventivo,
+
+      						 (list(distinct (par.codigo::varchar||''-''||par.nombre_partida::varchar)) )::VARCHAR as partida
 
                               from tes.tobligacion_pago obpg
                               inner join segu.tusuario usu1 on usu1.id_usuario = obpg.id_usuario_reg
@@ -362,10 +354,80 @@ BEGIN
 
                               left join tes.tconformidad conf on conf.id_obligacion_pago = obpg.id_obligacion_pago
 
+                              left join tes.tobligacion_det od ON od.id_obligacion_pago = obpg.id_obligacion_pago
+      						  left join pre.tpartida par ON par.id_partida = od.id_partida
+
                               where  '||v_filadd;
 
                   --Definicion de la respuesta
                   v_consulta:=v_consulta||v_parametros.filtro;
+                  v_consulta:=  v_consulta ||
+					' GROUP BY obpg.id_obligacion_pago,
+                                obpg.id_proveedor,
+                                pv.desc_proveedor,
+                                obpg.estado,
+                                obpg.tipo_obligacion,
+                                obpg.id_moneda,
+                                mn.moneda,
+                                obpg.obs,
+                                obpg.porc_retgar,
+                                obpg.id_subsistema,
+                                ss.nombre,
+                                obpg.id_funcionario,
+                                fun.desc_funcionario1,
+                                obpg.estado_reg,
+                                obpg.porc_anticipo,
+                                obpg.id_estado_wf,
+                                obpg.id_depto,
+                                dep.nombre,
+                                obpg.num_tramite,
+                                obpg.id_proceso_wf,
+                                obpg.fecha_reg,
+                                obpg.id_usuario_reg,
+                                obpg.fecha_mod,
+                                obpg.id_usuario_mod,
+                                usu1.cuenta,
+                                usu2.cuenta,
+                                obpg.fecha,
+                                obpg.numero,
+                                obpg.tipo_cambio_conv,
+                                obpg.id_gestion,
+                                obpg.comprometido,
+                                obpg.nro_cuota_vigente,
+                                mn.tipo_moneda,
+                                obpg.total_pago,
+                                obpg.pago_variable,
+                                obpg.id_depto_conta,
+                                obpg.total_nro_cuota,
+                                obpg.fecha_pp_ini,
+                                obpg.rotacion,
+                                obpg.id_plantilla,
+                                pla.desc_plantilla,
+                                obpg.ultima_cuota_pp,
+                                obpg.ultimo_estado_pp,
+                                obpg.tipo_anticipo,
+                                obpg.ajuste_anticipo,
+                                obpg.ajuste_aplicado,
+                                obpg.monto_estimado_sg,
+                                obpg.id_obligacion_pago_extendida,
+                                con.tipo,
+                                con.numero ,
+                                con.id_contrato,
+                                obpg.obs_presupuestos,
+                                obpg.codigo_poa,
+                                obpg.obs_poa,
+                                obpg.uo_ex,
+                                obpg.id_funcionario_responsable,
+                                fresp.desc_funcionario1,
+                                conf.id_conformidad,
+                                conf.conformidad_final,
+                                conf.fecha_conformidad_final,
+                                conf.fecha_inicio,
+                                conf.fecha_fin,
+                                conf.observaciones,
+                                obpg.fecha_certificacion_pres,
+                                obpg.presupuesto_aprobado,
+                                obpg.nro_preventivo ';
                   v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
 
 
