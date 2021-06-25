@@ -1071,7 +1071,46 @@ header("content-type: text/javascript; charset=UTF-8");
                 grid: true,
                 form: true
             },
-
+            {
+                config : {
+                    name:'porc_monto_retgar',
+                    fieldLabel: 'Porcentaje Ret. Garantia',
+                    resizable:true,
+                    allowBlank:true,
+                    gwidth: 100,
+                    emptyText:'Seleccione ...',
+                    store: new Ext.data.JsonStore({
+                        url: '../../sis_parametros/control/Catalogo/listarCatalogoCombo',
+                        id: 'id_catalogo',
+                        root: 'datos',
+                        sortInfo:{
+                            field: 'orden',
+                            direction: 'ASC'
+                        },
+                        totalProperty: 'total',
+                        fields: ['id_catalogo','codigo','descripcion'],
+                        // turn on remote sorting
+                        remoteSort: true,
+                        baseParams: {par_filtro:'descripcion',cod_subsistema:'TES',catalogo_tipo:'tplan_pago_retencion'}
+                    }),
+                    enableMultiSelect:true,
+                    valueField: 'codigo',
+                    displayField: 'descripcion',
+                    gdisplayField: 'porc_monto_retgar',
+                    forceSelection:true,
+                    typeAhead: false,
+                    triggerAction: 'all',
+                    lazyRender:true,
+                    mode:'remote',
+                    pageSize:10,
+                    listWidth: 350,
+                    queryDelay:1000
+                },
+                type : 'ComboBox',
+                id_grupo: 1,
+                form : true,
+                grid: true,
+            },
             {
                 config: {
                     name: 'monto_retgar_mo',
@@ -1705,7 +1744,9 @@ header("content-type: text/javascript; charset=UTF-8");
             'id_moneda', 'tipo_moneda', 'desc_moneda',
             'num_tramite', 'monto_excento',
             'proc_monto_excento_var', 'obs_wf', 'descuento_inter_serv',
-            'obs_descuento_inter_serv', 'porc_monto_retgar', 'desc_funcionario1', 'revisado_asistente',
+            'obs_descuento_inter_serv',
+            {name: 'porc_monto_retgar', type: 'numeric'},
+            'desc_funcionario1', 'revisado_asistente',
             {name: 'fecha_conformidad', type: 'date', dateFormat: 'Y-m-d'},
             'conformidad',
             'tipo_obligacion',
@@ -1736,7 +1777,7 @@ header("content-type: text/javascript; charset=UTF-8");
             'descuento_anticipo', 'monto_retgar_mo', 'monto_no_pagado', 'otros_descuentos', 'descuento_inter_serv', 'descuento_ley', 'id_depto_lb',
             'id_depto_lb', 'id_cuenta_bancaria', 'obs_wf', 'fecha_dev', 'fecha_pag', 'obs_descuentos_anticipo', 'obs_monto_no_pagado',
             'obs_otros_descuentos', 'obs_descuentos_ley', 'obs_descuento_inter_serv', 'monto_ajuste_ag', 'monto_ajuste_siguiente_pag', 'fecha_costo_ini',
-            'fecha_costo_fin', 'funcionario_wf', 'monto_anticipo', 'monto', 'monto_ejecutar_total_mo', 'monto_establecido','nit'],
+            'fecha_costo_fin', 'funcionario_wf', 'monto_anticipo', 'monto', 'monto_ejecutar_total_mo', 'monto_establecido','nit','porc_monto_retgar'],
 
 
         rowExpander: new Ext.ux.grid.RowExpander({
@@ -2086,11 +2127,15 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.Cmp.monto_retgar_mo.setValue(this.porc_ret_gar * this.Cmp.monto.getValue());
             }
 
-            monto_ret_gar = this.Cmp.monto_retgar_mo.getValue();
-
+            //24-06-2021 (may)para calcular Retenciones de garantia con porcentaje de retenciones de garantia
+            //monto_ret_gar = this.Cmp.monto_retgar_mo.getValue();
+            monto_ret_gar =  this.Cmp.monto.getValue() * this.Cmp.porc_monto_retgar.getValue();
+            this.Cmp.monto_retgar_mo.setValue(monto_ret_gar);
 
             var liquido = this.Cmp.monto.getValue() - this.Cmp.monto_no_pagado.getValue() - this.Cmp.otros_descuentos.getValue() - monto_ret_gar - this.Cmp.descuento_ley.getValue() - this.Cmp.descuento_inter_serv.getValue() - this.Cmp.descuento_anticipo.getValue();
             //this.Cmp.liquido_pagable.setValue(liquido > 0 ? liquido : 0);
+
+
             this.Cmp.liquido_pagable.setValue(liquido);
             var eje = this.Cmp.monto.getValue() - this.Cmp.monto_no_pagado.getValue() - this.Cmp.monto_anticipo.getValue();
             this.Cmp.monto_ejecutar_total_mo.setValue(eje > 0 ? eje : 0);
