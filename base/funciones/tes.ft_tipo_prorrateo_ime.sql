@@ -251,7 +251,7 @@ BEGIN
 
                            --(may) para la OT
 
-                           select id_tipo_cc
+                           /*select id_tipo_cc
                            into v_id_tipo_cc
                            from param.tcentro_costo cc
                            where cc.id_centro_costo = v_registros.id_centro_costo;
@@ -269,7 +269,7 @@ BEGIN
 
                            IF v_ordenes is null THEN
                               raise exception 'Falta Orden de Trabajo';
-                           END IF;
+                           END IF;*/
 
                            --numero telefonico
                            SELECT num.numero
@@ -301,7 +301,7 @@ BEGIN
                               ' || v_parametros.id_valor || ',
                               ' || v_parametros.id_concepto_ingas || ',
                               ' || v_registros.id_centro_costo || ',
-                              ' || v_ordenes || ',
+                              ' || v_registros.id_orden_trabajo || ',
                               ' || v_parametrizacion.ps_id_partida || ',
                               ' || v_parametrizacion.ps_id_cuenta || ',
                               ' || v_parametrizacion.ps_id_auxiliar || ',
