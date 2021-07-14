@@ -1075,6 +1075,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 config : {
                     name:'porc_monto_retgar',
                     fieldLabel: 'Porcentaje Ret. Garantia',
+                    currencyChar: ' ',
                     resizable:true,
                     allowBlank:true,
                     gwidth: 100,
@@ -2169,7 +2170,7 @@ header("content-type: text/javascript; charset=UTF-8");
             this.tmp_porc_monto_excento_var = undefined;
 
 
-          //may
+            //may
 
             if (data.estado == 'vbsolicitante') {
 
@@ -2550,6 +2551,8 @@ header("content-type: text/javascript; charset=UTF-8");
             this.Cmp.monto_ajuste_siguiente_pag.setValue(0);
             this.Cmp.monto_anticipo.setValue(0);
 
+            this.Cmp.porc_monto_retgar.setValue(0);
+
         },
 
         ocultarFP: function (me, pFormaPago) {
@@ -2696,6 +2699,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 me.mostrarComponente(me.Cmp.descuento_ley);
                 me.mostrarComponente(me.Cmp.monto_anticipo);
                 me.mostrarComponente(me.Cmp.obs_descuentos_ley);
+                me.mostrarComponente(me.Cmp.porc_monto_retgar);
                 me.deshabilitarDescuentos(me);
                 me.ocultarComponentesPago(me);
                 me.Cmp.monto_retgar_mo.setReadOnly(false);
@@ -2743,6 +2747,8 @@ header("content-type: text/javascript; charset=UTF-8");
                 me.mostrarComponente(me.Cmp.descuento_ley);
                 me.mostrarComponente(me.Cmp.monto_anticipo);
 
+                me.mostrarComponente(me.Cmp.porc_monto_retgar);
+
                 me.habilitarDescuentos(me);
                 me.mostrarComponentesPago(me);
                 me.Cmp.monto_retgar_mo.setReadOnly(false);
@@ -2788,6 +2794,8 @@ header("content-type: text/javascript; charset=UTF-8");
                 me.ocultarComponente(me.Cmp.monto_no_pagado);
                 me.ocultarComponente(me.Cmp.monto_retgar_mo);
                 me.ocultarComponente(me.Cmp.monto_anticipo);
+
+                me.ocultarComponente(me.Cmp.porc_monto_retgar);
                 me.ocultarGrupo(2); //ocultar el grupo de ajustes
                 me.ocultarGrupo(3); //ocultar el grupo de periodo del costo
 
@@ -2806,6 +2814,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 me.ocultarComponente(me.Cmp.monto_no_pagado);
                 me.ocultarComponente(me.Cmp.monto_retgar_mo);
                 me.ocultarComponente(me.Cmp.monto_anticipo);
+                me.ocultarComponente(me.Cmp.porc_monto_retgar);
                 me.ocultarGrupo(2); //ocultar el grupo de ajustes
                 me.ocultarGrupo(3); //ocultar el grupo de periodo del costo
 
@@ -2824,6 +2833,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 me.ocultarComponente(me.Cmp.monto_no_pagado);
                 me.ocultarComponente(me.Cmp.monto_retgar_mo);
                 me.ocultarComponente(me.Cmp.monto_anticipo);
+                me.ocultarComponente(me.Cmp.porc_monto_retgar);
                 me.ocultarGrupo(2); //ocultar el grupo de ajustes
                 me.ocultarGrupo(3); //ocultar el grupo de periodo del costo
 
@@ -2841,6 +2851,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 me.ocultarComponente(me.Cmp.monto_no_pagado);
                 me.ocultarComponente(me.Cmp.monto_retgar_mo);
                 me.ocultarComponente(me.Cmp.monto_anticipo);
+                me.ocultarComponente(me.Cmp.porc_monto_retgar);
                 me.ocultarGrupo(2); //ocultar el grupo de ajustes
                 me.ocultarGrupo(3); //ocultar el grupo de periodo del costo
 
@@ -2894,6 +2905,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 me.ocultarComponente(me.Cmp.obs_descuentos_ley);
                 me.mostrarComponente(me.Cmp.liquido_pagable);
                 me.ocultarComponente(me.Cmp.monto_anticipo);
+                me.ocultarComponente(me.Cmp.porc_monto_retgar);
                 me.ocultarGrupo(2); //ocultar el grupo de ajustes
                 me.ocultarGrupo(3); //ocultar el grupo de periodo del costo
 
@@ -2919,6 +2931,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 me.mostrarComponente(me.Cmp.liquido_pagable);
                 me.mostrarComponente(me.Cmp.descuento_ley);
                 me.mostrarComponente(me.Cmp.obs_descuentos_ley);
+                me.ocultarComponente(me.Cmp.porc_monto_retgar);
                 me.ocultarGrupo(2); //ocultar el grupo de ajustes
                 me.mostrarGrupo(3); //ocultar el grupo de periodo del costo
 
@@ -2933,6 +2946,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 me.ocultarComponente(me.Cmp.monto_no_pagado);
                 me.ocultarComponente(me.Cmp.monto_anticipo);
                 me.ocultarComponente(me.Cmp.liquido_pagable);
+                me.ocultarComponente(me.Cmp.porc_monto_retgar);
                 me.deshabilitarDescuentos(me);
 
                 me.ocultarComponentesPago(me);
