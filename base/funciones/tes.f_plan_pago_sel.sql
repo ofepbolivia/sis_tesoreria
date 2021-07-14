@@ -234,7 +234,7 @@ BEGIN
                         '||v_strg_obs||' ,
                         plapa.obs_descuento_inter_serv,
                         plapa.descuento_inter_serv,
-                        (to_char(plapa.porc_monto_retgar,''999G999G999G999D999''))::numeric as porc_monto_retgar,
+                        ROUND(plapa.porc_monto_retgar,3)::numeric as porc_monto_retgar,
                         fun.desc_funcionario1::text,
                         plapa.revisado_asistente,
                         plapa.conformidad,
