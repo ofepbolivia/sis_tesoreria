@@ -965,6 +965,8 @@ class MODPlanPago extends MODbase{
         $this->captura('c31', 'varchar');
         $this->captura('numero', 'varchar');
 
+        $this->captura('porc_monto_retgar', 'NUMERIC');
+
         //Ejecuta la instruccion
         $this->armarConsulta();
         $this->ejecutarConsulta();

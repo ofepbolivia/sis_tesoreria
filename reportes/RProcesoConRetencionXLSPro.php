@@ -100,7 +100,7 @@ class RProcesoConRetencionXLSPro
 
         //titulos
 
-        $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0,2,'PROCESOS CON RETENCION DEL 7% A PRORRATEO' );
+        $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0,2,'PROCESOS CON RETENCION DE GARANTIA A PRORRATEO' );
         $this->docexcel->getActiveSheet()->getStyle('A2:O2')->applyFromArray($styleTitulos1);
         $this->docexcel->getActiveSheet()->mergeCells('A2:O2');
         $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0,4,'Del: '.  $this->objParam->getParametro('fecha_ini').'   Al: '.  $this->objParam->getParametro('fecha_fin') );

@@ -100,12 +100,12 @@ class RProcesoConRetencionXLS
 
         //titulos
 
-        $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0,2,'PROCESOS CON RETENCION DEL 7%' );
-        $this->docexcel->getActiveSheet()->getStyle('A2:L2')->applyFromArray($styleTitulos1);
-        $this->docexcel->getActiveSheet()->mergeCells('A2:L2');
+        $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0,2,'PROCESOS CON RETENCION DE GARANTIA' );
+        $this->docexcel->getActiveSheet()->getStyle('A2:M2')->applyFromArray($styleTitulos1);
+        $this->docexcel->getActiveSheet()->mergeCells('A2:M2');
         $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0,4,'Del: '.  $this->objParam->getParametro('fecha_ini').'   Al: '.  $this->objParam->getParametro('fecha_fin') );
-        $this->docexcel->getActiveSheet()->getStyle('A4:L4')->applyFromArray($styleTitulos3);
-        $this->docexcel->getActiveSheet()->mergeCells('A4:L4');
+        $this->docexcel->getActiveSheet()->getStyle('A4:M4')->applyFromArray($styleTitulos3);
+        $this->docexcel->getActiveSheet()->mergeCells('A4:M4');
 
         $this->docexcel->getActiveSheet()->getColumnDimension('B')->setWidth(80);
         $this->docexcel->getActiveSheet()->getColumnDimension('C')->setWidth(30);
@@ -115,17 +115,18 @@ class RProcesoConRetencionXLS
         $this->docexcel->getActiveSheet()->getColumnDimension('G')->setWidth(15);
         $this->docexcel->getActiveSheet()->getColumnDimension('H')->setWidth(20);
         $this->docexcel->getActiveSheet()->getColumnDimension('I')->setWidth(15);
-        $this->docexcel->getActiveSheet()->getColumnDimension('J')->setWidth(20);
-        $this->docexcel->getActiveSheet()->getColumnDimension('K')->setWidth(15);
-        $this->docexcel->getActiveSheet()->getColumnDimension('L')->setWidth(20);
+        $this->docexcel->getActiveSheet()->getColumnDimension('J')->setWidth(15);
+        $this->docexcel->getActiveSheet()->getColumnDimension('K')->setWidth(20);
+        $this->docexcel->getActiveSheet()->getColumnDimension('L')->setWidth(15);
+        $this->docexcel->getActiveSheet()->getColumnDimension('M')->setWidth(20);
 
-        $this->docexcel->getActiveSheet()->getStyle('A5:L5')->getAlignment()->setWrapText(true);
-        $this->docexcel->getActiveSheet()->getStyle('A5:L5')->applyFromArray($styleTitulos2);
+        $this->docexcel->getActiveSheet()->getStyle('A5:M5')->getAlignment()->setWrapText(true);
+        $this->docexcel->getActiveSheet()->getStyle('A5:M5')->applyFromArray($styleTitulos2);
 
 
 
         //*************************************Cabecera*****************************************
-        $this->docexcel->getActiveSheet()->setCellValue('A5','N?');
+        $this->docexcel->getActiveSheet()->setCellValue('A5','Nº');
         $this->docexcel->getActiveSheet()->setCellValue('B5','PROVEEDOR');
         $this->docexcel->getActiveSheet()->setCellValue('C5','NRO. DE CONTRATO');
         $this->docexcel->getActiveSheet()->setCellValue('D5','NRO. DE TRAMITE');
@@ -134,9 +135,10 @@ class RProcesoConRetencionXLS
         $this->docexcel->getActiveSheet()->setCellValue('G5','FECHA DE PAGO');
         $this->docexcel->getActiveSheet()->setCellValue('H5','MONEDA');
         $this->docexcel->getActiveSheet()->setCellValue('I5','MONTO A PAGAR');
-        $this->docexcel->getActiveSheet()->setCellValue('J5','MONTO RETENCION DE GARANTIA');
-        $this->docexcel->getActiveSheet()->setCellValue('K5','LIQUIDO PAGABLE');
-        $this->docexcel->getActiveSheet()->setCellValue('L5','NRO. C31');
+        $this->docexcel->getActiveSheet()->setCellValue('J5','% RETENCION DE GARANTIA');
+        $this->docexcel->getActiveSheet()->setCellValue('K5','MONTO RETENCION DE GARANTIA');
+        $this->docexcel->getActiveSheet()->setCellValue('L5','LIQUIDO PAGABLE');
+        $this->docexcel->getActiveSheet()->setCellValue('M5','NRO. C31');
 
     }
     function generarDatos()
@@ -179,17 +181,18 @@ class RProcesoConRetencionXLS
             $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(6, $fila, $value['fecha_dev']);
             $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(7, $fila,$value['moneda']);
             $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(8, $fila, $value['monto']);
-            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(9, $fila, $value['monto_retgar_mo']);
-            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(10, $fila, $value['liquido_pagable']);
-            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(11, $fila, $value['c31']);
+            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(9, $fila, $value['porc_monto_retgar']);
+            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(10, $fila, $value['monto_retgar_mo']);
+            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(11, $fila, $value['liquido_pagable']);
+            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(12, $fila, $value['c31']);
 
             $this->docexcel->getActiveSheet()->getStyle("E$fila:E$fila")->applyFromArray($styleTitulos3);
             $this->docexcel->getActiveSheet()->getStyle("G$fila:G$fila")->applyFromArray($styleTitulos3);
             $this->docexcel->getActiveSheet()->getStyle("I$fila:I$fila")->applyFromArray($styleTitulos3);
             $this->docexcel->getActiveSheet()->getStyle("J$fila:J$fila")->applyFromArray($styleTitulos3);
             $this->docexcel-> getActiveSheet () -> getStyle ( "I$fila:I$fila") -> getNumberFormat () -> setFormatCode (PHPExcel_Style_NumberFormat :: FORMAT_NUMBER_COMMA_SEPARATED1);
-            $this->docexcel-> getActiveSheet () -> getStyle ( "J$fila:J$fila") -> getNumberFormat () -> setFormatCode (PHPExcel_Style_NumberFormat :: FORMAT_NUMBER_COMMA_SEPARATED1);
             $this->docexcel-> getActiveSheet () -> getStyle ( "K$fila:K$fila") -> getNumberFormat () -> setFormatCode (PHPExcel_Style_NumberFormat :: FORMAT_NUMBER_COMMA_SEPARATED1);
+            $this->docexcel-> getActiveSheet () -> getStyle ( "L$fila:L$fila") -> getNumberFormat () -> setFormatCode (PHPExcel_Style_NumberFormat :: FORMAT_NUMBER_COMMA_SEPARATED1);
 
             $this->docexcel->getActiveSheet()->getStyle("K$fila:K$fila")->applyFromArray($styleTitulos3);
             $this->docexcel->getActiveSheet()->getStyle("L$fila:L$fila")->applyFromArray($styleTitulos3);
@@ -205,12 +208,12 @@ class RProcesoConRetencionXLS
         }
         $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(1,($fila),'TOTAL GENERAL');
         $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(8,($fila),$sumatoria_monto);
-        $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(9,($fila),$sumatoria_monto_retgar_mo);
-        $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(10,($fila),$sumatoria_liquido_pagable);
-        $this->docexcel->getActiveSheet()->getStyle("A".($fila).":L".($fila))->applyFromArray($styleArrayTotalGral);
+        $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(10,($fila),$sumatoria_monto_retgar_mo);
+        $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(11,($fila),$sumatoria_liquido_pagable);
+        $this->docexcel->getActiveSheet()->getStyle("A".($fila).":M".($fila))->applyFromArray($styleArrayTotalGral);
         $this->docexcel-> getActiveSheet () -> getStyle ( "I$fila:I$fila") -> getNumberFormat () -> setFormatCode (PHPExcel_Style_NumberFormat :: FORMAT_NUMBER_COMMA_SEPARATED1);
-        $this->docexcel-> getActiveSheet () -> getStyle ( "J$fila:J$fila") -> getNumberFormat () -> setFormatCode (PHPExcel_Style_NumberFormat :: FORMAT_NUMBER_COMMA_SEPARATED1);
         $this->docexcel-> getActiveSheet () -> getStyle ( "K$fila:K$fila") -> getNumberFormat () -> setFormatCode (PHPExcel_Style_NumberFormat :: FORMAT_NUMBER_COMMA_SEPARATED1);
+        $this->docexcel-> getActiveSheet () -> getStyle ( "L$fila:L$fila") -> getNumberFormat () -> setFormatCode (PHPExcel_Style_NumberFormat :: FORMAT_NUMBER_COMMA_SEPARATED1);
 
         //var_dump($this->objParam); exit;
     }
