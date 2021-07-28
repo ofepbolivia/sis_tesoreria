@@ -2751,24 +2751,17 @@ BEGIN
 
                         --recueprar centro de cotos para la siguiente gestion  (los centro de cosots y presupeustos tiene los mismo IDS)
 
+                            select pi.id_presupuesto_dos
+                            into v_id_centro_costo_dos
+                            from pre.tpresupuesto_ids pi
+                            where pi.id_presupuesto_uno = v_registros_det.id_centro_costo;
 
-                          /*select
-                            pi.id_presupuesto_dos
-                          into
-                            v_id_centro_costo_dos
-                          from pre.tpresupuesto_ids pi
-                          where pi.id_presupuesto_uno = v_registros_det.id_centro_costo;
-                          IF v_id_centro_costo_dos is not NULL THEN
-                          ELSE
-                          	raise exception 'No existe el Centro de Costo - Presupuesto';
-                          END IF;
+                            IF v_id_centro_costo_dos is not NULL THEN
 
-                                  SELECT
-                                      ps_id_partida
-                                    into
-                                      v_id_partida
-                                  FROM conta.f_get_config_relacion_contable('CUECOMP', v_id_gestion_sg[1]::integer, v_registros_det.id_concepto_ingas, v_id_centro_costo_dos);
-							*/
+                                    SELECT ps_id_partida
+                                    into v_id_partida
+                                    FROM conta.f_get_config_relacion_contable('CUECOMP', v_id_gestion_sg[1]::integer, v_registros_det.id_concepto_ingas, v_id_centro_costo_dos);
+
 
                                   --Sentencia de la insercion
                                   insert into tes.tobligacion_det(
@@ -2810,7 +2803,7 @@ BEGIN
 
                                   )RETURNING id_obligacion_det into v_id_obligacion_det;
 
-
+                            END IF;
 
                   END LOOP;
 
