@@ -2742,7 +2742,8 @@ BEGIN
                                               od.descripcion,
                                               od.monto_pago_mo ,
                                               od.id_orden_trabajo,
-                                              od.monto_pago_mb
+                                              od.monto_pago_mb,
+                                              od.factor_porcentual
                                             FROM  tes.tobligacion_det od
                                             where  od.estado_reg = 'activo' and
                                                    od.id_obligacion_pago = v_parametros.id_obligacion_pago) LOOP
@@ -2785,7 +2786,8 @@ BEGIN
                                     id_usuario_reg,
                                     fecha_mod,
                                     id_usuario_mod,
-                                    id_orden_trabajo
+                                    id_orden_trabajo,
+                                    factor_porcentual
                                   )
                                   values
                                   (
@@ -2803,7 +2805,8 @@ BEGIN
                                     p_id_usuario,
                                     null,
                                     null,
-                                    v_registros_det.id_orden_trabajo
+                                    v_registros_det.id_orden_trabajo,
+                                    v_registros_det.factor_porcentual
 
                                   )RETURNING id_obligacion_det into v_id_obligacion_det;
 
