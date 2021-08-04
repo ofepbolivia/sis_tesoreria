@@ -901,8 +901,8 @@ header("content-type: text/javascript; charset=UTF-8");
                     gwidth: 280,
                     maxLength: 50
                 },
-                type: 'Field',
-                //filters: {pfiltro: 'partida', type: 'string'},
+                type: 'TextField',
+                filters: {pfiltro: 'par.codigo#par.nombre_partida', type: 'string'},
                 id_grupo: 1,
                 grid: true,
                 form: false
@@ -1031,7 +1031,7 @@ header("content-type: text/javascript; charset=UTF-8");
             {name: 'fecha_certificacion_pres', type: 'date', dateFormat: 'Y-m-d'},
             {name: 'presupuesto_aprobado', type: 'string'},
             {name: 'nro_preventivo', type: 'numeric'},
-            'partida'
+            {name: 'partida', type: 'string'}
 
         ],
 

@@ -557,6 +557,8 @@ BEGIN
                   END IF;
 
              ELSIF v_parametros.tipo_interfaz =  'ObligacionPagoConsulta' THEN
+                --04-08-2021(may) para ell filtro de paginas no salgan en blanco
+             	v_strg_sol = 'DISTINCT(obpg.id_obligacion_pago)';
                 --no hay limitaciones ...
              ELSIF v_parametros.tipo_interfaz =  'ObligacionPagoApropiacion' THEN
                 --no hay limitaciones ...
@@ -565,6 +567,8 @@ BEGIN
 
             --(28-01-2020) MAY nuevo filtro consulta obligaciones de pago para cada gerencia
          ELSIF  v_parametros.tipo_interfaz =  'ObligacionPagoConsultaGerencia' THEN
+                --04-08-2021(may) para ell filtro de paginas no salgan en blanco
+         		  v_strg_sol = 'DISTINCT(obpg.id_obligacion_pago)';
 
           		--busca id_uo del usuario
                   SELECT uo.id_uo
@@ -593,22 +597,36 @@ BEGIN
 
                   -- SI LA NTERFACE VIENE DE ADQUISIONES
 
+                  --04-08-2021(may) para ell filtro de paginas no salgan en blanco
+					v_strg_sol = 'DISTINCT(obpg.id_obligacion_pago)';
+
                   IF   p_administrador != 1 THEN
-                       select
-                             pxp.aggarray(depu.id_depto)
-                          into
-                             va_id_depto
-                         from param.tdepto_usuario depu
-                         where depu.id_usuario =  p_id_usuario and depu.cargo = 'responsable';
+                     select
+                         pxp.aggarray(depu.id_depto)
+                      into
+                         va_id_depto
+                     from param.tdepto_usuario depu
+                     where depu.id_usuario =  p_id_usuario and depu.cargo in  ('responsable', 'auxiliar');
+
+                   --(may)
+
+                            SELECT tf.id_funcionario
+                            INTO v_id_funcionario
+                            FROM segu.tusuario tu
+                            INNER JOIN orga.tfuncionario tf on tf.id_persona = tu.id_persona
+                            WHERE tu.id_usuario = p_id_usuario ;
 
 
-                         v_filadd='( (pc.id_depto  in ('|| COALESCE(array_to_string(va_id_depto,','),'0')||'))   or   pc.id_usuario_auxiliar = '||p_id_usuario::varchar ||' ) and ';
+                            v_filadd = ' (pc.id_depto  in ('|| COALESCE(array_to_string(va_id_depto,','),'0')||')  or obpg.id_funcionario = '||v_id_funcionario||' or obpg.id_usuario_reg = '||p_id_usuario||' or sol.id_usuario_reg = '||p_id_usuario||') and ';
+
+                    --
                   END IF;
 
 
                   v_inner = '
                                 inner join adq.tcotizacion cot on cot.id_obligacion_pago = obpg.id_obligacion_pago
-                                inner join adq.tproceso_compra pc on pc.id_proceso_compra = cot.id_proceso_compra  ';
+                                inner join adq.tproceso_compra pc on pc.id_proceso_compra = cot.id_proceso_compra
+                                inner join adq.tsolicitud sol on sol.id_solicitud = pc.id_solicitud ';
             END IF;
 
 
@@ -627,6 +645,12 @@ BEGIN
                         '|| v_inner ||'
                         left join orga.vfuncionario fun on fun.id_funcionario=obpg.id_funcionario
                         left join orga.vfuncionario fresp ON fresp.id_funcionario = obpg.id_funcionario_responsable
+
+             			left join tes.tconformidad conf on conf.id_obligacion_pago = obpg.id_obligacion_pago
+
+						left join tes.tobligacion_det od ON od.id_obligacion_pago = obpg.id_obligacion_pago
+      					left join pre.tpartida par ON par.id_partida = od.id_partida
+
                         where  '||v_filadd;
 
 			--Definicion de la respuesta
