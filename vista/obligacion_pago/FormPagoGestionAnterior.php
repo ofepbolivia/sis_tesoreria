@@ -654,7 +654,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     fieldLabel: 'Contrato',
                     typeAhead: false,
                     forceSelection: false,
-                    allowBlank: false,
+                    allowBlank: true,
                     //disabled: true,
                     emptyText: 'Contratos...',
                     store: new Ext.data.JsonStore({
