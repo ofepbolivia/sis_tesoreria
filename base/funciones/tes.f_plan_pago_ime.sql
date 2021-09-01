@@ -214,6 +214,18 @@ DECLARE
 
     v_prioridad					integer;
 
+    -- 14-06-2021 (may)
+    v_registros_pro				record;
+    v_comprometido				numeric;
+    v_ejecutado					numeric;
+    v_centro_costo				varchar;
+    v_desc_ingas				varchar;
+    v_partida					varchar;
+    v_sw_verificacion  			boolean;
+    v_mensaje_verificacion 		varchar;
+    v_respuesta 				varchar[];
+    v_id_moneda					integer;
+
 
 BEGIN
 
@@ -581,12 +593,15 @@ BEGIN
             op.id_depto,
             op.pago_variable,
             op.id_funcionario_gerente,
-            op.id_funcionario
+            op.id_funcionario,
+            op.tipo_obligacion,
+            op.fecha
           into v_registros
            from tes.tobligacion_pago op
            where op.id_obligacion_pago = v_parametros.id_obligacion_pago;
 
-             --recuperamos el id_funcionario_gerente actual de la obligacion de pago
+            --25-08-2021 (may) modificacion a solicitud de Marcelo Vidaurre para funcionario GERENTE segun la Matriz
+             /*--recuperamos el id_funcionario_gerente actual de la obligacion de pago
            SELECT
            pxp.aggarray(id_funcionario)
            into
@@ -598,6 +613,8 @@ BEGIN
                 set id_funcionario_gerente =  va_id_funcionario_gerente[1]
                 where id_obligacion_pago = v_parametros.id_obligacion_pago;
            end if;
+           */
+
 
           select
             pp.monto,
@@ -618,6 +635,35 @@ BEGIN
            IF v_codigo_estado = 'borrador' or v_codigo_estado = 'pagado'  or v_codigo_estado = 'pendiente' or v_codigo_estado = 'devengado' or v_codigo_estado = 'anulado' THEN
              raise exception 'Solo puede modificar pagos en estado borrador';
            END IF;
+
+           ---25-08-2021 (may) modificacion asolicitud de Marcelo Vidaurre para funcionario GERENTE,
+            /* sera segun una matriz y conceptos de gastos para un funcionario aprobador, funcion despues de insertar*/
+            --SOLO PARA procesos recurrentes, pagos unicos, PGA, sin imputacion
+           IF (v_registros_pp.estado = 'borrador') THEN
+
+                --SOLO PARA tramites recurrentes registro uno por uno el detalle
+                IF (v_registros.tipo_obligacion in ('pago_directo', 'pago_unico','pago_especial', 'pga') ) THEN
+
+                   v_resp = tes.ft_solicitud_obligacion_pago(v_parametros.id_obligacion_pago, p_id_usuario);
+
+                ELSE
+
+                	--recuperamos el id_funcionario_gerente actual de la obligacion de pago
+                   SELECT
+                   pxp.aggarray(id_funcionario)
+                   into
+                       va_id_funcionario_gerente
+                   FROM orga.f_get_aprobadores_x_funcionario(now()::date,  v_registros.id_funcionario , 'todos', 'si', 'todos', 'ninguno') AS (id_funcionario integer);
+
+                   if v_registros.id_funcionario_gerente != va_id_funcionario_gerente[1] then
+                        update tes.tobligacion_pago
+                        set id_funcionario_gerente =  va_id_funcionario_gerente[1]
+                        where id_obligacion_pago = v_parametros.id_obligacion_pago;
+                   end if;
+
+                END IF;
+
+            END IF;
 
 
            --valida que los valores no sean negativos

@@ -2127,3 +2127,11 @@ IS 'identificador de la tabla tes.tobligacion_pago de donde sale la relacion';
 ALTER TABLE tes.tconformidad
   ALTER COLUMN observaciones TYPE VARCHAR(5000);
 /*****************************F-SCP-MAY-TES-0-04/12/2020*************/
+
+/***********************************I-SCP-MAY-TES-0-01/09/2021***************************************/
+ALTER TABLE tes.tobligacion_pago
+  ALTER COLUMN id_matriz_modalidad INTEGER;
+
+COMMENT ON COLUMN tes.tobligacion_pago.id_matriz_modalidad
+IS 'identificador de la tabla matriz';
+/***********************************F-SCP-MAY-TES-0-01/09/2021***************************************/

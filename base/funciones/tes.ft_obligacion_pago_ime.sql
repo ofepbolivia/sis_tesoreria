@@ -261,10 +261,11 @@ BEGIN
             END IF;
 
             --   TODO
-            --   revisa tabla de expcecion por concepto de gasto
+            --25-08-2021 (may) modificacion a solicitud de Marcelo Vidaurre para funcionario GERENTE segun la Matriz
+            /*--   revisa tabla de expcecion por concepto de gasto
             --  algunos concepto de gasto solo los pueden aprobar ciertas gerencias ....
 
-           IF  v_id_funcionario_sol is not NULL  THEN
+          IF  v_id_funcionario_sol is not NULL  THEN
 
                  --OJO  si el funcionario que solicita es un gerente .... es el mimso encargado de aprobar
                  IF exists(select 1 from orga.tuo_funcionario uof
@@ -322,6 +323,80 @@ BEGIN
 
 
             END IF;
+            */
+
+            ---25-08-2021 (may) modificacion asolicitud de Marcelo Vidaurre para funcionario gerente 01-09-2021,
+            /* sera segun una matriz y conceptos de gastos para un funcionario aprobador, funcion despues de insertar*/
+            --SOLO PARA procesos recurrentes, pagos unicos, PGA, sin imputacion
+            --SOLO PARA tramites recurrentes registro uno por uno el detalle
+
+            IF (v_registros.tipo_obligacion in ('pago_directo', 'pago_unico','pago_especial', 'pga') ) THEN
+
+               v_resp = tes.ft_solicitud_obligacion_pago(v_parametros.id_obligacion_pago, p_id_usuario);
+
+            ELSE
+
+                  IF  v_id_funcionario_sol is not NULL  THEN
+
+                       --OJO  si el funcionario que solicita es un gerente .... es el mimso encargado de aprobar
+                       IF exists(select 1 from orga.tuo_funcionario uof
+                                 inner join orga.tuo uo on uo.id_uo = uof.id_uo and uo.estado_reg = 'activo'
+                                 inner join orga.tnivel_organizacional no on no.id_nivel_organizacional = uo.id_nivel_organizacional and no.numero_nivel in (1)
+                                 where  uof.estado_reg = 'activo' and  uof.id_funcionario = v_id_funcionario_sol ) THEN
+
+                            va_id_funcionario_gerente[1] = v_id_funcionario_sol;
+
+                       ELSE
+                          --si tiene funcionario identificar el gerente correspondientes
+                           SELECT
+                                 pxp.aggarray(id_funcionario)
+                             into
+                                 va_id_funcionario_gerente
+                          -- FROM orga.f_get_aprobadores_x_funcionario(v_registros.fecha,  v_id_funcionario_sol , 'todos', 'si', 'todos', 'ninguno') AS (id_funcionario integer);
+                          --recuperar el funcionario_gerente actual
+                              FROM orga.f_get_aprobadores_x_funcionario(now()::date,  v_id_funcionario_sol , 'todos', 'si', 'todos', 'ninguno') AS (id_funcionario integer);
+
+                              --NOTA el valor en la primera posicion del array es el genre de menor nivel
+
+                      END IF;
+
+                     -----------------------------
+                     -- verificar exepcione
+                     -------------------------------
+
+                        SELECT
+                          ce.id_uo
+                        into
+                          v_id_uo
+                        FROM tes.tconcepto_excepcion ce
+                        where   ce.estado_reg = 'activo'  and
+                                 ce.id_concepto_ingas in (select
+                                                        id_concepto_ingas
+                                                       from tes.tobligacion_det od
+                                                       where od.id_obligacion_pago = v_parametros.id_obligacion_pago
+                                                       and od.estado_reg = 'activo' )  limit 1 OFFSET 0;
+
+                          --si existe una excepcion cambiar el funcionar aprobador
+
+                          IF v_id_uo is NOT NULL THEN
+                               --recuperamos el aprobador
+
+                              va_id_funcionarios =  orga.f_get_funcionarios_x_uo(v_id_uo, coalesce(v_fecha_op,now()::date));
+
+                              IF va_id_funcionarios[1] is NULL THEN
+                                 raise exception 'La UO configurada por excpeción no tiene un funcionario asignado para le fecha de la OP%,%',v_id_uo,v_fecha_op;
+                              END IF;
+
+                              va_id_funcionario_gerente[1] = va_id_funcionarios[1];
+
+                          END IF ;
+
+                  END IF;
+
+
+            END IF;
+
+
 
 
             IF   pxp.f_existe_parametro(p_tabla,'id_contrato')    THEN
@@ -358,7 +433,7 @@ BEGIN
               usuario_ai = v_parametros._nombre_usuario_ai,
               --tipo_anticipo = v_parametros.tipo_anticipo,
               tipo_anticipo = v_tipo_anticipo,
-              id_funcionario_gerente = va_id_funcionario_gerente[1],
+              --id_funcionario_gerente = va_id_funcionario_gerente[1],
               id_contrato = v_id_contrato
 
             where id_obligacion_pago = v_parametros.id_obligacion_pago;
@@ -771,6 +846,20 @@ BEGIN
                         where o.id_obligacion_pago = v_parametros.id_obligacion_pago;
 
                      END IF ;
+
+                    ---25-08-2021 (may) modificacion asolicitud de Marcelo Vidaurre para funcionario gerente desde la fecha 01-09-2021,
+                    /* sera segun una matriz y conceptos de gastos para un funcionario aprobador, funcion despues de insertar*/
+                    --SOLO PARA procesos recurrentes, pagos unicos, PGA, sin imputacion
+
+
+                    --SOLO PARA tramites recurrentes registro uno por uno el detalle
+                    IF (v_tipo_obligacion in ('pago_directo', 'pago_unico','pago_especial', 'pga') ) THEN
+
+                       v_resp = tes.ft_solicitud_obligacion_pago(v_parametros.id_obligacion_pago, p_id_usuario);
+
+                    END IF;
+
+
             END IF;
 
           -- recupera datos del estado

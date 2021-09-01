@@ -49,6 +49,8 @@ $body$
         v_id_documento_wf_op 		integer;
 
         v_anio_ges					integer;
+        --may(30-08-2021)
+        v_funcionario_gerente       integer;
 
 
 
@@ -160,26 +162,42 @@ $body$
                                NULL);
 
                     --si el funcionario que solicita es un gerente .... es el mimso encargado de aprobar
+                    --25-08-2021 (may) se comenta porque ya no se pondra gerente al iniciar proceso, se pondra al dar siguiente y segun la matriz
 
-                     IF exists(select 1 from orga.tuo_funcionario uof
-                               inner join orga.tuo uo on uo.id_uo = uof.id_uo and uo.estado_reg = 'activo'
-                               inner join orga.tnivel_organizacional no on no.id_nivel_organizacional = uo.id_nivel_organizacional and no.numero_nivel in (3)
-                               where  uof.estado_reg = 'activo' and  uof.id_funcionario = (p_hstore->'id_funcionario')::integer ) THEN
+                    IF ((p_hstore->'tipo_obligacion')::varchar  in ('pago_directo','pago_unico','pago_especial', 'pga') ) THEN
 
-                          va_id_funcionario_gerente[1] = (p_hstore->'id_funcionario')::integer;
+                            v_funcionario_gerente = null;
 
-                     ELSE
-                        --si tiene funcionario identificar el gerente correspondientes
-                        IF (p_hstore->'id_funcionario')::integer  is not NULL THEN
+                    ELSE
+                         --antigua condicion
+                    	 IF exists(select 1 from orga.tuo_funcionario uof
+                                   inner join orga.tuo uo on uo.id_uo = uof.id_uo and uo.estado_reg = 'activo'
+                                   inner join orga.tnivel_organizacional no on no.id_nivel_organizacional = uo.id_nivel_organizacional and no.numero_nivel in (3)
+                                   where  uof.estado_reg = 'activo' and  uof.id_funcionario = (p_hstore->'id_funcionario')::integer ) THEN
 
-                            SELECT
-                               pxp.aggarray(id_funcionario)
-                             into
-                               va_id_funcionario_gerente
-                             FROM orga.f_get_aprobadores_x_funcionario((p_hstore->'fecha')::date,  (p_hstore->'id_funcionario')::integer , 'todos', 'si', 'todos', 'ninguno') AS (id_funcionario integer);
-                            --NOTA el valor en la primera posicion del array es el genre de menor nivel
-                        END IF;
+                              va_id_funcionario_gerente[1] = (p_hstore->'id_funcionario')::integer;
+
+                         ELSE
+                            --si tiene funcionario identificar el gerente correspondientes
+                            IF (p_hstore->'id_funcionario')::integer  is not NULL THEN
+
+                                SELECT
+                                   pxp.aggarray(id_funcionario)
+                                 into
+                                   va_id_funcionario_gerente
+                                 FROM orga.f_get_aprobadores_x_funcionario((p_hstore->'fecha')::date,  (p_hstore->'id_funcionario')::integer , 'todos', 'si', 'todos', 'ninguno') AS (id_funcionario integer);
+                                --NOTA el valor en la primera posicion del array es el genre de menor nivel
+                            END IF;
+                         END IF;
+
+
+                          v_funcionario_gerente = va_id_funcionario_gerente[1] ;
+
                     END IF;
+
+
+
+                     -----
 
                      --id_subsistema
                      select
@@ -351,7 +369,7 @@ $body$
                 (p_hstore->'_id_usuario_ai')::integer,
                 (p_hstore->'_nombre_usuario_ai')::varchar,
                 (p_hstore->'tipo_anticipo')::varchar,
-                 va_id_funcionario_gerente[1],
+                v_funcionario_gerente, -- va_id_funcionario_gerente[1],
                 (p_hstore->'id_contrato')::integer,
                 (p_hstore->'fecha_costo_ini_pp')::date,
                 (p_hstore->'fecha_costo_fin_pp')::date,
