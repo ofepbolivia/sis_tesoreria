@@ -142,9 +142,9 @@ BEGIN
 
                                                 raise NOTICE 'llegaFUncionario %', v_funcionario;
                                                 -- recupera la uo gerencia del funcionario
-                                                v_id_uo_matriz =   orga.f_get_uo_gerencia_area_ope(NULL, v_funcionario, v_obligacion_pago.fecha::Date);
+                                                v_id_uo_matriz =   orga.f_get_uo_gerencia_area_ope(NULL, v_funcionario, now()::Date);
                                                 raise NOTICE 'llegaUO %', v_id_uo_matriz;
-                                                v_id_uo_sol =   orga.f_get_uo_gerencia_area_ope(NULL, v_obligacion_pago.id_funcionario, v_obligacion_pago.fecha::Date);
+                                                v_id_uo_sol =   orga.f_get_uo_gerencia_area_ope(NULL, v_obligacion_pago.id_funcionario, now()::Date);
 
 
                                                 raise NOTICE 'llegaUOSol %', v_id_uo_sol;
@@ -202,7 +202,7 @@ BEGIN
                                             v_id_matriz_modalidad =   v_matriz_id_modalidad;
 
                                             IF (v_id_matriz_modalidad is null) THEN
-                                                RAISE EXCEPTION 'No1 se encuentra parametrizado el Concepto de Gasto % en la Matriz Tipo Contratación(Aprobador). Comunicarse con el Departamento de Adquisiciones (Marcelo Vidaurre).', v_desc_ingas;
+                                                RAISE EXCEPTION 'No se encuentra parametrizado el Concepto de Gasto % en la Matriz Tipo Contratación(Aprobador). Comunicarse con el Departamento de Adquisiciones (Marcelo Vidaurre).', v_desc_ingas;
                                             END IF;
 
 
@@ -268,7 +268,7 @@ BEGIN
                                    END LOOP;
 
                                    IF ( bandera_matriz = 'no')THEN
-                                   		RAISE EXCEPTION 'No2 se encuentra parametrizado el Concepto de Gasto % en la Matriz Tipo Contratación(Aprobador) para el Sistema de Obligaciones de Pago. Comunicarse con el Departamento de Adquisiciones (Marcelo Vidaurre).', v_desc_ingas;
+                                   		RAISE EXCEPTION 'No se encuentra parametrizado el Concepto de Gasto % en la Matriz Tipo Contratación(Aprobador) para el Sistema de Obligaciones de Pago. Comunicarse con el Departamento de Adquisiciones (Marcelo Vidaurre).', v_desc_ingas;
                                    END IF;
                                    --
 
@@ -310,14 +310,14 @@ BEGIN
                                    FROM orga.tcargo car
                                    WHERE car.id_cargo = v_matriz_modalidad.id_cargo;
 
-                                   IF (v_idfun_modalidad is null) THEN
+                                   /*IF (v_idfun_modalidad is null) THEN
                                         RAISE EXCEPTION 'No se encuentra el Funcionario Responsable % del cargo % en la Matriz Tipo Contratación - Aprobado.  Comunicarse con el Departamento de Adquisiciones (Marcelo Vidaurre). ',v_desc_funcionario, v_nombre_cargo ;
-                                   END IF;
+                                   END IF;*/
 
                                    IF (v_matriz_modalidad.id_cargo = 18594  or v_matriz_modalidad.id_cargo IS NULL) THEN
 
                                       -- recupera la uo gerencia del funcionario
-                                      v_id_uo =   orga.f_get_uo_gerencia_area_ope(NULL, v_obligacion_pago.id_funcionario, v_obligacion_pago.fecha_::Date);
+                                      v_id_uo =   orga.f_get_uo_gerencia_area_ope(NULL, v_obligacion_pago.id_funcionario, now()::Date);
 
                                       IF exists(select 1 from orga.tuo_funcionario uof
                                                  inner join orga.tuo uo on uo.id_uo = uof.id_uo and uo.estado_reg = 'activo'
@@ -328,13 +328,13 @@ BEGIN
 
                                       ELSE
                                           --si tiene funcionario identificar el gerente correspondientes
-                                          IF v_solicitud.id_funcionario is not NULL THEN
+                                          IF v_obligacion_pago.id_funcionario is not NULL THEN
 
                                               SELECT
                                                  pxp.aggarray(id_funcionario)
                                                into
                                                  va_id_funcionario_gerente
-                                               FROM orga.f_get_aprobadores_x_funcionario(v_obligacion_pago.fecha,v_obligacion_pago.id_funcionario , 'todos', 'si', 'todos', 'ninguno') AS (id_funcionario integer);
+                                               FROM orga.f_get_aprobadores_x_funcionario(now()::date,v_obligacion_pago.id_funcionario , 'todos', 'si', 'todos', 'ninguno') AS (id_funcionario integer);
 
                                            END IF;
                                       END IF;

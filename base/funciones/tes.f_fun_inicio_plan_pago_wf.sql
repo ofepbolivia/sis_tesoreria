@@ -120,7 +120,8 @@ CREATE OR REPLACE FUNCTION tes.f_fun_inicio_plan_pago_wf (
 
 
     /*jrr(10/10/2014): El monto no puede ser menor o igual a 0*/
-    IF p_codigo_estado  in ('vbgerente','vbfin','vbsolicitante')  THEN
+    --02-09-2021 (may) se aumenta vbaprobador sera como vbgerente, solo cambia nombre
+    IF p_codigo_estado  in ('vbgerente','vbfin','vbsolicitante', 'vbaprobador')  THEN
       /*if (v_registros.fecha_conformidad is null or v_registros.conformidad is null) then
          raise exception 'Registre la conformidad antes de pasar al siguiente estado';
        end if;*/
