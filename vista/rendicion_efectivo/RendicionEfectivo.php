@@ -168,7 +168,7 @@ Phx.vista.RendicionEfectivo=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: false,
 				emptyText: 'Elija una opción...',
 				store: new Ext.data.JsonStore({
-					url: '../../sis_/control/Clase/Metodo',
+					url: '../../sis_workflow/control/ProcesoWf/listarProcesoWf',//Correcion en el llamdo de ruta para obtencion de id_estado_wf
 					id: 'id_',
 					root: 'datos',
 					sortInfo: {
@@ -226,7 +226,7 @@ Phx.vista.RendicionEfectivo=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: false,
 				emptyText: 'Elija una opción...',
 				store: new Ext.data.JsonStore({
-					url: '../../sis_/control/Clase/Metodo',
+					url: '../../sis_workflow/control/ProcesoWf/listarProcesoWf',//Correcion en el llamdo de ruta para obtencion de id_proceso_wf
 					id: 'id_',
 					root: 'datos',
 					sortInfo: {

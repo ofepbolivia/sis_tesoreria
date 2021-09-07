@@ -48,7 +48,7 @@ Phx.vista.CuentaBancariaPeriodo=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				emptyText: 'Elija una opción...',
 				store: new Ext.data.JsonStore({
-					url: '../../sis_/control/Clase/Metodo',
+					url: '../../sis_tesoreria/control/CuentaBancaria/listarCuentaBancaria',
 					id: 'id_',
 					root: 'datos',
 					sortInfo: {
@@ -121,7 +121,7 @@ Phx.vista.CuentaBancariaPeriodo=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				emptyText: 'Elija una opción...',
 				store: new Ext.data.JsonStore({
-					url: '../../sis_/control/Clase/Metodo',
+					url: '../../sis_tesoreria/control/CuentaBancariaPeriodo/listarCuentaBancariaPeriodo',//Correcion en la direccion la obtencion de id_periodo
 					id: 'id_',
 					root: 'datos',
 					sortInfo: {
