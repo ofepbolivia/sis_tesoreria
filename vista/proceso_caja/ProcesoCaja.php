@@ -39,7 +39,7 @@ Phx.vista.ProcesoCaja=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				emptyText: 'Elija una opción...',
 				store: new Ext.data.JsonStore({
-					url: '../../sis_/control/Clase/Metodo',
+					url: '../../sis_tesoreria/control/ProcesoCaja/listarProcesoCaja',
 					id: 'id_',
 					root: 'datos',
 					sortInfo: {
@@ -238,7 +238,7 @@ Phx.vista.ProcesoCaja=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: false,
 				emptyText: 'Elija una opción...',
 				store: new Ext.data.JsonStore({
-					url: '../../sis_/control/Clase/Metodo',
+					url: '../../sis_workflow/control/ProcesoWf/listarProcesoWf',
 					id: 'id_',
 					root: 'datos',
 					sortInfo: {
@@ -311,7 +311,7 @@ Phx.vista.ProcesoCaja=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				emptyText: 'Elija una opción...',
 				store: new Ext.data.JsonStore({
-					url: '../../sis_/control/Clase/Metodo',
+					url: '../../sis_tesoreria/control/ProcesoCaja/listarProcesoCaja',
 					id: 'id_',
 					root: 'datos',
 					sortInfo: {
@@ -354,7 +354,7 @@ Phx.vista.ProcesoCaja=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: false,
 				emptyText: 'Elija una opción...',
 				store: new Ext.data.JsonStore({
-					url: '../../sis_/control/Clase/Metodo',
+					url: '../../sis_workflow/control/ProcesoWf/listarProcesoWf',
 					id: 'id_',
 					root: 'datos',
 					sortInfo: {
