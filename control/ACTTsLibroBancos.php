@@ -15,6 +15,7 @@ include_once(dirname(__FILE__).'/../../lib/PHPMailer/class.phpmailer.php');
 include_once(dirname(__FILE__).'/../../lib/PHPMailer/class.smtp.php');
 include_once(dirname(__FILE__).'/../../lib/lib_general/cls_correo_externo.php');
 include_once(dirname(__FILE__).'/../reportes/RConciliacionBancariaXLS.php');
+require_once(dirname(__FILE__).'/../reportes/RMemoCajaChicaPdf.php');
 
 
 class ACTTsLibroBancos extends ACTbase{
@@ -609,6 +610,45 @@ class ACTTsLibroBancos extends ACTbase{
         $this->res=$this->objFunc->codPais($this->objParam);
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
+    //13-08-2021 (may) memorandum caja chica PDF
+	function recuperarCajaChica(){
+
+		$this->objFunc = $this->create('MODSolicitudEfectivo');
+		$cbteHeader = $this->objFunc->imprimirMemoCajaChicaPdf($this->objParam);
+		if($cbteHeader->getTipo() == 'EXITO'){
+			return $cbteHeader;
+		}
+		else{
+			$cbteHeader->imprimirRespuesta($cbteHeader->generarJson());
+			exit;
+		}
+
+	}
+	function imprimirMemoCajaChicaPdf(){
+
+		$nombreArchivo = uniqid(md5(session_id()).'MemoAsignaciónCC').'.pdf';
+		$dataSource = $this->recuperarCajaChica();
+
+		//parametros basicos
+		$tamano = 'LETTER';
+		$orientacion = 'p';
+		$this->objParam->addParametro('orientacion',$orientacion);
+		$this->objParam->addParametro('tamano',$tamano);
+		$this->objParam->addParametro('titulo_archivo',$titulo);
+		$this->objParam->addParametro('nombre_archivo',$nombreArchivo);
+		//Instancia la clase de pdf
+		$reporte = new RMemoCajaChicaPdf($this->objParam);
+
+		$reporte->datosHeader($dataSource->getDatos(),  $dataSource->extraData);
+		$reporte->generarReporte();
+		$reporte->output($reporte->url_archivo,'F');
+
+		$this->mensajeExito=new Mensaje();
+		$this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se generó con éxito el reporte: '.$nombreArchivo,'control');
+		$this->mensajeExito->setArchivoGenerado($nombreArchivo);
+		$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
+
+	}
 }
 
 ?>

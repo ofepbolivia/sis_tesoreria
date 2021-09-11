@@ -306,23 +306,35 @@ BEGIN
                             op.id_depto,
                             op.pago_variable,
                             op.id_funcionario_gerente, --04/12/2019 Alan
-                            op.id_funcionario
+                            op.id_funcionario,
+                            op.tipo_obligacion
+
                           into v_registros
                            from tes.tobligacion_pago op
                            where op.id_obligacion_pago = v_parametros.id_obligacion_pago;
 
                               --recuperamos el id_funcionario_gerente actual de la obligacion de pago
-                           SELECT
-                           pxp.aggarray(id_funcionario)
-                           into
-                               va_id_funcionario_gerente
-                           FROM orga.f_get_aprobadores_x_funcionario(now()::date,  v_registros.id_funcionario , 'todos', 'si', 'todos', 'ninguno') AS (id_funcionario integer);
+                              ---25-08-2021 (may) modificacion asolicitud de Marcelo Vidaurre para funcionario GERENTE,
+            				  /* sera segun una matriz y conceptos de gastos para un funcionario aprobador, funcion despues de insertar*/
+			 				--SOLO PARA tramites recurrentes registro uno por uno el detalle
+                          IF (v_registros.tipo_obligacion in ('pago_directo', 'pago_unico','pago_especial', 'pga') ) THEN
 
-                           if v_registros.id_funcionario_gerente != va_id_funcionario_gerente[1] then
-                           		update tes.tobligacion_pago
-                                set id_funcionario_gerente =  va_id_funcionario_gerente[1]
-                                where id_obligacion_pago = v_parametros.id_obligacion_pago;
-                           end if;
+                            	 v_resp = tes.ft_solicitud_obligacion_pago(v_parametros.id_obligacion_pago, p_id_usuario);
+
+                          ELSE
+
+                                 SELECT
+                                 pxp.aggarray(id_funcionario)
+                                 into va_id_funcionario_gerente
+                                 FROM orga.f_get_aprobadores_x_funcionario(now()::date,  v_registros.id_funcionario , 'todos', 'si', 'todos', 'ninguno') AS (id_funcionario integer);
+
+                                 if v_registros.id_funcionario_gerente != va_id_funcionario_gerente[1] then
+                                      update tes.tobligacion_pago
+                                      set id_funcionario_gerente =  va_id_funcionario_gerente[1]
+                                      where id_obligacion_pago = v_parametros.id_obligacion_pago;
+                                 end if;
+
+                          END IF;
 
                         select
                             pp.monto,

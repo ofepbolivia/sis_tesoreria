@@ -75,6 +75,7 @@ DECLARE
      v_obligacion_pago			record;
      v_matriz_modalidad			record;
      bandera_matriz				varchar;
+     v_nombre_funcionario		varchar;
 
 BEGIN
 
@@ -126,6 +127,7 @@ BEGIN
                                                                 left join adq.tmatriz_modalidad mm on mm.id_matriz_modalidad = mc.id_matriz_modalidad
                                                                 WHERE mc.id_concepto_ingas = v_obligacion_det.id_concepto_ingas
                                                                 and mc.estado_reg = 'activo'
+                                                                and mm.estado_reg = 'activo'
                                                                 and mm.flujo_sistema in ('TESORERIA','ADQUISICIONES-TESORERIA')
                                                                 and mm.id_uo != 10445
                                                          		 )LOOP
@@ -156,10 +158,10 @@ BEGIN
 
                                         IF (v_id_uo_matriz = v_id_uo_sol ) THEN
 
-                                            v_id_uo_jefatura =   orga.f_get_uo_jefatura_area_ope(NULL, v_obligacion_pago.id_funcionario, v_obligacion_pago.fecha::Date);
-                                            v_id_uo_jefatura_gerencia =   orga.f_get_uo_jefa_ger_area_ope(NULL, v_obligacion_pago.id_funcionario, v_obligacion_pago.fecha::Date);
-                                            v_id_uo_jefatura_unidad =   orga.f_get_uo_jefa_unidad_area_ope(NULL, v_obligacion_pago.id_funcionario, v_obligacion_pago.fecha::Date);
-                                            v_id_uo_jefatura_direccion =   orga.f_get_uo_direccion_area_ope(NULL, v_obligacion_pago.id_funcionario, v_obligacion_pago.fecha::Date);
+                                            v_id_uo_jefatura =   orga.f_get_uo_jefatura_area_ope(NULL, v_obligacion_pago.id_funcionario, now()::Date);
+                                            v_id_uo_jefatura_gerencia =   orga.f_get_uo_jefa_ger_area_ope(NULL, v_obligacion_pago.id_funcionario, now()::Date);
+                                            v_id_uo_jefatura_unidad =   orga.f_get_uo_jefa_unidad_area_ope(NULL, v_obligacion_pago.id_funcionario, now()::Date);
+                                            v_id_uo_jefatura_direccion =   orga.f_get_uo_direccion_area_ope(NULL, v_obligacion_pago.id_funcionario, now()::Date);
                                             --RAISE EXCEPTION 'id_uo_jegatura % - % - %', v_id_uo_jefatura, v_id_uo_jefatura_gerencia, v_id_uo_jefatura_unidad;
 
                                             SELECT count(mc.id_matriz_modalidad)
@@ -231,7 +233,7 @@ BEGIN
                                              WHERE car.id_cargo = v_id_matriz.id_cargo;
 
                                              IF (v_idfun_modalidad is null) THEN
-                                                  RAISE EXCEPTION 'No se encuentra el Funcionario Responsable % del cargo % en la Matriz Tipo Contratación - Aprobado.  Comunicarse con el Departamento de Adquisiciones (Marcelo Vidaurre). ',v_desc_funcionario, v_nombre_cargo ;
+                                                  RAISE EXCEPTION 'No se encuentra el Funcionario Aprobador % del cargo % en la Matriz Tipo Contratación - Aprobado.  Comunicarse con el Departamento de Adquisiciones (Marcelo Vidaurre). ',v_desc_funcionario, v_nombre_cargo ;
                                              END IF;
 
                                         ELSE
@@ -241,6 +243,7 @@ BEGIN
                                                           left join adq.tmatriz_modalidad mm on mm.id_matriz_modalidad = mc.id_matriz_modalidad
                                                           WHERE mc.id_concepto_ingas = v_obligacion_det.id_concepto_ingas
                                                           and mc.estado_reg = 'activo'
+                                                          and mm.estado_reg = 'activo'
                                                           and mm.flujo_sistema in ('TESORERIA','ADQUISICIONES-TESORERIA')
                                                           and mm.id_uo != 10445
                                                           AND mm.id_uo_gerencia = v_id_uo_sol
@@ -249,15 +252,15 @@ BEGIN
 
 
                                                     IF (v_funcionario is null) THEN
-                                                        RAISE EXCEPTION 'El Funcionario Responsable se encuentra Inactivo, verificar la parametrización en la Matriz Tipo Contratación - Aprobado, Nro:%.  Comunicarse con el Departamento de Adquisiciones (Marcelo Vidaurre). ', v_id_matriz.id_matriz_modalidad ;
+                                                        RAISE EXCEPTION 'El Funcionario Aprobador se encuentra Inactivo, verificar la parametrización en la Matriz Tipo Contratación - Aprobado, Nro:%.  Comunicarse con el Departamento de Adquisiciones (Marcelo Vidaurre). ', v_id_matriz.id_matriz_modalidad ;
                                                     END IF;
 
                                                     IF (v_id_matriz.id_cargo is null) THEN
                                                         RAISE EXCEPTION 'No se encuentra parametrizado el Responsable de Nivel Aprobación  en la Matriz Tipo Contratación - Aprobador. Comunicarse con el Departamento de Adquisiciones (Marcelo Vidaurre).';
                                                      END IF;
 
-                                              ELSE
-                                                     RAISE EXCEPTION 'aca';
+                                              --ELSE
+                                                     --RAISE EXCEPTION 'aca';
 
                                               END IF;
 
@@ -281,6 +284,7 @@ BEGIN
                                   left join adq.tmatriz_modalidad mm on mm.id_matriz_modalidad = mc.id_matriz_modalidad
                                   WHERE mc.id_concepto_ingas = v_obligacion_det.id_concepto_ingas
                                   and mc.estado_reg = 'activo'
+                                  and mm.estado_reg = 'activo'
                                   and mm.flujo_sistema in ('TESORERIA','ADQUISICIONES-TESORERIA')
                                   and mm.id_uo in (10445) ; --nombre de parametrizacion en la matriz Gerencias Regionales = 10445
 
@@ -350,6 +354,16 @@ BEGIN
 
 
       END LOOP;
+
+                        SELECT vf.desc_funcionario1
+                        INTO	v_nombre_funcionario
+                        FROM orga.vfuncionario vf
+                        WHERE vf.id_funcionario =  v_obligacion_pago.id_funcionario;
+
+      					--control para que no sea el mismo funcionario aprobador con el funcionario solicitante
+      					IF (v_idfun_modalidad = v_obligacion_pago.id_funcionario) THEN
+                            RAISE EXCEPTION 'El Funcionario % esta como Solicitante y como Funcionario Aprobador, verificar la parametrizacion en la  Matriz Tipo Contratación(Aprobador). Comunicarse con el Departamento de Adquisiciones (Marcelo Vidaurre).', v_nombre_funcionario;
+                        END IF;
 
 
                     	UPDATE tes.tobligacion_pago SET

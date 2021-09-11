@@ -558,7 +558,9 @@ v_consulta:='select lb.fecha,
                                sol.descripcion_cargo as cargo_cajero,
                                lb.importe_cheque,
                                pc.num_memo,
-                               mo.codigo as codigo_mone
+                               mo.codigo as codigo_mone,
+                               pxp.f_convertir_num_a_letra(lb.importe_cheque)::varchar as importe_literal
+
                         from tes.tproceso_caja pc
                         inner join tes.tcaja cj on cj.id_caja = pc.id_caja
                         inner join tes.tts_libro_bancos lb on lb.id_int_comprobante=pc.id_int_comprobante
