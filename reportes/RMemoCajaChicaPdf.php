@@ -46,10 +46,10 @@ class RMemoCajaChicaPdf extends  ReportePDF {
         $importe_literal = $dataSource[0]['importe_literal'];
         $importe = number_format($dataSource[0]['importe_cheque'], 2, ',', '.');
         $nro_cheque = $dataSource[0]['nro_cheque'];
-        $num_memo = $dataSource[0]['codigo_mone'];
+        $num_memo = $dataSource[0]['num_memo'];
         $codigo =  $dataSource[0]['codigo'];
         $aprobador = $dataSource[0]['aprobador'];
-        $QR = $this->codigoQr($aprobador, $dataSource[0]['cargo_aprobador'], $codigo);
+        $QR = $this->codigoQr($aprobador, $dataSource[0]['cargo_aprobador'], $num_memo);
         if($dataSource[0]['genero_solicitante'] == 'F'){
             $genero = 'Señora ';
             $desig='designada ';
@@ -68,8 +68,8 @@ class RMemoCajaChicaPdf extends  ReportePDF {
     }
 
 
-    function codigoQr ($gerente, $cargo_gerente, $codigo){
-        $cadena = ' '.$codigo.'  Aprobado por: '.$gerente."\n".'Cargo: '.$cargo_gerente."\n";
+    function codigoQr ($gerente, $cargo_gerente, $num_memo){
+        $cadena = 'Aprobado por: '.$gerente."\n".'Cargo: '.$cargo_gerente."\n".'N° Memo: '.$num_memo."\n";
         $barcodeobj = new TCPDF2DBarcode($cadena, 'QRCODE,M');
         $png = $barcodeobj->getBarcodePngData($w = 8, $h = 8, $color = array(0, 0, 0));
         $im = imagecreatefromstring($png);
