@@ -837,7 +837,7 @@ BEGIN
                          va_id_funcionarios =  orga.f_get_funcionarios_x_uo(v_id_uo, v_fecha_op);
 
                         IF va_id_funcionarios[1] is NULL THEN
-                           raise exception 'La UO configurada por excpeción no tiene un funcionario asignado para le fecha de la OP';
+                           --raise exception 'La UO configurada por excpeción no tiene un funcionario asignado para le fecha de la OP';
                         END IF;
 
                         update tes.tobligacion_pago o set
