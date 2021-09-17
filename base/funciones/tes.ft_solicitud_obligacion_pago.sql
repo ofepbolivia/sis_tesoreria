@@ -132,19 +132,38 @@ BEGIN
                                                                 and mm.id_uo != 10445
                                                          		 )LOOP
 
-                                            --RAISE EXCEPTION 'MATRIZ % - %',v_id_matriz.id_matriz_modalidad, v_id_matriz.id_uo;
-                                                SELECT fc.id_funcionario
-                                                into v_funcionario
-                                                FROM orga.vfuncionario_cargo fc
-                                                WHERE fc.id_uo = v_id_matriz.id_uo
-                                                and (fc.fecha_asignacion  <=  now()
-                         						and (fc.fecha_finalizacion is null or fc.fecha_finalizacion >= now() ));
+                                            ---RAISE EXCEPTION 'MATRIZ % - %',v_id_matriz.id_matriz_modalidad, v_id_matriz.id_uo;
+                                                 /*SELECT fc.id_funcionario
+                                                 into v_funcionario
+                                                 FROM orga.vfuncionario_cargo fc
+                                                 WHERE fc.id_uo = v_id_matriz.id_uo
+                                                 and (fc.fecha_asignacion  <=  now()
+                                                 and (fc.fecha_finalizacion is null or fc.fecha_finalizacion >= now() ));*/
+
+                                                 --17-09-2021
+                                                  SELECT  uofun.id_funcionario
+                                                  INTO v_funcionario
+                                                  FROM orga.tcargo car
+                                                  inner join orga.tuo_funcionario uofun on uofun.id_uo = car.id_uo
+                                                  WHERE car.id_cargo =  v_id_matriz.id_cargo
+                                                  and uofun.fecha_asignacion  <=  now()
+                                                  and (uofun.fecha_finalizacion is null or uofun.fecha_finalizacion >= now() );
+
+                                                  SELECT vf.desc_funcionario1
+                                                  INTO	v_desc_funcionario
+                                                  FROM orga.vfuncionario vf
+                                                  WHERE vf.id_funcionario = v_funcionario;
+
+                                                  SELECT car.nombre
+                                                  INTO	v_nombre_cargo
+                                                  FROM orga.tcargo car
+                                                  WHERE car.id_cargo = v_id_matriz.id_cargo;
 
 
 
-                                                raise NOTICE 'llegaFUncionario %', v_funcionario;
+                                                 raise NOTICE 'llegaFUncionario %', v_funcionario;
                                                 -- recupera la uo gerencia del funcionario
-                                                v_id_uo_matriz =   orga.f_get_uo_gerencia_area_ope(NULL, v_funcionario, now()::Date);
+                                                v_id_uo_matriz =   orga.f_get_uo_gerencia_area_ope(v_id_matriz.id_uo, NULL, now()::Date);
                                                 raise NOTICE 'llegaUO %', v_id_uo_matriz;
                                                 v_id_uo_sol =   orga.f_get_uo_gerencia_area_ope(NULL, v_obligacion_pago.id_funcionario, now()::Date);
 
@@ -214,27 +233,29 @@ BEGIN
                                              END IF;
 
 
-                                             --CONDICION PARA RESCATAR DE LA MATRIZ EL FUNCIONARIO RESPONSABLE
-                                             SELECT vc.id_funcionario
-                                             INTO v_idfun_modalidad
-                                             FROM orga.vfuncionario_cargo vc
-                                             WHERE vc.id_cargo = v_id_matriz.id_cargo
-                                             and vc.fecha_asignacion  <=  now()
-                                             and (vc.fecha_finalizacion is null or vc.fecha_finalizacion >= now() );
+                                              --CONDICION PARA RESCATAR DE LA MATRIZ EL FUNCIONARIO RESPONSABLE
 
-                                             SELECT vf.desc_funcionario1
-                                             INTO	v_desc_funcionario
-                                             FROM orga.vfuncionario vf
-                                             WHERE vf.id_funcionario = v_idfun_modalidad;
+                                              --17-09-2021
+                                              /*SELECT vc.id_funcionario
+                                              INTO v_idfun_modalidad
+                                              FROM orga.vfuncionario_cargo vc
+                                              WHERE vc.id_cargo = v_id_matriz.id_cargo
+                                              and vc.fecha_asignacion  <=  now()
+                                              and (vc.fecha_finalizacion is null or vc.fecha_finalizacion >= now() );
 
-                                             SELECT car.nombre
-                                             INTO	v_nombre_cargo
-                                             FROM orga.tcargo car
-                                             WHERE car.id_cargo = v_id_matriz.id_cargo;
+                                              SELECT vf.desc_funcionario1
+                                              INTO	v_desc_funcionario
+                                              FROM orga.vfuncionario vf
+                                              WHERE vf.id_funcionario = v_idfun_modalidad;
 
-                                             IF (v_idfun_modalidad is null) THEN
-                                                  RAISE EXCEPTION 'No se encuentra el Funcionario Aprobador % del cargo % en la Matriz Tipo Contratación - Aprobado.  Comunicarse con el Departamento de Adquisiciones (Marcelo Vidaurre). ',v_desc_funcionario, v_nombre_cargo ;
-                                             END IF;
+                                              SELECT car.nombre
+                                              INTO	v_nombre_cargo
+                                              FROM orga.tcargo car
+                                              WHERE car.id_cargo = v_id_matriz.id_cargo;*/
+
+                                              IF (v_funcionario is null) THEN
+                                                   RAISE EXCEPTION 'No se encuentra el Funcionario Aprobador % del cargo % en la Matriz Tipo Contratación - Aprobado.  Comunicarse con el Departamento de Adquisiciones (Marcelo Vidaurre). ',v_desc_funcionario, v_nombre_cargo ;
+                                              END IF;
 
                                         ELSE
 
@@ -296,18 +317,27 @@ BEGIN
 
 
                                    --CONDICION PARA RESCATAR DE LA MATRIZ EL FUNCIONARIO RESPONSABLE
-                                   SELECT vc.id_funcionario
+                                   /*SELECT vc.id_funcionario
                                    INTO v_idfun_modalidad
                                    FROM orga.vfuncionario_cargo vc
                                    WHERE vc.id_cargo = v_matriz_modalidad.id_cargo
                                    and vc.fecha_asignacion  <=  now()
-                                   and (vc.fecha_finalizacion is null or vc.fecha_finalizacion >= now() );
+                                   and (vc.fecha_finalizacion is null or vc.fecha_finalizacion >= now() );*/
+
+                                   --17-09-2021
+                                   SELECT  uofun.id_funcionario
+                                   INTO v_funcionario
+                                   FROM orga.tcargo car
+                                   inner join orga.tuo_funcionario uofun on uofun.id_uo = car.id_uo
+                                   WHERE car.id_cargo =  v_matriz_modalidad.id_cargo
+                                   and uofun.fecha_asignacion  <=  now()
+                                   and (uofun.fecha_finalizacion is null or uofun.fecha_finalizacion >= now() );
 
 
                                    SELECT vf.desc_funcionario1
                                    INTO	v_desc_funcionario
                                    FROM orga.vfuncionario vf
-                                   WHERE vf.id_funcionario = v_idfun_modalidad;
+                                   WHERE vf.id_funcionario = v_funcionario;
 
                                    SELECT car.nombre
                                    INTO	v_nombre_cargo
@@ -343,7 +373,7 @@ BEGIN
                                            END IF;
                                       END IF;
 
-                                        v_idfun_modalidad = va_id_funcionario_gerente[1] ;
+                                        v_funcionario = va_id_funcionario_gerente[1] ;
                                      END IF;
 
 
@@ -361,13 +391,13 @@ BEGIN
                         WHERE vf.id_funcionario =  v_obligacion_pago.id_funcionario;
 
       					--control para que no sea el mismo funcionario aprobador con el funcionario solicitante
-      					IF (v_idfun_modalidad = v_obligacion_pago.id_funcionario) THEN
+      					IF (v_funcionario = v_obligacion_pago.id_funcionario) THEN
                             RAISE EXCEPTION 'El Funcionario % esta como Solicitante y como Funcionario Aprobador, verificar la parametrizacion en la  Matriz Tipo Contratación(Aprobador). Comunicarse con el Departamento de Adquisiciones (Marcelo Vidaurre).', v_nombre_funcionario;
                         END IF;
 
 
                     	UPDATE tes.tobligacion_pago SET
-                        id_funcionario_gerente = v_idfun_modalidad,
+                        id_funcionario_gerente = v_funcionario,
                         id_matriz_modalidad = v_id_matriz_modalidad
                         WHERE id_obligacion_pago = v_id_obligacion_pago;
 

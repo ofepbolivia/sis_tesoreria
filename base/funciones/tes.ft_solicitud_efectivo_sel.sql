@@ -559,7 +559,13 @@ v_consulta:='select lb.fecha,
                                lb.importe_cheque,
                                pc.num_memo,
                                mo.codigo as codigo_mone,
-                               pxp.f_convertir_num_a_letra(lb.importe_cheque)::varchar as importe_literal
+                               pxp.f_convertir_num_a_letra(lb.importe_cheque)::varchar as importe_literal,
+                                CASE
+                                 WHEN pe.genero::text = ANY (ARRAY[''varon''::character varying,''VARON''::character varying, ''Varon''::character varying]::text[]) THEN ''M''::text
+                                 WHEN pe.genero::text = ANY (ARRAY[''mujer''::character varying,''MUJER''::character varying, ''Mujer''::character varying]::text[]) THEN ''F''::text
+                                 ELSE ''''::text
+                                 END::character varying AS genero_solicitante
+
 
                         from tes.tproceso_caja pc
                         inner join tes.tcaja cj on cj.id_caja = pc.id_caja
@@ -575,6 +581,10 @@ v_consulta:='select lb.fecha,
                                coalesce(sol.fecha_finalizacion, now())
                         inner join tes.tcuenta_bancaria cue on cue.id_cuenta_bancaria = lb.id_cuenta_bancaria
                         inner join param.tmoneda mo on mo.id_moneda = cue.id_moneda
+
+                        inner join orga.vfuncionario_persona f on f.id_funcionario = sol.id_funcionario
+                        inner join segu.vpersona2 pe on pe.id_persona = f.id_persona
+
                         where pc.id_proceso_wf= '||v_parametros.id_proceso_wf;
 
             --Devuelve la respuesta

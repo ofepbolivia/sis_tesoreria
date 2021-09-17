@@ -480,6 +480,7 @@ class MODSolicitudEfectivo extends MODbase{
         $this->captura('num_memo','varchar');
         $this->captura('codigo_mone','varchar');
         $this->captura('importe_literal','varchar');
+        $this->captura('genero_solicitante','varchar');
 
         //Ejecuta la instruccion
         $this->armarConsulta();

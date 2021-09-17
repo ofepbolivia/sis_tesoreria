@@ -26,7 +26,7 @@
     <tbody>
     <tr >
         <td width="3%"></td>
-        <td width="100%" align="justify">Señor(a) <?php echo $this->datos_detalle[0]["cajero"]?></td>
+        <td width="100%" align="justify"><?php echo $genero.$this->datos_detalle[0]["cajero"]?></td>
     </tr>
     <tr>
         <td width="3%"></td>
