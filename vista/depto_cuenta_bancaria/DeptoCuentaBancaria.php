@@ -90,7 +90,8 @@ Phx.vista.DeptoCuentaBancaria=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: false,
 				emptyText: 'Elija una opción...',
 				store: new Ext.data.JsonStore({
-					url: '../../sis_tesoreria/control/DeptoCuentaBancaria/listarDeptoCuentaBancaria',// Correcion de la llamada para obtencion de id_depto
+					//url: '../../sis_tesoreria/control/DeptoCuentaBancaria/listarDeptoCuentaBancaria',// Correcion de la llamada para obtencion de id_depto
+					url: '../../sis_parametros/control/Depto/listarDepto',    //rguancollo: error al listar y sincronizar. 24/09/2021
 					id: 'id_',
 					root: 'datos',
 					sortInfo: {
