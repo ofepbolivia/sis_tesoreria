@@ -1815,7 +1815,7 @@ header("content-type: text/javascript; charset=UTF-8");
             // console.debug(rec);
             console.log('acaaaa', rec);
             Ext.Ajax.request({
-                url: '../../sis_tesoreria/control/ConsultaImportePP/importePP',
+                //url: '../../sis_tesoreria/control/ConsultaImportePP/importePP',   //rguancollo: no existe el archivo. 24/09/2021
                 params: {'id_plan_pago': rec.data.id_plan_pago},
                 success: this.successExport,
                 failure: this.conexionFailure,
