@@ -286,7 +286,7 @@ Phx.vista.SolicitudEfectivo=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: false,
 				emptyText: 'Elija una opción...',
 				store: new Ext.data.JsonStore({
-					url: '../../sis_/control/Clase/Metodo',
+					//url: '../../sis_/control/Clase/Metodo',	//rguancollo:  28/09/2021
 					id: 'id_',
 					root: 'datos',
 					sortInfo: {
@@ -400,7 +400,7 @@ Phx.vista.SolicitudEfectivo=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: false,
 				emptyText: 'Elija una opción...',
 				store: new Ext.data.JsonStore({
-					url: '../../sis_/control/Clase/Metodo',
+					//url: '../../sis_/control/Clase/Metodo',		//rguancollo: 28/09/2021
 					id: 'id_',
 					root: 'datos',
 					sortInfo: {
