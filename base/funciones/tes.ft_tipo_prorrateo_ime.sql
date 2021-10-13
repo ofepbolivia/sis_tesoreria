@@ -417,10 +417,10 @@ BEGIN
             ELSE
 
             	for v_registros in (
-                            select id_centro_costo,id_orden_trabajo,descripcion, sum(monto) as monto, id_tabla
-                            from tes_temp_prorrateo
-                            --where (id_proveedor = v_parametros.id_proveedor and id_proveedor is null)
-                            group by id_centro_costo,id_orden_trabajo,descripcion, id_tabla) loop
+                       select p.id_centro_costo, p.id_orden_trabajo, p.descripcion, sum(p.monto) as monto, p.id_tabla, f.desc_funcionario1
+                        from tes_temp_prorrateo p
+                        inner join orga.vfuncionario f on p.id_funcionario = f.id_funcionario
+                        group by p.id_centro_costo, p.id_orden_trabajo, p.descripcion, p.id_tabla, f.desc_funcionario1) loop
 
 
                     if (v_parametros.tiene_tipo_cambio = 'si') then
@@ -446,7 +446,7 @@ BEGIN
                         v_id_centro_costo_aux = tes.f_get_uo_presupuesta_prorrateo(v_parametros.id_concepto_ingas,v_registros.id_centro_costo);
 
                         if (v_id_centro_costo_aux is null) then
-                            raise exception 'No existe un centro de  costo: % relacionado a la partida',v_registros.id_centro_costo;
+                            raise exception 'No existe un centro de  costo: % relacionado a la partida, para el funcionario: %',v_registros.id_centro_costo,v_registros.desc_funcionario1;
                         else
                             v_registros.id_centro_costo = v_id_centro_costo_aux;
                         end if;
