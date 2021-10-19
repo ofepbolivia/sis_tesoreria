@@ -76,13 +76,17 @@ DECLARE
      v_matriz_modalidad			record;
      bandera_matriz				varchar;
      v_nombre_funcionario		varchar;
+     v_matriz_cargo				integer;
+
+     v_nombre_unidad_matriz			varchar;
+     v_nombre_unidad_solicitante	varchar;
+
+     v_padres					varchar;
 
 BEGIN
 
 
-
-
-  	v_nombre_funcion = 'tes.ft_solicitud_obligacion_pago';
+  	  v_nombre_funcion = 'tes.ft_solicitud_obligacion_pago';
 
 
 	  SELECT op.fecha, op.id_funcionario
@@ -98,8 +102,29 @@ BEGIN
       WHERE op.id_obligacion_pago = v_id_obligacion_pago;
 
 
-       --RECORRE PARA VERIFICAR EL DETALLLE DE LA SOLICITUD con cada concepto de gasto a que modalidad corresponde o no
---raise exception 'llega %', v_id_solicitud;
+      --v_id_uo_jefatura =   orga.f_get_uo_jefatura_area_ope(NULL, v_obligacion_pago.id_funcionario, now()::Date); --nivel 7 Jefatura de departamento
+      --v_id_uo_jefatura_gerencia =   orga.f_get_uo_jefa_ger_area_ope(NULL, v_obligacion_pago.id_funcionario, now()::Date); --nivel 4 Gerencia de Area
+      --v_id_uo_jefatura_unidad =   orga.f_get_uo_jefa_unidad_area_ope(NULL, v_obligacion_pago.id_funcionario, now()::Date);--nivel 8 Unidad
+      --v_id_uo_jefatura_direccion =   orga.f_get_uo_direccion_area_ope(NULL, v_obligacion_pago.id_funcionario, now()::Date); --nivel 3 Direccion
+
+
+      select funuo.id_uo
+      into v_id_uo
+      from orga.tuo_funcionario funuo
+      where funuo.estado_reg = 'activo' and funuo.id_funcionario = v_obligacion_pago.id_funcionario and
+		funuo.fecha_asignacion <= CURRENT_DATE and (funuo.fecha_finalizacion is null or funuo.fecha_finalizacion >= CURRENT_DATE);
+
+      --obtenemos todas las unidades padre incluyendo la enviada como parametro
+      v_padres = orga.f_get_arbol_padre_uo (v_id_uo);
+
+      --obtenemos la gerencia a la que pertenece el funcionario
+      v_id_uo_sol =   orga.f_get_uo_gerencia_area_ope(NULL, v_obligacion_pago.id_funcionario, now()::Date);
+      --RAISE EXCEPTION 'id_uo_jegatura % - % - %', v_id_uo_jefatura, v_id_uo_jefatura_gerencia, v_id_uo_jefatura_unidad;
+
+       --raise exception  'Los valores son: %, %, %, %, %.', v_id_uo_jefatura, v_id_uo_jefatura_unidad, v_id_uo_jefatura_gerencia, v_id_uo_jefatura_direccion, v_id_uo_sol;
+
+      --RECORRE PARA VERIFICAR EL DETALLLE DE LA SOLICITUD con cada concepto de gasto a que modalidad corresponde o no
+	  --raise exception 'llega %', v_id_solicitud;
       FOR v_obligacion_det in(SELECT odet.id_concepto_ingas
                               FROM tes.tobligacion_det odet
                               WHERE odet.id_obligacion_pago= v_id_obligacion_pago
@@ -107,299 +132,297 @@ BEGIN
                               GROUP BY odet.id_concepto_ingas
                              )LOOP
 
-                            --nombre del concepto de gasto
-                            SELECT cin.desc_ingas
-                            into v_desc_ingas
-                            FROM param.tconcepto_ingas cin
-                            WHERE cin.id_concepto_ingas = v_obligacion_det.id_concepto_ingas;
+                          --nombre del concepto de gasto
+                          SELECT cin.desc_ingas
+                          into v_desc_ingas
+                          FROM param.tconcepto_ingas cin
+                          WHERE cin.id_concepto_ingas = v_obligacion_det.id_concepto_ingas;
 
                            --para diferenciar de las regionales y de la central que si pueden elegir una de ellas
                            --para la central
                            --10445 = Gerencias Regionales
+                           --30-09-2021 segun restruccturacion organigrama ya no se diferencia por depto, solo segunparametrizacion de la Matriz
 
-                           IF (v_depto_prioridad = 1) THEN
+                           --IF (v_depto_prioridad = 1) THEN
 
-                           		    bandera_matriz = 'no';
-									--raise exception 'llega2 %',v_obligacion_det.id_concepto_ingas;
+                          bandera_matriz = 'no';
+                          --raise exception 'llega2 %',v_obligacion_det.id_concepto_ingas;
 
-                                    FOR v_id_matriz IN(SELECT mc.id_matriz_modalidad, mm.id_uo, mm.id_cargo
-                                                                FROM adq.tmatriz_concepto mc
-                                                                left join adq.tmatriz_modalidad mm on mm.id_matriz_modalidad = mc.id_matriz_modalidad
-                                                                WHERE mc.id_concepto_ingas = v_obligacion_det.id_concepto_ingas
-                                                                and mc.estado_reg = 'activo'
-                                                                and mm.estado_reg = 'activo'
-                                                                and mm.flujo_sistema in ('TESORERIA','ADQUISICIONES-TESORERIA')
-                                                                and mm.id_uo != 10445
-                                                         		 )LOOP
+                          /*SELECT mc.id_matriz_modalidad
+                          INTO v_id_matriz_modalidad
+                          FROM adq.tmatriz_concepto mc
+                          INNER join adq.tmatriz_modalidad mm on mm.id_matriz_modalidad = mc.id_matriz_modalidad
+                          WHERE mc.id_concepto_ingas = v_obligacion_det.id_concepto_ingas
+                          and mc.estado_reg = 'activo'
+                          and mm.estado_reg = 'activo'
+                          and mm.flujo_sistema in ('TESORERIA','ADQUISICIONES-TESORERIA')
+                          --and mm.id_uo in (v_id_uo_jefatura, v_id_uo_jefatura_unidad, v_id_uo_jefatura_gerencia, v_id_uo_jefatura_direccion, v_id_uo_funcionario)
+                          and mm.id_uo in (v_padres)
+                          and mm.id_uo_gerencia = v_id_uo_sol;*/
 
-                                            ---RAISE EXCEPTION 'MATRIZ % - %',v_id_matriz.id_matriz_modalidad, v_id_matriz.id_uo;
-                                                 /*SELECT fc.id_funcionario
-                                                 into v_funcionario
-                                                 FROM orga.vfuncionario_cargo fc
-                                                 WHERE fc.id_uo = v_id_matriz.id_uo
-                                                 and (fc.fecha_asignacion  <=  now()
-                                                 and (fc.fecha_finalizacion is null or fc.fecha_finalizacion >= now() ));*/
+                          execute('SELECT mc.id_matriz_modalidad
+                          FROM adq.tmatriz_concepto mc
+                          INNER join adq.tmatriz_modalidad mm on mm.id_matriz_modalidad = mc.id_matriz_modalidad
+                          WHERE mc.id_concepto_ingas ='|| v_obligacion_det.id_concepto_ingas||'
+                          and mc.estado_reg = ''activo''
+                          and mm.estado_reg = ''activo''
+                          and mm.flujo_sistema in (''TESORERIA'',''ADQUISICIONES-TESORERIA'')
+                          and mm.id_uo in ('||v_padres||')
+                          and mm.id_uo_gerencia ='|| v_id_uo_sol||' limit 1') INTO v_id_matriz_modalidad;
 
-                                                 --17-09-2021
-                                                  SELECT  uofun.id_funcionario
-                                                  INTO v_funcionario
-                                                  FROM orga.tcargo car
-                                                  inner join orga.tuo_funcionario uofun on uofun.id_uo = car.id_uo
-                                                  WHERE car.id_cargo =  v_id_matriz.id_cargo
-                                                  and uofun.fecha_asignacion  <=  now()
-                                                  and (uofun.fecha_finalizacion is null or uofun.fecha_finalizacion >= now() );
+                         -- IF (v_id_matriz_modalidad is null) THEN
+                         -- 	RAISE EXCEPTION '1. El valor v_id_matriz_modalidad es nulo, los valores recibidos son: id_uo_gerencia= %, id_concepto_ingas=%, v_matriz_id_modalidad= %, ',v_id_uo_sol, v_obligacion_det.id_concepto_ingas, v_id_matriz_modalidad;
+                          --END IF;
 
-                                                  SELECT vf.desc_funcionario1
-                                                  INTO	v_desc_funcionario
-                                                  FROM orga.vfuncionario vf
-                                                  WHERE vf.id_funcionario = v_funcionario;
+                           IF (v_id_matriz_modalidad is null) THEN
+                           		RAISE EXCEPTION '1. No se encuentra parametrizado el Concepto de Gasto: %, en la Matriz Tipo Contratación Aprobador. Comunicarse con el Departamento de Adquisiciones (Marcelo Vidaurre).', v_desc_ingas;
+                           		--RAISE EXCEPTION 'los valores son id_concepto_ingas: %, v_padres:%, v_id_uo_sol: % ',v_obligacion_det.id_concepto_ingas, v_padres, v_id_uo_sol;
 
-                                                  SELECT car.nombre
-                                                  INTO	v_nombre_cargo
-                                                  FROM orga.tcargo car
-                                                  WHERE car.id_cargo = v_id_matriz.id_cargo;
+                           END IF;
 
-
-
-                                                 raise NOTICE 'llegaFUncionario %', v_funcionario;
-                                                -- recupera la uo gerencia del funcionario
-                                                v_id_uo_matriz =   orga.f_get_uo_gerencia_area_ope(v_id_matriz.id_uo, NULL, now()::Date);
-                                                raise NOTICE 'llegaUO %', v_id_uo_matriz;
-                                                v_id_uo_sol =   orga.f_get_uo_gerencia_area_ope(NULL, v_obligacion_pago.id_funcionario, now()::Date);
-
-
-                                                raise NOTICE 'llegaUOSol %', v_id_uo_sol;
+                          --obtenemos todas las modalidades que contienen el concepto de gasto seleccionado y se corresponden con el cargo
+                          FOR v_id_matriz IN execute('SELECT mc.id_matriz_modalidad, mm.id_uo, mm.id_cargo
+                                                      FROM adq.tmatriz_concepto mc
+                                                      inner join adq.tmatriz_modalidad mm on mm.id_matriz_modalidad = mc.id_matriz_modalidad
+                                                      WHERE mc.id_concepto_ingas ='|| v_obligacion_det.id_concepto_ingas||'
+                                                      and mc.estado_reg = ''activo''
+                                                      and mm.estado_reg = ''activo''
+                                                      and mm.flujo_sistema in (''TESORERIA'',''ADQUISICIONES-TESORERIA'')
+                                                      and mm.id_uo in ('||v_padres||')
+                                                      and mm.id_uo_gerencia ='|| v_id_uo_sol
+                                              )LOOP
 
 
 
+                              --RAISE EXCEPTION 'MATRIZ % - %',v_id_matriz.id_matriz_modalidad, v_id_matriz.id_uo;
+                               /*SELECT fc.id_funcionario
+                               into v_funcionario
+                               FROM orga.vfuncionario_cargo fc
+                               WHERE fc.id_uo = v_id_matriz.id_uo
+                               and (fc.fecha_asignacion  <=  now()
+                               and (fc.fecha_finalizacion is null or fc.fecha_finalizacion >= now() ));*/
 
-                                        --RAISE EXCEPTION 'MATRIZ % - %', v_id_uo_matriz,v_id_uo_sol;
+                               --17-09-2021
+                               --obtenemos el id_funcionario aprobador en base al cargo
+                                SELECT  uofun.id_funcionario
+                                INTO v_funcionario
+                                FROM orga.tcargo car
+                                inner join orga.tuo_funcionario uofun on uofun.id_uo = car.id_uo
+                                WHERE car.id_cargo =  v_id_matriz.id_cargo
+                                and uofun.fecha_asignacion  <=  now()
+                                and (uofun.fecha_finalizacion is null or uofun.fecha_finalizacion >= now() );
 
-                                        IF (v_id_uo_matriz = v_id_uo_sol ) THEN
+                                --obtenemos el nombre del funcionario aprobador
+                                SELECT vf.desc_funcionario1
+                                INTO	v_desc_funcionario
+                                FROM orga.vfuncionario vf
+                                WHERE vf.id_funcionario = v_funcionario;
 
-                                            v_id_uo_jefatura =   orga.f_get_uo_jefatura_area_ope(NULL, v_obligacion_pago.id_funcionario, now()::Date);
-                                            v_id_uo_jefatura_gerencia =   orga.f_get_uo_jefa_ger_area_ope(NULL, v_obligacion_pago.id_funcionario, now()::Date);
-                                            v_id_uo_jefatura_unidad =   orga.f_get_uo_jefa_unidad_area_ope(NULL, v_obligacion_pago.id_funcionario, now()::Date);
-                                            v_id_uo_jefatura_direccion =   orga.f_get_uo_direccion_area_ope(NULL, v_obligacion_pago.id_funcionario, now()::Date);
-                                            --RAISE EXCEPTION 'id_uo_jegatura % - % - %', v_id_uo_jefatura, v_id_uo_jefatura_gerencia, v_id_uo_jefatura_unidad;
-
-                                            SELECT count(mc.id_matriz_modalidad)
-                                            INTO v_matriz_id_modalidad
-                                            FROM adq.tmatriz_concepto mc
-                                            left join adq.tmatriz_modalidad mm on mm.id_matriz_modalidad = mc.id_matriz_modalidad
-                                            WHERE mc.id_concepto_ingas = v_obligacion_det.id_concepto_ingas
-                                            and mc.estado_reg = 'activo'
-                                            AND mm.id_uo_gerencia = v_id_uo_sol;
-
-                                            --si existe mas de 1 registro se toma la condicion por su departamento jefatura
-                                            IF (v_matriz_id_modalidad > 1 or v_matriz_id_modalidad = 0) THEN
-
-                                                SELECT mc.id_matriz_modalidad
-                                                INTO v_matriz_id_modalidad
-                                                FROM adq.tmatriz_concepto mc
-                                                left join adq.tmatriz_modalidad mm on mm.id_matriz_modalidad = mc.id_matriz_modalidad
-                                                WHERE mc.id_concepto_ingas = v_obligacion_det.id_concepto_ingas
-                                                and mc.estado_reg = 'activo'
-                                                --and mm.id_uo = v_id_uo_jefatura
-                                                and mm.id_uo in (v_id_uo_jefatura,v_id_uo_jefatura_unidad, v_id_uo_jefatura_gerencia, v_id_uo_jefatura_direccion)
-                                                and mm.id_uo_gerencia = v_id_uo_sol;
-
-                                            ELSE
-
-                                                SELECT mc.id_matriz_modalidad
-                                                INTO v_matriz_id_modalidad
-                                                FROM adq.tmatriz_concepto mc
-                                                left join adq.tmatriz_modalidad mm on mm.id_matriz_modalidad = mc.id_matriz_modalidad
-                                                WHERE mc.id_concepto_ingas = v_obligacion_det.id_concepto_ingas
-                                                and mc.estado_reg = 'activo'
-                                                AND mm.id_uo_gerencia = v_id_uo_sol;
-
-                                            END IF;
-
-                                            bandera_matriz = 'si';
-
-                                            --RAISE EXCEPTION 'MATRIZ %',v_matriz_id_modalidad;
-
-                                            v_id_matriz_modalidad =   v_matriz_id_modalidad;
-
-                                            IF (v_id_matriz_modalidad is null) THEN
-                                                RAISE EXCEPTION 'No se encuentra parametrizado el Concepto de Gasto % en la Matriz Tipo Contratación(Aprobador). Comunicarse con el Departamento de Adquisiciones (Marcelo Vidaurre).', v_desc_ingas;
-                                            END IF;
+                                --obtenemos el nombre del cargo aprobador
+                                SELECT car.nombre
+                                INTO	v_nombre_cargo
+                                FROM orga.tcargo car
+                                WHERE car.id_cargo = v_id_matriz.id_cargo;
 
 
 
-                                             IF (v_id_matriz.id_cargo is null) THEN
-                                                RAISE EXCEPTION 'No se encuentra parametrizado el Responsable de Nivel Aprobación  en la Matriz Tipo Contratación - Aprobador. Comunicarse con el Departamento de Adquisiciones (Marcelo Vidaurre).';
-                                             END IF;
+                               raise NOTICE 'llegaFUncionario %', v_funcionario;
+                              -- recupera la uo en base a la uo registrada en la matriz
+                              v_id_uo_matriz =   orga.f_get_uo_gerencia_area_ope(v_id_matriz.id_uo, NULL, now()::Date);
+                              raise NOTICE 'llegaUO %', v_id_uo_matriz;
+
+                              --22-09-2021(may)modificacion funcion porque no mostraba del primer que lista si oficial o funcional, ahora sera el oficial segun funcionario
+                              --obtenemos el id_uo del funcionario solicitante, si tiene asignacion funcional prevalece ante la asiginacion oficial
+                              --v_id_uo_sol =   orga.f_get_uo_gerencia_area_ope(NULL, v_obligacion_pago.id_funcionario, now()::Date);
+
+                              --Comentado por grover
+                              --v_id_uo_sol =   orga.f_get_uo_gerencia_area_ope_ofi(NULL, v_obligacion_pago.id_funcionario, now()::Date);
 
 
-                                              --CONDICION PARA RESCATAR DE LA MATRIZ EL FUNCIONARIO RESPONSABLE
+                              raise NOTICE 'llegaUOSol %', v_id_uo_sol;
 
-                                              --17-09-2021
-                                              /*SELECT vc.id_funcionario
-                                              INTO v_idfun_modalidad
-                                              FROM orga.vfuncionario_cargo vc
-                                              WHERE vc.id_cargo = v_id_matriz.id_cargo
-                                              and vc.fecha_asignacion  <=  now()
-                                              and (vc.fecha_finalizacion is null or vc.fecha_finalizacion >= now() );
+                              --RAISE EXCEPTION 'MATRIZ % - %', v_id_uo_matriz,v_id_uo_sol;
 
-                                              SELECT vf.desc_funcionario1
-                                              INTO	v_desc_funcionario
-                                              FROM orga.vfuncionario vf
-                                              WHERE vf.id_funcionario = v_idfun_modalidad;
-
-                                              SELECT car.nombre
-                                              INTO	v_nombre_cargo
-                                              FROM orga.tcargo car
-                                              WHERE car.id_cargo = v_id_matriz.id_cargo;*/
-
-                                              IF (v_funcionario is null) THEN
-                                                   RAISE EXCEPTION 'No se encuentra el Funcionario Aprobador % del cargo % en la Matriz Tipo Contratación - Aprobado.  Comunicarse con el Departamento de Adquisiciones (Marcelo Vidaurre). ',v_desc_funcionario, v_nombre_cargo ;
-                                              END IF;
-
-                                        ELSE
-
-                                              IF exists ( SELECT 1
-                                                          FROM adq.tmatriz_concepto mc
-                                                          left join adq.tmatriz_modalidad mm on mm.id_matriz_modalidad = mc.id_matriz_modalidad
-                                                          WHERE mc.id_concepto_ingas = v_obligacion_det.id_concepto_ingas
-                                                          and mc.estado_reg = 'activo'
-                                                          and mm.estado_reg = 'activo'
-                                                          and mm.flujo_sistema in ('TESORERIA','ADQUISICIONES-TESORERIA')
-                                                          and mm.id_uo != 10445
-                                                          AND mm.id_uo_gerencia = v_id_uo_sol
-                                                          ) THEN
+                              --comparamos las gerencias recuperadas anteriormente sean iguales
+                              IF (v_id_uo_matriz = v_id_uo_sol ) THEN
 
 
+                              		v_matriz_id_modalidad=v_id_matriz.id_matriz_modalidad;
 
-                                                    IF (v_funcionario is null) THEN
-                                                        RAISE EXCEPTION 'El Funcionario Aprobador se encuentra Inactivo, verificar la parametrización en la Matriz Tipo Contratación - Aprobado, Nro:%.  Comunicarse con el Departamento de Adquisiciones (Marcelo Vidaurre). ', v_id_matriz.id_matriz_modalidad ;
-                                                    END IF;
-
-                                                    IF (v_id_matriz.id_cargo is null) THEN
-                                                        RAISE EXCEPTION 'No se encuentra parametrizado el Responsable de Nivel Aprobación  en la Matriz Tipo Contratación - Aprobador. Comunicarse con el Departamento de Adquisiciones (Marcelo Vidaurre).';
-                                                     END IF;
-
-                                              --ELSE
-                                                     --RAISE EXCEPTION 'aca';
-
-                                              END IF;
-
-                                        END IF;
-
-                                        ---
-
-                                   END LOOP;
-
-                                   IF ( bandera_matriz = 'no')THEN
-                                   		RAISE EXCEPTION 'No se encuentra parametrizado el Concepto de Gasto % en la Matriz Tipo Contratación(Aprobador) para el Sistema de Obligaciones de Pago. Comunicarse con el Departamento de Adquisiciones (Marcelo Vidaurre).', v_desc_ingas;
-                                   END IF;
-                                   --
-
-                          ELSE
-                                  --prioridad 2 para regionales nacionales
-
-                                  SELECT mc.id_matriz_modalidad, mm.id_cargo
-                                  into v_matriz_modalidad
+                                  --contamos en cuantas modalidades esta parametrizado el concepto y la gerencia solicitante
+                                 /* SELECT count(mc.id_matriz_modalidad)
+                                  INTO v_matriz_id_modalidad
                                   FROM adq.tmatriz_concepto mc
-                                  left join adq.tmatriz_modalidad mm on mm.id_matriz_modalidad = mc.id_matriz_modalidad
+                                  inner join adq.tmatriz_modalidad mm on mm.id_matriz_modalidad = mc.id_matriz_modalidad
                                   WHERE mc.id_concepto_ingas = v_obligacion_det.id_concepto_ingas
                                   and mc.estado_reg = 'activo'
-                                  and mm.estado_reg = 'activo'
-                                  and mm.flujo_sistema in ('TESORERIA','ADQUISICIONES-TESORERIA')
-                                  and mm.id_uo in (10445) ; --nombre de parametrizacion en la matriz Gerencias Regionales = 10445
+                                  AND mm.id_uo_gerencia = v_id_uo_sol;
 
-                                  v_id_matriz_modalidad = v_matriz_modalidad.id_matriz_modalidad;
+                                  --raise exception 'El valor de v_matriz_id_modalidad es: %', v_matriz_id_modalidad;
+
+                                  --si existe mas de 1 registro se toma la condicion por su departamento jefatura
+                                  IF (v_matriz_id_modalidad > 1 or v_matriz_id_modalidad = 0) THEN
+
+                                      --obtenemos el id de la matriz en la que esta parametrizada
+                                      SELECT mc.id_matriz_modalidad
+                                      --INTO v_matriz_id_modalidad
+                                      INTO v_id_matriz_modalidad
+                                      FROM adq.tmatriz_concepto mc
+                                      left join adq.tmatriz_modalidad mm on mm.id_matriz_modalidad = mc.id_matriz_modalidad
+                                      WHERE mc.id_concepto_ingas = v_obligacion_det.id_concepto_ingas
+                                      and mc.estado_reg = 'activo'
+                                      --and mm.id_uo = v_id_uo_jefatura
+                                      and mm.id_uo in (v_id_uo_jefatura, v_id_uo_jefatura_unidad, v_id_uo_jefatura_gerencia, v_id_uo_jefatura_direccion)
+                                      and mm.id_uo_gerencia = v_id_uo_sol;
+
+                                     -- IF (v_id_matriz_modalidad is null) THEN
+                                     -- 	RAISE EXCEPTION '1. El valor v_id_matriz_modalidad es nulo, los valores recibidos son: id_uo_gerencia= %, id_concepto_ingas=%, v_matriz_id_modalidad= %, ',v_id_uo_sol, v_obligacion_det.id_concepto_ingas, v_id_matriz_modalidad;
+                                      --END IF;
+
+                                  ELSE
+
+                                      SELECT mc.id_matriz_modalidad
+                                      --INTO v_matriz_id_modalidad
+                                      INTO v_id_matriz_modalidad
+                                      FROM adq.tmatriz_concepto mc
+                                      left join adq.tmatriz_modalidad mm on mm.id_matriz_modalidad = mc.id_matriz_modalidad
+                                      WHERE mc.id_concepto_ingas = v_obligacion_det.id_concepto_ingas
+                                      and mc.estado_reg = 'activo'
+                                      AND mm.id_uo_gerencia = v_id_uo_sol;
+
+                                      --IF (v_id_matriz_modalidad is null) THEN
+
+                                      --	RAISE EXCEPTION '2. El valor v_id_matriz_modalidad es nulo, los valores recibidos son: id_uo_gerencia= %, id_concepto_ingas=%, v_matriz_id_modalidad= %, ',v_id_uo_sol, v_obligacion_det.id_concepto_ingas, v_id_matriz_modalidad;
+                                      --END IF;
+
+                                  END IF;
+									*/
+                                  bandera_matriz = 'si';
+
+                                  --RAISE EXCEPTION 'MATRIZ %',v_matriz_id_modalidad;
+
+                                  --v_id_matriz_modalidad =   v_matriz_id_modalidad;
 
                                   IF (v_id_matriz_modalidad is null) THEN
-                                      RAISE EXCEPTION 'No se encuentra parametrizado el Concepto de Gasto % para una Regional, en la Matriz Tipo Contratación(Aprobador). Comunicarse con el Departamento de Adquisiciones (Marcelo Vidaurre).', v_desc_ingas;
+                                      RAISE EXCEPTION '2. NO se encuentra parametrizado el Concepto de Gasto % en la Matriz Tipo Contratación Aprobador. Comunicarse con el Departamento de Adquisiciones (Marcelo Vidaurre).', v_desc_ingas;
                                   END IF;
 
 
-                                   --CONDICION PARA RESCATAR DE LA MATRIZ EL FUNCIONARIO RESPONSABLE
-                                   /*SELECT vc.id_funcionario
-                                   INTO v_idfun_modalidad
-                                   FROM orga.vfuncionario_cargo vc
-                                   WHERE vc.id_cargo = v_matriz_modalidad.id_cargo
-                                   and vc.fecha_asignacion  <=  now()
-                                   and (vc.fecha_finalizacion is null or vc.fecha_finalizacion >= now() );*/
 
-                                   --17-09-2021
-                                   SELECT  uofun.id_funcionario
-                                   INTO v_funcionario
-                                   FROM orga.tcargo car
-                                   inner join orga.tuo_funcionario uofun on uofun.id_uo = car.id_uo
-                                   WHERE car.id_cargo =  v_matriz_modalidad.id_cargo
-                                   and uofun.fecha_asignacion  <=  now()
-                                   and (uofun.fecha_finalizacion is null or uofun.fecha_finalizacion >= now() );
+                                  IF (v_id_matriz.id_cargo is null) THEN
+                                    RAISE EXCEPTION 'No se encuentra parametrizado el Responsable de Aprobación  en la Matriz Tipo Contratación - Aprobador. Comunicarse con el Departamento de Adquisiciones (Marcelo Vidaurre).';
+                                  END IF;
 
 
-                                   SELECT vf.desc_funcionario1
-                                   INTO	v_desc_funcionario
-                                   FROM orga.vfuncionario vf
-                                   WHERE vf.id_funcionario = v_funcionario;
+                                    --CONDICION PARA RESCATAR DE LA MATRIZ EL FUNCIONARIO RESPONSABLE
 
-                                   SELECT car.nombre
-                                   INTO	v_nombre_cargo
-                                   FROM orga.tcargo car
-                                   WHERE car.id_cargo = v_matriz_modalidad.id_cargo;
+                                    --17-09-2021
+                                    /*SELECT vc.id_funcionario
+                                    INTO v_idfun_modalidad
+                                    FROM orga.vfuncionario_cargo vc
+                                    WHERE vc.id_cargo = v_id_matriz.id_cargo
+                                    and vc.fecha_asignacion  <=  now()
+                                    and (vc.fecha_finalizacion is null or vc.fecha_finalizacion >= now() );
 
-                                   /*IF (v_idfun_modalidad is null) THEN
-                                        RAISE EXCEPTION 'No se encuentra el Funcionario Responsable % del cargo % en la Matriz Tipo Contratación - Aprobado.  Comunicarse con el Departamento de Adquisiciones (Marcelo Vidaurre). ',v_desc_funcionario, v_nombre_cargo ;
-                                   END IF;*/
+                                    SELECT vf.desc_funcionario1
+                                    INTO	v_desc_funcionario
+                                    FROM orga.vfuncionario vf
+                                    WHERE vf.id_funcionario = v_idfun_modalidad;
 
-                                   IF (v_matriz_modalidad.id_cargo = 18594  or v_matriz_modalidad.id_cargo IS NULL) THEN
+                                    SELECT car.nombre
+                                    INTO	v_nombre_cargo
+                                    FROM orga.tcargo car
+                                    WHERE car.id_cargo = v_id_matriz.id_cargo;*/
 
-                                      -- recupera la uo gerencia del funcionario
-                                      v_id_uo =   orga.f_get_uo_gerencia_area_ope(NULL, v_obligacion_pago.id_funcionario, now()::Date);
+                                    SELECT mm.id_cargo
+                                    INTO v_matriz_cargo
+                                    FROM adq.tmatriz_modalidad mm
+                                    WHERE mm.id_matriz_modalidad =  v_id_matriz_modalidad;
 
-                                      IF exists(select 1 from orga.tuo_funcionario uof
-                                                 inner join orga.tuo uo on uo.id_uo = uof.id_uo and uo.estado_reg = 'activo'
-                                                 inner join orga.tnivel_organizacional no on no.id_nivel_organizacional = uo.id_nivel_organizacional and no.numero_nivel in (1,2)
-                                                 where  uof.estado_reg = 'activo' and  uof.id_funcionario = v_obligacion_pago.id_funcionario ) THEN
-
-                                            va_id_funcionario_gerente[1] = v_obligacion_pago.id_funcionario;
-
-                                      ELSE
-                                          --si tiene funcionario identificar el gerente correspondientes
-                                          IF v_obligacion_pago.id_funcionario is not NULL THEN
-
-                                              SELECT
-                                                 pxp.aggarray(id_funcionario)
-                                               into
-                                                 va_id_funcionario_gerente
-                                               FROM orga.f_get_aprobadores_x_funcionario(now()::date,v_obligacion_pago.id_funcionario , 'todos', 'si', 'todos', 'ninguno') AS (id_funcionario integer);
-
-                                           END IF;
-                                      END IF;
-
-                                        v_funcionario = va_id_funcionario_gerente[1] ;
-                                     END IF;
+                                    IF (v_matriz_cargo is null) THEN
+                                          RAISE EXCEPTION 'No se encontro un valor en la tabla adq.tmatriz_modalidad para el id_matriz_modalidad = %.',v_id_matriz_modalidad ;
+                                    END IF;
 
 
-                                 --
+                                    SELECT  uofun.id_funcionario
+                                    INTO v_funcionario
+                                    FROM orga.tcargo car
+                                    inner join orga.tuo_funcionario uofun on uofun.id_uo = car.id_uo
+                                    WHERE car.id_cargo =  v_matriz_cargo
+                                    and uofun.fecha_asignacion  <=  now()
+                                    and (uofun.fecha_finalizacion is null or uofun.fecha_finalizacion >= now() );
 
-						  END IF;
+                                    Select car.nombre
+                                    into v_nombre_cargo
+                                    from orga.tcargo car
+                                    where car.id_cargo=v_matriz_cargo;
+
+                                    IF (v_funcionario is null) THEN
+                                         RAISE EXCEPTION 'No se pudo encontrar una asignacion activa para el cargo aprobador: %, id_cargo = %. Revise la matriz de aprobacion y la asignacion del cargo.', v_nombre_cargo, v_matriz_cargo ;
+                                    END IF;
 
 
+                                    IF (v_funcionario is null) THEN
+                                         RAISE EXCEPTION 'No se encuentra el Funcionario Aprobador % del cargo % en la Matriz Tipo Contratación Aprobado.  Comunicarse con el Departamento de Adquisiciones (Marcelo Vidaurre). ',v_desc_funcionario, v_nombre_cargo ;
+                                    END IF;
+                              ELSE
+
+                                  Select uo.nombre_unidad
+                                  into v_nombre_unidad_matriz
+                                  from orga.tuo uo
+                                  where uo.id_uo=v_id_uo_matriz;
+
+                                  Select uo.nombre_unidad
+                                  into v_nombre_unidad_solicitante
+                                  from orga.tuo uo
+                                  where uo.id_uo=v_id_uo_sol;
+
+                                  RAISE EXCEPTION 'Las unidades organizacionales recuperadas son diferentes, Unidad Matriz: %, Unidad Solicitud: %, v_id_uo_matriz=%, v_id_uo_sol=%',v_nombre_unidad_matriz, v_nombre_unidad_solicitante, v_id_uo_matriz, v_id_uo_sol;
+
+                              END IF;
+
+                              ---
+
+                         END LOOP;
+
+                          --si no se pudo encontrar parametrizaciones  mostramos el error
+                         IF ( bandera_matriz = 'no')THEN
+                              RAISE EXCEPTION '3. No se encuentra parametrizado el Concepto de Gasto: % en la Matriz Tipo Contratación (Aprobador) para el Sistema de Obligaciones de Pago, id_concepto = %. Comunicarse con el Departamento de Adquisiciones (Marcelo Vidaurre).', v_desc_ingas, v_obligacion_det.id_concepto_ingas;
+                         END IF;
+                                   --
 
       END LOOP;
 
-                        SELECT vf.desc_funcionario1
-                        INTO	v_nombre_funcionario
-                        FROM orga.vfuncionario vf
-                        WHERE vf.id_funcionario =  v_obligacion_pago.id_funcionario;
+      SELECT vf.desc_funcionario1
+      INTO	v_nombre_funcionario
+      FROM orga.vfuncionario vf
+      WHERE vf.id_funcionario =  v_obligacion_pago.id_funcionario;
 
-      					--control para que no sea el mismo funcionario aprobador con el funcionario solicitante
-      					IF (v_funcionario = v_obligacion_pago.id_funcionario) THEN
-                            RAISE EXCEPTION 'El Funcionario % esta como Solicitante y como Funcionario Aprobador, verificar la parametrizacion en la  Matriz Tipo Contratación(Aprobador). Comunicarse con el Departamento de Adquisiciones (Marcelo Vidaurre).', v_nombre_funcionario;
-                        END IF;
+      --par sacar el funcionario aprobador
+      SELECT mm.id_cargo
+      INTO v_matriz_cargo
+      FROM adq.tmatriz_modalidad mm
+      WHERE mm.id_matriz_modalidad =  v_id_matriz_modalidad;
 
+      SELECT  uofun.id_funcionario
+      INTO v_funcionario
+      FROM orga.tcargo car
+      inner join orga.tuo_funcionario uofun on uofun.id_uo = car.id_uo
+      WHERE car.id_cargo =  v_matriz_cargo
+      and uofun.fecha_asignacion  <=  now()
+      and (uofun.fecha_finalizacion is null or uofun.fecha_finalizacion >= now() );
+      --
 
-                    	UPDATE tes.tobligacion_pago SET
-                        id_funcionario_gerente = v_funcionario,
-                        id_matriz_modalidad = v_id_matriz_modalidad
-                        WHERE id_obligacion_pago = v_id_obligacion_pago;
+      --control para que no sea el mismo funcionario aprobador con el funcionario solicitante
+      IF (v_funcionario = v_obligacion_pago.id_funcionario) THEN
+          RAISE EXCEPTION 'El Funcionario % esta como Solicitante y como Funcionario Aprobador, verificar la parametrizacion en la  Matriz Tipo Contratación(Aprobador). Comunicarse con el Departamento de Adquisiciones (Marcelo Vidaurre).', v_nombre_funcionario;
+      END IF;
+
+      --raise EXCEPTION 'llega %', v_id_matriz_modalidad;
+      UPDATE tes.tobligacion_pago SET
+      id_funcionario_gerente = v_funcionario,
+      id_matriz_modalidad = v_id_matriz_modalidad
+      WHERE id_obligacion_pago = v_id_obligacion_pago;
 
 
 
@@ -426,3 +449,6 @@ VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
 COST 100 ROWS 1000;
+
+ALTER FUNCTION tes.ft_solicitud_obligacion_pago (v_id_obligacion_pago integer, v_id_usuario integer)
+  OWNER TO postgres;

@@ -316,8 +316,9 @@ BEGIN
                               --recuperamos el id_funcionario_gerente actual de la obligacion de pago
                               ---25-08-2021 (may) modificacion asolicitud de Marcelo Vidaurre para funcionario GERENTE,
             				  /* sera segun una matriz y conceptos de gastos para un funcionario aprobador, funcion despues de insertar*/
+			 				--15-10-2021 (may) pra procesos de adquisiciones tambien se incluye que tenga aprobador,hasta distinto aprobador que del flujo adquisiciones
 			 				--SOLO PARA tramites recurrentes registro uno por uno el detalle
-                          IF (v_registros.tipo_obligacion in ('pago_directo', 'pago_unico','pago_especial', 'pga') ) THEN
+                          IF (v_registros.tipo_obligacion in ('pago_directo', 'pago_unico','pago_especial', 'pga', 'adquisiciones' ) ) THEN
 
                             	 v_resp = tes.ft_solicitud_obligacion_pago(v_parametros.id_obligacion_pago, p_id_usuario);
 
@@ -654,7 +655,9 @@ BEGIN
            IF (v_registros_pp.estado = 'borrador') THEN
 
                 --SOLO PARA tramites recurrentes registro uno por uno el detalle
-                IF (v_registros.tipo_obligacion in ('pago_directo', 'pago_unico','pago_especial', 'pga') ) THEN
+                --15-10-2021 (may) pra procesos de adquisiciones tambien se incluye que tenga aprobador,hasta distinto aprobador que del flujo adquisiciones
+
+                IF (v_registros.tipo_obligacion in ('pago_directo', 'pago_unico','pago_especial', 'pga', 'adquisiciones' ) ) THEN
 
                    v_resp = tes.ft_solicitud_obligacion_pago(v_parametros.id_obligacion_pago, p_id_usuario);
 
