@@ -216,6 +216,10 @@ class ACTPlanPago extends ACTbase{
     function generarConformidad(){
         $this->objFunc=$this->create('MODPlanPago');
         $this->res=$this->objFunc->generarConformidad($this->objParam);
+        // {dev: breydi.vasquez, date: 20/10/2021, desc: ejecutar action firma documentos}
+        if ($this->res->getTipo() == 'EXITO') {
+            include("../../../sis_workflow/control/ActionFirmaDocumentos.php"); 
+        }
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
 
