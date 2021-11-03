@@ -839,7 +839,8 @@ Phx.vista.SolicitudRendicionDet=Ext.extend(Phx.gridInterfaz,{
 
 	
 	bdel:true,
-	bsave:false
+	bsave:false,
+    bgantt:true
 	}
 )
 </script>

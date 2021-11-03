@@ -47,7 +47,7 @@ Phx.vista.SolicitudEfectivoVb=Ext.extend(Phx.gridInterfaz,{
 				}
 		);
 
-		this.addButton('diagrama_gantt',
+		/*this.addButton('diagrama_gantt',
             {
                 text:'Gant',
                 iconCls: 'bgantt',
@@ -55,7 +55,7 @@ Phx.vista.SolicitudEfectivoVb=Ext.extend(Phx.gridInterfaz,{
                 handler: this.diagramGantt,
                 tooltip: '<b>Diagrama Gantt de Solicitud de Efectivo</b>'
             }
-        );
+        );*/
 				
 		this.iniciarEventos();
 
@@ -449,13 +449,14 @@ Phx.vista.SolicitudEfectivoVb=Ext.extend(Phx.gridInterfaz,{
 	bsave:false,
 	bedit:false,
 	bnew:false,
+    bgantt:true,
 	
 	preparaMenu:function(n){
           var data = this.getSelectedData();
           var tb =this.tbar;          
           		  
           Phx.vista.SolicitudEfectivoVb.superclass.preparaMenu.call(this,n);
-          this.getBoton('diagrama_gantt').enable();
+          //this.getBoton('diagrama_gantt').enable();
           if (data['estado']!= 'borrador'){    
               this.getBoton('fin_registro').enable();
 			  this.getBoton('ant_estado').enable();
@@ -473,7 +474,7 @@ Phx.vista.SolicitudEfectivoVb=Ext.extend(Phx.gridInterfaz,{
 			this.getBoton('fin_registro').disable();
 			this.getBoton('ant_estado').disable();
 			this.getBoton('btnChequeoDocumentosWf').disable();
-			this.getBoton('diagrama_gantt').disable();
+			//this.getBoton('diagrama_gantt').disable();
 		}
 	},
 	
@@ -589,7 +590,7 @@ Phx.vista.SolicitudEfectivoVb=Ext.extend(Phx.gridInterfaz,{
 		)
 	},
 
-    diagramGantt : function (){
+    /*diagramGantt : function (){
         var data=this.sm.getSelected().data.id_proceso_wf;
         Phx.CP.loadingShow();
         Ext.Ajax.request({
@@ -600,7 +601,7 @@ Phx.vista.SolicitudEfectivoVb=Ext.extend(Phx.gridInterfaz,{
             timeout: this.timeout,
             scope: this
         });
-    },
+    },*/
 	
 	tabsouth:[
             { 
