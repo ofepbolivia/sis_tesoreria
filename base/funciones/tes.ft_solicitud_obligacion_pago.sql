@@ -82,6 +82,7 @@ DECLARE
      v_nombre_unidad_solicitante	varchar;
 
      v_padres					varchar;
+     v_nom_funcionario			varchar;
 
 BEGIN
 
@@ -113,6 +114,15 @@ BEGIN
       from orga.tuo_funcionario funuo
       where funuo.estado_reg = 'activo' and funuo.id_funcionario = v_obligacion_pago.id_funcionario and
 		funuo.fecha_asignacion <= CURRENT_DATE and (funuo.fecha_finalizacion is null or funuo.fecha_finalizacion >= CURRENT_DATE);
+
+      SELECT fun.desc_funcionario1
+      into v_nom_funcionario
+      FROM orga.vfuncionario fun
+      WHERE fun.id_funcionario= v_obligacion_pago.id_funcionario;
+
+      IF (v_id_uo is null) THEN
+      	RAISE EXCEPTION 'El Funcionario solicitante % se encuentra inactivo en la empresa, si desea continuar, solicite a DTI la transferencia del tramite a nombre de un funcionario activo.',v_nom_funcionario;
+      END IF;
 
       --obtenemos todas las unidades padre incluyendo la enviada como parametro
       v_padres = orga.f_get_arbol_padre_uo (v_id_uo);
