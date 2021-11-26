@@ -32,10 +32,11 @@ BEGIN
 	FOR v_record IN (SELECT tci.desc_ingas, tod.descripcion
                      FROM  tes.tobligacion_det tod
                      INNER JOIN param.tconcepto_ingas tci ON tci.id_concepto_ingas = tod.id_concepto_ingas
-                     WHERE tod.id_obligacion_pago = p_id_obligacion_pago)LOOP
+                     WHERE tod.id_obligacion_pago = p_id_obligacion_pago
+                     group by tci.desc_ingas, tod.descripcion)LOOP
     	v_resp = v_resp ||'<tr>
-                              <td>'||v_record.desc_ingas||'</td>
-                              <td>'||v_record.descripcion||'</td>
+                              <td>'||coalesce(v_record.desc_ingas,'')||'</td>
+                              <td>'||coalesce(v_record.descripcion,'')||'</td>
         				   </tr>';			                
     END LOOP;
 	
