@@ -70,6 +70,13 @@ class ACTPlanPago extends ACTbase{
     }
 
     function insertarPlanPago(){
+
+        /*Aumentando para identificar que son comprobantes para la siguiente gestion
+        (Ismael Valdivia 3/12/2021)*/
+        if($this->objParam->getParametro('tipo_interfaz') != ''){
+          $this->objParam->addParametro('tipo_interfaz',$this->objParam->getParametro('tipo_interfaz'));
+        }
+
         $this->objFunc=$this->create('MODPlanPago');
         if($this->objParam->insertar('id_plan_pago')){
             $this->res=$this->objFunc->insertarPlanPago($this->objParam);
@@ -218,7 +225,7 @@ class ACTPlanPago extends ACTbase{
         $this->res=$this->objFunc->generarConformidad($this->objParam);
         // {dev: breydi.vasquez, date: 20/10/2021, desc: ejecutar action firma documentos}
         if ($this->res->getTipo() == 'EXITO') {
-            include("../../../sis_workflow/control/ActionFirmaDocumentos.php"); 
+            include("../../../sis_workflow/control/ActionFirmaDocumentos.php");
         }
         $this->res->imprimirRespuesta($this->res->generarJson());
     }

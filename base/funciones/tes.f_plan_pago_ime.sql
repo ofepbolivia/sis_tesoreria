@@ -316,7 +316,7 @@ BEGIN
                               --recuperamos el id_funcionario_gerente actual de la obligacion de pago
                               ---25-08-2021 (may) modificacion asolicitud de Marcelo Vidaurre para funcionario GERENTE,
             				  /* sera segun una matriz y conceptos de gastos para un funcionario aprobador, funcion despues de insertar*/
-			 				--15-10-2021 (may) pra procesos de adquisiciones tambien se incluye que tenga aprobador,hasta distinto aprobador que del flujo adquisiciones
+                              --15-10-2021 (may) pra procesos de adquisiciones tambien se incluye que tenga aprobador,hasta distinto aprobador que del flujo adquisiciones
 			 				--SOLO PARA tramites recurrentes registro uno por uno el detalle
                           IF (v_registros.tipo_obligacion in ('pago_directo', 'pago_unico','pago_especial', 'pga', 'adquisiciones' ) ) THEN
 
@@ -530,7 +530,6 @@ BEGIN
 
            -- raise exception '%, %, %,%,%', COALESCE(v_parametros.id_cuenta_bancaria,0), COALESCE(v_parametros.id_cuenta_bancaria_mov,0),  COALESCE(v_parametros.forma_pago,''),  COALESCE(v_parametros.nro_cheque,0),  COALESCE(v_parametros.nro_cuenta_bancaria,'');
 
-
              IF  pxp.f_existe_parametro(p_tabla,'id_cuenta_bancaria') THEN
                v_id_cuenta_bancaria =  v_parametros.id_cuenta_bancaria;
              END IF;
@@ -613,7 +612,7 @@ BEGIN
            from tes.tobligacion_pago op
            where op.id_obligacion_pago = v_parametros.id_obligacion_pago;
 
-            --25-08-2021 (may) modificacion a solicitud de Marcelo Vidaurre para funcionario GERENTE segun la Matriz
+			--25-08-2021 (may) modificacion a solicitud de Marcelo Vidaurre para funcionario GERENTE segun la Matriz
              /*--recuperamos el id_funcionario_gerente actual de la obligacion de pago
            SELECT
            pxp.aggarray(id_funcionario)
@@ -1138,9 +1137,20 @@ BEGIN
             join param.tgestion ges on ges.id_gestion = op.id_gestion
             where pp.id_obligacion_pago = v_parametros.id_obligacion_pago;
 
-            IF NOT ((date_part('year',v_parametros.fecha_costo_ini) = v_anio_ges) and (date_part('year',v_parametros.fecha_costo_fin)=v_anio_ges)) THEN
-               raise exception 'LAS FECHAS NO CORRESPONDEN A LA GESTIÓN, NÚMERO DE TRÁMITE % gestión %', v_num_tramite, v_anio_ges;
+            /*Aumentando condicion para los devengados de la siguiente Gestion (IRVA 03DIC2021)*/
+            IF  pxp.f_existe_parametro(p_tabla,'tipo_interfaz') THEN
+               if (v_parametros.tipo_interfaz != 'deven_SigGestion') then
+               	IF NOT ((date_part('year',v_parametros.fecha_costo_ini) = v_anio_ges) and (date_part('year',v_parametros.fecha_costo_fin)=v_anio_ges)) THEN
+                	raise exception 'LAS FECHAS NO CORRESPONDEN A LA GESTIÓN, NÚMERO DE TRÁMITE % gestión %', v_num_tramite, v_anio_ges;
+            	END IF;
+               end if;
+            ELSE
+            	IF NOT ((date_part('year',v_parametros.fecha_costo_ini) = v_anio_ges) and (date_part('year',v_parametros.fecha_costo_fin)=v_anio_ges)) THEN
+                	raise exception 'LAS FECHAS NO CORRESPONDEN A LA GESTIÓN, NÚMERO DE TRÁMITE % gestión %', v_num_tramite, v_anio_ges;
+            	END IF;
             END IF;
+
+
 
             --control fecha de conclusion del pago
             /*IF (v_parametros.fecha_conclusion_pago<now()) THEN
@@ -1429,7 +1439,7 @@ BEGIN
            --validacion de la cuota
 
            select
-             pp.*,op.total_pago,op.comprometido, op.id_contrato
+             pp.*,op.total_pago,op.comprometido, op.id_contrato, op.tipo_obligacion
            into
              v_registros
            from tes.tplan_pago pp
@@ -1468,7 +1478,7 @@ BEGIN
 	  END IF;
 
           --(may) 20-07-2019 los tipo plan de pago devengado_pagado_1c_sp son para las internacionales -tramites sp con contato
-          IF  v_registros.tipo  in ('pagado' ,'devengado_pagado','devengado_pagado_1c','anticipo','ant_parcial','devengado_pagado_1c_sp') THEN
+          IF  v_registros.tipo  in ('pagado' ,'devengado_pagado','devengado_pagado_1c','anticipo','ant_parcial','devengado_pagado_1c_sp') and v_registros.tipo_obligacion != 'pago_pvr' THEN
 
                   IF v_registros.forma_pago = 'cheque' THEN
 
@@ -1552,14 +1562,23 @@ BEGIN
 
            END IF;
 
-
-           v_verficacion = tes.f_generar_comprobante(
+           if v_registros.tipo_obligacion = 'pago_pvr' then
+            v_verficacion = tes.f_generar_comprobante_pvr(
                                                       p_id_usuario,
                                                       v_parametros._id_usuario_ai,
                                                       v_parametros._nombre_usuario_ai,
                                                       v_parametros.id_plan_pago,
                                                       v_parametros.id_depto_conta,
                                                       v_nombre_conexion);
+           else
+            v_verficacion = tes.f_generar_comprobante(
+                                                      p_id_usuario,
+                                                      v_parametros._id_usuario_ai,
+                                                      v_parametros._nombre_usuario_ai,
+                                                      v_parametros.id_plan_pago,
+                                                      v_parametros.id_depto_conta,
+                                                      v_nombre_conexion);
+           end if;
 
           --select * into v_resp from migra.f_cerrar_conexion(v_nombre_conexion,'exito');
 
@@ -1790,7 +1809,8 @@ BEGIN
             pp.id_plantilla,
             pp.id_obligacion_pago,
             op.num_tramite,
-            pp.tipo
+            pp.tipo,
+            op.id_moneda
         into
             v_id_plan_pago,
             v_id_proceso_wf,
@@ -1807,11 +1827,106 @@ BEGIN
             v_id_plantilla,
             v_id_obligacion_pago_pp,
             v_numero_tramite,
-            vtipo_pp
+            vtipo_pp,
+            v_id_moneda
 
         from tes.tplan_pago  pp
         inner  join tes.tobligacion_pago op on op.id_obligacion_pago = pp.id_obligacion_pago
         where pp.id_proceso_wf  = v_parametros.id_proceso_wf_act;
+
+        --14-06-2021 (may)
+        v_pre_integrar_presupuestos = pxp.f_get_variable_global('pre_integrar_presupuestos');
+
+         -- 14-06-2021 (may)
+          v_sw_verificacion = true;
+          v_mensaje_verificacion ='';
+          v_cont =1;
+
+          IF vtipo_pp in ('devengado_pagado','devengado','devengado_pagado_1c','ant_aplicado','rendicion') and  v_pre_integrar_presupuestos = 'true'  THEN
+
+
+           		--verifica si el presupuesto comprometido sobrante alcanza para pagar el monto de la cuota prorrateada correspondiente al pago
+
+                  FOR  v_registros_pro in (
+                                 select
+                                   pro.id_prorrateo,
+                                   pro.monto_ejecutar_mb,
+                                   pro.monto_ejecutar_mo,
+                                   od.id_partida_ejecucion_com,
+                                   od.descripcion,
+                                   od.id_concepto_ingas,
+                                   par.sw_movimiento,
+                                   tp.movimiento,
+                                   od.id_centro_costo
+                                 from  tes.tprorrateo pro
+                                 inner join tes.tobligacion_det od on od.id_obligacion_det = pro.id_obligacion_det
+                                 INNER JOIN pre.tpresupuesto   p  on p.id_centro_costo = od.id_centro_costo
+   								 INNER JOIN pre.tpartida par on par.id_partida  = od.id_partida
+                                 INNER JOIN pre.ttipo_presupuesto tp on tp.codigo = p.tipo_pres
+
+
+                                 where  pro.id_plan_pago = v_id_plan_pago
+                                   and pro.estado_reg = 'activo') LOOP
+
+						--raise exception 'v_registros_pro: %', v_registros_pro;
+                        v_comprometido=0;
+                        v_ejecutado=0;
+
+                        IF v_registros_pro.sw_movimiento != 'flujo'  THEN
+
+				          SELECT
+                                   ps_comprometido,
+                                   COALESCE(ps_ejecutado,0)
+                               into
+                                   v_comprometido,
+                                   v_ejecutado
+                            FROM pre.f_verificar_com_eje_pag(v_registros_pro.id_partida_ejecucion_com, v_id_moneda,null);
+
+                        END IF;
+
+                      --verifica si el presupuesto comprometido sobrante alcanza para devengar
+                      IF  (v_comprometido - v_ejecutado)  <  v_registros_pro.monto_ejecutar_mo  and v_registros_pro.sw_movimiento != 'flujo' THEN
+
+                         -- raise EXCEPTION  '% - % = % < %',v_comprometido,v_ejecutado,v_comprometido - v_ejecutado, v_registros_pro.monto_ejecutar_mb;
+
+
+                         select cig.desc_ingas
+                         into v_desc_ingas
+                         from  param.tconcepto_ingas cig
+                         where cig.id_concepto_ingas  = v_registros_pro.id_concepto_ingas;
+
+						  select ttc.codigo AS centro_costo
+                          into v_centro_costo
+                          from param.tcentro_costo tcc
+        				  inner join param.ttipo_cc ttc on ttc.id_tipo_cc = tcc.id_tipo_cc
+                          where  tcc.id_centro_costo = v_registros_pro.id_centro_costo;
+
+                          select (tp.codigo||' - '||tp.nombre_partida)
+                          into v_partida
+                          from pre.tpartida_ejecucion pe
+                          inner join  pre.tpartida tp on tp.id_partida = pe.id_partida
+                          where pe.id_partida_ejecucion = v_registros_pro.id_partida_ejecucion_com;
+
+                          --sinc_presupuesto
+                          v_mensaje_verificacion ='Falta Presupuesto según el siguiente detalle :' ||v_cont::varchar||') '||v_desc_ingas||'('||  substr(v_registros_pro.descripcion, 0, 15)   ||'...)'||' Presup. '||v_centro_costo||' monto faltante ' || (v_registros_pro.monto_ejecutar_mo - (v_comprometido - v_ejecutado))::varchar||', en la partida: <br>'||coalesce(v_partida,'')||'<br> -------------------------------------------------------- <br>';
+                          v_sw_verificacion=false;
+                          v_cont = v_cont +1;
+
+                      END IF;
+
+						IF not v_sw_verificacion THEN
+                             raise EXCEPTION  '% ',v_mensaje_verificacion;
+                        END IF;
+
+
+                   END LOOP;
+
+
+
+
+          END IF;
+          --
+
 
          --si esta saliendo de borrador vadamos el rango de gasto
          -- chequea fechas de costos inicio y fin
@@ -2048,6 +2163,8 @@ BEGIN
 
 
           ---
+
+
           /*------------------------------------------------------------------
             CONEXION A BUE
             si elige  Libro de bancos destino a BUE copia su obligacion,
@@ -2484,3 +2601,6 @@ VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
 COST 100;
+
+ALTER FUNCTION tes.f_plan_pago_ime (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
+  OWNER TO postgres;
