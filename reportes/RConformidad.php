@@ -29,7 +29,7 @@ class RConformidad extends  ReportePDFFormulario {
 	}
 
 	function generarActa($maestro) {
-
+		ini_set('memory_limit', '500M');
 		$nombre_solicitante = $maestro[0]['nombre_solicitante'];
 		$proveedor = $maestro[0]['proveedor'];
 		$fecha_conformidad = $maestro[0]['fecha_conformidad'];
