@@ -398,10 +398,18 @@ BEGIN
 
                             v_sum_total_pp = COALESCE(v_sum_monto_pp, 0) + COALESCE(v_parametros.monto, 0);
 
-                           --raise exception 'llegaaaa %>= %', v_sum_total_pp,v_sum_monto_pe ;
+                            /*--raise exception 'llegaaaa %>= %', v_sum_total_pp,v_sum_monto_pe ;
                             IF (COALESCE(v_sum_total_pp,0) > COALESCE(v_sum_monto_pe,0)) THEN
                               raise exception ' El monto total de las cuotas es de % y excede al monto total certificado de % para el trámite %. Comunicarse con la Unidad de Presupuestos. ',v_sum_total_pp, v_sum_monto_pe, v_registros.num_tramite ;
-                            END IF;
+                            END IF;*/
+
+                            --(may)10-12-2021 modificacion control no controle para los de tipo adq que son los que vienen de GM
+                           IF (v_registros.tipo_obligacion != 'gestion_mat') THEN
+                              IF (COALESCE(v_sum_total_pp,0) > COALESCE(v_sum_monto_pe,0)) THEN
+                                raise exception ' El monto total de las cuotas es de % y excede al monto total certificado de % para el trámite %. Comunicarse con la Unidad de Presupuestos. ',v_sum_total_pp, v_sum_monto_pe, v_registros.num_tramite ;
+                              END IF;
+                           END IF;
+
                       --END IF;
                           /*  v_sum_total_pp = COALESCE(v_parametros.monto,0);
 
@@ -839,9 +847,11 @@ BEGIN
                          v_sum_total_pp = (COALESCE(v_sum_monto_pp,0) - COALESCE(v_sum_monto_solo_pp, 0)) + COALESCE(v_parametros.monto, 0);
                          --raise exception '% = % - % + %',v_sum_total_pp,  v_sum_monto_pp, v_sum_monto_solo_pp, v_parametros.monto;
 
+                         IF (v_registros.tipo_obligacion != 'gestion_mat') THEN
                            IF (COALESCE(v_sum_total_pp,0) > COALESCE(v_sum_monto_pe,0)) THEN
                               raise exception ' El monto total de las cuotas es de % y excede al monto total certificado de % para el trámite %. Comunicarse con la Unidad de Presupuestos. ',v_sum_total_pp, v_sum_monto_pe, v_registros.num_tramite ;
                            END IF;
+                         END IF;
                        --END IF;
 
 
@@ -2039,9 +2049,11 @@ BEGIN
                  v_sum_total_pp = (COALESCE(v_sum_monto_pp,0));
  				--raise exception 'v_sum_total_pp % = v_sum_monto_pp % - v_sum_monto_solo_pp % + v_monto_pp %',v_sum_total_pp, v_sum_monto_pp,v_sum_monto_solo_pp, v_monto_pp;
 
+                 IF (v_tipo_obligacion != 'gestion_mat') THEN
                    IF (COALESCE(v_sum_total_pp,0) > COALESCE(v_sum_monto_pe, 0)) THEN
                       raise exception ' El monto total de las cuotas es de % y excede al monto total certificado de % para el trámite %. Comunicarse con la Unidad de Presupuestos. ',v_sum_total_pp, v_sum_monto_pe, v_numero_tramite;
                    END IF;
+                 END IF;
                --END IF;
 
           END IF;
