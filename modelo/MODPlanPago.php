@@ -280,7 +280,9 @@ class MODPlanPago extends MODbase{
         $this->setParametro('monto_establecido','monto_establecido','numeric');
         $this->setParametro('id_proveedor_cta_bancaria','id_proveedor_cta_bancaria','int4');
         $this->setParametro('id_multa','id_multa','int4');
-
+        /*Aumentando para diferenciar los comprobantes a la sigGestion (Ismael Valdivia 3/12/2021)*/
+        $this->setParametro('tipo_interfaz','tipo_interfaz','varchar');
+        /******************************************************************************************/
 
 
 
