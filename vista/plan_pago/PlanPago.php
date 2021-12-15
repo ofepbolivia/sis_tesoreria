@@ -2149,11 +2149,12 @@ header("content-type: text/javascript; charset=UTF-8");
             //deshabilita el cambio del tipo de pago
             //may 08-01-2020 solo para visto bueno conta puede modificar el tipo de cuota
             console.log('llegamay', data.estado);
-            if (data.estado == 'vbconta') {
+            //15-12-2021 (may) a solicitud de Grover desde la fecha se puede modificar el tipo de cuota
+            //if (data.estado == 'vbconta') {
                 this.Cmp.tipo.enable();
-            }else{
+            /*}else{
                 this.Cmp.tipo.disable();
-            }
+            }*/
 
             this.Cmp.fecha_tentativa.enable();
             //08-01-2020 (may) modificacion para que pueda listar lo mismo que un new
