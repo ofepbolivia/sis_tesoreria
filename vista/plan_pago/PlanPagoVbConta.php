@@ -301,6 +301,9 @@ header("content-type: text/javascript; charset=UTF-8");
             this.Cmp.monto_anticipo.on('change',this.calculaMontoPago,this);
             this.Cmp.monto_excento.on('change',this.calculaMontoPago,this);
 
+            this.Cmp.porc_monto_retgar.on('change', this.calculaMontoPago, this);
+            this.Cmp.porc_monto_retgar.on('select', this.calculaMontoPago, this);
+
             this.Cmp.id_plantilla.on('select',function(cmb,rec,i){
                 this.getDecuentosPorAplicar(rec.data.id_plantilla);
                 //this.Cmp.monto_excento.reset();
