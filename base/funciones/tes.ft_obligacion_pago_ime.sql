@@ -1559,7 +1559,8 @@ BEGIN
 
                         -- cuando el estado al que regresa es  borrador o presupeustos esta comprometido y no viene de adquisiciones se revierte el repsupuesto
                         --tipo de obligacion SIP para  internacionales pago_especial_spi
-         			     IF (v_codigo_estado = 'borrador' or v_codigo_estado = 'vbpresupuestos') and v_comprometido = 'si' and   v_tipo_obligacion !='adquisiciones' and   v_tipo_obligacion !='pago_especial' and v_tipo_obligacion !='pago_especial_spi' and  v_pre_integrar_presupuestos = 'true'  THEN
+                        --30-12-2021 (may) se aumenta a proceso de GM gestion_mat para que no revierta el presupuesto (igual que adq)
+         			     IF (v_codigo_estado = 'borrador' or v_codigo_estado = 'vbpresupuestos') and v_comprometido = 'si' and   v_tipo_obligacion !='adquisiciones' and   v_tipo_obligacion !='pago_especial' and v_tipo_obligacion !='pago_especial_spi' and v_tipo_obligacion != 'gestion_mat' and v_pre_integrar_presupuestos = 'true'  THEN
 
                              --se revierte el presupeusto
                              IF not tes.f_gestionar_presupuesto_tesoreria(v_parametros.id_obligacion_pago, p_id_usuario, 'revertir')  THEN
@@ -1576,12 +1577,13 @@ BEGIN
 
                          --RAC 02/08/2017
                          --verifica si el presupeusto fue comprometido en adquisicioens o no
+                         --30-12-2021 (may) se aumenta a proceso de GM gestion_mat para que no revierta el presupuesto (igual que adq)
 
                          v_adq_comprometer_presupuesto = pxp.f_get_variable_global('adq_comprometer_presupuesto');
 
                           IF ( v_codigo_estado = 'borrador' or v_codigo_estado = 'vbpresupuestos')
                              and v_comprometido = 'si'
-                             and  v_tipo_obligacion = 'adquisiciones'
+                             and  v_tipo_obligacion in ('adquisiciones', 'gestion_mat')
                              and  v_adq_comprometer_presupuesto = 'no'
                              and   v_pre_integrar_presupuestos = 'true'  THEN
 
