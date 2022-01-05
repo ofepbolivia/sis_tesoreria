@@ -19,6 +19,8 @@ class MODCuotasDevengadas extends MODbase{
         $this->transaccion='TES_DEVEN_SEL';
         $this->tipo_procedimiento='SEL';//tipo de transaccion
 
+        $this->setParametro('pes_estado','pes_estado','varchar');
+        $this->setParametro('id_gestion','id_gestion','int4');
 
         //Definicion de la lista del resultado del query
         $this->captura('id_plan_pago','int4');
@@ -144,6 +146,8 @@ class MODCuotasDevengadas extends MODbase{
         //Define los parametros para la funcion
         $this->setParametro('id_plan_pago','id_plan_pago','int4');
         $this->setParametro('id_depto_conta','id_depto_conta','int4');
+        $this->setParametro('estado_interfaz','estado_interfaz','varchar');
+        $this->setParametro('accion','accion','varchar');
 
         //Ejecuta la instruccion
         $this->armarConsulta();

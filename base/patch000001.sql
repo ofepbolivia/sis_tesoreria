@@ -2135,3 +2135,11 @@ ALTER TABLE tes.tobligacion_pago
 COMMENT ON COLUMN tes.tobligacion_pago.id_matriz_modalidad
 IS 'identificador de la tabla matriz';
 /***********************************F-SCP-MAY-TES-0-01/09/2021***************************************/
+
+/***********************************I-SCP-IRVA-TES-0-05/01/2022***************************************/
+ALTER TABLE tes.tplan_pago
+  ADD COLUMN convertido VARCHAR(5) DEFAULT 'no' NOT NULL;
+
+COMMENT ON COLUMN tes.tplan_pago.convertido
+IS 'Campo para diferenciar cuales han sido convertidos para la siguiente getion';
+/***********************************F-SCP-IRVA-TES-0-05/01/2022***************************************/

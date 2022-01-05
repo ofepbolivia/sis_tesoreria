@@ -27,6 +27,7 @@ DECLARE
 	v_parametros  		record;
 	v_nombre_funcion   	text;
 	v_resp				varchar;
+    v_subconsulta		varchar;
 
 BEGIN
 
@@ -43,6 +44,16 @@ BEGIN
 	if(p_transaccion='TES_DEVEN_SEL')then
 
     	begin
+        	if (v_parametros.pes_estado = 'devengado') then
+            	v_subconsulta = 'and plapa.id_plan_pago not in (select pp.id_plan_pago_fk
+                                                                from tes.tplan_pago pp
+                                                                inner join tes.tobligacion_pago op2 on op2.id_obligacion_pago = pp.id_obligacion_pago
+                                                                where pp.id_plan_pago_fk is not null
+                                                                and op2.id_gestion = '||v_parametros.id_gestion||')';
+            else
+            	v_subconsulta = '';
+            end if;
+
     		--Sentencia de la consulta
 			v_consulta:='select
 						plapa.id_plan_pago,
@@ -167,7 +178,7 @@ BEGIN
                         left join param.tdepto depc on depc.id_depto = plapa.id_depto_conta
                         left join conta.tint_comprobante tcon on tcon.id_int_comprobante = plapa.id_int_comprobante
                         left join sigep.tmulta mul on mul.id_multa = plapa.id_multa
-                       where  plapa.estado_reg=''activo''  and plapa.tipo = ''pagado'' and plapa.estado not in (''pagado'') and ';
+                       where  plapa.estado_reg=''activo'' '||v_subconsulta||'  and ';
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
@@ -188,6 +199,16 @@ BEGIN
 	elsif(p_transaccion='TES_DEVEN_CONT')then
 
 		begin
+        	if (v_parametros.pes_estado = 'devengado') then
+            	v_subconsulta = 'and plapa.id_plan_pago not in (select pp.id_plan_pago_fk
+                                                                from tes.tplan_pago pp
+                                                                inner join tes.tobligacion_pago op2 on op2.id_obligacion_pago = pp.id_obligacion_pago
+                                                                where pp.id_plan_pago_fk is not null
+                                                                and op2.id_gestion = '||v_parametros.id_gestion||')';
+            else
+            	v_subconsulta = '';
+            end if;
+
 			--Sentencia de la consulta de conteo de registros
 			v_consulta:='select count(plapa.id_plan_pago)
 						from tes.tplan_pago plapa
@@ -205,7 +226,7 @@ BEGIN
                         left join param.tdepto depto on depto.id_depto = plapa.id_depto_lb
                         left join tes.tts_libro_bancos lb on plapa.id_int_comprobante = lb.id_int_comprobante
                         left join conta.tint_comprobante tcon on tcon.id_int_comprobante = plapa.id_int_comprobante
-                      where  plapa.estado_reg=''activo''   and plapa.tipo = ''pagado'' and plapa.estado not in (''pagado'') and ';
+                      where  plapa.estado_reg=''activo'' '||v_subconsulta||' and ';
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;

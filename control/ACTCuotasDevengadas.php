@@ -16,6 +16,21 @@ class ACTCuotasDevengadas extends ACTbase{
       if ($this->objParam->getParametro('id_gestion') != '') {
         $this->objParam->addFiltro("op.id_gestion = ".$this->objParam->getParametro('id_gestion'));
       }
+
+      /*Aumentando para los procesos que son devengados*/
+      if ($this->objParam->getParametro('pes_estado') != '') {
+        if ($this->objParam->getParametro('pes_estado') == 'devengado') {
+          $this->objParam->addFiltro("plapa.tipo = ''".$this->objParam->getParametro('pes_estado')."'' and plapa.estado = ''devengado'' and plapa.convertido = ''no''");
+        } else if ($this->objParam->getParametro('pes_estado') == 'pagado') {
+          $this->objParam->addFiltro("plapa.tipo = ''".$this->objParam->getParametro('pes_estado')."'' and plapa.estado not in (''pagado'') and plapa.convertido = ''no'' ");
+        } else if ($this->objParam->getParametro('pes_estado') == 'convertidos') {
+          $this->objParam->addFiltro("plapa.convertido = ''si'' ");
+        }
+      }
+      /**************************************************/
+
+
+
       $this->objParam->defecto('dir_ordenacion','asc');
         if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
             $this->objReporte = new Reporte($this->objParam,$this);

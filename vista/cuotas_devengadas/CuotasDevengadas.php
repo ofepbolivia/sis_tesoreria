@@ -20,6 +20,7 @@ Phx.vista.CuotasDevengadas=Ext.extend(Phx.gridInterfaz,{
 		Phx.vista.CuotasDevengadas.superclass.constructor.call(this,config);
 		this.init();
 		this.crearFomularioDepto();
+		this.crearFomularioDeptoConvertido();
 		this.iniciarEventos();
 
     var añoActual = new Date().getFullYear();
@@ -43,10 +44,30 @@ Phx.vista.CuotasDevengadas=Ext.extend(Phx.gridInterfaz,{
 
 		this.addButton('SolDevPag', {
 				text: 'Generar Cbte',
+				grupo:[2],
 				iconCls: 'bpagar',
 				disabled: true,
 				handler: this.onBtnDevPag,
 				tooltip: '<b>Solicitar Devengado/Pago</b><br/>Genera en cotabilidad el comprobante Correspondiente'
+		});
+
+
+		this.addButton('GenCuotaDeven', {
+				text: 'Convertir y Generar Cuota',
+				grupo:[1],
+				iconCls: 'bredo',
+				disabled: true,
+				handler: this.onConvertir,
+				tooltip: '<b>Convertir y Generar Cuota'
+		});
+
+		this.addButton('btnChequeoDocumentosWf',{
+				text: 'Documentos',
+				grupo: [3],
+				iconCls: 'bchecklist',
+				disabled: true,
+				handler: this.loadCheckDocumentosRecWf,
+				tooltip: '<b>Documentos </b><br/>Subir los documetos requeridos.'
 		});
 
     this.bbar.el.dom.style.background='#73AAB3';
@@ -54,7 +75,61 @@ Phx.vista.CuotasDevengadas=Ext.extend(Phx.gridInterfaz,{
     this.grid.body.dom.firstChild.firstChild.firstChild.firstChild.style.background='#E9E9E9';
     this.grid.body.dom.firstChild.firstChild.lastChild.style.background='#F6F6F6';
 
+		this.store.baseParams.pes_estado = 'devengado';
+
+
 	},
+	beditGroups: [1,2],
+	bactGroups:  [1,2,3],
+	bexcelGroups: [1,2,3],
+	bganttGroups: [3],
+
+
+	gruposBarraTareas:[
+										  {name:'devengado',title:'<H1 style="font-size:11px; color: #009915;" align="center">Devengados <br> Pendientes de Pago</h1>',grupo:1,height:0},
+											{name:'pagado',title:'<H1 style="font-size:11px; color: #0031BF;" align="center">Pagos <br> Pendientes</h1>',grupo:2,height:0},
+											{name:'convertidos',title:'<H1 style="font-size:11px; color: #060606;" align="center">Devengados <br> Convertidos</h1>',grupo:3,height:0},
+										],
+
+	loadCheckDocumentosRecWf:function() {
+		var rec=this.sm.getSelected();
+		var that=this;
+		Phx.CP.loadWindows('../../../sis_workflow/vista/documento_wf/DocumentoWf.php',
+				'Chequear documento del WF',
+				{
+						width:'90%',
+						height:500,
+						onDestroy: function() {
+								this.fireEvent('closepanel',this);
+
+								if (this.window) {
+										this.window.destroy();
+								}
+								if (this.form) {
+										this.form.destroy();
+								}
+								Phx.CP.destroyPage(this.idContenedor);
+								that.reload();
+
+
+						},
+				},
+				rec.data,
+				this.idContenedor,
+				'DocumentoWf'
+		)
+	},
+
+	actualizarSegunTab: function(name, indice){
+
+ 					 this.store.baseParams.pes_estado = name;
+
+					 if (this.cmbGestion.getValue()) {
+						 this.load({params:{start:0, limit:this.tam_pag}});
+					 }
+
+
+ 	},
 
 	Grupos: [
 			{
@@ -183,7 +258,7 @@ Phx.vista.CuotasDevengadas=Ext.extend(Phx.gridInterfaz,{
 
   cmbGestion: new Ext.form.ComboBox({
       fieldLabel: 'Gestion',
-      grupo:[0,1,2],
+      grupo:[1,2,3],
       allowBlank: false,
       blankText:'... ?',
       emptyText:'Gestion...',
@@ -1867,24 +1942,132 @@ Phx.vista.CuotasDevengadas=Ext.extend(Phx.gridInterfaz,{
 
 	},
 
+
+	crearFomularioDeptoConvertido: function () {
+
+			this.cmpDeptoContaConvertido = new Ext.form.ComboBox({
+					xtype: 'combo',
+					name: 'id_depto_conta',
+					hiddenName: 'id_depto_conta',
+					fieldLabel: 'Depto. Conta.',
+					allowBlank: false,
+					emptyText: 'Elija un Depto',
+					store: new Ext.data.JsonStore(
+							{
+									//url: '../../sis_tesoreria/control/ObligacionPago/listarDeptoFiltradoObligacionPago',
+									url: '../../sis_parametros/control/Depto/listarDepto',
+									id: 'id_depto',
+									root: 'datos',
+									sortInfo: {
+											field: 'deppto.nombre',
+											direction: 'ASC'
+									},
+									totalProperty: 'total',
+									fields: ['id_depto', 'nombre'],
+									// turn on remote sorting
+									remoteSort: true,
+									baseParams: {
+											par_filtro: 'deppto.nombre#deppto.codigo',
+											estado: 'activo',
+											codigo_subsistema: 'CONTA'
+									}
+							}),
+					valueField: 'id_depto',
+					displayField: 'nombre',
+					tpl: '<tpl for="."><div class="x-combo-list-item"><p>{nombre}</p></div></tpl>',
+					hiddenName: 'id_depto_tes',
+					forceSelection: true,
+					typeAhead: true,
+					triggerAction: 'all',
+					lazyRender: true,
+					mode: 'remote',
+					pageSize: 10,
+					queryDelay: 1000,
+					width: 250,
+					listWidth: '280',
+					minChars: 2
+			});
+
+			this.formDEPTO2 = new Ext.form.FormPanel({
+					baseCls: 'x-plain',
+					autoDestroy: true,
+					layout: 'form',
+					items: [this.cmpDeptoContaConvertido]
+			});
+
+
+			this.wDEPTO2 = new Ext.Window({
+					title: 'Depto Tesoreria',
+					collapsible: true,
+					maximizable: true,
+					autoDestroy: true,
+					width: 400,
+					height: 200,
+					layout: 'fit',
+					plain: true,
+					bodyStyle: 'padding:5px;',
+					buttonAlign: 'center',
+					items: this.formDEPTO2,
+					modal: true,
+					closeAction: 'hide',
+					buttons: [{
+							text: 'Guardar',
+							handler: this.onSubmitDeptoConvertido,
+							scope: this
+
+					}, {
+							text: 'Cancelar',
+							handler: function () {
+									this.wDEPTO2.hide();
+									this.reload();
+							},
+							scope: this
+					}]
+			});
+
+	},
+
+
+
 	onBtnDevPag: function () {
 			var data = this.getSelectedData();
 			this.wDEPTO.show();
 			this.cmpDeptoConta.reset();
 			this.cmpDeptoConta.store.baseParams = Ext.apply(this.cmpDeptoConta.store.baseParams, {id_depto_origen: data.id_depto_lb})
 			this.cmpDeptoConta.modificado = true;
+			this.store.baseParams.accion = 'generar_comprobante';
+	},
+
+
+	onConvertir: function () {
+			var data = this.getSelectedData();
+			Phx.CP.loadingShow();
+			Ext.Ajax.request({
+					url: '../../sis_tesoreria/control/CuotasDevengadas/solicitarDevPag',
+					params: {
+							id_plan_pago: data.id_plan_pago,
+							id_depto_conta: null,
+							estado_interfaz: this.store.baseParams.pes_estado,
+							accion: 'convertir'
+					},
+					success: this.successSincConvertido,
+					failure: this.conexionFailure,
+					timeout: this.timeout,
+					scope: this
+			})
 	},
 
 	onSubmitDepto: function (x, y, id_depto_conta) {
 			var data = this.getSelectedData();
-
 			if (this.formDEPTO.getForm().isValid() || id_depto_conta) {
 					Phx.CP.loadingShow();
 					Ext.Ajax.request({
 							url: '../../sis_tesoreria/control/CuotasDevengadas/solicitarDevPag',
 							params: {
 									id_plan_pago: data.id_plan_pago,
-									id_depto_conta: id_depto_conta ? id_depto_conta : this.cmpDeptoConta.getValue()
+									id_depto_conta: id_depto_conta ? id_depto_conta : this.cmpDeptoConta.getValue(),
+									estado_interfaz: this.store.baseParams.pes_estado,
+									accion: this.store.baseParams.accion
 							},
 							success: this.successSincGC,
 							failure: this.conexionFailure,
@@ -1907,21 +2090,93 @@ Phx.vista.CuotasDevengadas=Ext.extend(Phx.gridInterfaz,{
 			}
 	},
 
+	successSincConvertido: function (resp) {
+		Phx.CP.loadingHide();
+		var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+		var data = this.getSelectedData();
+
+		this.id_plan_pago_convertido = reg.ROOT.datos.id_plan_pago;
+		this.wDEPTO2.show();
+		this.cmpDeptoContaConvertido.reset();
+		this.cmpDeptoContaConvertido.store.baseParams = Ext.apply(this.cmpDeptoContaConvertido.store.baseParams, {id_depto_origen: data.id_depto_lb})
+		this.cmpDeptoContaConvertido.modificado = true;
+		this.store.baseParams.accion = 'generar_comprobante';
+	},
+
+
+	onSubmitDeptoConvertido: function (x, y, id_depto_conta) {
+			var data = this.getSelectedData();
+			if (this.formDEPTO2.getForm().isValid() || id_depto_conta) {
+					Phx.CP.loadingShow();
+					Ext.Ajax.request({
+							url: '../../sis_tesoreria/control/CuotasDevengadas/solicitarDevPag',
+							params: {
+									id_plan_pago: this.id_plan_pago_convertido,
+									id_depto_conta: id_depto_conta ? id_depto_conta : this.cmpDeptoConta.getValue(),
+									estado_interfaz: this.store.baseParams.pes_estado,
+									accion: this.store.baseParams.accion
+							},
+							success: this.successSincGC2,
+							failure: this.conexionFailure,
+							timeout: this.timeout,
+							scope: this
+					})
+			}
+
+	},
+
+	successSincGC2: function (resp) {
+			Phx.CP.loadingHide();
+			this.wDEPTO2.hide();
+			var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+			if (reg.ROOT.datos.resultado != 'falla') {
+
+					this.reload();
+			} else {
+					alert(reg.ROOT.datos.mensaje)
+			}
+	},
+
+
 	preparaMenu: function (n) {
 			var data = this.getSelectedData();
 			var tb = this.tbar;
+
 			Phx.vista.CuotasDevengadas.superclass.preparaMenu.call(this, n);
+
+			if (this.store.baseParams.pes_estado == 'devengado') {
+				this.getBoton('SolDevPag').hide(true);
+				if (data['estado'] == 'pagado') {
+					this.getBoton('GenCuotaDeven').disable();
+					this.getBoton('edit').disable();
+				}
+				else {
+					this.getBoton('GenCuotaDeven').enable();
+					this.getBoton('edit').enable();
+				}
+
+			} else {
+				if (data['estado'] == 'pagado') {
+					this.getBoton('SolDevPag').disable();
+					this.getBoton('edit').disable();
+				}
+				else {
+					this.getBoton('SolDevPag').enable();
+					this.getBoton('edit').enable();
+				}
+			}
 
 					if (data['estado'] == 'pagado') {
 							this.getBoton('SolDevPag').disable();
 							this.getBoton('edit').disable();
+
 					}
 					else {
 
 								this.getBoton('SolDevPag').enable();
 								this.getBoton('edit').enable();
+								this.getBoton('btnChequeoDocumentosWf').setDisabled(false)
 					}
-
 
 	},
 
@@ -1930,6 +2185,7 @@ Phx.vista.CuotasDevengadas=Ext.extend(Phx.gridInterfaz,{
 
 			if (tb) {
 					this.getBoton('SolDevPag').disable();
+					this.getBoton('btnChequeoDocumentosWf').setDisabled(true);
 			}
 			return tb
 	},
@@ -2782,7 +3038,8 @@ Phx.vista.CuotasDevengadas=Ext.extend(Phx.gridInterfaz,{
   bnew:false,
 	bdel:false,
 	bsave:false,
-  btest:false
+  btest:false,
+	bgantt: true,
 	}
 )
 </script>
