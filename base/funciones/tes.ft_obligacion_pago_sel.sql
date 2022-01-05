@@ -230,7 +230,7 @@ BEGIN
          --05-02-2020 (MAY) filtro para interfaz para procesos de gestion materiales en obligaciones de pago
          ELSIF v_parametros.tipo_interfaz =  'ObligacionPagoGestionMat' THEN
 
-           		v_filadd= ' obpg.tipo_obligacion = ''adquisiciones'' and  obpg.tipo_solicitud = ''Boa'' and ';
+           		v_filadd= ' obpg.tipo_obligacion = ''gestion_mat'' and  obpg.tipo_solicitud = ''Boa'' and ';
          --
 
          ELSE
@@ -590,7 +590,7 @@ BEGIN
              --05-02-2020 (MAY) filtro para interfaz para procesos de gestion materiales en obligaciones de pago
              ELSIF v_parametros.tipo_interfaz =  'ObligacionPagoGestionMat' THEN
 
-                    v_filadd= ' obpg.tipo_obligacion = ''adquisiciones'' and  obpg.tipo_solicitud = ''Boa'' and ';
+                    v_filadd= ' obpg.tipo_obligacion = ''gestion_mat'' and  obpg.tipo_solicitud = ''Boa'' and ';
              --
 
              ELSE

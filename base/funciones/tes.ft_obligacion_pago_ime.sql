@@ -542,7 +542,8 @@ BEGIN
                   op.id_proceso_wf,
                   op.id_obligacion_pago,
                   op.id_depto,
-                  op.id_estado_wf
+                  op.id_estado_wf,
+                  op.num_tramite
                 into v_registros
                  from  tes.tobligacion_pago op
                  where  op.id_obligacion_pago = v_parametros.id_obligacion_pago;
@@ -687,9 +688,81 @@ BEGIN
 
                   v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Obligaciones de Pago eliminado(a), y cotizacion retrocedida');
 
-                ELSE
-                  v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Obligaciones de Pago eliminado(a)');
+                --ELSE
+                --  v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Obligaciones de Pago eliminado(a)');
                 END IF;
+
+               ----------------------------------------------------------------
+               --28-12-2021 (may)
+               ---si esta integrado con Gestion de Materiales libera COmpra
+               -----------------------------------------------------------------
+
+               IF  exists (select 1
+                            from mat.tsolicitud sol
+                            where sol.id_obligacion_pago = v_parametros.id_obligacion_pago)  THEN
+
+
+               			 -- retroceder el estado de la cotizacion
+
+                          Select sol.id_solicitud,
+                                sol.id_proceso_wf,
+                                sol.id_estado_wf,
+                                sol.estado
+                          into v_registros
+                          from mat.tsolicitud sol
+                          where sol.id_obligacion_pago = v_parametros.id_obligacion_pago;
+
+
+                         --recuperaq estado anterior segun Log del WF
+
+                            SELECT
+                               ps_id_tipo_estado,
+                               ps_id_funcionario,
+                               ps_id_usuario_reg,
+                               ps_id_depto,
+                               ps_codigo_estado,
+                               ps_id_estado_wf_ant
+                            into
+                               v_id_tipo_estado,
+                               v_id_funcionario,
+                               v_id_usuario_reg,
+                               v_id_depto,
+                               v_codigo_estado,
+                               v_id_estado_wf_ant
+                            FROM wf.f_obtener_estado_ant_log_wf(v_registros.id_estado_wf);
+
+
+                          -- registra nuevo estado
+
+                          v_id_estado_actual = wf.f_registra_estado_wf(
+                                              v_id_tipo_estado,
+                                              v_id_funcionario,
+                                              v_registros.id_estado_wf,
+                                              v_registros.id_proceso_wf,
+                                              p_id_usuario,
+                                              v_parametros._id_usuario_ai,
+                                              v_parametros._nombre_usuario_ai,
+                                              v_id_depto,
+                                              'El estado  retrocede por anulacion de la obligacion en tesoreria');
+
+
+
+                            -- actualiza estado en la solicitud
+                            update mat.tsolicitud sol set
+                               id_estado_wf =  v_id_estado_actual,
+                               estado = v_codigo_estado,
+                               id_usuario_mod=p_id_usuario,
+                               fecha_mod=now(),
+                               id_obligacion_pago = NULL
+                             where sol.id_obligacion_pago = v_parametros.id_obligacion_pago;
+
+
+                  v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Obligaciones de Pago eliminado(a), y GM retrocedida');
+               ELSE
+                  v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Obligaciones de Pago eliminado(a)');
+               END IF;
+
+               -----
 
             --Definicion de la respuesta
 
@@ -1486,7 +1559,8 @@ BEGIN
 
                         -- cuando el estado al que regresa es  borrador o presupeustos esta comprometido y no viene de adquisiciones se revierte el repsupuesto
                         --tipo de obligacion SIP para  internacionales pago_especial_spi
-         			     IF (v_codigo_estado = 'borrador' or v_codigo_estado = 'vbpresupuestos') and v_comprometido = 'si' and   v_tipo_obligacion !='adquisiciones' and   v_tipo_obligacion !='pago_especial' and v_tipo_obligacion !='pago_especial_spi' and  v_pre_integrar_presupuestos = 'true'  THEN
+                        --30-12-2021 (may) se aumenta a proceso de GM gestion_mat para que no revierta el presupuesto (igual que adq)
+         			     IF (v_codigo_estado = 'borrador' or v_codigo_estado = 'vbpresupuestos') and v_comprometido = 'si' and   v_tipo_obligacion !='adquisiciones' and   v_tipo_obligacion !='pago_especial' and v_tipo_obligacion !='pago_especial_spi' and v_tipo_obligacion != 'gestion_mat' and v_pre_integrar_presupuestos = 'true'  THEN
 
                              --se revierte el presupeusto
                              IF not tes.f_gestionar_presupuesto_tesoreria(v_parametros.id_obligacion_pago, p_id_usuario, 'revertir')  THEN
@@ -1503,12 +1577,13 @@ BEGIN
 
                          --RAC 02/08/2017
                          --verifica si el presupeusto fue comprometido en adquisicioens o no
+                         --30-12-2021 (may) se aumenta a proceso de GM gestion_mat para que no revierta el presupuesto (igual que adq)
 
                          v_adq_comprometer_presupuesto = pxp.f_get_variable_global('adq_comprometer_presupuesto');
 
                           IF ( v_codigo_estado = 'borrador' or v_codigo_estado = 'vbpresupuestos')
                              and v_comprometido = 'si'
-                             and  v_tipo_obligacion = 'adquisiciones'
+                             and  v_tipo_obligacion in ('adquisiciones', 'gestion_mat')
                              and  v_adq_comprometer_presupuesto = 'no'
                              and   v_pre_integrar_presupuestos = 'true'  THEN
 
