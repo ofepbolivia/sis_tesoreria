@@ -23,6 +23,10 @@ Phx.vista.CuotasDevengadas=Ext.extend(Phx.gridInterfaz,{
 		this.crearFomularioDeptoConvertido();
 		this.iniciarEventos();
 
+		var contadores = 0;
+		var contadoresConver = 0;
+
+
     var añoActual = new Date().getFullYear();
     this.cmbGestion.store.load({params:{start:0,limit:50},
            callback : function (r) {
@@ -1860,7 +1864,6 @@ Phx.vista.CuotasDevengadas=Ext.extend(Phx.gridInterfaz,{
   }),
 
 	crearFomularioDepto: function () {
-
 			this.cmpDeptoConta = new Ext.form.ComboBox({
 					xtype: 'combo',
 					name: 'id_depto_conta',
@@ -1928,12 +1931,26 @@ Phx.vista.CuotasDevengadas=Ext.extend(Phx.gridInterfaz,{
 					closeAction: 'hide',
 					buttons: [{
 							text: 'Guardar',
+							id: 'saveDep1',
+							diasabled: 'false',
+							listeners : {
+			         click : function(n){
+								 contadores ++;
+								 console.log("aqui llega click",contadores);
+									if(contadores >= 1){
+										Ext.getCmp('saveDep1').setDisabled(true);
+									}
+			         }
+						 },
 							handler: this.onSubmitDepto,
-							scope: this
+							scope: this,
+
 
 					}, {
 							text: 'Cancelar',
 							handler: function () {
+									contadores = 0;
+									Ext.getCmp('saveDep1').setDisabled(false);
 									this.wDEPTO.hide()
 							},
 							scope: this
@@ -2012,12 +2029,25 @@ Phx.vista.CuotasDevengadas=Ext.extend(Phx.gridInterfaz,{
 					closeAction: 'hide',
 					buttons: [{
 							text: 'Guardar',
-							handler: this.onSubmitDeptoConvertido,
-							scope: this
+							scope: this,
+							id:'botonGuardarDeven',
+							diasabled: 'false',
+							listeners : {
+							 click : function(n){
+								 contadoresConver ++;
+								 console.log("aqui llega click",contadoresConver);
+									if(contadoresConver >= 1){
+										Ext.getCmp('botonGuardarDeven').setDisabled(true);
+									}
+							 }
+						 },
+						 handler: this.onSubmitDeptoConvertido,
 
 					}, {
 							text: 'Cancelar',
 							handler: function () {
+									contadoresConver = 0;
+									Ext.getCmp('botonGuardarDeven').setDisabled(false);
 									this.wDEPTO2.hide();
 									this.reload();
 							},
@@ -2051,7 +2081,7 @@ Phx.vista.CuotasDevengadas=Ext.extend(Phx.gridInterfaz,{
 							accion: 'convertir'
 					},
 					success: this.successSincConvertido,
-					failure: this.conexionFailure,
+					failure: this.errorConvertido,
 					timeout: this.timeout,
 					scope: this
 			})
@@ -2070,7 +2100,7 @@ Phx.vista.CuotasDevengadas=Ext.extend(Phx.gridInterfaz,{
 									accion: this.store.baseParams.accion
 							},
 							success: this.successSincGC,
-							failure: this.conexionFailure,
+							failure: this.error,
 							timeout: this.timeout,
 							scope: this
 					})
@@ -2081,14 +2111,35 @@ Phx.vista.CuotasDevengadas=Ext.extend(Phx.gridInterfaz,{
 	successSincGC: function (resp) {
 			Phx.CP.loadingHide();
 			this.wDEPTO.hide();
+			contadores = 0;
+			Ext.getCmp('saveDep1').setDisabled(false);
 			var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
 			if (reg.ROOT.datos.resultado != 'falla') {
-
 					this.reload();
 			} else {
 					alert(reg.ROOT.datos.mensaje)
 			}
 	},
+
+	error:function(resp){
+		var datos_respuesta = JSON.parse(resp.responseText);
+		if (datos_respuesta.ROOT.error == true) {
+				  contadores = 0;
+					Phx.CP.loadingHide();
+					Ext.Msg.show({
+						 title:'<h1 style="color:red"><center>Mensaje</center></h1>',
+						 msg: datos_respuesta.ROOT.detalle.mensaje,
+						 buttons: Ext.Msg.OK,
+						 maxWidth : 400,
+						 width: 380,
+						 fn: function () {
+									Ext.getCmp('saveDep1').setDisabled(false);
+						 },
+						 scope:this
+					});
+			}
+	 },
+
 
 	successSincConvertido: function (resp) {
 		Phx.CP.loadingHide();
@@ -2102,6 +2153,25 @@ Phx.vista.CuotasDevengadas=Ext.extend(Phx.gridInterfaz,{
 		this.cmpDeptoContaConvertido.modificado = true;
 		this.store.baseParams.accion = 'generar_comprobante';
 	},
+
+	errorConvertido:function(resp){
+		var datos_respuesta = JSON.parse(resp.responseText);
+		if (datos_respuesta.ROOT.error == true) {
+					contadoresConver = 0;
+					Phx.CP.loadingHide();
+					Ext.Msg.show({
+						 title:'<h1 style="color:red"><center>Mensaje</center></h1>',
+						 msg: datos_respuesta.ROOT.detalle.mensaje,
+						 maxWidth : 400,
+						 width: 380,
+						 buttons: Ext.Msg.OK,
+						 fn: function () {
+									Ext.getCmp('botonGuardarDeven').setDisabled(false);
+						 },
+						 scope:this
+					});
+			}
+	 },
 
 
 	onSubmitDeptoConvertido: function (x, y, id_depto_conta) {
@@ -2117,7 +2187,7 @@ Phx.vista.CuotasDevengadas=Ext.extend(Phx.gridInterfaz,{
 									accion: this.store.baseParams.accion
 							},
 							success: this.successSincGC2,
-							failure: this.conexionFailure,
+							failure: this.errorConvertido,
 							timeout: this.timeout,
 							scope: this
 					})
@@ -2127,6 +2197,8 @@ Phx.vista.CuotasDevengadas=Ext.extend(Phx.gridInterfaz,{
 
 	successSincGC2: function (resp) {
 			Phx.CP.loadingHide();
+			contadoresConver = 0;
+			Ext.getCmp('botonGuardarDeven').setDisabled(false);
 			this.wDEPTO2.hide();
 			var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
 			if (reg.ROOT.datos.resultado != 'falla') {
@@ -2920,6 +2992,9 @@ Phx.vista.CuotasDevengadas=Ext.extend(Phx.gridInterfaz,{
 
 	iniciarEventos: function () {
 
+			this.contador = 0;
+
+
 
 			this.Cmp.monto.on('change', this.calculaMontoPago, this);
 			this.Cmp.descuento_anticipo.on('change', this.calculaMontoPago, this);
@@ -3032,6 +3107,10 @@ Phx.vista.CuotasDevengadas=Ext.extend(Phx.gridInterfaz,{
 					this.Cmp.fecha_costo_fin.setMaxValue(fecha_fin);
 			}, this);
 
+		//	console.log("aqui llega el boton",Ext.getCmp('botonGuardarDeven'));
+			Ext.getCmp('botonGuardarDeven').on('click', function(e) {
+	        console.log("aqui llega el contador");
+	    });
 
 	},
 
