@@ -303,10 +303,11 @@ $body$
                     id_usuario_mod,
                     id_ajuste,
                     descripcion,
-                    id_orden_trabajo
+                    id_orden_trabajo,
+                    id_sol_origen
                 ) select
                     tsd.id_centro_costo,
-                    -pro.monto_ejecutar_mo,
+                    pro.monto_ejecutar_mo,
                     tsd.id_partida,
                     'activo',
                     'decremento',
@@ -318,7 +319,8 @@ $body$
                     null,
                     v_id_ajuste,
                     tsd.descripcion,
-                    tsd.id_orden_trabajo
+                    tsd.id_orden_trabajo,
+                    tsd.id_obligacion_det
                 from  tes.tprorrateo pro
                 inner join tes.tobligacion_det tsd on tsd.id_obligacion_det = pro.id_obligacion_det
                 inner join tes.tobligacion_pago ts on ts.id_obligacion_pago = tsd.id_obligacion_pago
