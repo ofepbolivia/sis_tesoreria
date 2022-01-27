@@ -10,6 +10,10 @@
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
+
+var contadores = 0;
+var contadoresConver = 0;
+
 Phx.vista.CuotasDevengadas=Ext.extend(Phx.gridInterfaz,{
 
 	constructor:function(config){
@@ -22,10 +26,8 @@ Phx.vista.CuotasDevengadas=Ext.extend(Phx.gridInterfaz,{
 		this.crearFomularioDepto();
 		this.crearFomularioDeptoConvertido();
 		this.iniciarEventos();
-
-		var contadores = 0;
-		var contadoresConver = 0;
-
+		console.log("Contador contadores",contadores);
+		console.log("Contador contadores",contadoresConver);
 
     var añoActual = new Date().getFullYear();
     this.cmbGestion.store.load({params:{start:0,limit:50},
