@@ -137,7 +137,7 @@ $body$
                        INTO v_id_funcionario_aprobador
                        FROM segu.tusuario tu
                        INNER JOIN orga.tfuncionario tf on tf.id_persona = tu.id_persona
-                       WHERE tu.id_usuario = 17 ; -- =HUGO TAPIA
+                       WHERE tu.id_usuario = p_id_usuario; -- 17 ; -- =HUGO TAPIA
                        --WHERE tu.id_usuario = 727 ; -- =CASIANA ALVAREZ DE CAMACHO
 
 
@@ -307,7 +307,7 @@ $body$
                     id_sol_origen
                 ) select
                     tsd.id_centro_costo,
-                    pro.monto_ejecutar_mo,
+                    (pro.monto_ejecutar_mo) * -1,
                     tsd.id_partida,
                     'activo',
                     'decremento',
