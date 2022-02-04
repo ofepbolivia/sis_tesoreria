@@ -258,12 +258,12 @@ header("content-type: text/javascript; charset=UTF-8");
                     gwidth: 100,
                     maxLength: 50
                     /*renderer:function(value, p, record){
-                        if(record.data.presupuesto_aprobado=='sin_presupuesto_cc'){                        
+                        if(record.data.presupuesto_aprobado=='sin_presupuesto_cc'){
                             return '<tpl style="background-color:#FA5E5E; margin-top:0px; position:absolute; width:100px; float:left;">'+record.data['estado']+'</tpl>';
                         }else{
                             return String.format('{0}', value);
                         }
-                    }*/                  
+                    }*/
                 },
                 type: 'TextField',
                 filters: {pfiltro: 'obpg.estado', type: 'string'},
@@ -1982,7 +1982,7 @@ header("content-type: text/javascript; charset=UTF-8");
         onBtnCheckPresup: function () {
             var rec = this.sm.getSelected();
             //Se define el nombre de la columna de la llave primaria
-
+            console.log("aqui llega el dato",rec);
 
             Phx.CP.loadWindows('../../../sis_tesoreria/vista/presupuesto/CheckPresupuesto.php', 'Evolución presupuestaria <span style="color:green; font-size:15;">(' + rec.data.moneda + ')</span>', {
                 modal: true,
@@ -2154,8 +2154,8 @@ header("content-type: text/javascript; charset=UTF-8");
         },
         conexionFailPresupuesto:function(resp, data){
             Phx.CP.loadingHide();
-            var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));                                               
-            
+            var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+
             Ext.Msg.show({
                 title:'<h1 style="font-size:15px;">Aviso!</h1>',
                 msg: '<p style="font-weight:bold; font-size:12px;">'+reg.ROOT.detalle.mensaje+'</p>',
@@ -2164,14 +2164,14 @@ header("content-type: text/javascript; charset=UTF-8");
                 height:200,
                 icon: Ext.MessageBox.WARNING,
                 scope:this
-            });            
+            });
 
-            if (reg.ROOT.error){                
-                
+            if (reg.ROOT.error){
+
                 if (reg.ROOT.detalle.mensaje.search('centro de costo ->') >= 0 ){
-                        Ext.Ajax.request({                
+                        Ext.Ajax.request({
                         url:'../../sis_tesoreria/control/ObligacionPago/aprobarPresupuestoSolicitud',
-                        params: { id_obligacion_pago: data.params.id_obligacion_pago, aprobar:'no'},                
+                        params: { id_obligacion_pago: data.params.id_obligacion_pago, aprobar:'no'},
                         success: function(resp){
                             var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
                             !reg.ROOT.error && this.reload();
@@ -2181,7 +2181,7 @@ header("content-type: text/javascript; charset=UTF-8");
                         scope: this
                     });
                 }
-            }                        
+            }
         },
         successWizard: function (resp) {
             Phx.CP.loadingHide();

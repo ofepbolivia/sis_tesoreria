@@ -56,7 +56,7 @@ DECLARE
    v_id_concepto_ingas2		integer;
    v_desc_partida			varchar;
 
-
+	v_centro_costo_recuperado varchar;
 
 BEGIN
 
@@ -112,8 +112,16 @@ BEGIN
           from param.tconcepto_ingas cig
           where cig.id_concepto_ingas =  v_parametros.id_concepto_ingas;
 
+
+          select cc.codigo_tcc into v_centro_costo_recuperado
+          from param.vcentro_costo cc
+          where cc.id_centro_costo = v_parametros.id_centro_costo
+          and cc.id_gestion = v_id_gestion;
+
+
+
           --(may) el tipo de obligacion pago_especial_spi son para las estaciones internacionales SIP
-          IF v_tipo_obligacion = 'pago_especial' or v_tipo_obligacion = 'pago_especial_spi' THEN
+          IF v_tipo_obligacion = 'pago_especial' or v_tipo_obligacion = 'pago_especial_spi'  or v_centro_costo_recuperado = '895' THEN
               v_relacion = 'PAGOES';
           ELSE
               v_relacion = 'CUECOMP';
@@ -226,12 +234,16 @@ BEGIN
            from tes.tobligacion_pago op
            where op.id_obligacion_pago = v_parametros.id_obligacion_pago;
 
-		  IF v_tipo_obligacion = 'pago_especial' or v_tipo_obligacion = 'pago_especial_spi' THEN
+		  select cc.codigo_tcc into v_centro_costo_recuperado
+          from param.vcentro_costo cc
+          where cc.id_centro_costo = v_parametros.id_centro_costo
+          and cc.id_gestion = v_id_gestion;
+
+		  IF v_tipo_obligacion = 'pago_especial' or v_tipo_obligacion = 'pago_especial_spi' or v_centro_costo_recuperado = '895' THEN
               v_relacion = 'PAGOES';
           ELSE
               v_relacion = 'CUECOMP';
           END IF;
-
 
           SELECT
               ps_id_partida
@@ -695,3 +707,6 @@ VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
 COST 100;
+
+ALTER FUNCTION tes.ft_obligacion_det_ime (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
+  OWNER TO postgres;
