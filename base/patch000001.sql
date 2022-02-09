@@ -2143,3 +2143,72 @@ ALTER TABLE tes.tplan_pago
 COMMENT ON COLUMN tes.tplan_pago.convertido
 IS 'Campo para diferenciar cuales han sido convertidos para la siguiente getion';
 /***********************************F-SCP-IRVA-TES-0-05/01/2022***************************************/
+
+
+/***********************************I-SCP-FEA-TES-0-09/02/2022***************************************/
+CREATE TABLE tes.tplanilla_pvr_con_pago (
+  id_planilla_pvr_con_pago SERIAL,
+  ids_funcionario JSONB,
+  nombre_origen VARCHAR(30),
+  fecha_pago DATE,
+  detalle_con_pago JSONB,
+  glosa_pago TEXT,
+  CONSTRAINT tplanilla_pvr_con_pago_pkey PRIMARY KEY(id_planilla_pvr_con_pago)
+) INHERITS (pxp.tbase)
+WITH (oids = false);
+
+ALTER TABLE tes.tplanilla_pvr_con_pago
+  ALTER COLUMN id_planilla_pvr_con_pago SET STATISTICS 0;
+
+ALTER TABLE tes.tplanilla_pvr_con_pago
+  ALTER COLUMN ids_funcionario SET STATISTICS 0;
+
+ALTER TABLE tes.tplanilla_pvr_con_pago
+  ALTER COLUMN nombre_origen SET STATISTICS 0;
+
+ALTER TABLE tes.tplanilla_pvr_con_pago
+  ALTER COLUMN fecha_pago SET STATISTICS 0;
+
+ALTER TABLE tes.tplanilla_pvr_con_pago
+  ALTER COLUMN detalle_con_pago SET STATISTICS 0;
+
+ALTER TABLE tes.tplanilla_pvr_con_pago
+  ALTER COLUMN glosa_pago SET STATISTICS 0;
+
+ALTER TABLE tes.tplanilla_pvr_con_pago
+  OWNER TO postgres;
+
+
+CREATE TABLE tes.tplanilla_pvr_sin_pago (
+  id_planilla_pvr_sin_pago SERIAL,
+  ids_funcionario JSONB,
+  nombre_origen VARCHAR(30),
+  fecha_pago DATE,
+  detalle_sin_pago JSONB,
+  glosa_pago TEXT,
+  CONSTRAINT tplanilla_pvr_sin_pago_pkey PRIMARY KEY(id_planilla_pvr_sin_pago)
+) INHERITS (pxp.tbase)
+WITH (oids = false);
+
+ALTER TABLE tes.tplanilla_pvr_sin_pago
+  ALTER COLUMN id_planilla_pvr_sin_pago SET STATISTICS 0;
+
+ALTER TABLE tes.tplanilla_pvr_sin_pago
+  ALTER COLUMN ids_funcionario SET STATISTICS 0;
+
+ALTER TABLE tes.tplanilla_pvr_sin_pago
+  ALTER COLUMN nombre_origen SET STATISTICS 0;
+
+ALTER TABLE tes.tplanilla_pvr_sin_pago
+  ALTER COLUMN fecha_pago SET STATISTICS 0;
+
+ALTER TABLE tes.tplanilla_pvr_sin_pago
+  ALTER COLUMN detalle_sin_pago SET STATISTICS 0;
+
+ALTER TABLE tes.tplanilla_pvr_sin_pago
+  ALTER COLUMN glosa_pago SET STATISTICS 0;
+
+ALTER TABLE tes.tplanilla_pvr_sin_pago
+  OWNER TO postgres;
+
+/***********************************F-SCP-FEA-TES-0-09/02/2022***************************************/

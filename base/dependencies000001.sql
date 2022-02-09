@@ -5953,3 +5953,167 @@ GROUP BY pp.id_plan_pago, op.id_proveedor, p.desc_proveedor, op.id_moneda,
 ALTER VIEW tes.vcomp_devtesprov_plan_pago_2
   OWNER TO postgres;
 /***********************************F-DEP-MAY-TES-0-26/02/2021****************************************/
+
+/***********************************I-DEP-FEA-TES-0-09/02/2022****************************************/
+CREATE VIEW tes.vrefrigerio_viatico_plan_pago (
+    id_plan_pago,
+    id_proveedor,
+    desc_proveedor,
+    id_moneda,
+    id_depto_conta,
+    numero,
+    fecha_actual,
+    estado,
+    monto_ejecutar_total_mb,
+    monto_ejecutar_total_mo,
+    monto,
+    monto_mb,
+    monto_retgar_mb,
+    monto_retgar_mo,
+    monto_no_pagado,
+    monto_no_pagado_mb,
+    otros_descuentos,
+    otros_descuentos_mb,
+    id_plantilla,
+    id_cuenta_bancaria,
+    id_cuenta_bancaria_mov,
+    nro_cheque,
+    nro_cuenta_bancaria,
+    num_tramite,
+    tipo,
+    id_gestion_cuentas,
+    id_int_comprobante,
+    liquido_pagable,
+    liquido_pagable_mb,
+    nombre_pago,
+    porc_monto_excento_var,
+    obs_pp,
+    descuento_anticipo,
+    descuento_inter_serv,
+    tipo_obligacion,
+    id_categoria_compra,
+    id_proceso_wf,
+    forma_pago,
+    monto_ajuste_ag,
+    monto_ajuste_siguiente_pago,
+    monto_anticipo,
+    tipo_cambio_conv,
+    id_depto_libro,
+    fecha_costo_ini,
+    fecha_costo_fin,
+    id_obligacion_pago,
+    fecha_tentativa,
+    id_int_comprobante_rel,
+    fecha,
+    id_depto,
+    id_centro_costo_depto)
+AS
+SELECT pp.id_plan_pago,
+    op.id_proveedor,
+    COALESCE(p.desc_proveedor, ''::character varying) AS desc_proveedor,
+    op.id_moneda,
+    op.id_depto_conta,
+    op.numero,
+    now() AS fecha_actual,
+    pp.estado,
+    pp.monto_ejecutar_total_mb,
+    pp.monto_ejecutar_total_mo,
+    pp.monto,
+    pp.monto_mb,
+    pp.monto_retgar_mb,
+    pp.monto_retgar_mo,
+    pp.monto_no_pagado,
+    pp.monto_no_pagado_mb,
+    pp.otros_descuentos,
+    pp.otros_descuentos_mb,
+    pp.id_plantilla,
+    pp.id_cuenta_bancaria,
+    pp.id_cuenta_bancaria_mov,
+    pp.nro_cheque,
+    pp.nro_cuenta_bancaria,
+    op.num_tramite,
+    pp.tipo,
+    op.id_gestion AS id_gestion_cuentas,
+    pp.id_int_comprobante,
+    pp.liquido_pagable,
+    pp.liquido_pagable_mb,
+    pp.nombre_pago,
+    pp.porc_monto_excento_var,
+    ((COALESCE(op.numero, ''::character varying)::text || ' '::text) || COALESCE(pp.obs_monto_no_pagado, ''::text))::character varying AS obs_pp,
+    pp.descuento_anticipo,
+    pp.descuento_inter_serv,
+    op.tipo_obligacion,
+    op.id_categoria_compra,
+    pp.id_proceso_wf,
+    pp.forma_pago,
+    pp.monto_ajuste_ag,
+    pp.monto_ajuste_siguiente_pago,
+    pp.monto_anticipo,
+    pp.tipo_cambio AS tipo_cambio_conv,
+    pp.id_depto_lb AS id_depto_libro,
+        CASE
+            WHEN pp.fecha_costo_ini IS NULL THEN now()::date
+            WHEN pp.fecha_costo_ini > now() THEN now()::date
+            ELSE pp.fecha_costo_ini
+        END AS fecha_costo_ini,
+    COALESCE(pp.fecha_costo_fin, now()::date) AS fecha_costo_fin,
+    op.id_obligacion_pago,
+    pp.fecha_tentativa,
+    pr.id_int_comprobante AS id_int_comprobante_rel,
+    op.fecha,
+    4 AS id_depto,
+    (
+    SELECT f_get_config_relacion_contable.ps_id_centro_costo
+    FROM conta.f_get_config_relacion_contable('CCDEPCON'::character varying, (
+        SELECT f_get_periodo_gestion.po_id_gestion
+        FROM param.f_get_periodo_gestion(op.fecha) f_get_periodo_gestion(po_id_periodo, po_id_gestion, po_id_periodo_subsistema)
+        ), 4, NULL::integer, 'No existe presupuesto administrativo relacionado al departamento de RRHH'::character varying)
+            f_get_config_relacion_contable(ps_id_cuenta, ps_id_auxiliar, ps_id_partida, ps_id_centro_costo, ps_nombre_tipo_relacion)
+    ) AS id_centro_costo_depto
+FROM tes.tplan_pago pp
+     JOIN tes.tobligacion_pago op ON pp.id_obligacion_pago = op.id_obligacion_pago AND op.tipo_obligacion::text = 'pago_pvr'::text
+     JOIN param.tdepto d ON d.codigo::text = 'CON'::text
+     LEFT JOIN param.vproveedor p ON p.id_proveedor = op.id_proveedor
+     LEFT JOIN tes.tplan_pago pr ON pr.id_plan_pago = pp.id_plan_pago_fk;
+
+ALTER VIEW tes.vrefrigerio_viatico_plan_pago
+  OWNER TO postgres;
+
+
+
+  CREATE VIEW tes.vrefrigerio_viatico_plan_pago_detalle (
+    id_concepto_ingas,
+    id_partida,
+    id_partida_ejecucion_com,
+    monto_pago_mo,
+    monto_pago_mb,
+    id_centro_costo,
+    descripcion,
+    id_plan_pago,
+    id_prorrateo,
+    id_int_transaccion,
+    id_orden_trabajo,
+    id_auxiliar,
+    id_cuenta)
+AS
+SELECT od.id_concepto_ingas,
+    od.id_partida,
+    od.id_partida_ejecucion_com,
+    pro.monto_ejecutar_mo AS monto_pago_mo,
+    pro.monto_ejecutar_mb AS monto_pago_mb,
+    od.id_centro_costo,
+    od.descripcion,
+    pro.id_plan_pago,
+    pro.id_prorrateo,
+    pro.id_int_transaccion,
+    od.id_orden_trabajo,
+    od.id_auxiliar,
+    od.id_cuenta
+FROM tes.tprorrateo pro
+     JOIN tes.tobligacion_det od ON od.id_obligacion_det = pro.id_obligacion_det
+     JOIN tes.tobligacion_pago op ON op.id_obligacion_pago = od.id_obligacion_pago AND op.tipo_obligacion::text = 'pago_pvr'::text;
+
+ALTER VIEW tes.vrefrigerio_viatico_plan_pago_detalle
+  OWNER TO postgres;
+
+  /***********************************F-DEP-FEA-TES-0-09/02/2022****************************************/

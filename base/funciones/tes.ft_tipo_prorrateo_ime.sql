@@ -12,13 +12,13 @@ $body$
  DESCRIPCION:   Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'tes.ttipo_prorrateo'
  AUTOR: 		 (jrivera)
  FECHA:	        31-07-2014 23:29:22
- COMENTARIOS:	
+ COMENTARIOS:
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
 
- DESCRIPCION:	
- AUTOR:			
- FECHA:		
+ DESCRIPCION:
+ AUTOR:
+ FECHA:
 ***************************************************************************/
 
 DECLARE
@@ -52,15 +52,15 @@ BEGIN
     v_nombre_funcion = 'tes.ft_tipo_prorrateo_ime';
     v_parametros = pxp.f_get_record(p_tabla);
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'TES_TIPO_INS'
  	#DESCRIPCION:	Insercion de registros
- 	#AUTOR:		jrivera	
+ 	#AUTOR:		jrivera
  	#FECHA:		31-07-2014 23:29:22
 	***********************************/
 
 	if(p_transaccion='TES_TIPO_INS')then
-					
+
         begin
         	--Sentencia de la insercion
         	insert into tes.ttipo_prorrateo(
@@ -91,13 +91,13 @@ BEGIN
 			null,
 			v_parametros.tiene_cuenta,
 			v_parametros.tiene_lugar
-							
-			
-			
+
+
+
 			)RETURNING id_tipo_prorrateo into v_id_tipo_prorrateo;
-			
+
 			--Definicion de la respuesta
-			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Tipo Prorrateo almacenado(a) con exito (id_tipo_prorrateo'||v_id_tipo_prorrateo||')'); 
+			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Tipo Prorrateo almacenado(a) con exito (id_tipo_prorrateo'||v_id_tipo_prorrateo||')');
             v_resp = pxp.f_agrega_clave(v_resp,'id_tipo_prorrateo',v_id_tipo_prorrateo::varchar);
 
             --Devuelve la respuesta
@@ -105,10 +105,10 @@ BEGIN
 
 		end;
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'TES_TIPO_MOD'
  	#DESCRIPCION:	Modificacion de registros
- 	#AUTOR:		jrivera	
+ 	#AUTOR:		jrivera
  	#FECHA:		31-07-2014 23:29:22
 	***********************************/
 
@@ -128,20 +128,20 @@ BEGIN
 			tiene_cuenta = v_parametros.tiene_cuenta,
 			tiene_lugar = v_parametros.tiene_lugar
 			where id_tipo_prorrateo=v_parametros.id_tipo_prorrateo;
-               
+
 			--Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Tipo Prorrateo modificado(a)'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Tipo Prorrateo modificado(a)');
             v_resp = pxp.f_agrega_clave(v_resp,'id_tipo_prorrateo',v_parametros.id_tipo_prorrateo::varchar);
-               
+
             --Devuelve la respuesta
             return v_resp;
-            
+
 		end;
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'TES_TIPO_ELI'
  	#DESCRIPCION:	Eliminacion de registros
- 	#AUTOR:		jrivera	
+ 	#AUTOR:		jrivera
  	#FECHA:		31-07-2014 23:29:22
 	***********************************/
 
@@ -151,20 +151,20 @@ BEGIN
 			--Sentencia de la eliminacion
 			delete from tes.ttipo_prorrateo
             where id_tipo_prorrateo=v_parametros.id_tipo_prorrateo;
-               
+
             --Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Tipo Prorrateo eliminado(a)'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Tipo Prorrateo eliminado(a)');
             v_resp = pxp.f_agrega_clave(v_resp,'id_tipo_prorrateo',v_parametros.id_tipo_prorrateo::varchar);
-              
+
             --Devuelve la respuesta
             return v_resp;
 
 		end;
-        
-    /*********************************    
+
+    /*********************************
  	#TRANSACCION:  'TES_TIPOEJE_UPD'
  	#DESCRIPCION:	Generación de algun tipo de prorrateo
- 	#AUTOR:		jrivera	
+ 	#AUTOR:		jrivera
  	#FECHA:		31-07-2014 23:29:22
 	***********************************/
 
@@ -432,15 +432,22 @@ BEGIN
                     end if;
                     v_id_partida = null;
 
-                    select p.id_partida into v_id_partida
+                    --verifica que la partida este parametrizado en presupuestos en memoria de calculo
+                    select p.id_partida
+                    into v_id_partida
                     from pre.tpartida p
                     inner join pre.tconcepto_partida cp on cp.id_partida = p.id_partida
                     inner join pre.tpresup_partida pp on pp.id_partida = p.id_partida
-                    where  p.id_gestion = v_periodo.id_gestion and cp.id_concepto_ingas = v_parametros.id_concepto_ingas
-                    and pp.id_presupuesto = v_registros.id_centro_costo and pp.estado_reg = 'activo';
+                    where  p.id_gestion = v_periodo.id_gestion
+                    and cp.id_concepto_ingas = v_parametros.id_concepto_ingas
+                    and pp.id_presupuesto = v_registros.id_centro_costo
+                    and pp.estado_reg = 'activo';
+
                     if (v_registros.id_centro_costo is null) then
                         raise exception 'llega';
                     end if;
+
+                    --si la partida NO este parametrizado en presupuestos en memoria de calculo, este busca siguiente depto segun el organigrama
                     if (v_id_partida is null) then
                         v_id_centro_costo_aux = NULL;
                         v_id_centro_costo_aux = tes.f_get_uo_presupuesta_prorrateo(v_parametros.id_concepto_ingas,v_registros.id_centro_costo);
@@ -452,7 +459,7 @@ BEGIN
                         end if;
                     end if;
 
-
+--raise exception 'lelga % - %',v_registros.id_centro_costo, v_registros.id_orden_trabajo;
 
                     SELECT * into v_parametrizacion
                     FROM conta.f_get_config_relacion_contable('CUECOMP', v_periodo.id_gestion,
@@ -505,34 +512,34 @@ BEGIN
 
 
             END IF;
-           
+
             --Definicion de la respuesta
-            
-            
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Generacion de prorrateo realizado'); 
+
+
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Generacion de prorrateo realizado');
             v_resp = pxp.f_agrega_clave(v_resp,'id_tipo_prorrateo',v_parametros.id_tipo_prorrateo::varchar);
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje_prorrateo',v_res);
-            
+
             --Devuelve la respuesta
             return v_resp;
 
 		end;
-         
+
 	else
-     
+
     	raise exception 'Transaccion inexistente: %',p_transaccion;
 
 	end if;
 
 EXCEPTION
-				
+
 	WHEN OTHERS THEN
 		v_resp='';
 		v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
 		v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
 		v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
 		raise exception '%',v_resp;
-				        
+
 END;
 $body$
 LANGUAGE 'plpgsql'
@@ -540,3 +547,6 @@ VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
 COST 100;
+
+ALTER FUNCTION tes.ft_tipo_prorrateo_ime (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
+  OWNER TO postgres;

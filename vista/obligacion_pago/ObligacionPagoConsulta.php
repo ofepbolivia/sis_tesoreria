@@ -16,6 +16,7 @@ Phx.vista.ObligacionPagoConsulta = {
     bnew:false,
     bsave:false,
     bdel:false,
+    bgantt: true,
 	require:'../../../sis_tesoreria/vista/obligacion_pago/ObligacionPago.php',
 	requireclase:'Phx.vista.ObligacionPago',
 	title:'Obligacion de Pago (Consulta)',

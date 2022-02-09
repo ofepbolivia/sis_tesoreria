@@ -1316,6 +1316,86 @@ class MODObligacionPago extends MODbase
         return $this->respuesta;
     }
 
+    /********************************* BEGIN {developer: franklin.espinoza, date: 11/10/2021} GENERAR PLAN PAGOS PVR *********************************/
+    function generarPlanPagoPVR(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento = 'tes.ft_obligacion_pago_ime';
+        $this->transaccion = 'TES_GEN_PP_PVR_IME';
+        $this->tipo_procedimiento = 'IME';
+
+        //Define los parametros para la funcion
+        $this->setParametro('id_obligacion_pago', 'id_obligacion_pago', 'int4');
+        $this->setParametro('operacion', 'operacion', 'varchar');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+    /********************************* END {developer: franklin.espinoza, date: 11/10/2021} GENERAR PLAN PAGOS PVR *********************************/
+
+    /********************************* BEGIN {developer: franklin.espinoza, date: 11/10/2021} PAGOS PVR *********************************/
+    function generarPagoPVR()
+    {
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento = 'tes.ft_obligacion_pago_ime';
+        $this->transaccion = 'TES_GENERAR_PVR_IME';
+        $this->tipo_procedimiento = 'IME';
+
+        //Define los parametros para la funcion
+
+        $this->setParametro('nombre_origen', 'nombre_origen', 'varchar');
+        $this->setParametro('json_beneficiarios', 'json_beneficiarios', 'jsonb');
+        $this->setParametro('fecha_pago', 'fecha_pago', 'date');
+        $this->setParametro('glosa_pago', 'glosa_pago', 'varchar');
+        $this->setParametro('id_funcionario_responsable', 'id_funcionario_responsable', 'integer');
+
+        $this->setParametro('fecha_ini', 'fecha_ini', 'date');
+        $this->setParametro('fecha_fin', 'fecha_fin', 'date');
+
+        $this->captura('personal_sin_presupuesto','json');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();//echo $this->consulta; exit;
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+    /********************************* END {developer: franklin.espinoza, date: 11/10/2021} PAGOS PVR *********************************/
+
+    /********************************* BEGIN {developer: franklin.espinoza, date: 11/11/2021} PAGOS PVR ADMINISTRATIVO *********************************/
+    function generarPagoAdministrativoPVR(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento = 'tes.ft_obligacion_pago_ime';
+        $this->transaccion = 'TES_GENERAR_PVR_ADM';
+        $this->tipo_procedimiento = 'IME';
+
+        //Define los parametros para la funcion
+
+        $this->setParametro('nombre_origen', 'nombre_origen', 'varchar');
+        $this->setParametro('json_beneficiarios', 'json_beneficiarios', 'jsonb');
+        $this->setParametro('fecha_pago', 'fecha_pago', 'date');
+        $this->setParametro('glosa_pago', 'glosa_pago', 'varchar');
+        $this->setParametro('id_funcionario_responsable', 'id_funcionario_responsable', 'integer');
+
+        $this->setParametro('fecha_ini', 'fecha_ini', 'date');
+        $this->setParametro('fecha_fin', 'fecha_fin', 'date');
+        $this->setParametro('codigo_tipo_pago', 'codigo_tipo_pago', 'varchar');
+
+        $this->captura('personal_sin_presupuesto','json');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();//echo $this->consulta; exit;
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+    /********************************* END {developer: franklin.espinoza, date: 11/10/2021} PAGOS PVR ADMINISTRATIVO *********************************/
+
 }
 
 ?>

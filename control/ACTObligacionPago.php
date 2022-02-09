@@ -1128,7 +1128,28 @@ class ACTObligacionPago extends ACTbase
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
 
+    /********************************* BEGIN {developer: franklin.espinoza, date: 11/10/2021} GENERAR PLAN PAGOS PVR *********************************/
+    function generarPlanPagoPVR(){
+        $this->objFunc = $this->create('MODObligacionPago');
+        $this->res = $this->objFunc->generarPlanPagoPVR($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
 
+    /********************************* BEGIN {developer: franklin.espinoza, date: 11/10/2021} GENERAR PLAN PAGOS PVR *********************************/
+    function generarPagoPVR(){
+        $this->objFunc = $this->create('MODObligacionPago');
+        $this->res = $this->objFunc->generarPagoPVR($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+    /********************************* END {developer: franklin.espinoza, date: 11/10/2021} PAGOS PVR *********************************/
+
+    /********************************* BEGIN {developer: franklin.espinoza, date: 11/11/2021} PAGOS PVR ADMINISTRATIVO *********************************/
+    function generarPagoAdministrativoPVR(){
+        $this->objFunc = $this->create('MODObligacionPago');
+        $this->res = $this->objFunc->generarPagoAdministrativoPVR($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+    /********************************* END {developer: franklin.espinoza, date: 11/10/2021} PAGOS PVR ADMINISTRATIVO *********************************/
 
 }
 

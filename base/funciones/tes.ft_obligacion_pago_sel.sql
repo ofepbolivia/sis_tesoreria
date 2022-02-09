@@ -98,7 +98,7 @@ BEGIN
 
 
          -- 25-02-2021 (may) se aumenta PGAE para pagos de gestion anterior del exterior
-         IF   v_parametros.tipo_interfaz in ('obligacionPagoTes','obligacionPagoUnico', 'PGA', 'PPM', 'PCE', 'PBR', 'PGAE') THEN
+         IF   v_parametros.tipo_interfaz in ('obligacionPagoTes','obligacionPagoUnico', 'PGA', 'PPM', 'PCE', 'PBR', 'PGAE','PVR') THEN
 
                  IF   p_administrador != 1 THEN
 
@@ -168,6 +168,8 @@ BEGIN
                 -- 25-02-2021 (may) se aumenta PGAE para pagos de gestion anterior del exterior
                 ELSIF v_parametros.tipo_interfaz  = 'PGAE' THEN
                 	v_filadd=v_filadd ||' obpg.tipo_obligacion = ''pgaext'' and';
+                ELSIF v_parametros.tipo_interfaz  = 'PVR' THEN
+                	v_filadd=v_filadd ||' obpg.tipo_obligacion = ''pago_pvr'' and';
                 ELSE
                    v_filadd=v_filadd ||' obpg.tipo_obligacion in (''pago_directo'',''rrhh'') and';
                 END IF;
@@ -460,7 +462,7 @@ BEGIN
               END IF;
 
              -- 25-02-2021 (may) se aumenta PGAE para pagos de gestion anterior del exterior
-             IF   v_parametros.tipo_interfaz in ('obligacionPagoTes','obligacionPagoUnico', 'PGA', 'PPM', 'PCE', 'PBR', 'PGAE') THEN
+             IF   v_parametros.tipo_interfaz in ('obligacionPagoTes','obligacionPagoUnico', 'PGA', 'PPM', 'PCE', 'PBR', 'PGAE','PVR') THEN
 
                      IF   p_administrador != 1 THEN
 
@@ -523,6 +525,8 @@ BEGIN
                     -- 25-02-2021 (may) se aumenta PGAE para pagos de gestion anterior del exterior
                     ELSIF v_parametros.tipo_interfaz  = 'PGAE' THEN
                         v_filadd=v_filadd ||' obpg.tipo_obligacion = ''pgaext'' and';
+                    ELSIF v_parametros.tipo_interfaz  = 'PVR' THEN
+                		v_filadd=v_filadd ||' obpg.tipo_obligacion = ''pago_pvr'' and';
                     ELSE
                        v_filadd=v_filadd ||' obpg.tipo_obligacion in (''pago_directo'',''rrhh'') and';
                     END IF;
