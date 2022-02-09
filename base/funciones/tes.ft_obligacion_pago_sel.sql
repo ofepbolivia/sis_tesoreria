@@ -1784,7 +1784,7 @@ BEGIN
                         inner join param.tmoneda mon on mon.id_moneda = obpg.id_moneda
                         inner join param.tgestion ges on ges.id_gestion = obpg.id_gestion
                         inner join param.tdepto dep on dep.id_depto = obpg.id_depto
-                        inner join orga.vfuncionario funa on funa.id_funcionario = obpg.id_funcionario_gerente
+                        left join orga.vfuncionario funa on funa.id_funcionario = obpg.id_funcionario_gerente
                         left join segu.tusuario usu2 on usu2.id_usuario = obpg.id_usuario_mod
                         inner join wf.testado_wf ew on ew.id_estado_wf = obpg.id_estado_wf
                         inner join orga.vfuncionario_ultimo_cargo fca on fca.id_funcionario = fun.id_funcionario
