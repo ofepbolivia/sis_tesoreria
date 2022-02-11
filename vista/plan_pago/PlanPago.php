@@ -9,6 +9,10 @@
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
+
+var contadores = 0;
+
+
     Phx.vista.PlanPago = Ext.extend(Phx.gridInterfaz, {
         fheight: '90%',
         fwidth: '85%',
@@ -3132,12 +3136,22 @@ header("content-type: text/javascript; charset=UTF-8");
                 closeAction: 'hide',
                 buttons: [{
                     text: 'Guardar',
+                    listeners : {
+      			         click : function(n){
+      								 contadores ++;
+      									if(contadores >= 1){
+      										Ext.getCmp(this.id).setDisabled(true);
+      									}
+      			         }
+      						 },
                     handler: this.onSubmitDepto,
                     scope: this
 
                 }, {
                     text: 'Cancelar',
                     handler: function () {
+                        contadores = 0;
+      									Ext.getCmp(this.wDEPTO.buttons[0].id).setDisabled(false);
                         this.wDEPTO.hide()
                     },
                     scope: this
