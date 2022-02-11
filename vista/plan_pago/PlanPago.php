@@ -3132,12 +3132,25 @@ header("content-type: text/javascript; charset=UTF-8");
                 closeAction: 'hide',
                 buttons: [{
                     text: 'Guardar',
+                    id: 'saveDep1',
+      							diasabled: 'false',
+      							listeners : {
+      			         click : function(n){
+      								 contadores ++;
+      								 console.log("aqui llega click",contadores);
+      									if(contadores >= 1){
+      										Ext.getCmp('saveDep1').setDisabled(true);
+      									}
+      			         }
+      						 },
                     handler: this.onSubmitDepto,
                     scope: this
 
                 }, {
                     text: 'Cancelar',
                     handler: function () {
+                        contadores = 0;
+      									Ext.getCmp('saveDep1').setDisabled(false);
                         this.wDEPTO.hide()
                     },
                     scope: this
