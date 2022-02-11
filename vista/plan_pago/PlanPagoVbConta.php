@@ -11,7 +11,6 @@
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
-var contadores = 0;
     Phx.vista.PlanPagoVbConta = {
         bedit:true,
         bnew:false,
@@ -257,8 +256,6 @@ var contadores = 0;
         successSincGC:function(resp){
             Phx.CP.loadingHide();
             this.wDEPTO.hide();
-            contadores = 0;
-      			Ext.getCmp('saveDep1').setDisabled(false);
             var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
             if(reg.ROOT.datos.resultado != 'falla'){
 
