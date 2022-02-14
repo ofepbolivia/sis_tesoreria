@@ -85,6 +85,39 @@ Phx.vista.EvoluPresupDet=Ext.extend(Phx.gridInterfaz,{
             },
             {
                 config:{
+                    name: 'comprometido_mb',                    
+                    fieldLabel: 'Comprometido Moneda Base',                                        
+                    gwidth: 160,                    
+                    renderer:(value, p, record) => {                         
+                            return  String.format('<div style="text-align:right;"><b>{0}</b></div>',Ext.util.Format.number(value,'0,000.00'));                        
+                    }
+                },
+                type:'MoneyField',                
+                id_grupo:1,
+                grid:true,
+                form:false
+            },  
+            {
+                config:{
+                    name: 'tipo_cambio_pj',                    
+                    fieldLabel: 'Tipo Cambio',                                        
+                    gwidth: 80,                    
+                    renderer:(value, p, record) => {     
+                        var tc = record.data.comprometido > 0 ? record.data.comprometido_mb / record.data.comprometido: 0;
+                        if (tc>0){
+                            return  String.format('<div style="text-align:right;"><b>{0}</b></div>',Ext.util.Format.number(tc.toFixed(2)));                        
+                        } else {
+                            return '';
+                        }                        
+                    }
+                },
+                type:'MoneyField',                
+                id_grupo:1,
+                grid:true,
+                form:false
+            },                                  
+            {
+                config:{
                     name: 'moneda',
                     fieldLabel: 'Moneda',
                     allowBlank: true,
@@ -276,8 +309,11 @@ Phx.vista.EvoluPresupDet=Ext.extend(Phx.gridInterfaz,{
             {name:'usr_mod', type: 'string'},
             {name:'fecha_reg', type: 'date',dateFormat:'Y-m-d H:i:s.u'},            
             {name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
-            {name:'estado_reg', type: 'string'}           
+            {name:'estado_reg', type: 'string'},           
+            {name:'comprometido_mb', type: 'numeric'},
+            {name:'tipo_cambio_pj', type: 'numeric'}
         ],
+        arrayDefaultColumHidden: ['comprometido_mb', 'tipo_cambio_pj'],
         sortInfo:{
             field: 'id_partida_ejecucion',
             direction: 'DESC'

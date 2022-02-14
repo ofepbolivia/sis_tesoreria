@@ -1066,8 +1066,11 @@ class MODObligacionPago extends MODbase
         $this->captura('id_partida_ejecucion_fk', 'int4');
         $this->captura('moneda', 'varchar');
         $this->captura('comprometido', 'numeric');
+        $this->captura('comprometido_mb', 'numeric');
         $this->captura('ejecutado', 'numeric');
+        $this->captura('ejecutado_mb', 'numeric');
         $this->captura('pagado', 'numeric');
+        $this->captura('pagado_mb', 'numeric');
         $this->captura('nro_tramite', 'varchar');
         $this->captura('tipo_movimiento', 'varchar');
         $this->captura('nombre_partida', 'varchar');

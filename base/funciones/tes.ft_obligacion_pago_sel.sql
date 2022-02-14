@@ -1569,8 +1569,11 @@ BEGIN
               id_partida_ejecucion_fk   integer,
               moneda					varchar,
               comprometido				numeric,
+              comprometido_mb			numeric,
               ejecutado					numeric,
+              ejecutado_mb				numeric,
               pagado					numeric,
+              pagado_mb					numeric,
               nro_tramite				varchar,
               tipo_movimiento			varchar,
               nombre_partida			varchar,
@@ -1631,7 +1634,7 @@ BEGIN
                 inner join path_rec  pr on pe2.id_partida_ejecucion_fk = pr.id_partida_ejecucion
             )
             insert into ttemp_eval_det (id_partida_ejecucion, id_partida_ejecucion_fk,
-                          comprometido, ejecutado, pagado, moneda, nro_tramite, tipo_movimiento,
+                          comprometido, ejecutado, pagado, comprometido_mb, ejecutado_mb, pagado_mb, moneda, nro_tramite, tipo_movimiento,
                           nombre_partida, codigo, codigo_categoria, fecha, codigo_cc,
                           usr_reg, usr_mod, fecha_reg, fecha_mod, estado_reg)
              SELECT
@@ -1649,6 +1652,18 @@ BEGIN
                 p.monto
              else
              0.00 end,
+             case when p.tipo_movimiento = 'comprometido'then
+                round(p.monto_mb, 2)
+             else
+             0.00 end,
+             case when p.tipo_movimiento = 'ejecutado'then
+                round(p.monto_mb, 2)
+             else
+             0.00 end,
+             case when p.tipo_movimiento = 'pagado'then
+                round(p.monto_mb, 2)
+             else
+             0.00 end,             
               mo.moneda,
               pej.nro_tramite,
               p.tipo_movimiento,
