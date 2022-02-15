@@ -2211,4 +2211,33 @@ ALTER TABLE tes.tplanilla_pvr_sin_pago
 ALTER TABLE tes.tplanilla_pvr_sin_pago
   OWNER TO postgres;
 
+
+CREATE TABLE tes.tt_sin_presupuesto (
+  id_funcionario INTEGER,
+  codigo_cc VARCHAR,
+  centro_costo VARCHAR,
+  partida VARCHAR,
+  fecha_pago DATE,
+  orden_viaje JSONB,
+  motivo TEXT
+) INHERITS (pxp.tbase)
+WITH (oids = false);
+
+ALTER TABLE tes.tt_sin_presupuesto
+  OWNER TO postgres;
+
+
+ALTER TABLE tes.tobligacion_det
+  ADD COLUMN id_proveedor INTEGER;
+
+COMMENT ON COLUMN tes.tobligacion_det.id_proveedor
+IS 'Campo que  representa el identificador de un proveedor.';
+
+ALTER TABLE tes.tobligacion_det
+  ADD COLUMN registro_viatico_refrigerio TEXT;
+
+COMMENT ON COLUMN tes.tobligacion_det.registro_viatico_refrigerio
+IS 'Campo que describre el tipo y al funcionario que se le hace el pago.';
+
+
 /***********************************F-SCP-FEA-TES-0-09/02/2022***************************************/

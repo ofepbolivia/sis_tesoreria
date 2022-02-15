@@ -246,6 +246,14 @@ DECLARE
      v_numero_tramite			varchar;
      vtipo_pp					varchar;
      v_id_moneda					integer;
+     v_gestion					integer;
+
+    v_nombre_conexion			 varchar;
+    v_res						 boolean;
+    v_centro 					 varchar;
+    v_sw_retenciones 			 varchar;
+    v_verficacion 				 varchar[];
+
     /********** plan pago **********/
 BEGIN
 
@@ -3220,6 +3228,15 @@ BEGIN
                     '[]'::jsonb,
                     v_parametros.glosa_pago
                 )returning id_planilla_pvr_sin_pago into v_id_planilla_pvr_sin_pago;
+
+                /******* creamos la tabla para consultar presupuesto *******/
+                create temp table tt_saldo_presupuesto (
+                    id_centro_costo INTEGER,
+                    id_partida INTEGER,
+                    vigente NUMERIC
+                )on commit drop;
+                /******* creamos la tabla para consultar presupuesto *******/
+
             end if;
 
 
@@ -3414,7 +3431,7 @@ BEGIN
                     from pre.tconcepto_partida par
                     inner join pre.tpartida tpa on tpa.id_partida = par.id_partida
                     where par.id_concepto_ingas = v_id_concepto_ingas and tpa.id_gestion = v_id_gestion;
-                    select tsp.id_centro_costo, tsp.id_partida into v_saldo_presupuesto from pxp.tt_saldo_presupuesto tsp where tsp.id_centro_costo = v_presupuestos.id_centro_costo and tsp.id_partida = v_id_partida;
+                    select tsp.id_centro_costo, tsp.id_partida into v_saldo_presupuesto from tt_saldo_presupuesto tsp where tsp.id_centro_costo = v_presupuestos.id_centro_costo and tsp.id_partida = v_id_partida;
 
                     select rel.id_cuenta, rel.id_partida, rel.id_auxiliar
                     into v_relacion_contable
@@ -3436,7 +3453,7 @@ BEGIN
                     end if;
 
                     if v_saldo_presupuesto.id_centro_costo is null and v_saldo_presupuesto.id_partida is null then
-                        insert into pxp.tt_saldo_presupuesto(id_centro_costo, id_partida, vigente )
+                        insert into tt_saldo_presupuesto(id_centro_costo, id_partida, vigente )
                         values(v_presupuestos.id_centro_costo, v_id_partida, pre.f_get_estado_presupuesto_mb_x_fechas(v_presupuestos.id_centro_costo, v_id_partida,'formulado','01/01/2021','31/12/2021') - pre.f_get_estado_presupuesto_mb_x_fechas(v_presupuestos.id_centro_costo, v_id_partida,'comprometido','01/01/2021','31/12/2021'));
                     end if;
                 end if;
@@ -3447,7 +3464,7 @@ BEGIN
                     from pre.tconcepto_partida par
                     inner join pre.tpartida tpa on tpa.id_partida = par.id_partida
                     where par.id_concepto_ingas = v_id_concepto_ingas and tpa.id_gestion = v_id_gestion;
-                    select tsp.id_centro_costo, tsp.id_partida into v_saldo_presupuesto from pxp.tt_saldo_presupuesto tsp where tsp.id_centro_costo = v_presupuestos.id_centro_costo and tsp.id_partida = v_id_partida;
+                    select tsp.id_centro_costo, tsp.id_partida into v_saldo_presupuesto from tt_saldo_presupuesto tsp where tsp.id_centro_costo = v_presupuestos.id_centro_costo and tsp.id_partida = v_id_partida;
 
                     select rel.id_cuenta, rel.id_partida, rel.id_auxiliar
                     into v_relacion_contable
@@ -3469,7 +3486,7 @@ BEGIN
                     end if;
 
                     if v_saldo_presupuesto.id_centro_costo is null and v_saldo_presupuesto.id_partida is null then
-                        insert into pxp.tt_saldo_presupuesto(id_centro_costo, id_partida, vigente )
+                        insert into tt_saldo_presupuesto(id_centro_costo, id_partida, vigente )
                         values(v_presupuestos.id_centro_costo, v_id_partida, pre.f_get_estado_presupuesto_mb_x_fechas(v_presupuestos.id_centro_costo, v_id_partida,'formulado','01/01/2021','31/12/2021') - pre.f_get_estado_presupuesto_mb_x_fechas(v_presupuestos.id_centro_costo, v_id_partida,'comprometido','01/01/2021','31/12/2021'));
                     end if;
                 end if;
@@ -3480,9 +3497,9 @@ BEGIN
                     from pre.tconcepto_partida par
                     inner join pre.tpartida tpa on tpa.id_partida = par.id_partida
                     where par.id_concepto_ingas = v_id_concepto_ingas and tpa.id_gestion = v_id_gestion;
-                    select tsp.id_centro_costo, tsp.id_partida into v_saldo_presupuesto from pxp.tt_saldo_presupuesto tsp where tsp.id_centro_costo = v_presupuestos.id_centro_costo and tsp.id_partida = v_id_partida;
+                    select tsp.id_centro_costo, tsp.id_partida into v_saldo_presupuesto from tt_saldo_presupuesto tsp where tsp.id_centro_costo = v_presupuestos.id_centro_costo and tsp.id_partida = v_id_partida;
                     if v_saldo_presupuesto.id_centro_costo is null and v_saldo_presupuesto.id_partida is null then
-                        insert into pxp.tt_saldo_presupuesto(id_centro_costo, id_partida, vigente )
+                        insert into tt_saldo_presupuesto(id_centro_costo, id_partida, vigente )
                         values(v_presupuestos.id_centro_costo, v_id_partida, pre.f_get_estado_presupuesto_mb_x_fechas(v_presupuestos.id_centro_costo, v_id_partida,'formulado','01/01/2021','31/12/2021') - pre.f_get_estado_presupuesto_mb_x_fechas(v_presupuestos.id_centro_costo, v_id_partida,'comprometido','01/01/2021','31/12/2021'));
                     end if;
                 end if;
@@ -3493,9 +3510,9 @@ BEGIN
                     from pre.tconcepto_partida par
                     inner join pre.tpartida tpa on tpa.id_partida = par.id_partida
                     where par.id_concepto_ingas = v_id_concepto_ingas and tpa.id_gestion = v_id_gestion;
-                    select tsp.id_centro_costo, tsp.id_partida into v_saldo_presupuesto from pxp.tt_saldo_presupuesto tsp where tsp.id_centro_costo = v_presupuestos.id_centro_costo and tsp.id_partida = v_id_partida;
+                    select tsp.id_centro_costo, tsp.id_partida into v_saldo_presupuesto from tt_saldo_presupuesto tsp where tsp.id_centro_costo = v_presupuestos.id_centro_costo and tsp.id_partida = v_id_partida;
                     if v_saldo_presupuesto.id_centro_costo is null and v_saldo_presupuesto.id_partida is null then
-                        insert into pxp.tt_saldo_presupuesto(id_centro_costo, id_partida, vigente )
+                        insert into tt_saldo_presupuesto(id_centro_costo, id_partida, vigente )
                         values(v_presupuestos.id_centro_costo, v_id_partida, pre.f_get_estado_presupuesto_mb_x_fechas(v_presupuestos.id_centro_costo, v_id_partida,'formulado','01/01/2021','31/12/2021') - pre.f_get_estado_presupuesto_mb_x_fechas(v_presupuestos.id_centro_costo, v_id_partida,'comprometido','01/01/2021','31/12/2021'));
                     end if;
                 end if;
@@ -3506,9 +3523,9 @@ BEGIN
                     from pre.tconcepto_partida par
                     inner join pre.tpartida tpa on tpa.id_partida = par.id_partida
                     where par.id_concepto_ingas = v_id_concepto_ingas and tpa.id_gestion = v_id_gestion;
-                    select tsp.id_centro_costo, tsp.id_partida into v_saldo_presupuesto from pxp.tt_saldo_presupuesto tsp where tsp.id_centro_costo = v_presupuestos.id_centro_costo and tsp.id_partida = v_id_partida;
+                    select tsp.id_centro_costo, tsp.id_partida into v_saldo_presupuesto from tt_saldo_presupuesto tsp where tsp.id_centro_costo = v_presupuestos.id_centro_costo and tsp.id_partida = v_id_partida;
                     if v_saldo_presupuesto.id_centro_costo is null and v_saldo_presupuesto.id_partida is null then
-                        insert into pxp.tt_saldo_presupuesto(id_centro_costo, id_partida, vigente )
+                        insert into tt_saldo_presupuesto(id_centro_costo, id_partida, vigente )
                         values(v_presupuestos.id_centro_costo, v_id_partida, pre.f_get_estado_presupuesto_mb_x_fechas(v_presupuestos.id_centro_costo, v_id_partida,'formulado','01/01/2021','31/12/2021') - pre.f_get_estado_presupuesto_mb_x_fechas(v_presupuestos.id_centro_costo, v_id_partida,'comprometido','01/01/2021','31/12/2021'));
                     end if;
                 end if;
@@ -3519,9 +3536,9 @@ BEGIN
                     from pre.tconcepto_partida par
                     inner join pre.tpartida tpa on tpa.id_partida = par.id_partida
                     where par.id_concepto_ingas = v_id_concepto_ingas and tpa.id_gestion = v_id_gestion;
-                    select tsp.id_centro_costo, tsp.id_partida into v_saldo_presupuesto from pxp.tt_saldo_presupuesto tsp where tsp.id_centro_costo = v_presupuestos.id_centro_costo and tsp.id_partida = v_id_partida;
+                    select tsp.id_centro_costo, tsp.id_partida into v_saldo_presupuesto from tt_saldo_presupuesto tsp where tsp.id_centro_costo = v_presupuestos.id_centro_costo and tsp.id_partida = v_id_partida;
                     if v_saldo_presupuesto.id_centro_costo is null and v_saldo_presupuesto.id_partida is null then
-                        insert into pxp.tt_saldo_presupuesto(id_centro_costo, id_partida, vigente )
+                        insert into tt_saldo_presupuesto(id_centro_costo, id_partida, vigente )
                         values(v_presupuestos.id_centro_costo, v_id_partida, pre.f_get_estado_presupuesto_mb_x_fechas(v_presupuestos.id_centro_costo, v_id_partida,'formulado','01/01/2021','31/12/2021') - pre.f_get_estado_presupuesto_mb_x_fechas(v_presupuestos.id_centro_costo, v_id_partida,'comprometido','01/01/2021','31/12/2021'));
                     end if;
                 end if;
@@ -3562,7 +3579,7 @@ BEGIN
                     where par.id_concepto_ingas = v_id_concepto_ingas and tp.id_gestion = v_id_gestion;
 
                     select tsp.id_centro_costo, tsp.id_partida, tsp.vigente into v_saldo_presupuesto
-                    from pxp.tt_saldo_presupuesto tsp
+                    from tt_saldo_presupuesto tsp
                     where tsp.id_centro_costo = v_presupuestos.id_centro_costo and tsp.id_partida = v_id_partida;
 
                     select rel.id_cuenta, rel.id_partida, rel.id_auxiliar
@@ -3596,14 +3613,14 @@ BEGIN
                             where par.id_concepto_ingas = 4815 and tp.id_gestion = v_id_gestion;
 
                             select tsp.id_centro_costo, tsp.id_partida, tsp.vigente into v_saldo_presupuesto_aux
-                            from pxp.tt_saldo_presupuesto tsp
+                            from tt_saldo_presupuesto tsp
                             where tsp.id_centro_costo = v_presupuestos.id_centro_costo and tsp.id_partida = v_id_partida_aux;
 
                             v_verificar_internacional = v_saldo_presupuesto_aux.vigente >= (v_record_json->>'monto_internacional_operativo')::numeric;
                         end if;
                         /********************* Verificar si tiene saldo vigente en pago de viatico internacional *********************/
                         if v_verificar_internacional then
-                            update pxp.tt_saldo_presupuesto set
+                            update tt_saldo_presupuesto set
                                 vigente = vigente - (v_record_json->>'monto_nacional_operativo')::numeric
                             where id_centro_costo = v_presupuestos.id_centro_costo and id_partida = v_id_partida;
 
@@ -3686,7 +3703,7 @@ BEGIN
                             where id_planilla_pvr_sin_pago = v_id_planilla_pvr_sin_pago;
                         end if;
 
-                        insert into pxp.tt_sin_presupuesto(id_funcionario, codigo_cc, centro_costo, partida, fecha_pago)
+                        insert into tes.tt_sin_presupuesto(id_funcionario, codigo_cc, centro_costo, partida, fecha_pago)
                         values((v_record_json->>'id_funcionario')::integer, v_presupuestos.codigo_cc, v_presupuestos.centro_costo, v_partida, v_parametros.fecha_pago);
                     end if;
                 end if;
@@ -3700,7 +3717,7 @@ BEGIN
                     where par.id_concepto_ingas = v_id_concepto_ingas and tp.id_gestion = v_id_gestion;
 
                     select tsp.id_centro_costo, tsp.id_partida, tsp.vigente into v_saldo_presupuesto
-                    from pxp.tt_saldo_presupuesto tsp
+                    from tt_saldo_presupuesto tsp
                     where tsp.id_centro_costo = v_presupuestos.id_centro_costo and tsp.id_partida = v_id_partida;
 
                     select rel.id_cuenta, rel.id_partida, rel.id_auxiliar
@@ -3722,7 +3739,7 @@ BEGIN
                         where rel.id_tabla = v_id_concepto_ingas and rel.id_gestion = v_id_gestion and rel.id_partida = v_id_partida and rel.id_centro_costo = v_presupuestos.id_centro_costo;
 
                         select tsp.id_centro_costo, tsp.id_partida, tsp.vigente into v_saldo_presupuesto
-                        from pxp.tt_saldo_presupuesto tsp
+                        from tt_saldo_presupuesto tsp
                         where tsp.id_centro_costo = v_presupuestos.id_centro_costo and tsp.id_partida = v_id_partida;
 
                     end if;
@@ -3740,14 +3757,14 @@ BEGIN
                             where par.id_concepto_ingas = 4814 and tp.id_gestion = v_id_gestion;
 
                             select tsp.id_centro_costo, tsp.id_partida, tsp.vigente into v_saldo_presupuesto_aux
-                            from pxp.tt_saldo_presupuesto tsp
+                            from tt_saldo_presupuesto tsp
                             where tsp.id_centro_costo = v_presupuestos.id_centro_costo and tsp.id_partida = v_id_partida_aux;
 
                             v_verificar_nacional = v_saldo_presupuesto_aux.vigente >= (v_record_json->>'monto_nacional_operativo')::numeric;
                         end if;
                         /********************* Verificar si tiene saldo vigente en pago de viatico internacional *********************/
                         if v_verificar_nacional then
-                            update pxp.tt_saldo_presupuesto set
+                            update tt_saldo_presupuesto set
                                 vigente = vigente - (v_record_json->>'monto_internacional_operativo')::numeric
                             where id_centro_costo = v_presupuestos.id_centro_costo and id_partida = v_id_partida;
                             insert into tes.tobligacion_det( estado_reg, id_partida, id_concepto_ingas, monto_pago_mo, id_obligacion_pago,
@@ -3828,7 +3845,7 @@ BEGIN
                             where id_planilla_pvr_sin_pago = v_id_planilla_pvr_sin_pago;
                         end if;
 
-                        insert into pxp.tt_sin_presupuesto(id_funcionario, codigo_cc, centro_costo, partida, fecha_pago)
+                        insert into tes.tt_sin_presupuesto(id_funcionario, codigo_cc, centro_costo, partida, fecha_pago)
                         values((v_record_json->>'id_funcionario')::integer, v_presupuestos.codigo_cc, v_presupuestos.centro_costo, v_partida, v_parametros.fecha_pago);
                     end if;
                 end if;
@@ -3849,7 +3866,7 @@ BEGIN
                     where par.id_concepto_ingas = v_id_concepto_ingas and tp.id_gestion = v_id_gestion;
 
                     select tsp.id_centro_costo, tsp.id_partida, tsp.vigente into v_saldo_presupuesto
-                    from pxp.tt_saldo_presupuesto tsp
+                    from tt_saldo_presupuesto tsp
                     where tsp.id_centro_costo = v_presupuestos.id_centro_costo and tsp.id_partida = v_id_partida;
 
                     select rel.id_cuenta, rel.id_partida, rel.id_auxiliar
@@ -3858,7 +3875,7 @@ BEGIN
                     where rel.id_tabla = v_id_concepto_ingas and rel.id_gestion = v_id_gestion and rel.id_partida = v_id_partida and rel.id_centro_costo = v_presupuestos.id_centro_costo;
 
                     if v_saldo_presupuesto.id_centro_costo is not null and v_saldo_presupuesto.id_partida is not null and  (v_saldo_presupuesto.vigente >= (v_record_json->>'monto_nacional_operativo_vuelo')::numeric or v_saldo_presupuesto.vigente >= (v_record_json->>'monto_nacional_administrativo')::numeric ) then
-                        update pxp.tt_saldo_presupuesto set
+                        update tt_saldo_presupuesto set
                             vigente = vigente - coalesce((v_record_json->>'monto_nacional_operativo_vuelo')::numeric,0) - coalesce((v_record_json->>'monto_nacional_administrativo')::numeric,0)
                         where id_centro_costo = v_presupuestos.id_centro_costo and id_partida = v_id_partida;
 
@@ -3916,7 +3933,7 @@ BEGIN
                             where id_planilla_pvr_sin_pago = v_id_planilla_pvr_sin_pago;
                         end if;
 
-                        insert into pxp.tt_sin_presupuesto(id_funcionario, codigo_cc, centro_costo, partida)
+                        insert into tes.tt_sin_presupuesto(id_funcionario, codigo_cc, centro_costo, partida)
                         values(v_presupuestos.id_funcionario, v_presupuestos.codigo_cc, v_presupuestos.centro_costo, v_partida);
                     end if;
                 end if;
@@ -3938,7 +3955,7 @@ BEGIN
                     where par.id_concepto_ingas = v_id_concepto_ingas and tp.id_gestion = v_id_gestion;
 
                     select tsp.id_centro_costo, tsp.id_partida, tsp.vigente into v_saldo_presupuesto
-                    from pxp.tt_saldo_presupuesto tsp
+                    from tt_saldo_presupuesto tsp
                     where tsp.id_centro_costo = v_presupuestos.id_centro_costo and tsp.id_partida = v_id_partida;
 
                     select rel.id_cuenta, rel.id_partida, rel.id_auxiliar
@@ -3947,7 +3964,7 @@ BEGIN
                     where rel.id_tabla = v_id_concepto_ingas and rel.id_gestion = v_id_gestion and rel.id_partida = v_id_partida and rel.id_centro_costo = v_presupuestos.id_centro_costo;
 
                     if v_saldo_presupuesto.id_centro_costo is not null and v_saldo_presupuesto.id_partida is not null and (v_saldo_presupuesto.vigente >= (v_record_json->>'monto_internacional_operativo_vuelo')::numeric or v_saldo_presupuesto.vigente >=  (v_record_json->>'monto_internacional_administrativo')::numeric) then
-                        update pxp.tt_saldo_presupuesto set
+                        update tt_saldo_presupuesto set
                             vigente = vigente - coalesce((v_record_json->>'monto_internacional_operativo_vuelo')::numeric,0) - coalesce((v_record_json->>'monto_internacional_administrativo')::numeric,0)
                         where id_centro_costo = v_presupuestos.id_centro_costo and id_partida = v_id_partida;
 
@@ -3981,7 +3998,7 @@ BEGIN
                             where id_planilla_pvr_con_pago = v_id_planilla_pvr_con_pago;
                         end if;
                     else
-                        insert into pxp.tt_sin_presupuesto(id_funcionario, codigo_cc, centro_costo, partida)
+                        insert into tes.tt_sin_presupuesto(id_funcionario, codigo_cc, centro_costo, partida)
                         values(v_presupuestos.id_funcionario, v_presupuestos.codigo_cc, v_presupuestos.centro_costo, v_partida);
                     end if;
                 end if;
@@ -3995,7 +4012,7 @@ BEGIN
                     where par.id_concepto_ingas = v_id_concepto_ingas and tp.id_gestion = v_id_gestion;
 
                     select tsp.id_centro_costo, tsp.id_partida, tsp.vigente into v_saldo_presupuesto
-                    from pxp.tt_saldo_presupuesto tsp
+                    from tt_saldo_presupuesto tsp
                     where tsp.id_centro_costo = v_presupuestos.id_centro_costo and tsp.id_partida = v_id_partida;
 
                     select rel.id_cuenta, rel.id_partida, rel.id_auxiliar
@@ -4004,7 +4021,7 @@ BEGIN
                     where rel.id_tabla = v_id_concepto_ingas and rel.id_gestion = v_id_gestion and rel.id_partida = v_id_partida and rel.id_centro_costo = v_presupuestos.id_centro_costo;
 
                     if v_saldo_presupuesto.id_centro_costo is not null and v_saldo_presupuesto.id_partida is not null and  v_saldo_presupuesto.vigente >= (v_record_json->>'monto_nacional_administrativo_entrenamiento')::numeric then
-                        update pxp.tt_saldo_presupuesto set
+                        update tt_saldo_presupuesto set
                             vigente = vigente - (v_record_json->>'monto_nacional_administrativo_entrenamiento')::numeric
                         where id_centro_costo = v_presupuestos.id_centro_costo and id_partida = v_id_partida;
 
@@ -4038,7 +4055,7 @@ BEGIN
                             where id_planilla_pvr_con_pago = v_id_planilla_pvr_con_pago;
                         end if;
                     else
-                        insert into pxp.tt_sin_presupuesto(id_funcionario, codigo_cc, centro_costo, partida)
+                        insert into tes.tt_sin_presupuesto(id_funcionario, codigo_cc, centro_costo, partida)
                         values(v_presupuestos.id_funcionario, v_presupuestos.codigo_cc, v_presupuestos.centro_costo, v_partida);
                     end if;
                 end if;
@@ -4052,7 +4069,7 @@ BEGIN
                     where par.id_concepto_ingas = v_id_concepto_ingas and tp.id_gestion = v_id_gestion;
 
                     select tsp.id_centro_costo, tsp.id_partida, tsp.vigente into v_saldo_presupuesto
-                    from pxp.tt_saldo_presupuesto tsp
+                    from tt_saldo_presupuesto tsp
                     where tsp.id_centro_costo = v_presupuestos.id_centro_costo and tsp.id_partida = v_id_partida;
 
                     select rel.id_cuenta, rel.id_partida, rel.id_auxiliar
@@ -4061,7 +4078,7 @@ BEGIN
                     where rel.id_tabla = v_id_concepto_ingas and rel.id_gestion = v_id_gestion and rel.id_partida = v_id_partida and rel.id_centro_costo = v_presupuestos.id_centro_costo;
 
                     if v_saldo_presupuesto.id_centro_costo is not null and v_saldo_presupuesto.id_partida is not null and  v_saldo_presupuesto.vigente >= (v_record_json->>'monto_internacional_administrativo_entrenamiento')::numeric then
-                        update pxp.tt_saldo_presupuesto set
+                        update tt_saldo_presupuesto set
                             vigente = vigente - (v_record_json->>'monto_internacional_administrativo_entrenamiento')::numeric
                         where id_centro_costo = v_presupuestos.id_centro_costo and id_partida = v_id_partida;
 
@@ -4095,7 +4112,7 @@ BEGIN
                             where id_planilla_pvr_con_pago = v_id_planilla_pvr_con_pago;
                         end if;
                     else
-                        insert into pxp.tt_sin_presupuesto(id_funcionario, codigo_cc, centro_costo, partida)
+                        insert into tes.tt_sin_presupuesto(id_funcionario, codigo_cc, centro_costo, partida)
                         values(v_presupuestos.id_funcionario, v_presupuestos.codigo_cc, v_presupuestos.centro_costo, v_partida);
                     end if;
                 end if;
@@ -4108,7 +4125,7 @@ BEGIN
 
             v_json_presupuesto = '[';
     	    for v_presupuestos in select sp.codigo_cc, sp.centro_costo, sp.id_funcionario,  pxp.list(sp.partida)partida
-                                  from pxp.tt_sin_presupuesto sp
+                                  from tes.tt_sin_presupuesto sp
     	                          group by sp.codigo_cc,sp.centro_costo,sp.id_funcionario
                                   order by sp.codigo_cc asc loop
 
@@ -4126,6 +4143,370 @@ BEGIN
             else
                 v_status = 'observado';
             end if;
+
+            /******************************** PROCESO DE CAMBIO DE ESTADO Y GENERACIÓN CUOTA ********************************/
+            if v_id_obligacion_pago is not null then
+              v_pre_integrar_presupuestos = pxp.f_get_variable_global('pre_integrar_presupuestos');
+
+              for v_estados in select tte.codigo
+                               from wf.ttipo_proceso  ttp
+                               inner join wf.ttipo_estado tte on tte.id_tipo_proceso = ttp.id_tipo_proceso
+                               where ttp.codigo = 'PVR' loop
+
+                  select op.id_proceso_wf, op.id_estado_wf, op.estado, op.id_depto, op.tipo_obligacion,
+                    op.total_nro_cuota, op.fecha_pp_ini, op.rotacion, op.id_plantilla, op.tipo_cambio_conv,
+                    pr.desc_proveedor, op.pago_variable, op.comprometido, op.id_usuario_reg, op.fecha
+                  into v_id_proceso_wf, v_id_estado_wf, v_codigo_estado, v_id_depto, v_tipo_obligacion,
+                    v_total_nro_cuota, v_fecha_pp_ini, v_rotacion, v_id_plantilla, v_tipo_cambio_conv,
+                    v_desc_proveedor, v_pago_variable, v_comprometido, v_id_usuario_reg_op, v_fecha_op
+                  from tes.tobligacion_pago op
+                  left join param.vproveedor pr  on pr.id_proveedor = op.id_proveedor
+                  where op.id_obligacion_pago = v_id_obligacion_pago;
+
+                  select te.id_tipo_estado
+                  into v_id_tipo_estado
+                  from wf.testado_wf te
+                  inner join wf.ttipo_estado tip on tip.id_tipo_estado = te.id_tipo_estado
+                  where te.id_estado_wf = v_id_estado_wf;
+
+
+                  SELECT ps_id_tipo_estado[1], ps_codigo_estado[1]
+                  into v_id_tipo_estado, v_codigo_estado_siguiente
+                  from  wf.f_obtener_estado_wf ( v_id_proceso_wf, v_id_estado_wf, v_id_tipo_estado, 'siguiente', p_id_usuario);
+
+                  select tft.id_funcionario
+                  into v_id_funcionario
+                  from wf.ttipo_estado tip
+                  inner join wf.tfuncionario_tipo_estado tft on tft.id_tipo_estado = tip.id_tipo_estado
+                  where tip.id_tipo_estado = v_id_tipo_estado
+                  limit 1;
+
+                  ---------------------------------------
+                  -- REGISTA EL SIGUIENTE ESTADO DEL WF.
+                  ---------------------------------------
+                  v_id_estado_actual = wf.f_registra_estado_wf(  v_id_tipo_estado,
+                                                                 v_id_funcionario,
+                                                                 v_id_estado_wf,
+                                                                 v_id_proceso_wf,
+                                                                 p_id_usuario,
+                                                                 null::integer,
+                                                                 null::varchar,
+                                                                 null::integer,
+                                                                 'Cambio en Automatico PVR');
+
+
+                  IF  v_codigo_estado in ('borrador','vbpoa','vbpresupuestos','liberacion' ) THEN
+                      --validamos que el detalle tenga por lo menos un item con valor
+                      select sum(od.monto_pago_mo)
+                      into v_total_detalle
+                      from tes.tobligacion_det od
+                      where od.id_obligacion_pago = v_id_obligacion_pago and od.estado_reg ='activo';
+
+                      IF v_total_detalle = 0 or v_total_detalle is null THEN
+                          raise exception 'No existe el detalle de obligacion...';
+                      END IF;
+                      ------------------------------------------------------------
+                      --calcula el factor de prorrateo de la obligacion  detalle
+                      -----------------------------------------------------------
+                      IF (tes.f_calcular_factor_obligacion_det(v_id_obligacion_pago) != 'exito')  THEN
+                          raise exception 'error al calcular factores';
+                      END IF;
+                  END IF;
+
+                  update tes.tobligacion_pago  set
+                   id_estado_wf =  v_id_estado_actual,
+                   estado = v_codigo_estado_siguiente,
+                   id_usuario_mod = p_id_usuario,
+                   fecha_mod = now()
+                  where id_obligacion_pago  = v_id_obligacion_pago;
+
+
+                  IF  v_codigo_estado_siguiente = 'registrado'  and v_total_nro_cuota > 0 THEN
+
+                      select ps_descuento_porc, ps_descuento, ps_observaciones into v_registros_plan
+                      FROM  conta.f_get_descuento_plantilla_calculo(v_id_plantilla);
+
+                      /*jrr(10/10/2014): En caso de que sea pago variable el valor de la cuota sera 0*/
+                      if (v_pago_variable = 'si') then
+                          v_monto_cuota = 0;
+                      else
+                          v_monto_cuota =  (v_total_detalle::numeric/v_total_nro_cuota::numeric)::numeric(19,1);
+                      end if;
+
+                      FOR v_i  IN 1..v_total_nro_cuota LOOP
+                          IF v_i = v_total_nro_cuota THEN
+                              v_monto_cuota = v_total_detalle - (v_monto_cuota*v_total_nro_cuota) + v_monto_cuota;
+                              /*jrr(10/10/2014): En caso de que sea pago variable el valor de la cuota sera 0*/
+                              if (v_pago_variable = 'si') then
+                                v_monto_cuota = 0;
+                              end if;
+                              v_ultima_cuota = true;
+                          END IF;
+
+                          v_descuentos_ley = v_monto_cuota * v_registros_plan.ps_descuento_porc;
+
+
+
+                          --(may)tipo de obligacion SIP para  internacionales pago_especial_spi
+                          --pago para bol pago_especial
+
+                          IF v_tipo_obligacion in  ('pago_especial') THEN
+                              v_tipo_plan_pago = 'especial';
+                          ELSIF v_tipo_obligacion in  ('pago_especial_spi') THEN
+                              v_tipo_plan_pago = 'especial_spi';
+                          ELSE
+                              --verifica que tipo de apgo estan deshabilitados
+                              va_tipo_pago = regexp_split_to_array(pxp.f_get_variable_global('tes_tipo_pago_deshabilitado'), E'\\s+');
+                              v_tipo_plan_pago = 'devengado_pagado';
+
+                              IF v_tipo_plan_pago =ANY(va_tipo_pago) THEN
+                                  v_tipo_plan_pago = 'devengado_pagado_1c';
+                              END IF;
+
+                              IF v_tipo_obligacion in  ('spd', 'pgaext') THEN
+                                  v_tipo_plan_pago = 'devengado_pagado_1c_sp';
+                              END IF;
+                          END IF;
+
+
+
+                          --armar hstore
+                          v_hstore_pp =   hstore(ARRAY[
+                                                          'tipo_pago',
+                                                          'normal',
+                                                          'tipo',
+                                                          v_tipo_plan_pago,
+                                                          'tipo_cambio',v_tipo_cambio_conv::varchar,
+                                                          'id_plantilla',v_id_plantilla::varchar,
+                                                          'id_obligacion_pago',v_id_obligacion_pago::varchar,
+                                                          'monto_no_pagado','0',
+                                                          'monto_retgar_mo','0',
+                                                          'otros_descuentos','0',
+                                                          'monto_excento','0',
+                                                          'id_plan_pago_fk',NULL::varchar,
+                                                          'porc_descuento_ley',v_registros_plan.ps_descuento_porc::varchar,
+                                                          'obs_descuentos_ley',v_registros_plan.ps_observaciones::varchar,
+                                                          'obs_otros_descuentos','',
+                                                          'obs_monto_no_pagado','',
+                                                          'nombre_pago',v_desc_proveedor::varchar,
+                                                          'monto', v_monto_cuota::varchar,
+                                                          'descuento_ley',v_descuentos_ley::varchar,
+                                                          'fecha_tentativa',v_fecha_pp_ini::varchar
+                          ]);
+
+                          --TODO,  bloquear en formulario de OP  facturas con monto excento
+
+
+                          -- si es un proceso de pago unico,  la primera cuota pasa de borrador al siguiente estado de manera automatica
+                          IF  ((v_tipo_obligacion = 'pbr' or v_tipo_obligacion = 'ppm' or v_tipo_obligacion = 'pga' or v_tipo_obligacion = 'pce' or v_tipo_obligacion = 'pago_unico' or v_tipo_obligacion = 'spd' or v_tipo_obligacion ='pgaext') and   v_i = 1)   THEN
+                             v_sw_saltar = TRUE;
+                          else
+                             v_sw_saltar = FALSE;
+                          END IF;
+
+                          -- llamada para insertar plan de pagos
+                          v_resp = tes.f_inserta_plan_pago_dev(p_administrador, v_id_usuario_reg_op,v_hstore_pp, v_sw_saltar);
+                          --raise 'v_resp: %', v_resp;
+                          -- calcula la fecha para la siguiente insercion
+                          v_fecha_pp_ini =  v_fecha_pp_ini + interval  '1 month'*v_rotacion;
+                      END LOOP;
+
+                      IF not tes.f_gestionar_presupuesto_tesoreria(v_id_obligacion_pago, p_id_usuario, 'comprometer')  THEN
+                          raise exception 'Error al comprometer el presupeusto';
+                      END IF;
+
+                      v_comprometido = 'si';
+                      --cambia la bandera del comprometido
+                      update tes.tobligacion_pago  set
+                          comprometido = v_comprometido
+                      where id_obligacion_pago  = v_id_obligacion_pago;
+
+                      EXIT;
+                  END IF;
+              end loop;
+              /*********************************************** Plan Pago Next Estado ***********************************************/
+              select pp.id_proceso_wf
+              into v_id_proceso_wf
+              from tes.tplan_pago pp
+              where pp.id_obligacion_pago = v_id_obligacion_pago;
+
+               for v_estados in select tte.codigo
+                               from wf.ttipo_proceso  ttp
+                               inner join wf.ttipo_estado tte on tte.id_tipo_proceso = ttp.id_tipo_proceso
+                               where ttp.codigo = 'PVR_DEV' loop
+
+                  select pp.id_plan_pago, pp.id_proceso_wf, pp.id_estado_wf, pp.estado, pp.fecha_tentativa, op.numero, pp.total_prorrateado ,
+                         pp.monto_ejecutar_total_mo, pp.estado, pp.id_estado_wf, op.tipo_obligacion, pp.id_depto_lb, pp.monto,
+                         pp.id_plantilla, pp.id_obligacion_pago, op.num_tramite, pp.tipo, op.id_moneda
+                  into   v_id_plan_pago, v_id_proceso_wf, v_id_estado_wf, v_codigo_estado, v_fecha_tentativa, v_num_obliacion_pago, v_total_prorrateo,
+                         v_monto_ejecutar_total_mo, v_estado_aux, v_id_estado_actual, v_tipo_obligacion, v_id_depto_lb_pp, v_monto_pp,
+                         v_id_plantilla, v_id_obligacion_pago_pp, v_numero_tramite, vtipo_pp, v_id_moneda
+                  from tes.tplan_pago  pp
+                  inner  join tes.tobligacion_pago op on op.id_obligacion_pago = pp.id_obligacion_pago
+                  where pp.id_proceso_wf  = v_id_proceso_wf;
+
+                  select te.id_tipo_estado
+                  into v_id_tipo_estado
+                  from wf.testado_wf te
+                  inner join wf.ttipo_estado tip on tip.id_tipo_estado = te.id_tipo_estado
+                  where te.id_estado_wf = v_id_estado_wf;
+
+
+                  SELECT ps_id_tipo_estado[1], ps_codigo_estado[1]
+                  into v_id_tipo_estado, v_codigo_estado_siguiente
+                  from  wf.f_obtener_estado_wf ( v_id_proceso_wf, v_id_estado_wf, v_id_tipo_estado, 'siguiente', p_id_usuario);
+
+                  select tft.id_funcionario, tft.id_depto
+                  into v_id_funcionario, v_id_depto
+                  from wf.ttipo_estado tip
+                  inner join wf.tfuncionario_tipo_estado tft on tft.id_tipo_estado = tip.id_tipo_estado
+                  where tip.id_tipo_estado = v_id_tipo_estado
+                  limit 1;
+                  --raise 'v_id_tipo_estado: %, v_codigo_estado_siguiente: %, v_id_funcionario: %, v_id_depto: %',v_id_tipo_estado, v_codigo_estado_siguiente, v_id_funcionario, v_id_depto;
+                  /*if  v_codigo_estado_siguiente = 'supconta' then
+                      raise 'v_id_funcionario: %, v_id_depto: %',v_id_funcionario, v_id_depto;
+                  end if;*/
+                  ---------------------------------------
+                  -- REGISTA EL SIGUIENTE ESTADO DEL WF.
+                  ---------------------------------------
+                  v_id_estado_actual = wf.f_registra_estado_wf(  v_id_tipo_estado,
+                                                                 v_id_funcionario,
+                                                                 v_id_estado_wf,
+                                                                 v_id_proceso_wf,
+                                                                 p_id_usuario,
+                                                                 null::integer,
+                                                                 null::varchar,
+                                                                 v_id_depto,
+                                                                 'Cambio en Automatico Plan Pago PVR');
+
+
+                  update tes.tplan_pago  set
+                   id_estado_wf =  v_id_estado_actual,
+                   estado = v_codigo_estado_siguiente,
+                   id_usuario_mod = p_id_usuario,
+                   fecha_mod = now(),
+
+                   id_depto_lb = 15,
+                   id_cuenta_bancaria = 61,
+                   forma_pago = 'transferencia',
+                   id_proveedor_cta_bancaria = 652,
+                   id_depto_conta = 4
+
+                  where id_obligacion_pago  = v_id_obligacion_pago;
+
+                  if  v_codigo_estado_siguiente = 'vbconta' then
+                      EXIT;
+                  end if;
+
+              end loop;
+			end if;
+    	    /*********************************************** Plan Pago Next Estado ***********************************************/
+            /******************************** PROCESO DE CAMBIO DE ESTADO Y GENERACIÓN CUOTA ********************************/
+
+            /******************************** PROCESO PARA GENERAR EL COMPROBANTE PRESUPUESTARIO ********************************/
+            --validacion de la cuota
+
+
+            select pp.*,op.total_pago,op.comprometido, op.id_contrato, op.tipo_obligacion
+            into v_registros
+            from tes.tplan_pago pp
+            inner join tes.tobligacion_pago op on op.id_obligacion_pago = pp.id_obligacion_pago
+            where pp.id_obligacion_pago = v_id_obligacion_pago;
+
+			v_pre_integrar_presupuestos = pxp.f_get_variable_global('pre_integrar_presupuestos');
+			IF v_pre_integrar_presupuestos = 'true' THEN
+              /*jrr:29/10/2014
+              1) si el presupuesto no esta comprometido*/
+
+              if (v_registros.comprometido = 'no') then
+
+                  /*1.1)Validar que la suma de los detalles igualen al total de la obligacion*/
+                  if ((select sum(od.monto_pago_mo)
+                        from tes.tobligacion_det od
+                        where id_obligacion_pago = v_id_obligacion_pago and estado_reg = 'activo') != v_registros.total_pago) THEN
+                        raise exception 'La suma de todos los detalles no iguala con el total de la obligacion. La diferencia se genero al modificar la apropiacion';
+                  end if;
+
+                  /*1.2 Comprometer*/
+                  select * into v_nombre_conexion from migra.f_crear_conexion();
+
+                  select tes.f_gestionar_presupuesto_tesoreria(v_id_obligacion_pago, p_id_usuario, 'comprometer',NULL,v_nombre_conexion) into v_res;
+
+                  if v_res = false then
+                      raise exception 'Error al comprometer el presupuesto';
+                  end if;
+
+                  update tes.tobligacion_pago
+                  set comprometido = 'si'
+                  where id_obligacion_pago = v_id_obligacion_pago;
+              end if;
+	  		END IF;
+
+            --(may) 20-07-2019 los tipo plan de pago devengado_pagado_1c_sp son para las internacionales -tramites sp con contato
+            IF  v_registros.tipo  in ('pagado' ,'devengado_pagado','devengado_pagado_1c','anticipo','ant_parcial','devengado_pagado_1c_sp') and v_registros.tipo_obligacion != 'pago_pvr' THEN
+
+              IF v_registros.forma_pago = 'cheque' THEN
+              	IF  v_registros.nro_cheque is NULL THEN
+                	raise exception  'Tiene que especificar el  nro de cheque';
+                END IF;
+              ELSE
+            	IF v_registros.id_proveedor_cta_bancaria is NULL THEN
+               		raise exception  'Tiene que especificar el nro de cuenta destino, para la transferencia bancaria';
+            	END IF;
+              END IF;
+
+              IF v_registros.id_cuenta_bancaria is NULL THEN
+                 raise exception  'Tiene que especificar la cuenta bancaria origen de los fondos';
+              END IF ;
+
+
+
+              --validacion de deposito, (solo BOA, puede retirarse)
+              IF v_registros.id_cuenta_bancaria_mov is NULL THEN
+				--TODO verificar si la cuenta es de centro
+               	select cb.centro
+               	into v_centro
+               	from tes.tcuenta_bancaria cb
+               	where cb.id_cuenta_bancaria = v_registros.id_cuenta_bancaria;
+              	IF  v_registros.nro_cuenta_bancaria  = '' or  v_registros.nro_cuenta_bancaria is NULL THEN
+                	IF  v_centro = 'no' THEN
+						raise exception  'Tiene que especificar el deposito  origen de los fondos';
+                    END IF;
+                END IF;
+              END IF ;
+            END IF;
+
+
+            --si es un pago de vengado , revisar si tiene contrato
+            --si tiene contrato con renteciones de garantia validar que la rentecion de garantia sea mayor a cero
+            --(may) 20-07-2019 los tipo plan de pago devengado_pagado_1c_sp son para las internacionales -tramites sp con contato
+            IF  v_registros.tipo in ('devengado','devengado_pagado','devengado_pagado_1c', 'devengado_pagado_1c_sp') THEN
+               IF v_registros.id_contrato is not null THEN
+                   v_sw_retenciones = 'no';
+                   select c.tiene_retencion
+                   into v_sw_retenciones
+                   from leg.tcontrato c
+                   where c.id_contrato = v_registros.id_contrato;
+
+                   IF v_sw_retenciones = 'si' and  v_registros.monto_retgar_mo = 0 THEN
+
+                      IF v_registros.monto != v_registros.descuento_inter_serv THEN
+                        raise exception 'Según contrato este pago debe tener retenciones de garantia';
+                      END IF;
+                   END IF;
+               END IF;
+            END IF;
+           	if v_registros.tipo_obligacion = 'pago_pvr' then
+           		v_verficacion = tes.f_generar_comprobante_pvr(
+                                                      p_id_usuario,
+                                                      v_parametros._id_usuario_ai,
+                                                      v_parametros._nombre_usuario_ai,
+                                                      v_registros.id_plan_pago,
+                                                      4,
+                                                      v_nombre_conexion);
+           	end if;
+            /******************************** PROCESO PARA GENERAR EL COMPROBANTE PRESUPUESTARIO ********************************/
+
             --Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','El registro se inserto con Exito');
             v_resp = pxp.f_agrega_clave(v_resp,'id_obligacion_pago',v_id_obligacion_pago::varchar);
@@ -4145,7 +4526,7 @@ BEGIN
     #FECHA:		   01/11/2021 10:28:30
     ***********************************/
     elsif(p_transaccion='TES_GENERAR_PVR_ADM')then
-    	begin --raise 'TES_GENERAR_PVR_ADM %', v_parametros.codigo_tipo_pago;
+    	begin --raise 'TES_GENERAR_PVR_ADM %, %', v_parametros.codigo_tipo_pago, v_parametros.fecha_pago;
             if v_parametros.codigo_tipo_pago = 'gasto' then
 
                 select tvr.nombre_origen, tvr.fecha_pago, tvr.detalle_con_pago
@@ -4187,6 +4568,16 @@ BEGIN
                         '[]'::jsonb,
                         v_parametros.glosa_pago
                     )returning id_planilla_pvr_sin_pago into v_id_planilla_pvr_sin_pago;
+
+                    /******* creamos la tabla para consultar presupuesto *******/
+                    create temp table tt_saldo_presupuesto (
+                        id_centro_costo INTEGER,
+                        id_partida INTEGER,
+                        vigente NUMERIC
+                    )on commit drop;
+                    /******* creamos la tabla para consultar presupuesto *******/
+
+
                 end if;
 
                 select s.id_subsistema
@@ -4203,15 +4594,15 @@ BEGIN
                 from wf.ttipo_proceso tp
                 where tp.id_proceso_macro = v_id_proceso_macro and tp.estado_reg = 'activo' and tp.inicio = 'si';
 
-                select ges.id_gestion
-                into v_id_gestion
+                select ges.id_gestion, ges.gestion
+                into v_id_gestion, v_gestion
                 from param.tgestion ges
-                where ges.gestion = date_part('year','31/12/2021'::date);--current_date
+                where ges.gestion = date_part('year',v_parametros.fecha_pago);--'31/12/2021'::date current_date
 
                 select per.id_periodo
                 into v_id_periodo
                 from param.tperiodo per
-                where per.periodo = date_part('month','31/12/2021'::date) and per.id_gestion = v_id_gestion;
+                where per.periodo = date_part('month',v_parametros.fecha_pago) and per.id_gestion = v_id_gestion; --'31/12/2021'::date
 
                 select usu.id_usuario
                 into v_id_usuario
@@ -4375,9 +4766,9 @@ BEGIN
                     inner join orga.tcargo_presupuesto pre on pre.id_cargo = asig.id_cargo and pre.id_gestion = v_id_gestion
                     and
                     (
-                        ((v_record_json->>'fecha_sol')::date between pre.fecha_ini and coalesce(pre.fecha_fin, '31/12/2021'::date))
+                        ((v_record_json->>'fecha_sol')::date between pre.fecha_ini and coalesce(pre.fecha_fin, ('31/12/'||v_gestion)::date))
                         or
-                        ((v_record_json->>'fecha_sol')::date between pre.fecha_ini and coalesce(pre.fecha_fin, '31/12/2021'::date))
+                        ((v_record_json->>'fecha_sol')::date between pre.fecha_ini and coalesce(pre.fecha_fin, ('31/12/'||v_gestion)::date))
                     )
 
                     inner join param.tcentro_costo cc on cc.id_centro_costo = pre.id_centro_costo
@@ -4393,7 +4784,7 @@ BEGIN
                         where par.id_concepto_ingas = v_id_concepto_ingas and tpa.id_gestion = v_id_gestion;
 
                         select tsp.id_centro_costo, tsp.id_partida into v_saldo_presupuesto
-                        from pxp.tt_saldo_presupuesto tsp
+                        from tt_saldo_presupuesto tsp
                         where tsp.id_centro_costo = v_presupuestos.id_centro_costo and tsp.id_partida = v_id_partida;
 
                         select rel.id_cuenta, rel.id_partida, rel.id_auxiliar
@@ -4402,8 +4793,8 @@ BEGIN
                         where rel.id_tabla = v_id_concepto_ingas and rel.id_gestion = v_id_gestion and rel.id_partida = v_id_partida and rel.id_centro_costo = v_presupuestos.id_centro_costo;
 
                         if v_saldo_presupuesto.id_centro_costo is null and v_saldo_presupuesto.id_partida is null then
-                            insert into pxp.tt_saldo_presupuesto(id_centro_costo, id_partida, vigente )
-                            values(v_presupuestos.id_centro_costo, v_id_partida, pre.f_get_estado_presupuesto_mb_x_fechas(v_presupuestos.id_centro_costo, v_id_partida,'formulado','01/01/2021','31/12/2021') - pre.f_get_estado_presupuesto_mb_x_fechas(v_presupuestos.id_centro_costo, v_id_partida,'comprometido','01/01/2021','31/12/2021'));
+                            insert into tt_saldo_presupuesto(id_centro_costo, id_partida, vigente )
+                            values(v_presupuestos.id_centro_costo, v_id_partida, pre.f_get_estado_presupuesto_mb_x_fechas(v_presupuestos.id_centro_costo, v_id_partida,'formulado',('01/01/'||v_gestion)::date,('31/12/'||v_gestion)::date) - pre.f_get_estado_presupuesto_mb_x_fechas(v_presupuestos.id_centro_costo, v_id_partida,'comprometido',('01/01/'||v_gestion)::date,('31/12/'||v_gestion)::date));
                         end if;
                     end if;
 
@@ -4416,7 +4807,7 @@ BEGIN
                         where par.id_concepto_ingas = v_id_concepto_ingas and tpa.id_gestion = v_id_gestion;
 
                         select tsp.id_centro_costo, tsp.id_partida into v_saldo_presupuesto
-                        from pxp.tt_saldo_presupuesto tsp
+                        from tt_saldo_presupuesto tsp
                         where tsp.id_centro_costo = v_presupuestos.id_centro_costo and tsp.id_partida = v_id_partida;
 
                         select rel.id_cuenta, rel.id_partida, rel.id_auxiliar
@@ -4426,8 +4817,8 @@ BEGIN
 
 
                         if v_saldo_presupuesto.id_centro_costo is null and v_saldo_presupuesto.id_partida is null then
-                            insert into pxp.tt_saldo_presupuesto(id_centro_costo, id_partida, vigente )
-                            values(v_presupuestos.id_centro_costo, v_id_partida, pre.f_get_estado_presupuesto_mb_x_fechas(v_presupuestos.id_centro_costo, v_id_partida,'formulado','01/01/2021','31/12/2021') - pre.f_get_estado_presupuesto_mb_x_fechas(v_presupuestos.id_centro_costo, v_id_partida,'comprometido','01/01/2021','31/12/2021'));
+                            insert into tt_saldo_presupuesto(id_centro_costo, id_partida, vigente )
+                            values(v_presupuestos.id_centro_costo, v_id_partida, pre.f_get_estado_presupuesto_mb_x_fechas(v_presupuestos.id_centro_costo, v_id_partida,'formulado',('01/01/'||v_gestion)::date,('31/12/'||v_gestion)::date) - pre.f_get_estado_presupuesto_mb_x_fechas(v_presupuestos.id_centro_costo, v_id_partida,'comprometido',('01/01/'||v_gestion)::date,('31/12/'||v_gestion)::date));
                         end if;
                     end if;
 
@@ -4440,12 +4831,12 @@ BEGIN
                         where par.id_concepto_ingas = v_id_concepto_ingas and tpa.id_gestion = v_id_gestion;
 
                         select tsp.id_centro_costo, tsp.id_partida into v_saldo_presupuesto
-                        from pxp.tt_saldo_presupuesto tsp
+                        from tt_saldo_presupuesto tsp
                         where tsp.id_centro_costo = v_presupuestos.id_centro_costo and tsp.id_partida = v_id_partida;
 
                         if v_saldo_presupuesto.id_centro_costo is null and v_saldo_presupuesto.id_partida is null then
-                            insert into pxp.tt_saldo_presupuesto(id_centro_costo, id_partida, vigente )
-                            values(v_presupuestos.id_centro_costo, v_id_partida, pre.f_get_estado_presupuesto_mb_x_fechas(v_presupuestos.id_centro_costo, v_id_partida,'formulado','01/01/2021','31/12/2021') - pre.f_get_estado_presupuesto_mb_x_fechas(v_presupuestos.id_centro_costo, v_id_partida,'comprometido','01/01/2021','31/12/2021'));
+                            insert into tt_saldo_presupuesto(id_centro_costo, id_partida, vigente )
+                            values(v_presupuestos.id_centro_costo, v_id_partida, pre.f_get_estado_presupuesto_mb_x_fechas(v_presupuestos.id_centro_costo, v_id_partida,'formulado',('01/01/'||v_gestion)::date,('31/12/'||v_gestion)::date) - pre.f_get_estado_presupuesto_mb_x_fechas(v_presupuestos.id_centro_costo, v_id_partida,'comprometido',('01/01/'||v_gestion)::date,('31/12/'||v_gestion)::date));
                         end if;
                     end if;
 
@@ -4458,12 +4849,12 @@ BEGIN
                         where par.id_concepto_ingas = v_id_concepto_ingas and tpa.id_gestion = v_id_gestion;
 
                         select tsp.id_centro_costo, tsp.id_partida into v_saldo_presupuesto
-                        from pxp.tt_saldo_presupuesto tsp
+                        from tt_saldo_presupuesto tsp
                         where tsp.id_centro_costo = v_presupuestos.id_centro_costo and tsp.id_partida = v_id_partida;
 
                         if v_saldo_presupuesto.id_centro_costo is null and v_saldo_presupuesto.id_partida is null then
-                            insert into pxp.tt_saldo_presupuesto(id_centro_costo, id_partida, vigente )
-                            values(v_presupuestos.id_centro_costo, v_id_partida, pre.f_get_estado_presupuesto_mb_x_fechas(v_presupuestos.id_centro_costo, v_id_partida,'formulado','01/01/2021','31/12/2021') - pre.f_get_estado_presupuesto_mb_x_fechas(v_presupuestos.id_centro_costo, v_id_partida,'comprometido','01/01/2021','31/12/2021'));
+                            insert into tt_saldo_presupuesto(id_centro_costo, id_partida, vigente )
+                            values(v_presupuestos.id_centro_costo, v_id_partida, pre.f_get_estado_presupuesto_mb_x_fechas(v_presupuestos.id_centro_costo, v_id_partida,'formulado',('01/01/'||v_gestion)::date,('31/12/'||v_gestion)::date) - pre.f_get_estado_presupuesto_mb_x_fechas(v_presupuestos.id_centro_costo, v_id_partida,'comprometido',('01/01/'||v_gestion)::date,('31/12/'||v_gestion)::date));
                         end if;
                     end if;
                 end loop;
@@ -4485,9 +4876,9 @@ BEGIN
                     inner join orga.tcargo_presupuesto pre on pre.id_cargo = asig.id_cargo and pre.id_gestion = v_id_gestion
                     and
                     (
-                        ((v_record_json->>'fecha_sol')::date between pre.fecha_ini and coalesce(pre.fecha_fin, '31/12/2021'::date))
+                        ((v_record_json->>'fecha_sol')::date between pre.fecha_ini and coalesce(pre.fecha_fin, ('31/12/'||v_gestion)::date))
                         or
-                        ((v_record_json->>'fecha_sol')::date between pre.fecha_ini and coalesce(pre.fecha_fin, '31/12/2021'::date))
+                        ((v_record_json->>'fecha_sol')::date between pre.fecha_ini and coalesce(pre.fecha_fin, ('31/12/'||v_gestion)::date))
                     )
                     inner join param.tcentro_costo cc on cc.id_centro_costo = pre.id_centro_costo
                     inner join param.ttipo_cc tcc on tcc.id_tipo_cc = cc.id_tipo_cc
@@ -4502,7 +4893,7 @@ BEGIN
                         where par.id_concepto_ingas = v_id_concepto_ingas and tp.id_gestion = v_id_gestion;
 
                         select tsp.id_centro_costo, tsp.id_partida, tsp.vigente into v_saldo_presupuesto
-                        from pxp.tt_saldo_presupuesto tsp
+                        from tt_saldo_presupuesto tsp
                         where tsp.id_centro_costo = v_presupuestos.id_centro_costo and tsp.id_partida = v_id_partida;
 
                         select rel.id_cuenta, rel.id_partida, rel.id_auxiliar
@@ -4535,7 +4926,7 @@ BEGIN
                                 where id_planilla_pvr_sin_pago = v_id_planilla_pvr_sin_pago;
                             end if;
 
-                            insert into pxp.tt_sin_presupuesto(id_funcionario, codigo_cc, centro_costo, partida, fecha_pago, orden_viaje, motivo)
+                            insert into tes.tt_sin_presupuesto(id_funcionario, codigo_cc, centro_costo, partida, fecha_pago, orden_viaje, motivo)
                             values((v_record_json->>'id_funcionario')::integer, v_presupuestos.codigo_cc, v_presupuestos.centro_costo, v_partida, v_parametros.fecha_pago, v_record_json::jsonb,'sin_relacion_contable');
 
                         else
@@ -4550,7 +4941,7 @@ BEGIN
                                     where par.id_concepto_ingas = 4873 and tp.id_gestion = v_id_gestion;
 
                                     select tsp.id_centro_costo, tsp.id_partida, tsp.vigente into v_saldo_presupuesto_aux
-                                    from pxp.tt_saldo_presupuesto tsp
+                                    from tt_saldo_presupuesto tsp
                                     where tsp.id_centro_costo = v_presupuestos.id_centro_costo and tsp.id_partida = v_id_partida_aux;
 
                                     v_verificar_internacional = v_saldo_presupuesto_aux.vigente >= (v_record_json->>'monto_internacional_administrativo')::numeric;
@@ -4558,7 +4949,7 @@ BEGIN
                                 end if;
                                 /********************* Verificar si tiene saldo vigente en pago de viatico internacional *********************/
                                 if v_verificar_internacional then
-                                    update pxp.tt_saldo_presupuesto set
+                                    update tt_saldo_presupuesto set
                                         vigente = vigente - (v_record_json->>'monto_nacional_administrativo')::numeric
                                     where id_centro_costo = v_presupuestos.id_centro_costo and id_partida = v_id_partida;
 
@@ -4641,7 +5032,7 @@ BEGIN
                                     where id_planilla_pvr_sin_pago = v_id_planilla_pvr_sin_pago;
                                 end if;
 
-                                insert into pxp.tt_sin_presupuesto(id_funcionario, codigo_cc, centro_costo, partida, fecha_pago, orden_viaje, motivo)
+                                insert into tes.tt_sin_presupuesto(id_funcionario, codigo_cc, centro_costo, partida, fecha_pago, orden_viaje, motivo)
                                 values((v_record_json->>'id_funcionario')::integer, v_presupuestos.codigo_cc, v_presupuestos.centro_costo, v_partida, v_parametros.fecha_pago, v_record_json::jsonb, 'sin_presupuesto');
                             end if;
                         end if;
@@ -4656,7 +5047,7 @@ BEGIN
                         where par.id_concepto_ingas = v_id_concepto_ingas and tp.id_gestion = v_id_gestion;
 
                         select tsp.id_centro_costo, tsp.id_partida, tsp.vigente into v_saldo_presupuesto
-                        from pxp.tt_saldo_presupuesto tsp
+                        from tt_saldo_presupuesto tsp
                         where tsp.id_centro_costo = v_presupuestos.id_centro_costo and tsp.id_partida = v_id_partida;
 
                         select rel.id_cuenta, rel.id_partida, rel.id_auxiliar
@@ -4689,7 +5080,7 @@ BEGIN
                                 where id_planilla_pvr_sin_pago = v_id_planilla_pvr_sin_pago;
                             end if;
 
-                            insert into pxp.tt_sin_presupuesto(id_funcionario, codigo_cc, centro_costo, partida, fecha_pago, orden_viaje, motivo)
+                            insert into tes.tt_sin_presupuesto(id_funcionario, codigo_cc, centro_costo, partida, fecha_pago, orden_viaje, motivo)
                             values((v_record_json->>'id_funcionario')::integer, v_presupuestos.codigo_cc, v_presupuestos.centro_costo, v_partida, v_parametros.fecha_pago, v_record_json::jsonb,'sin_relacion_contable');
 
                         else
@@ -4707,14 +5098,14 @@ BEGIN
                                     where par.id_concepto_ingas = 4872 and tp.id_gestion = v_id_gestion;
 
                                     select tsp.id_centro_costo, tsp.id_partida, tsp.vigente into v_saldo_presupuesto_aux
-                                    from pxp.tt_saldo_presupuesto tsp
+                                    from tt_saldo_presupuesto tsp
                                     where tsp.id_centro_costo = v_presupuestos.id_centro_costo and tsp.id_partida = v_id_partida_aux;
 
                                     v_verificar_nacional = v_saldo_presupuesto_aux.vigente >= (v_record_json->>'monto_nacional_administrativo')::numeric;
                                 end if;
                                 /********************* Verificar si tiene saldo vigente en pago de viatico internacional *********************/
                                 if v_verificar_nacional then
-                                    update pxp.tt_saldo_presupuesto set
+                                    update tt_saldo_presupuesto set
                                         vigente = vigente - (v_record_json->>'monto_internacional_administrativo')::numeric
                                     where id_centro_costo = v_presupuestos.id_centro_costo and id_partida = v_id_partida;
                                     insert into tes.tobligacion_det( estado_reg, id_partida, id_concepto_ingas, monto_pago_mo, id_obligacion_pago,
@@ -4795,7 +5186,7 @@ BEGIN
                                     where id_planilla_pvr_sin_pago = v_id_planilla_pvr_sin_pago;
                                 end if;
 
-                                insert into pxp.tt_sin_presupuesto(id_funcionario, codigo_cc, centro_costo, partida, fecha_pago, orden_viaje, motivo)
+                                insert into tes.tt_sin_presupuesto(id_funcionario, codigo_cc, centro_costo, partida, fecha_pago, orden_viaje, motivo)
                                 values((v_record_json->>'id_funcionario')::integer, v_presupuestos.codigo_cc, v_presupuestos.centro_costo, v_partida, v_parametros.fecha_pago, v_record_json::jsonb, 'sin_presupuesto');
                             end if;
                         end if;
@@ -4810,7 +5201,7 @@ BEGIN
                         where par.id_concepto_ingas = v_id_concepto_ingas and tp.id_gestion = v_id_gestion;
 
                         select tsp.id_centro_costo, tsp.id_partida, tsp.vigente into v_saldo_presupuesto
-                        from pxp.tt_saldo_presupuesto tsp
+                        from tt_saldo_presupuesto tsp
                         where tsp.id_centro_costo = v_presupuestos.id_centro_costo and tsp.id_partida = v_id_partida;
 
                         select rel.id_cuenta, rel.id_partida, rel.id_auxiliar
@@ -4843,7 +5234,7 @@ BEGIN
                                 where id_planilla_pvr_sin_pago = v_id_planilla_pvr_sin_pago;
                             end if;
 
-                            insert into pxp.tt_sin_presupuesto(id_funcionario, codigo_cc, centro_costo, partida, fecha_pago, orden_viaje, motivo)
+                            insert into tes.tt_sin_presupuesto(id_funcionario, codigo_cc, centro_costo, partida, fecha_pago, orden_viaje, motivo)
                             values((v_record_json->>'id_funcionario')::integer, v_presupuestos.codigo_cc, v_presupuestos.centro_costo, v_partida, v_parametros.fecha_pago, v_record_json::jsonb,'sin_relacion_contable');
 
                         else
@@ -4859,7 +5250,7 @@ BEGIN
                                     where par.id_concepto_ingas = 2914 and tp.id_gestion = v_id_gestion;
 
                                     select tsp.id_centro_costo, tsp.id_partida, tsp.vigente into v_saldo_presupuesto_aux
-                                    from pxp.tt_saldo_presupuesto tsp
+                                    from tt_saldo_presupuesto tsp
                                     where tsp.id_centro_costo = v_presupuestos.id_centro_costo and tsp.id_partida = v_id_partida_aux;
 
                                     v_verificar_internacional = v_saldo_presupuesto_aux.vigente >= (v_record_json->>'monto_internacional_administrativo')::numeric;
@@ -4867,7 +5258,7 @@ BEGIN
                                 end if;
                                 /********************* Verificar si tiene saldo vigente en pago de viatico internacional *********************/
                                 if v_verificar_internacional then
-                                    update pxp.tt_saldo_presupuesto set
+                                    update tt_saldo_presupuesto set
                                         vigente = vigente - (v_record_json->>'monto_nacional_administrativo')::numeric
                                     where id_centro_costo = v_presupuestos.id_centro_costo and id_partida = v_id_partida;
 
@@ -4950,7 +5341,7 @@ BEGIN
                                     where id_planilla_pvr_sin_pago = v_id_planilla_pvr_sin_pago;
                                 end if;
 
-                                insert into pxp.tt_sin_presupuesto(id_funcionario, codigo_cc, centro_costo, partida, fecha_pago, orden_viaje, motivo)
+                                insert into tes.tt_sin_presupuesto(id_funcionario, codigo_cc, centro_costo, partida, fecha_pago, orden_viaje, motivo)
                                 values((v_record_json->>'id_funcionario')::integer, v_presupuestos.codigo_cc, v_presupuestos.centro_costo, v_partida, v_parametros.fecha_pago, v_record_json::jsonb, 'sin_presupuesto');
                             end if;
                         end if;
@@ -4965,7 +5356,7 @@ BEGIN
                         where par.id_concepto_ingas = v_id_concepto_ingas and tp.id_gestion = v_id_gestion;
 
                         select tsp.id_centro_costo, tsp.id_partida, tsp.vigente into v_saldo_presupuesto
-                        from pxp.tt_saldo_presupuesto tsp
+                        from tt_saldo_presupuesto tsp
                         where tsp.id_centro_costo = v_presupuestos.id_centro_costo and tsp.id_partida = v_id_partida;
 
                         select rel.id_cuenta, rel.id_partida, rel.id_auxiliar
@@ -4998,7 +5389,7 @@ BEGIN
                                 where id_planilla_pvr_sin_pago = v_id_planilla_pvr_sin_pago;
                             end if;
 
-                            insert into pxp.tt_sin_presupuesto(id_funcionario, codigo_cc, centro_costo, partida, fecha_pago, orden_viaje, motivo)
+                            insert into tes.tt_sin_presupuesto(id_funcionario, codigo_cc, centro_costo, partida, fecha_pago, orden_viaje, motivo)
                             values((v_record_json->>'id_funcionario')::integer, v_presupuestos.codigo_cc, v_presupuestos.centro_costo, v_partida, v_parametros.fecha_pago, v_record_json::jsonb,'sin_relacion_contable');
 
                         else
@@ -5016,14 +5407,14 @@ BEGIN
                                     where par.id_concepto_ingas = 2912 and tp.id_gestion = v_id_gestion;
 
                                     select tsp.id_centro_costo, tsp.id_partida, tsp.vigente into v_saldo_presupuesto_aux
-                                    from pxp.tt_saldo_presupuesto tsp
+                                    from tt_saldo_presupuesto tsp
                                     where tsp.id_centro_costo = v_presupuestos.id_centro_costo and tsp.id_partida = v_id_partida_aux;
 
                                     v_verificar_nacional = v_saldo_presupuesto_aux.vigente >= (v_record_json->>'monto_nacional_administrativo')::numeric;
                                 end if;
                                 /********************* Verificar si tiene saldo vigente en pago de viatico internacional *********************/
                                 if v_verificar_nacional then
-                                    update pxp.tt_saldo_presupuesto set
+                                    update tt_saldo_presupuesto set
                                         vigente = vigente - (v_record_json->>'monto_internacional_administrativo')::numeric
                                     where id_centro_costo = v_presupuestos.id_centro_costo and id_partida = v_id_partida;
                                     insert into tes.tobligacion_det( estado_reg, id_partida, id_concepto_ingas, monto_pago_mo, id_obligacion_pago,
@@ -5104,7 +5495,7 @@ BEGIN
                                     where id_planilla_pvr_sin_pago = v_id_planilla_pvr_sin_pago;
                                 end if;
 
-                                insert into pxp.tt_sin_presupuesto(id_funcionario, codigo_cc, centro_costo, partida, fecha_pago, orden_viaje, motivo)
+                                insert into tes.tt_sin_presupuesto(id_funcionario, codigo_cc, centro_costo, partida, fecha_pago, orden_viaje, motivo)
                                 values((v_record_json->>'id_funcionario')::integer, v_presupuestos.codigo_cc, v_presupuestos.centro_costo, v_partida, v_parametros.fecha_pago, v_record_json::jsonb, 'sin_presupuesto');
                             end if;
                         end if;
@@ -5127,7 +5518,7 @@ BEGIN
 
                 v_json_presupuesto = '[';
                 for v_presupuestos in select sp.codigo_cc, sp.centro_costo, sp.id_funcionario,  /*pxp.list(*/sp.partida/*) partida*/, sp.motivo, sp.orden_viaje
-                                      from pxp.tt_sin_presupuesto sp
+                                      from tes.tt_sin_presupuesto sp
                                       --group by sp.codigo_cc,sp.centro_costo,sp.id_funcionario, sp.motivo, sp.orden_viaje
                                       order by sp.codigo_cc asc loop
                     --raise notice 'v_presupuestos: %, %, %',v_presupuestos.orden_viaje, (v_presupuestos.orden_viaje)->>'bandera_ov', (v_presupuestos.orden_viaje)->>'id_orden_viaje';
@@ -5143,6 +5534,368 @@ BEGIN
                 else
                     v_status = 'observado';
                 end if;
+
+                /******************************** PROCESO DE CAMBIO DE ESTADO Y GENERACIÓN CUOTA ********************************/
+            	if v_id_obligacion_pago is not null then
+              		v_pre_integrar_presupuestos = pxp.f_get_variable_global('pre_integrar_presupuestos');
+
+                for v_estados in select tte.codigo
+                                 from wf.ttipo_proceso  ttp
+                                 inner join wf.ttipo_estado tte on tte.id_tipo_proceso = ttp.id_tipo_proceso
+                                 where ttp.codigo = 'PVR' loop
+
+                    select op.id_proceso_wf, op.id_estado_wf, op.estado, op.id_depto, op.tipo_obligacion,
+                      op.total_nro_cuota, op.fecha_pp_ini, op.rotacion, op.id_plantilla, op.tipo_cambio_conv,
+                      pr.desc_proveedor, op.pago_variable, op.comprometido, op.id_usuario_reg, op.fecha
+                    into v_id_proceso_wf, v_id_estado_wf, v_codigo_estado, v_id_depto, v_tipo_obligacion,
+                      v_total_nro_cuota, v_fecha_pp_ini, v_rotacion, v_id_plantilla, v_tipo_cambio_conv,
+                      v_desc_proveedor, v_pago_variable, v_comprometido, v_id_usuario_reg_op, v_fecha_op
+                    from tes.tobligacion_pago op
+                    left join param.vproveedor pr  on pr.id_proveedor = op.id_proveedor
+                    where op.id_obligacion_pago = v_id_obligacion_pago;
+
+                    select te.id_tipo_estado
+                    into v_id_tipo_estado
+                    from wf.testado_wf te
+                    inner join wf.ttipo_estado tip on tip.id_tipo_estado = te.id_tipo_estado
+                    where te.id_estado_wf = v_id_estado_wf;
+
+
+                    SELECT ps_id_tipo_estado[1], ps_codigo_estado[1]
+                    into v_id_tipo_estado, v_codigo_estado_siguiente
+                    from  wf.f_obtener_estado_wf ( v_id_proceso_wf, v_id_estado_wf, v_id_tipo_estado, 'siguiente', p_id_usuario);
+
+                    select tft.id_funcionario
+                    into v_id_funcionario
+                    from wf.ttipo_estado tip
+                    inner join wf.tfuncionario_tipo_estado tft on tft.id_tipo_estado = tip.id_tipo_estado
+                    where tip.id_tipo_estado = v_id_tipo_estado
+                    limit 1;
+
+                    ---------------------------------------
+                    -- REGISTA EL SIGUIENTE ESTADO DEL WF.
+                    ---------------------------------------
+                    v_id_estado_actual = wf.f_registra_estado_wf(  v_id_tipo_estado,
+                                                                   v_id_funcionario,
+                                                                   v_id_estado_wf,
+                                                                   v_id_proceso_wf,
+                                                                   p_id_usuario,
+                                                                   null::integer,
+                                                                   null::varchar,
+                                                                   null::integer,
+                                                                   'Cambio en Automatico PVR');
+
+
+                    IF  v_codigo_estado in ('borrador','vbpoa','vbpresupuestos','liberacion' ) THEN
+                        --validamos que el detalle tenga por lo menos un item con valor
+                        select sum(od.monto_pago_mo)
+                        into v_total_detalle
+                        from tes.tobligacion_det od
+                        where od.id_obligacion_pago = v_id_obligacion_pago and od.estado_reg ='activo';
+
+                        IF v_total_detalle = 0 or v_total_detalle is null THEN
+                            raise exception 'No existe el detalle de obligacion...';
+                        END IF;
+                        ------------------------------------------------------------
+                        --calcula el factor de prorrateo de la obligacion  detalle
+                        -----------------------------------------------------------
+                        IF (tes.f_calcular_factor_obligacion_det(v_id_obligacion_pago) != 'exito')  THEN
+                            raise exception 'error al calcular factores';
+                        END IF;
+                    END IF;
+
+                    update tes.tobligacion_pago  set
+                     id_estado_wf =  v_id_estado_actual,
+                     estado = v_codigo_estado_siguiente,
+                     id_usuario_mod = p_id_usuario,
+                     fecha_mod = now()
+                    where id_obligacion_pago  = v_id_obligacion_pago;
+
+
+                    IF  v_codigo_estado_siguiente = 'registrado'  and v_total_nro_cuota > 0 THEN
+
+                        select ps_descuento_porc, ps_descuento, ps_observaciones into v_registros_plan
+                        FROM  conta.f_get_descuento_plantilla_calculo(v_id_plantilla);
+
+                        /*jrr(10/10/2014): En caso de que sea pago variable el valor de la cuota sera 0*/
+                        if (v_pago_variable = 'si') then
+                            v_monto_cuota = 0;
+                        else
+                            v_monto_cuota =  (v_total_detalle::numeric/v_total_nro_cuota::numeric)::numeric(19,1);
+                        end if;
+
+                        FOR v_i  IN 1..v_total_nro_cuota LOOP
+                            IF v_i = v_total_nro_cuota THEN
+                                v_monto_cuota = v_total_detalle - (v_monto_cuota*v_total_nro_cuota) + v_monto_cuota;
+                                /*jrr(10/10/2014): En caso de que sea pago variable el valor de la cuota sera 0*/
+                                if (v_pago_variable = 'si') then
+                                  v_monto_cuota = 0;
+                                end if;
+                                v_ultima_cuota = true;
+                            END IF;
+
+                            v_descuentos_ley = v_monto_cuota * v_registros_plan.ps_descuento_porc;
+
+
+
+                            --(may)tipo de obligacion SIP para  internacionales pago_especial_spi
+                            --pago para bol pago_especial
+
+                            IF v_tipo_obligacion in  ('pago_especial') THEN
+                                v_tipo_plan_pago = 'especial';
+                            ELSIF v_tipo_obligacion in  ('pago_especial_spi') THEN
+                                v_tipo_plan_pago = 'especial_spi';
+                            ELSE
+                                --verifica que tipo de apgo estan deshabilitados
+                                va_tipo_pago = regexp_split_to_array(pxp.f_get_variable_global('tes_tipo_pago_deshabilitado'), E'\\s+');
+                                v_tipo_plan_pago = 'devengado_pagado';
+
+                                IF v_tipo_plan_pago =ANY(va_tipo_pago) THEN
+                                    v_tipo_plan_pago = 'devengado_pagado_1c';
+                                END IF;
+
+                                IF v_tipo_obligacion in  ('spd', 'pgaext') THEN
+                                    v_tipo_plan_pago = 'devengado_pagado_1c_sp';
+                                END IF;
+                            END IF;
+
+
+
+                            --armar hstore
+                            v_hstore_pp =   hstore(ARRAY[
+                                                            'tipo_pago',
+                                                            'normal',
+                                                            'tipo',
+                                                            v_tipo_plan_pago,
+                                                            'tipo_cambio',v_tipo_cambio_conv::varchar,
+                                                            'id_plantilla',v_id_plantilla::varchar,
+                                                            'id_obligacion_pago',v_id_obligacion_pago::varchar,
+                                                            'monto_no_pagado','0',
+                                                            'monto_retgar_mo','0',
+                                                            'otros_descuentos','0',
+                                                            'monto_excento','0',
+                                                            'id_plan_pago_fk',NULL::varchar,
+                                                            'porc_descuento_ley',v_registros_plan.ps_descuento_porc::varchar,
+                                                            'obs_descuentos_ley',v_registros_plan.ps_observaciones::varchar,
+                                                            'obs_otros_descuentos','',
+                                                            'obs_monto_no_pagado','',
+                                                            'nombre_pago',v_desc_proveedor::varchar,
+                                                            'monto', v_monto_cuota::varchar,
+                                                            'descuento_ley',v_descuentos_ley::varchar,
+                                                            'fecha_tentativa',v_fecha_pp_ini::varchar
+                            ]);
+
+                            --TODO,  bloquear en formulario de OP  facturas con monto excento
+
+
+                            -- si es un proceso de pago unico,  la primera cuota pasa de borrador al siguiente estado de manera automatica
+                            IF  ((v_tipo_obligacion = 'pbr' or v_tipo_obligacion = 'ppm' or v_tipo_obligacion = 'pga' or v_tipo_obligacion = 'pce' or v_tipo_obligacion = 'pago_unico' or v_tipo_obligacion = 'spd' or v_tipo_obligacion ='pgaext') and   v_i = 1)   THEN
+                               v_sw_saltar = TRUE;
+                            else
+                               v_sw_saltar = FALSE;
+                            END IF;
+
+                            -- llamada para insertar plan de pagos
+                            v_resp = tes.f_inserta_plan_pago_dev(p_administrador, v_id_usuario_reg_op,v_hstore_pp, v_sw_saltar);
+                            --raise 'v_resp: %', v_resp;
+                            -- calcula la fecha para la siguiente insercion
+                            v_fecha_pp_ini =  v_fecha_pp_ini + interval  '1 month'*v_rotacion;
+                        END LOOP;
+
+                        IF not tes.f_gestionar_presupuesto_tesoreria(v_id_obligacion_pago, p_id_usuario, 'comprometer')  THEN
+                            raise exception 'Error al comprometer el presupeusto';
+                        END IF;
+
+                        v_comprometido = 'si';
+                        --cambia la bandera del comprometido
+                        update tes.tobligacion_pago  set
+                            comprometido = v_comprometido
+                        where id_obligacion_pago  = v_id_obligacion_pago;
+
+                        EXIT;
+                    END IF;
+                end loop;
+                /*********************************************** Plan Pago Next Estado ***********************************************/
+                select pp.id_proceso_wf
+                into v_id_proceso_wf
+                from tes.tplan_pago pp
+                where pp.id_obligacion_pago = v_id_obligacion_pago;
+
+               	for v_estados in select tte.codigo
+                               from wf.ttipo_proceso  ttp
+                               inner join wf.ttipo_estado tte on tte.id_tipo_proceso = ttp.id_tipo_proceso
+                               where ttp.codigo = 'PVR_DEV' loop
+
+                  select pp.id_plan_pago, pp.id_proceso_wf, pp.id_estado_wf, pp.estado, pp.fecha_tentativa, op.numero, pp.total_prorrateado ,
+                         pp.monto_ejecutar_total_mo, pp.estado, pp.id_estado_wf, op.tipo_obligacion, pp.id_depto_lb, pp.monto,
+                         pp.id_plantilla, pp.id_obligacion_pago, op.num_tramite, pp.tipo, op.id_moneda
+                  into   v_id_plan_pago, v_id_proceso_wf, v_id_estado_wf, v_codigo_estado, v_fecha_tentativa, v_num_obliacion_pago, v_total_prorrateo,
+                         v_monto_ejecutar_total_mo, v_estado_aux, v_id_estado_actual, v_tipo_obligacion, v_id_depto_lb_pp, v_monto_pp,
+                         v_id_plantilla, v_id_obligacion_pago_pp, v_numero_tramite, vtipo_pp, v_id_moneda
+                  from tes.tplan_pago  pp
+                  inner  join tes.tobligacion_pago op on op.id_obligacion_pago = pp.id_obligacion_pago
+                  where pp.id_proceso_wf  = v_id_proceso_wf;
+
+                  select te.id_tipo_estado
+                  into v_id_tipo_estado
+                  from wf.testado_wf te
+                  inner join wf.ttipo_estado tip on tip.id_tipo_estado = te.id_tipo_estado
+                  where te.id_estado_wf = v_id_estado_wf;
+
+
+                  SELECT ps_id_tipo_estado[1], ps_codigo_estado[1]
+                  into v_id_tipo_estado, v_codigo_estado_siguiente
+                  from  wf.f_obtener_estado_wf ( v_id_proceso_wf, v_id_estado_wf, v_id_tipo_estado, 'siguiente', p_id_usuario);
+
+                  select tft.id_funcionario, tft.id_depto
+                  into v_id_funcionario, v_id_depto
+                  from wf.ttipo_estado tip
+                  inner join wf.tfuncionario_tipo_estado tft on tft.id_tipo_estado = tip.id_tipo_estado
+                  where tip.id_tipo_estado = v_id_tipo_estado
+                  limit 1;
+                  --raise 'v_id_tipo_estado: %, v_codigo_estado_siguiente: %, v_id_funcionario: %, v_id_depto: %',v_id_tipo_estado, v_codigo_estado_siguiente, v_id_funcionario, v_id_depto;
+                  /*if  v_codigo_estado_siguiente = 'supconta' then
+                      raise 'v_id_funcionario: %, v_id_depto: %',v_id_funcionario, v_id_depto;
+                  end if;*/
+                  ---------------------------------------
+                  -- REGISTA EL SIGUIENTE ESTADO DEL WF.
+                  ---------------------------------------
+                  v_id_estado_actual = wf.f_registra_estado_wf(  v_id_tipo_estado,
+                                                                 v_id_funcionario,
+                                                                 v_id_estado_wf,
+                                                                 v_id_proceso_wf,
+                                                                 p_id_usuario,
+                                                                 null::integer,
+                                                                 null::varchar,
+                                                                 v_id_depto,
+                                                                 'Cambio en Automatico Plan Pago PVR');
+
+
+                  update tes.tplan_pago  set
+                   id_estado_wf =  v_id_estado_actual,
+                   estado = v_codigo_estado_siguiente,
+                   id_usuario_mod = p_id_usuario,
+                   fecha_mod = now(),
+
+                   id_depto_lb = 15,
+                   id_cuenta_bancaria = 61,
+                   forma_pago = 'transferencia',
+                   id_proveedor_cta_bancaria = 652,
+                   id_depto_conta = 4
+
+                  where id_obligacion_pago  = v_id_obligacion_pago;
+
+                  if  v_codigo_estado_siguiente = 'vbconta' then
+                      EXIT;
+                  end if;
+
+              end loop;
+			end if;
+    	    /*********************************************** Plan Pago Next Estado ***********************************************/
+            /******************************** PROCESO DE CAMBIO DE ESTADO Y GENERACIÓN CUOTA ********************************/
+
+            /******************************** PROCESO PARA GENERAR EL COMPROBANTE PRESUPUESTARIO ********************************/
+            --validacion de la cuota
+            select pp.*,op.total_pago,op.comprometido, op.id_contrato, op.tipo_obligacion
+            into v_registros
+            from tes.tplan_pago pp
+            inner join tes.tobligacion_pago op on op.id_obligacion_pago = pp.id_obligacion_pago
+            where pp.id_obligacion_pago = v_id_obligacion_pago;
+
+			v_pre_integrar_presupuestos = pxp.f_get_variable_global('pre_integrar_presupuestos');
+			IF v_pre_integrar_presupuestos = 'true' THEN
+              /*jrr:29/10/2014
+              1) si el presupuesto no esta comprometido*/
+
+              if (v_registros.comprometido = 'no') then
+
+                  /*1.1)Validar que la suma de los detalles igualen al total de la obligacion*/
+                  if ((select sum(od.monto_pago_mo)
+                        from tes.tobligacion_det od
+                        where id_obligacion_pago = v_id_obligacion_pago and estado_reg = 'activo') != v_registros.total_pago) THEN
+                        raise exception 'La suma de todos los detalles no iguala con el total de la obligacion. La diferencia se genero al modificar la apropiacion';
+                  end if;
+
+                  /*1.2 Comprometer*/
+                  select * into v_nombre_conexion from migra.f_crear_conexion();
+
+                  select tes.f_gestionar_presupuesto_tesoreria(v_id_obligacion_pago, p_id_usuario, 'comprometer',NULL,v_nombre_conexion) into v_res;
+
+                  if v_res = false then
+                      raise exception 'Error al comprometer el presupuesto';
+                  end if;
+
+                  update tes.tobligacion_pago
+                  set comprometido = 'si'
+                  where id_obligacion_pago = v_id_obligacion_pago;
+              end if;
+	  		END IF;
+
+            --(may) 20-07-2019 los tipo plan de pago devengado_pagado_1c_sp son para las internacionales -tramites sp con contato
+            IF  v_registros.tipo  in ('pagado' ,'devengado_pagado','devengado_pagado_1c','anticipo','ant_parcial','devengado_pagado_1c_sp') and v_registros.tipo_obligacion != 'pago_pvr' THEN
+
+              IF v_registros.forma_pago = 'cheque' THEN
+              	IF  v_registros.nro_cheque is NULL THEN
+                	raise exception  'Tiene que especificar el  nro de cheque';
+                END IF;
+              ELSE
+            	IF v_registros.id_proveedor_cta_bancaria is NULL THEN
+               		raise exception  'Tiene que especificar el nro de cuenta destino, para la transferencia bancaria';
+            	END IF;
+              END IF;
+
+              IF v_registros.id_cuenta_bancaria is NULL THEN
+                 raise exception  'Tiene que especificar la cuenta bancaria origen de los fondos';
+              END IF ;
+
+
+
+              --validacion de deposito, (solo BOA, puede retirarse)
+              IF v_registros.id_cuenta_bancaria_mov is NULL THEN
+				--TODO verificar si la cuenta es de centro
+               	select cb.centro
+               	into v_centro
+               	from tes.tcuenta_bancaria cb
+               	where cb.id_cuenta_bancaria = v_registros.id_cuenta_bancaria;
+              	IF  v_registros.nro_cuenta_bancaria  = '' or  v_registros.nro_cuenta_bancaria is NULL THEN
+                	IF  v_centro = 'no' THEN
+						raise exception  'Tiene que especificar el deposito  origen de los fondos';
+                    END IF;
+                END IF;
+              END IF ;
+            END IF;
+
+
+            --si es un pago de vengado , revisar si tiene contrato
+            --si tiene contrato con renteciones de garantia validar que la rentecion de garantia sea mayor a cero
+            --(may) 20-07-2019 los tipo plan de pago devengado_pagado_1c_sp son para las internacionales -tramites sp con contato
+            IF  v_registros.tipo in ('devengado','devengado_pagado','devengado_pagado_1c', 'devengado_pagado_1c_sp') THEN
+               IF v_registros.id_contrato is not null THEN
+                   v_sw_retenciones = 'no';
+                   select c.tiene_retencion
+                   into v_sw_retenciones
+                   from leg.tcontrato c
+                   where c.id_contrato = v_registros.id_contrato;
+
+                   IF v_sw_retenciones = 'si' and  v_registros.monto_retgar_mo = 0 THEN
+
+                      IF v_registros.monto != v_registros.descuento_inter_serv THEN
+                        raise exception 'Según contrato este pago debe tener retenciones de garantia';
+                      END IF;
+                   END IF;
+               END IF;
+            END IF;
+           	if v_registros.tipo_obligacion = 'pago_pvr' then
+           		v_verficacion = tes.f_generar_comprobante_pvr(
+                                                      p_id_usuario,
+                                                      v_parametros._id_usuario_ai,
+                                                      v_parametros._nombre_usuario_ai,
+                                                      v_registros.id_plan_pago,
+                                                      4,
+                                                      v_nombre_conexion);
+           	end if;
+            /******************************** PROCESO PARA GENERAR EL COMPROBANTE PRESUPUESTARIO ********************************/
+
             else
                 raise 'Estimado Usuario: Aun no se cuenta con la implementación de la funcionalidad para fondos en avance.';
             end if;
