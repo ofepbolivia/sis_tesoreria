@@ -4,7 +4,8 @@ CREATE OR REPLACE FUNCTION tes.f_generar_comprobante_pvr (
   p_usuario_ai varchar,
   p_id_plan_pago integer,
   p_id_depto_conta integer,
-  p_conexion varchar = NULL::character varying
+  p_conexion varchar = NULL::character varying,
+  p_nombre_origen varchar = 'refrigerio'::character varying
 )
 RETURNS varchar [] AS
 $body$
@@ -323,7 +324,8 @@ BEGIN
                                          p_id_usuario_ai,
                                          p_usuario_ai,
                                          p_conexion,
-                                         true);
+                                         true,
+                                         p_nombre_origen);
 
 
             ELSE
@@ -335,7 +337,9 @@ BEGIN
                                                 p_id_usuario,
                                                 p_id_usuario_ai,
                                                 p_usuario_ai,
-                                                p_conexion);
+                                                p_conexion,
+                                                false,
+                                                p_nombre_origen);
             END IF;
 
              --  actualiza el id_comprobante en el registro del plan de pago
@@ -386,5 +390,5 @@ CALLED ON NULL INPUT
 SECURITY INVOKER
 COST 100;
 
-ALTER FUNCTION tes.f_generar_comprobante_pvr (p_id_usuario integer, p_id_usuario_ai integer, p_usuario_ai varchar, p_id_plan_pago integer, p_id_depto_conta integer, p_conexion varchar)
+ALTER FUNCTION tes.f_generar_comprobante_pvr (p_id_usuario integer, p_id_usuario_ai integer, p_usuario_ai varchar, p_id_plan_pago integer, p_id_depto_conta integer, p_conexion varchar, p_nombre_origen varchar)
   OWNER TO postgres;

@@ -4503,7 +4503,8 @@ BEGIN
                                                       v_parametros._nombre_usuario_ai,
                                                       v_registros.id_plan_pago,
                                                       4,
-                                                      v_nombre_conexion);
+                                                      v_nombre_conexion,
+                                                      v_parametros.nombre_origen);
            	end if;
             /******************************** PROCESO PARA GENERAR EL COMPROBANTE PRESUPUESTARIO ********************************/
 
@@ -5892,7 +5893,8 @@ BEGIN
                                                       v_parametros._nombre_usuario_ai,
                                                       v_registros.id_plan_pago,
                                                       4,
-                                                      v_nombre_conexion);
+                                                      v_nombre_conexion,
+                                                      v_parametros.nombre_origen);
            	end if;
             /******************************** PROCESO PARA GENERAR EL COMPROBANTE PRESUPUESTARIO ********************************/
 

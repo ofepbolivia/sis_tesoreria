@@ -45,6 +45,9 @@ header("content-type: text/javascript; charset=UTF-8");
                 return "x-selectable";
             }
         },
+        bnew: false,
+        bedit: false,
+        bdel: false,
         constructor: function (config) {
 
 
@@ -72,34 +75,16 @@ header("content-type: text/javascript; charset=UTF-8");
             //crear venta de ajuste para pagos variable
             this.crearFormAjustes();
             this.iniciarEventos();
-            /*this.addButton('ini_estado', {
-                grupo: [0, 1, 2],
-                argument: {estado: 'inicio'},
-                text: 'Dev. al Solicitante',
-                iconCls: 'batras',
-                disabled: true,
-                handler: this.antEstado,
-                tooltip: '<b>Retorna la Obligacion al estado Borrador</b>'
-            });
 
-            this.addButton('ant_estado', {
-                grupo: [0, 1, 2],
-                argument: {estado: 'anterior'},
-                text: 'Retroceder',
-                iconCls: 'batras',
-                disabled: true,
-                handler: this.antEstado,
-                tooltip: '<b>Pasar al Anterior Estado</b>'
-            });
-*/
-            this.addButton('fin_registro', {
+            /*this.addButton('fin_registro', {
                 grupo: [0, 1, 2],
                 text: 'Generar Plan Pago',
                 iconCls: 'badelante',
                 disabled: true,
                 handler: this.generarPlanPago,//this.fin_registro,
                 tooltip: '<b>Siguiente</b><p>Pasa al siguiente estado, si esta en borrador comprometera presupuesto</p>'
-            });
+            });*/
+
             this.addButton('reporte_com_ejec_pag', {
                 grupo: [0, 1, 2],
                 text: 'Rep.',
@@ -161,7 +146,7 @@ header("content-type: text/javascript; charset=UTF-8");
 
             this.addBotonesGantt();
 
-            this.addButton('ajustes', {
+            /*this.addButton('ajustes', {
                 grupo: [0, 1, 2],
                 text: 'Ajus.',
                 iconCls: 'blist',
@@ -176,43 +161,30 @@ header("content-type: text/javascript; charset=UTF-8");
                 disabled: true,
                 handler: this.showAnticipo,
                 tooltip: '<b>Define el monto de ampliación util cuando necesitamos hacer pagos anticipados para la siguiente gestión</b>'
-            });
-            //this.addButton('extenderop',{grupo:[0,1,2],text:'Ext.', iconCls: 'blist', disabled: true, handler: this.extenederOp,tooltip: '<b>Extender la obligación de pago para la siguiente gestión</b>'});
-            this.addButton('btnExtender',
+            });*/
+
+            /*this.addButton('btnExtender',
                 {
                     iconCls: 'brenew',
                     xtype: 'splitbutton',
                     grupo: [0, 4],
                     tooltip: '<b>Ext. Pagos</b><br>Nos permite elegir extender un pago recurrente, unico <br> o pago de una gestion anterior.',
                     text: 'Ext. Pagos',
-                    /*argument: {
-                        'news': true,
-                        def: 'reset'
-                    },*/
+
                     scope: this,
                     menu: [{
                         text: 'Pago Recurrente (TES)',
-                        //iconCls: 'btag_accept',
                         tooltip: '<b>Permite Extender un Pago Unico, o Recurrente</b>',
-                        /*argument: {
-                            'news': true,
-                            def: 'csv'
-                        },*/
                         handler: this.extenederOp,
                         scope: this
                     }, {
                         text: 'Pago Gestiones Anteriores (PGA)',
-                        //iconCls: 'btemplate',
-                        /*argument: {
-                            'news': true,
-                            def: 'pdf'
-                        },*/
                         tooltip: '<b>Permite Extender un Pago Gestion Anterior</b>',
                         handler: this.extenderPGA,
                         scope: this
                     }]
                 }
-            );
+            );*/
 
             this.addButton('btnObs', {
                 grupo: [0, 1],
@@ -223,13 +195,13 @@ header("content-type: text/javascript; charset=UTF-8");
                 tooltip: '<b>Observaciones</b><br/><b>Observaciones del WF</b>'
             });
 
-            this.addButton('clonarOP', {
+            /*this.addButton('clonarOP', {
                 text: 'Clonar Obligacion de Pago',
                 iconCls: 'blist',
                 disabled: true,
                 handler: this.clonarOP,
                 tooltip: 'Clonar el registro de una Obligacion'
-            });
+            });*/
 
             this.construyeVariablesContratos();
 
@@ -1395,19 +1367,19 @@ header("content-type: text/javascript; charset=UTF-8");
 
 
             Phx.vista.ObligacionPagoPVR.superclass.preparaMenu.call(this, n);
-            this.getBoton('clonarOP').enable();
+            //this.getBoton('clonarOP').enable();
             if (data['estado'] == 'borrador') {
                 this.getBoton('edit').enable();
                 if (this.getBoton('new'))
                     this.getBoton('new').enable();
                 if (this.getBoton('del'))
                     this.getBoton('del').enable();
-                this.getBoton('fin_registro').enable();
+                //this.getBoton('fin_registro').enable();
                 //this.getBoton('ant_estado').disable();
 
                 this.getBoton('reporte_com_ejec_pag').disable();
                 this.getBoton('reporte_plan_pago').disable();
-                this.getBoton('ajustes').disable();
+                //this.getBoton('ajustes').disable();
 
                 this.disableTabPagos();
 
@@ -1418,35 +1390,35 @@ header("content-type: text/javascript; charset=UTF-8");
 
                 if (data['estado'] == 'registrado') {
                     //this.getBoton('ant_estado').enable();
-                    this.getBoton('fin_registro').disable();
+                    //this.getBoton('fin_registro').disable();
                     this.enableTabPagos();
-                    this.getBoton('est_anticipo').enable();
-                    this.getBoton('btnExtender').enable();
+                    //this.getBoton('est_anticipo').enable();
+                    //this.getBoton('btnExtender').enable();
                 }
 
                 if (data['estado'] == 'en_pago') {
                     this.enableTabPagos();
                     //this.getBoton('ant_estado').enable();
-                    this.getBoton('fin_registro').enable();
-                    this.getBoton('est_anticipo').enable();
-                    this.getBoton('btnExtender').enable();
+                    //this.getBoton('fin_registro').enable();
+                    //this.getBoton('est_anticipo').enable();
+                    //this.getBoton('btnExtender').enable();
                 }
 
                 if (data['estado'] == 'anulado') {
-                    this.getBoton('fin_registro').disable();
+                    //this.getBoton('fin_registro').disable();
                     this.disableTabPagos();
                     //this.getBoton('ant_estado').disable();
-                    this.getBoton('est_anticipo').disable();
+                    //this.getBoton('est_anticipo').disable();
                 }
                 if (data['estado'] == 'finalizado') {
                     //this.getBoton('ant_estado').disable();
-                    this.getBoton('fin_registro').disable();
-                    this.getBoton('est_anticipo').disable();
+                    //this.getBoton('fin_registro').disable();
+                    //this.getBoton('est_anticipo').disable();
                     if (data['id_obligacion_pago_extendida'] == '' || !data['id_obligacion_pago_extendida']) {
-                        this.getBoton('btnExtender').enable();
+                        //this.getBoton('btnExtender').enable();
                     }
                     else {
-                        this.getBoton('btnExtender').disable();
+                        //this.getBoton('btnExtender').disable();
                     }
 
                 }
@@ -1458,25 +1430,25 @@ header("content-type: text/javascript; charset=UTF-8");
                 if (data['estado'] == 'vbpresupuestos' || data['estado'] == 'vbpoa') {
 
                     if (this.nombreVista == 'ObligacionPagoVb' || this.nombreVista == 'ObligacionPagoVbPoa') {
-                        this.getBoton('fin_registro').enable();
+                        //this.getBoton('fin_registro').enable();
                         //this.getBoton('ant_estado').enable();
                     }
                     else {
-                        this.getBoton('fin_registro').disable();
+                        //this.getBoton('fin_registro').disable();
                         //this.getBoton('ant_estado').disable();
                     }
                 }
 
                 if (this.nombreVista == 'ObligacionPagoVb') {
-                    this.getBoton('fin_registro').enable();
+                    //this.getBoton('fin_registro').enable();
                     //this.getBoton('ant_estado').enable();
                 }
 
                 if (data['pago_variable'] == 'si' && data['estado'] == 'en_pago') {
-                    this.getBoton('ajustes').enable();
+                    //this.getBoton('ajustes').enable();
                 }
                 else {
-                    this.getBoton('ajustes').disable();
+                    //this.getBoton('ajustes').disable();
                 }
 
                 if (data['pago_variable'] != 'finalizado' && data['estado'] != 'anulado') {
@@ -1538,18 +1510,18 @@ header("content-type: text/javascript; charset=UTF-8");
         liberaMenu: function () {
             var tb = Phx.vista.ObligacionPagoPVR.superclass.liberaMenu.call(this);
             if (tb) {
-                this.getBoton('fin_registro').disable();
+                //this.getBoton('fin_registro').disable();
                 //this.getBoton('ant_estado').disable();
                 this.getBoton('reporte_com_ejec_pag').disable();
                 this.getBoton('reporte_plan_pago').disable();
                 this.getBoton('diagrama_gantt').disable();
                 this.getBoton('btnChequeoDocumentosWf').disable();
-                this.getBoton('ajustes').disable();
-                this.getBoton('est_anticipo').disable();
-                this.getBoton('btnExtender').disable();
+                //this.getBoton('ajustes').disable();
+                //this.getBoton('est_anticipo').disable();
+                //this.getBoton('btnExtender').disable();
                 this.getBoton('btnCheckPresupeusto').disable();
                 this.getBoton('btnObs').disable();
-                this.getBoton('clonarOP').disable();
+                //this.getBoton('clonarOP').disable();
                 //Inhabilita el reporte de disponibilidad
                 this.getBoton('btnVerifPresup').disable();
             }
@@ -1572,19 +1544,14 @@ header("content-type: text/javascript; charset=UTF-8");
                 cls: 'ObligacionDetPVR'
             },
             {
-                url: '../../../sis_tesoreria/vista/plan_pago/PlanPagoReq.php',
-                title: 'Plan de Pagos',
+                url: '../../../sis_tesoreria/vista/plan_pago/PlanPagoReqPVR.php',
+                title: 'Plan de Pago PVR',
                 height: '50%',
-                cls: 'PlanPagoReq'
+                cls: 'PlanPagoReqPVR'
             }
 
         ],
-
-
-        bdel: true,
-        bedit: true,
         bsave: false,
-
         loadCheckDocumentosSolWf: function () {
             var rec = this.sm.getSelected();
             rec.data.nombreVista = this.nombreVista;
