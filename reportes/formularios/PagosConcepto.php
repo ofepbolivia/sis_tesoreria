@@ -32,6 +32,48 @@ header("content-type: text/javascript; charset=UTF-8");
 	   			form : true
 	 },
 	 {
+		config: {
+			name: 'tipo_reporte',
+			fieldLabel: 'Filtrar por',
+			typeAhead: true,
+			allowBlank: false,
+
+			triggerAction: 'all',
+			emptyText: 'Tipo...',
+			selectOnFocus: false,
+			mode: 'local',
+			store: new Ext.data.ArrayStore({
+				fields: ['ID', 'valor'],              
+				data: [
+					['partida', 'Partida'],
+					['concepto_ingreso_gasto', 'Concepto Ingreso Gasto']
+				]
+			}),
+			valueField: 'ID',
+			displayField: 'valor',
+			// width: 150,
+			anchor:'100%'
+
+		},
+		type: 'ComboBox',
+		id_grupo: 0,
+		form: true
+	},	 
+	 {
+		config: {
+			sysorigen: 'sis_presupuestos',
+			name: 'id_partida',
+			origen: 'PARTIDA',
+			allowBlank: true,
+			fieldLabel: 'Partida',
+			width: 150,
+			anchor:'100%'
+		},
+		type: 'ComboRec',
+		id_grupo: 0,
+		form: true
+	},
+	 {
 					 config:{
 							 name:'id_concepto_ingas',
 							 fieldLabel:'Concepto Ingreso Gasto',
@@ -64,7 +106,7 @@ header("content-type: text/javascript; charset=UTF-8");
 							 queryDelay:1000,
 							 listWidth:600,
 							 resizable:true,
-							 disabled:true,
+							//  disabled:true,
 							 anchor:'100%'
 
 					 },
@@ -89,18 +131,32 @@ header("content-type: text/javascript; charset=UTF-8");
 			Phx.vista.PagosConcepto.superclass.constructor.call(this, config);
 			this.init();
 			this.iniciarEventos();
-
-
+			this.ocultarComponente(this.Cmp.id_partida);
+			this.ocultarComponente(this.Cmp.id_concepto_ingas);
 
 		},
 		tipo : 'reporte',
 		clsSubmit : 'bprint',
 
 		iniciarEventos:function(){
-						this.Cmp.id_gestion.on('select',function(c,r,i) {
-			         this.Cmp.id_concepto_ingas.store.baseParams.id_gestion = r.data.id_gestion;
-							 this.Cmp.id_concepto_ingas.setDisabled(false);
-			        },this);
+				this.Cmp.id_gestion.on('select',function(c,r,i) {
+				 	this.Cmp.id_concepto_ingas.store.baseParams.id_gestion = r.data.id_gestion;
+				 	this.Cmp.id_partida.store.baseParams.id_gestion = r.data.id_gestion;				 
+						//  this.Cmp.id_concepto_ingas.setDisabled(false);
+						//  this.Cmp.id_partida.setDisabled(false);
+				},this);
+				this.Cmp.tipo_reporte.on('select', function (combo, record, index) {
+                	this.Cmp.id_partida.reset();
+                	this.Cmp.id_concepto_ingas.reset();
+
+                if ( record.data.ID == 'partida') {					   
+					this.mostrarComponente(this.Cmp.id_partida);         
+					this.ocultarComponente(this.Cmp.id_concepto_ingas);
+				} else {
+					this.mostrarComponente(this.Cmp.id_concepto_ingas);
+					this.ocultarComponente(this.Cmp.id_partida);											
+				}
+			}, this);
 		},
 
 
@@ -112,10 +168,14 @@ header("content-type: text/javascript; charset=UTF-8");
 				data.concepto=this.getComponente('id_concepto_ingas').getRawValue();
 				data.gestion=this.getComponente('id_gestion').getRawValue();
 				data.id_concepto=this.getComponente('id_concepto_ingas').getValue();
+				data.id_partida=this.getComponente('id_partida').getValue();
+				data.tipo_reporte=this.getComponente('tipo_reporte').getValue();
 
-				Phx.CP.loadWindows('../../../sis_tesoreria/reportes/grillas/PagosConceptoVista.php', 'Kardex por Item: '+this.desc_item, {
+				//Phx.CP.loadWindows('../../../sis_tesoreria/reportes/grillas/PagosConceptoVista.php', 'Kardex por Item: '+this.desc_item, {
+				Phx.CP.loadWindows('../../../sis_tesoreria/reportes/grillas/PagosConceptoVista.php', 'Kardex por Item', {
 						width : '90%',
-						height : '80%'
+						height : '80%',
+						modal: true
 					}, data	, this.idContenedor, 'PagosConceptoVista')
 			}
 		},

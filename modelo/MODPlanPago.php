@@ -699,6 +699,8 @@ class MODPlanPago extends MODbase{
 
 
         $this->setParametro('id_concepto','id_concepto','int4');
+        $this->setParametro('id_partida','id_partida','int4');
+        $this->setParametro('tipo_reporte','tipo_reporte','varchar');
         $this->capturaCount('total_monto_ot','numeric');
 
 
@@ -721,10 +723,15 @@ class MODPlanPago extends MODbase{
         $this->captura('justificacion','varchar');
         /**************************************************************************************/
 
+        $this->captura('desc_funcionario1','text');
+        $this->captura('id_partida','int4');
+        $this->captura('nombre_partida','varchar');
+        $this->captura('codigo_partida','varchar');
+        $this->captura('nombre_ingas','text');
 
         //Ejecuta la instruccion
         $this->armarConsulta();
-        echo $this->thisconsulta;
+        // echo $this->consulta;exit;
         $this->ejecutarConsulta();
 
         //Devuelve la respuesta
