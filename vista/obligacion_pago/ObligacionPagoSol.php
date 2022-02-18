@@ -134,7 +134,8 @@ header("content-type: text/javascript; charset=UTF-8");
                 Phx.CP.loadingShow();
                 this.cmpFuncionario.reset();
                 this.cmpFuncionario.enable();
-                this.cmpFuncionario.store.baseParams.fecha = this.cmpFecha.getValue().dateFormat(this.cmpFecha.format);
+                //18-02-2022 (may) se comenta temporalmente por restructuracion y se necesita registrar funcionario
+                //this.cmpFuncionario.store.baseParams.fecha = this.cmpFecha.getValue().dateFormat(this.cmpFecha.format);
 
                 this.cmpFuncionario.store.load({
                     params: {start: 0, limit: this.tam_pag},
