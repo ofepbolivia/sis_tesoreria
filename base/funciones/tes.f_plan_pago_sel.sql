@@ -40,7 +40,6 @@ DECLARE
     v_id_funcionario			integer;
     v_consulta_sup		varchar= ' ';
     v_consulta_sup_1	varchar= ' ';
-    v_filtro_ini			varchar;
 
 BEGIN
 
@@ -657,12 +656,6 @@ BEGIN
 
 		begin
 
-			if (v_parametros.tipo_reporte = 'partida') then
-				v_filtro_ini = ' od.id_partida = ' || v_parametros.id_partida || '';
-			else 
-				v_filtro_ini = ' od.id_concepto_ingas = ' || v_parametros.id_concepto || '';
-			end if;
-
 			--Sentencia de la consulta de conteo de registros
 			v_consulta:='WITH obligacion_pago_concepto AS(
 						    SELECT
@@ -671,7 +664,7 @@ BEGIN
 						        pxp.list(ot.desc_orden) as desc_orden
 						    FROM tes.tobligacion_det od
 						    left join conta.torden_trabajo ot on ot.id_orden_trabajo = od.id_orden_trabajo
-						    where ' || v_filtro_ini || ' and od.estado_reg = ''activo''
+						    where od.id_concepto_ingas = ' || v_parametros.id_concepto || ' and od.estado_reg = ''activo''
 						    group by od.id_obligacion_pago
 						)
 
@@ -693,11 +686,6 @@ BEGIN
                                 od.descripcion,
                                 op.obs as justificacion
                                 /*****************************************************************/
-                        ,vf.desc_funcionario1,
-						par.id_partida,
-						par.nombre_partida,
-						par.codigo as codigo_partida,
-						cig.desc_ingas||''-(''||cig.movimiento||'')'' as nombre_ingas
 
 						FROM tes.tobligacion_pago op
 						inner join obligacion_pago_concepto opc on op.id_obligacion_pago = opc.id_obligacion_pago
@@ -714,11 +702,6 @@ BEGIN
 						inner join param.vproveedor prov on prov.id_proveedor = op.id_proveedor
 						inner join param.tmoneda mon on op.id_moneda = mon.id_moneda
 						left join conta.tint_comprobante com on com.id_int_comprobante = pp.id_int_comprobante
-
-						left join orga.vfuncionario vf  on vf.id_funcionario  = op.id_funcionario  
-						left join pre.tpartida par on par.id_partida = od.id_partida
-						left join param.tconcepto_ingas cig on cig.id_concepto_ingas = od.id_concepto_ingas
-
 						where pp.tipo = ''devengado_pagado''  and  op.estado_reg = ''activo'' and '||v_parametros.filtro ||
 						'order by pp.fecha_costo_ini,op.num_tramite,pp.nro_cuota, opc.desc_orden limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
 
@@ -739,12 +722,6 @@ BEGIN
 
 		begin
 
-			if (v_parametros.tipo_reporte = 'partida') then
-				v_filtro_ini = ' od.id_partida = ' || v_parametros.id_partida || '';
-			else 
-				v_filtro_ini = ' od.id_concepto_ingas = ' || v_parametros.id_concepto || '';
-			end if;
-
 			--Sentencia de la consulta de conteo de registros
 			v_consulta:='WITH obligacion_pago_concepto AS(
 						    SELECT
@@ -753,7 +730,7 @@ BEGIN
 						        pxp.list(ot.desc_orden) as desc_orden
 						    FROM tes.tobligacion_det od
 						    left join conta.torden_trabajo ot on ot.id_orden_trabajo = od.id_orden_trabajo
-						    where ' || v_filtro_ini|| ' and od.estado_reg = ''activo''
+						    where od.id_concepto_ingas = ' || v_parametros.id_concepto || ' and od.estado_reg = ''activo''
 						    group by od.id_obligacion_pago
 						)
 
@@ -777,11 +754,6 @@ BEGIN
 						inner join param.vproveedor prov on prov.id_proveedor = op.id_proveedor
 						inner join param.tmoneda mon on op.id_moneda = mon.id_moneda
 						left join conta.tint_comprobante com on com.id_int_comprobante = pp.id_int_comprobante
-
-						left join orga.vfuncionario vf  on vf.id_funcionario  = op.id_funcionario  
-						left join pre.tpartida par on par.id_partida = od.id_partida
-						left join param.tconcepto_ingas cig on cig.id_concepto_ingas = od.id_concepto_ingas
-
 						where pp.tipo = ''devengado_pagado''  and  op.estado_reg = ''activo'' and '||v_parametros.filtro;
 
 
