@@ -226,6 +226,9 @@ DECLARE
     v_respuesta 				varchar[];
     v_id_moneda					integer;
 
+    --23-02-2022 (may)
+	v_sw_movimiento_partida		varchar;
+
 
 BEGIN
 
@@ -846,11 +849,30 @@ BEGIN
                          v_sum_total_pp = (COALESCE(v_sum_monto_pp,0) - COALESCE(v_sum_monto_solo_pp, 0)) + COALESCE(v_parametros.monto, 0);
                          --raise exception '% = % - % + %',v_sum_total_pp,  v_sum_monto_pp, v_sum_monto_solo_pp, v_parametros.monto;
 
+
+
+						 --23-01-2022 (may) desde la fecha los PGA con conceptos de gastos de flujo no ingresan por la condicion porque ya no pasan por el estado de presupuestos
+                         SELECT par.sw_movimiento
+                         INTO v_sw_movimiento_partida
+                         FROM  tes.tobligacion_det od
+                         inner JOIN pre.tpartida par ON par.id_partida = od.id_partida
+                         WHERE od.id_obligacion_pago =  v_parametros.id_obligacion_pago
+                         LIMIT 1 ;
+
                          IF (v_registros.tipo_obligacion != 'gestion_mat') THEN
                            IF (COALESCE(v_sum_total_pp,0) > COALESCE(v_sum_monto_pe,0)) THEN
-                              raise exception ' El monto total de las cuotas es de % y excede al monto total certificado de % para el trámite %. Comunicarse con la Unidad de Presupuestos. ',v_sum_total_pp, v_sum_monto_pe, v_registros.num_tramite ;
-                           END IF;
+
+                           		 IF (v_registros.tipo_obligacion = 'pga' and v_sw_movimiento_partida != 'flujo') THEN
+                                 	raise exception ' El monto total de las cuotas es de % y excede al monto total certificado de % para el trámite %. Comunicarse con la Unidad de Presupuestos. ',v_sum_total_pp, v_sum_monto_pe, v_registros.num_tramite ;
+
+                                 ELSE
+                                 	raise exception ' El monto total de las cuotas es de % y excede al monto total certificado de % para el trámite %. Comunicarse con la Unidad de Presupuestos. ',v_sum_total_pp, v_sum_monto_pe, v_registros.num_tramite ;
+                           		 END IF;
+
+                              END IF;
                          END IF;
+
+
                        --END IF;
 
 
@@ -2264,10 +2286,29 @@ BEGIN
               where pp.id_plan_pago = v_id_plan_pago;
 
 
-              -- v_tipo_obligacion != 'pago_especial' estos tipo de obligacion no realizan su modificacion presupuestaria porq son sin imputacion
-              IF (v_prioridad = 3 and v_tipo_obligacion != 'pago_especial') THEN
-              	v_resp = tes.f_inserta_plan_pago_mod_presu(p_administrador, p_id_usuario,v_id_plan_pago);
-              END IF;
+			  --23-01-2022 (may) desde la fecha los PGA con conceptos de gastos de flujo ya no pasan por el estado de presupuestos, y tampoco se realizara la modificacion presupuestaria
+               SELECT par.sw_movimiento
+               INTO v_sw_movimiento_partida
+               FROM  tes.tobligacion_det od
+               inner JOIN pre.tpartida par ON par.id_partida = od.id_partida
+               WHERE od.id_obligacion_pago =  v_id_obligacion_pago_pp
+               LIMIT 1 ;
+
+
+				IF (v_tipo_obligacion= 'pga' and v_sw_movimiento_partida !='flujo') THEN
+
+                	  -- v_tipo_obligacion != 'pago_especial' estos tipo de obligacion no realizan su modificacion presupuestaria porq son sin imputacion
+                      IF (v_prioridad = 3 and v_tipo_obligacion != 'pago_especial') THEN
+                        v_resp = tes.f_inserta_plan_pago_mod_presu(p_administrador, p_id_usuario,v_id_plan_pago);
+                      END IF;
+
+                ELSE
+                       -- v_tipo_obligacion != 'pago_especial' estos tipo de obligacion no realizan su modificacion presupuestaria porq son sin imputacion
+                      IF (v_prioridad = 3 and v_tipo_obligacion != 'pago_especial') THEN
+                        v_resp = tes.f_inserta_plan_pago_mod_presu(p_administrador, p_id_usuario,v_id_plan_pago);
+                      END IF;
+                END IF;
+
 
               --
 
