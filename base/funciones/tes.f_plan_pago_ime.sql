@@ -859,17 +859,16 @@ BEGIN
                          WHERE od.id_obligacion_pago =  v_parametros.id_obligacion_pago
                          LIMIT 1 ;
 
-                         IF (v_registros.tipo_obligacion != 'gestion_mat') THEN
-                           IF (COALESCE(v_sum_total_pp,0) > COALESCE(v_sum_monto_pe,0)) THEN
+                         IF ((v_registros.tipo_obligacion != 'gestion_mat')) THEN
 
-                           		 IF (v_registros.tipo_obligacion = 'pga' and v_sw_movimiento_partida != 'flujo') THEN
-                                 	raise exception ' El monto total de las cuotas es de % y excede al monto total certificado de % para el trámite %. Comunicarse con la Unidad de Presupuestos. ',v_sum_total_pp, v_sum_monto_pe, v_registros.num_tramite ;
+                         	IF (v_registros.tipo_obligacion = 'pga' and v_sw_movimiento_partida != 'flujo') THEN
 
-                                 ELSE
-                                 	raise exception ' El monto total de las cuotas es de % y excede al monto total certificado de % para el trámite %. Comunicarse con la Unidad de Presupuestos. ',v_sum_total_pp, v_sum_monto_pe, v_registros.num_tramite ;
-                           		 END IF;
+                            		IF (COALESCE(v_sum_total_pp,0) > COALESCE(v_sum_monto_pe,0)) THEN
+                                			raise exception ' El monto total de las cuotas es de % y excede al monto total certificado de % para el trámite %. Comunicarse con la Unidad de Presupuestos. ',v_sum_total_pp, v_sum_monto_pe, v_registros.num_tramite ;
+                            		END IF;
 
-                              END IF;
+                            END IF;
+
                          END IF;
 
 
@@ -2295,18 +2294,15 @@ BEGIN
                LIMIT 1 ;
 
 
-				IF (v_tipo_obligacion= 'pga' and v_sw_movimiento_partida !='flujo') THEN
+				-- v_tipo_obligacion != 'pago_especial' estos tipo de obligacion no realizan su modificacion presupuestaria porq son sin imputacion
+                IF (v_prioridad = 3 and v_tipo_obligacion != 'pago_especial') THEN
 
-                	  -- v_tipo_obligacion != 'pago_especial' estos tipo de obligacion no realizan su modificacion presupuestaria porq son sin imputacion
-                      IF (v_prioridad = 3 and v_tipo_obligacion != 'pago_especial') THEN
-                        v_resp = tes.f_inserta_plan_pago_mod_presu(p_administrador, p_id_usuario,v_id_plan_pago);
-                      END IF;
+                	IF (v_tipo_obligacion= 'pga' and v_sw_movimiento_partida !='flujo') THEN
 
-                ELSE
-                       -- v_tipo_obligacion != 'pago_especial' estos tipo de obligacion no realizan su modificacion presupuestaria porq son sin imputacion
-                      IF (v_prioridad = 3 and v_tipo_obligacion != 'pago_especial') THEN
-                        v_resp = tes.f_inserta_plan_pago_mod_presu(p_administrador, p_id_usuario,v_id_plan_pago);
-                      END IF;
+                  		v_resp = tes.f_inserta_plan_pago_mod_presu(p_administrador, p_id_usuario,v_id_plan_pago);
+
+                	END IF;
+
                 END IF;
 
 
