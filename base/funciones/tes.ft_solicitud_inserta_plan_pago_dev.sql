@@ -82,6 +82,9 @@ DECLARE
     v_documentos				integer[];
     v_tam_array_doc				integer;
 	v_id_documento				integer;
+
+    v_doc_compra_venta			integer;
+
 BEGIN
 
     /*
@@ -621,6 +624,11 @@ BEGIN
             (p_hstore->'id_proveedor_cta_bancaria')::integer
            )RETURNING id_plan_pago into v_id_plan_pago;
 
+           select dcv.id_doc_compra_venta
+           into v_doc_compra_venta
+           from conta.tdoc_compra_venta dcv
+           where dcv.id_plan_pago = v_id_plan_pago;
+
        		--franklin.espinoza 31/8/2019
             --verifacion si existe parametro documentos a relacionar a un plan de pago
             if (p_hstore->'documentos')::varchar is not null or (p_hstore->'documentos')::varchar != '' then
@@ -637,7 +645,8 @@ BEGIN
             else
             	 --(5-12-2019)si es un  Extracto Bancario (comision bancaria) id=52 no ingresa
             	IF ((p_hstore->'id_plantilla')::integer != 52) THEN
-                	if v_parametros.id_doc_compra_venta is not null then
+                	--if v_parametros.id_doc_compra_venta is not null then
+                    if v_doc_compra_venta is not null then
                     	update conta.tdoc_compra_venta set
                         	id_plan_pago = v_id_plan_pago
                         where id_doc_compra_venta = (p_hstore->'id_doc_compra_venta')::varchar;
@@ -724,6 +733,3 @@ VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
 COST 100;
-
-ALTER FUNCTION tes.ft_solicitud_inserta_plan_pago_dev (p_administrador integer, p_id_usuario integer, p_hstore public.hstore, p_salta boolean)
-  OWNER TO postgres;

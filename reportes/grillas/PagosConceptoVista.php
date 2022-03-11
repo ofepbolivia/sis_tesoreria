@@ -11,21 +11,26 @@ header("content-type:text/javascript; charset=UTF-8");
 <script>
 	Phx.vista.PagosConceptoVista = Ext.extend(Phx.gridInterfaz, {
 		constructor : function(config) {
+			var me = this;
 			this.maestro = config;
 			this.title = "PAGOS X CONCEPTO";
 			this.description = this.maestro.concepto + "-" + this.maestro.gestion;
 			Phx.vista.PagosConceptoVista.superclass.constructor.call(this, config);
-			this.init();
+			this.init();	
+			this.store.baseParams = {
+				id_gestion: this.id_gestion && this.maestro.id_gestion,
+				id_concepto: this.id_concepto && this.maestro.id_concepto,
+				id_partida: this.id_partida && this.maestro.id_partida,
+				tipo_reporte: this.tipo_reporte && this.maestro.tipo_reporte
+			}
 			this.load({
 				params : {
 					start: 0,
-					limit: 1000,
-					id_gestion:this.maestro.id_gestion,
-					id_concepto:this.maestro.id_concepto
+					limit: 50					
 				}
 			});
 		},
-		tam_pag:1000,
+		tam_pag:50,
 		Atributos : [{
 			config : {
 				labelSeparator : '',
@@ -47,8 +52,19 @@ header("content-type:text/javascript; charset=UTF-8");
 				type : 'string'
 			},
 			grid : true,
-			form : false
+			form : false,
+			bottom_filter: true
 		},
+		{
+			config : {
+				name : 'nombre_ingas',
+				fieldLabel : 'Concepto Ingreso Gasto',
+				gwidth : 250
+			},
+			type : 'Field',
+			grid : true,
+			form : false			
+		},		
 		{
 			config : {
 				name : 'orden_trabajo',
@@ -61,7 +77,8 @@ header("content-type:text/javascript; charset=UTF-8");
 				type : 'string'
 			},
 			grid : true,
-			form : false
+			form : false,
+			bottom_filter: true
 		},
 		/*Aumentando estos dos campos 28/11/2019 (Ismael Valdivia)*/
 		{
@@ -76,7 +93,8 @@ header("content-type:text/javascript; charset=UTF-8");
 				type : 'string'
 			},
 			grid : true,
-			form : false
+			form : false,
+			bottom_filter: true
 		},
 		{
 			config : {
@@ -90,7 +108,8 @@ header("content-type:text/javascript; charset=UTF-8");
 				type : 'string'
 			},
 			grid : true,
-			form : false
+			form : false,
+			bottom_filter: true
 		},
 		/**********************************************************/
 		{
@@ -105,9 +124,22 @@ header("content-type:text/javascript; charset=UTF-8");
 				type : 'string'
 			},
 			grid : true,
-			form : false
+			form : false,
+			bottom_filter: true
 		},
-
+		{
+			config: {
+				name: 'desc_funcionario1',								
+				fieldLabel: 'Funcionario Solictante',
+				allowBlank: false,
+				gwidth: 200,				
+			},
+			type: 'Field',//ComboRec
+			id_grupo: 1,			
+			bottom_filter: true,
+			grid: true,
+			form: true
+		},
 		{
 			config : {
 				name : 'desc_proveedor',
@@ -120,7 +152,8 @@ header("content-type:text/javascript; charset=UTF-8");
 				type : 'string'
 			},
 			grid : true,
-			form : false
+			form : false,
+			bottom_filter: true
 		},
 		/*Remplazando el id_centro_costo por codigo_cc 28/11/2019 (Ismael Valdivia)*/
 		// {
@@ -150,6 +183,27 @@ header("content-type:text/javascript; charset=UTF-8");
 			},
 			grid : true,
 			form : false
+		},
+		{
+			config : {
+				name : 'nombre_partida',
+				fieldLabel : 'Partida',
+				gwidth : 250,
+				renderer: function(value, p, record) {
+					var nom_partida = record.data.nombre_partida + ' - ('+record.data.codigo_partida+')';
+
+					if(record.data.tipo_reg != 'summary'){
+						return String.format('{0}', nom_partida);
+					} else {
+						return '';
+					}										
+				}
+
+			},
+			type : 'Field',
+			grid : true,
+			form : false,
+			bottom_filter: true
 		},
 		/***********************************************/
 		{
@@ -236,7 +290,7 @@ header("content-type:text/javascript; charset=UTF-8");
 				gwidth : 120,
 				galign:'right',
 				renderer:function (value,p,record){
-					console.log("llega aqui el dato",record.data);
+					// console.log("llega aqui el dato",record.data);
 					if(record.data.tipo_reg != 'summary'){
 						return  String.format('{0}', value);
 					}
@@ -385,7 +439,13 @@ header("content-type:text/javascript; charset=UTF-8");
 			name : 'fecha',
 			type : 'date',
 			dateFormat : 'Y-m-d'
-		}],
+		},		
+		{ name : 'desc_funcionario1', type : 'string' },
+		{ name : 'id_partida', type : 'numeric' },
+		{ name : 'nombre_partida', type : 'string' },
+		{ name : 'codigo_partida', type : 'string' },
+		{ name : 'nombre_ingas', type : 'string' }
+	],
 		sortInfo : {
 			field : 'id',
 			direction : 'ASC'
@@ -394,6 +454,6 @@ header("content-type:text/javascript; charset=UTF-8");
 		bnew: false,
 		bedit: false,
 		fwidth : '90%',
-		fheight : '80%'
+		fheight : '80%'		
 	});
 </script>

@@ -38,7 +38,8 @@ DECLARE
     v_strg_sol			varchar;
     v_filadd 			varchar;
     v_id_funcionario			integer;
-
+    v_consulta_sup		varchar= ' ';
+    v_consulta_sup_1	varchar= ' ';
 
 BEGIN
 
@@ -91,7 +92,7 @@ BEGIN
             IF  lower(v_parametros.tipo_interfaz) = 'planpagovb' THEN
 
                 IF p_administrador !=1 THEN
-                   v_filtro = '(ew.id_funcionario='||v_parametros.id_funcionario_usu::varchar||'  or (ew.id_depto  in ('|| COALESCE(array_to_string(va_id_depto,','),'0')||')) or (ew.id_funcionario  IN (select * FROM orga.f_get_funcionarios_x_usuario_asistente(now()::date,'||p_id_usuario||') AS (id_funcionario INTEGER)))  ) 
+                   v_filtro = '(ew.id_funcionario='||v_parametros.id_funcionario_usu::varchar||'  or (ew.id_depto  in ('|| COALESCE(array_to_string(va_id_depto,','),'0')||')) or (ew.id_funcionario  IN (select * FROM orga.f_get_funcionarios_x_usuario_asistente(now()::date,'||p_id_usuario||') AS (id_funcionario INTEGER)))  )
                    and  (lower(plapa.estado)!=''borrador'') and lower(plapa.estado)!=''pagado'' and lower(plapa.estado)!=''devengado'' and lower(plapa.estado)!=''anticipado'' and lower(plapa.estado)!=''aplicado'' and lower(plapa.estado)!=''anulado'' and lower(plapa.estado)!=''devuelto'' and ';
                  ELSE
                      v_filtro = ' (lower(plapa.estado)!=''borrador''  and lower(plapa.estado)!=''pendiente''  and lower(plapa.estado)!=''pagado'' and lower(plapa.estado)!=''devengado'' and lower(plapa.estado)!=''anticipado'' and lower(plapa.estado)!=''aplicado'' and lower(plapa.estado)!=''anulado'' and lower(plapa.estado)!=''devuelto'') and ';
@@ -233,7 +234,7 @@ BEGIN
                         '||v_strg_obs||' ,
                         plapa.obs_descuento_inter_serv,
                         plapa.descuento_inter_serv,
-                        plapa.porc_monto_retgar,
+                        ROUND(plapa.porc_monto_retgar,3)::numeric as porc_monto_retgar,
                         fun.desc_funcionario1::text,
                         plapa.revisado_asistente,
                         plapa.conformidad,
@@ -269,7 +270,9 @@ BEGIN
                         pro.nit,
                         plapa.id_proveedor_cta_bancaria,
                         mul.id_multa,
-                        mul.desc_multa
+                        mul.desc_multa,
+                        op.id_obligacion_pago_extendida
+
                         from tes.tplan_pago plapa
                         inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = plapa.id_proceso_wf
                         inner join tes.tobligacion_pago op on op.id_obligacion_pago = plapa.id_obligacion_pago
@@ -601,9 +604,13 @@ BEGIN
 
 			--Sentencia de la consulta de conteo de registros
 			v_consulta:='select
-            			fun.desc_funcionario1, prov.desc_proveedor,
-            			to_char( pp.fecha_conformidad,''DD/MM/YYYY''),pp.conformidad,
-                        cot.numero_oc,op.numero, pp.nro_cuota,op.num_tramite::varchar,
+            			fun.desc_funcionario1,
+                        prov.desc_proveedor,
+            			to_char( pp.fecha_conformidad,''DD/MM/YYYY''),
+                        pp.conformidad,
+                        COALESCE(cot.numero_oc,cont.numero)::varchar as numero_oc,
+                        op.numero,
+                        pp.nro_cuota,op.num_tramite::varchar,
                          tes.f_get_detalle_html(op.id_obligacion_pago)::text,
                          (case when (pxp.list_unique(ci.tipo)) is null THEN
                             ''Servicio''
@@ -617,23 +624,19 @@ BEGIN
                          op.total_nro_cuota,
                          op.obs
 						from tes.tplan_pago pp
-						inner join tes.tobligacion_pago op
-							on pp.id_obligacion_pago = op.id_obligacion_pago
-						inner join param.vproveedor prov
-							on prov.id_proveedor = op.id_proveedor
-						inner join orga.vfuncionario fun
-							on fun.id_funcionario = op.id_funcionario
-						left join adq.tcotizacion cot
-							on cot.id_obligacion_pago = op.id_obligacion_pago
-                        inner join tes.tobligacion_det od
-                            on od.id_obligacion_pago = op.id_obligacion_pago
-                        inner join param.tconcepto_ingas ci
-                            on ci.id_concepto_ingas = od.id_concepto_ingas
+						inner join tes.tobligacion_pago op on pp.id_obligacion_pago = op.id_obligacion_pago
+						inner join param.vproveedor prov on prov.id_proveedor = op.id_proveedor
+						inner join orga.vfuncionario fun on fun.id_funcionario = op.id_funcionario
+						left join adq.tcotizacion cot on cot.id_obligacion_pago = op.id_obligacion_pago
+                        inner join tes.tobligacion_det od on od.id_obligacion_pago = op.id_obligacion_pago
+                        inner join param.tconcepto_ingas ci on ci.id_concepto_ingas = od.id_concepto_ingas
+
+                        left join leg.tcontrato cont on cont.id_contrato = op.id_contrato
 						where ';
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
-            v_consulta:=v_consulta||' group by fun.desc_funcionario1, prov.desc_proveedor, pp.fecha_conformidad,pp.conformidad, cot.numero_oc,op.numero, pp.nro_cuota,op.num_tramite,
+            v_consulta:=v_consulta||' group by fun.desc_funcionario1, prov.desc_proveedor, pp.fecha_conformidad,pp.conformidad, cot.numero_oc,op.numero,cont.numero, pp.nro_cuota,op.num_tramite,
                         pp.fecha_costo_ini, pp.fecha_costo_fin, pp.obs_monto_no_pagado, pp.observaciones_pago, op.total_nro_cuota, op.obs,op.id_obligacion_pago';
             raise notice '%',v_consulta;
 
@@ -984,14 +987,16 @@ BEGIN
                                 mo.moneda,
                                 pla.liquido_pagable,
                                 com.c31,
-                                cc.numero
+                                cc.numero,
+                                ROUND(pla.porc_monto_retgar,3)::numeric as porc_monto_retgar
+
                                 FROM tes.tobligacion_pago obli
                                 inner join tes.tplan_pago pla on pla.id_obligacion_pago = obli.id_obligacion_pago
                                 inner join param.vproveedor pro on pro.id_proveedor = obli.id_proveedor
                                 inner join param.tmoneda mo on mo.id_moneda = obli.id_moneda
                                 inner join conta.tint_comprobante com on com.id_int_comprobante = pla.id_int_comprobante
                                 left join   leg.tcontrato cc on cc.id_contrato = obli.id_contrato
-                                 WHERE pla.fecha_dev >= '''||v_parametros.fecha_ini||''' and pla.fecha_dev <= '''||v_parametros.fecha_fin||''' and (pla.estado in (''devengado'') and monto_retgar_mo != 0 or pla.estado in (''devuelto'' )) ';
+                                 WHERE pla.fecha_dev >= '''||v_parametros.fecha_ini||''' and pla.fecha_dev <= '''||v_parametros.fecha_fin||''' and (pla.estado in (''devengado'') and monto_retgar_mo != 0 or pla.estado in (''devuelto'' , ''anticipado'')) ';
 
             if (v_parametros.id_proveedor >0) then
                 v_consulta:= v_consulta || 'and cc.id_proveedor = '||v_parametros.id_proveedor;
@@ -1332,6 +1337,91 @@ BEGIN
 
 
             end;
+
+            /*********************************
+            #TRANSACCION:  'TES_REXCONT_SEL'
+            #DESCRIPCION:	consulta reporte Resumen por contrato
+            #AUTOR:		breydi vasquez
+            #FECHA:		10-12-2020
+            ***********************************/
+
+        elsif(p_transaccion='TES_REXCONT_SEL')then
+
+                begin
+
+                if (v_parametros.id_proveedor >0) then
+                    v_consulta_sup = ' and cc.id_proveedor = '||v_parametros.id_proveedor;
+                end if;
+                if (v_parametros.id_contrato >0) then
+                	v_consulta_sup_1 = ' and cc.id_contrato = '||v_parametros.id_contrato;
+                end if;
+
+                v_consulta:= '
+
+                SELECT	TO_JSON(ROW_TO_JSON(jsonD) :: TEXT) #>> ''{}'' as jsonData
+                FROM (
+                SELECT ARRAY_TO_JSON(ARRAY_AGG(tvalue_data)) as data
+                FROM(
+
+                with  dev (id,prov, n, t, m, mr, li ) AS
+                  (select
+                          cc.id_contrato,
+                          pro.desc_proveedor,
+                          cc.numero,
+                          pla.tipo ,
+                          sum(pla.monto) as monto,
+                          sum(pla.monto_retgar_mo),
+                          sum(pla.liquido_pagable)
+                      FROM tes.tobligacion_pago obli
+                      inner join tes.tplan_pago pla on pla.id_obligacion_pago = obli.id_obligacion_pago
+                      inner join param.vproveedor pro on pro.id_proveedor = obli.id_proveedor
+                      left join   leg.tcontrato cc on cc.id_contrato = obli.id_contrato
+                      WHERE pla.fecha_dev >= '''||v_parametros.fecha_ini||''' and pla.fecha_dev <= '''||v_parametros.fecha_fin||'''
+                      and (pla.estado in (''devengado'') and monto_retgar_mo != 0 or pla.estado in (''devuelto''))
+                      and pla.tipo = ''dev_garantia''
+                      '|| v_consulta_sup ||'
+                      '|| v_consulta_sup_1 ||'
+
+                      GROUP BY
+                      cc.id_contrato,
+                      pro.desc_proveedor,
+                      cc.numero,
+                      pla.tipo
+                      )
+                  select
+                          pro.desc_proveedor as proveedor,
+                          cc.numero,
+                          pla.tipo,
+                          sum(pla.monto) as monto,
+                          sum(pla.monto_retgar_mo) as monto_retgar_mo,
+                          sum(pla.liquido_pagable) as liquido_pagable,
+                          coalesce(dd.m, 0) as dev_garantia,
+                          (sum(pla.monto_retgar_mo) - coalesce(dd.m, 0)) as total_devol
+                      FROM tes.tobligacion_pago obli
+                      inner join tes.tplan_pago pla on pla.id_obligacion_pago = obli.id_obligacion_pago
+                      inner join param.vproveedor pro on pro.id_proveedor = obli.id_proveedor
+                      left join   leg.tcontrato cc on cc.id_contrato = obli.id_contrato
+                      left join dev dd on dd.id = cc.id_contrato
+                      WHERE pla.fecha_dev >= '''||v_parametros.fecha_ini||''' and pla.fecha_dev <= '''||v_parametros.fecha_fin||'''
+                      and (pla.estado in (''devengado'') and monto_retgar_mo != 0 or pla.estado in (''devuelto''))
+                      and pla.tipo = ''devengado_pagado''
+                      '|| v_consulta_sup ||'
+                      '|| v_consulta_sup_1 ||'
+
+                      GROUP BY
+                      pro.desc_proveedor,
+                      cc.numero,
+                      dd.m,
+                      pla.tipo
+                      ORDER BY proveedor
+                  ) tvalue_data
+                ) jsonD ';
+
+                raise notice '% .',v_consulta;
+                --Devuelve la respuesta
+                return v_consulta;
+
+                end;
 
     else
 

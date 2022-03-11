@@ -15,40 +15,40 @@ Autor: RAC KPLIANF
 Fecha:   6 junio de 2013
 Descripcion  Esta funcion retrocede el estado de los planes de pago cuando los comprobantes son eliminados
 
-  
+
 
 */
 
 
 DECLARE
-  
+
 	v_nombre_funcion   	text;
 	v_resp				varchar;
-    
-    
+
+
     v_registros 		record;
-    
+
     v_id_estado_actual  integer;
-    
-    
+
+
     va_id_tipo_estado integer[];
     va_codigo_estado varchar[];
     va_disparador    varchar[];
-    va_regla         varchar[]; 
+    va_regla         varchar[];
     va_prioridad     integer[];
-    
+
     v_tipo_sol   varchar;
-    
+
     v_nro_cuota numeric;
-    
+
      v_id_proceso_wf integer;
      v_id_estado_wf integer;
-  
+
      v_id_plan_pago integer;
      v_verficacion  boolean;
      v_verficacion2  varchar[];
-     
-     
+
+
       v_id_tipo_estado integer;
      v_id_funcionario  integer;
      v_id_usuario_reg integer;
@@ -73,12 +73,12 @@ DECLARE
 BEGIN
 
 	v_nombre_funcion = 'tes.f_gestionar_cuota_plan_pago_eliminacion';
-    
-    
-    
+
+
+
     -- 1) con el id_comprobante identificar el plan de pago
-   
-      select 
+
+      select
           pp.id_plan_pago,
           pp.id_estado_wf,
           pp.id_proceso_wf,
@@ -114,20 +114,20 @@ BEGIN
       inner join param.tplantilla plt on plt.id_plantilla = pp.id_plantilla
       inner join conta.tint_comprobante  c on c.id_int_comprobante = pp.id_int_comprobante
       where  pp.id_int_comprobante = p_id_int_comprobante;
-    
+
     --2) Validar que tenga un plan de pago
-    
-    
+
+
      IF  v_registros.id_plan_pago is NULL  THEN
-     
+
         raise exception 'El comprobante no esta relacionado con nigun plan de pagos';
-     
+
      END IF;
-     
-     
+
+
          -- si el registro del plan de pago proviene de un tipo de documento distinto de Extracto bancario se retrocede normalmente
             if (v_registros.desc_plantilla != 'Extracto Bancario') THEN
-     
+
                    --  recuperaq estado anterior segun Log del WF
                       SELECT
                          ps_id_tipo_estado,
@@ -315,11 +315,11 @@ BEGIN
                               END IF;
 
             end if;
-          
-          IF v_codigo_estado != 'pendiente' THEN          
-                      
+
+          IF v_codigo_estado != 'pendiente' OR (v_registros.tipo_pago is null and v_registros.tipo like ('pagado')) THEN --se aumenta el or para desvalidar comprobantes error tipo cambio 08/06/2021 (franklin.espinoza)
+
             -- actualiza estado en la solicitud
-              update tes.tplan_pago pp set 
+              update tes.tplan_pago pp set
                  id_estado_wf =  v_id_estado_actual,
                  estado = v_codigo_estado,
                  id_usuario_mod=p_id_usuario,
@@ -330,58 +330,59 @@ BEGIN
                where pp.id_plan_pago = v_registros.id_plan_pago;
           ELSE
           -- si el estado es pendiente conservamos el ID del cbte ...
-            
+
             -- actualiza estado en la solicitud
-            update tes.tplan_pago pp set 
+            update tes.tplan_pago pp set
                id_estado_wf =  v_id_estado_actual,
                estado = v_codigo_estado,
                id_usuario_mod=p_id_usuario,
                fecha_mod=now(),
                id_usuario_ai = p_id_usuario_ai,
-               usuario_ai = p_usuario_ai
+               usuario_ai = p_usuario_ai,
+               id_int_comprobante = NULL --08/06/2021 (franklin.espinoza)
              where pp.id_plan_pago = v_registros.id_plan_pago;
-          
-          
-             
-          END IF;   
-             
-     
+
+
+
+          END IF;
+
+
            -- solo si el estado del cbte es borrador y no es un comprobante temporal
            -- desasociamos las transacciones del comprobante
-         
-           
+
+
             IF v_registros.estadato_cbte in ('borrador','eliminado') and v_registros.temporal = 'no' then
                --cheque si tiene prorrateo en tesoria (modulo de obligacion de pagos)
-              for v_rec_cbte_trans in (select * 
+              for v_rec_cbte_trans in (select *
                                        from conta.tint_transaccion
                                         where id_int_comprobante = p_id_int_comprobante) LOOP
-              
+
                     update tes.tprorrateo p set
                          id_int_transaccion = NULL
                     where p.id_int_transaccion = v_rec_cbte_trans.id_int_transaccion;
-                    
-                     
-             
+
+
+
               END LOOP;
             END IF;
-            
-         
-     
-    
+
+
+
+
      -- 3.1)  si es tipo es devengado_pago
       IF   v_registros.tipo = 'devengado_pagado' THEN
-           
-             
-           
+
+
+
      END IF;
-    
-  
+
+
 RETURN  TRUE;
 
 
 
 EXCEPTION
-					
+
 	WHEN OTHERS THEN
 			v_resp='';
 			v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);

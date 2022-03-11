@@ -558,7 +558,15 @@ v_consulta:='select lb.fecha,
                                sol.descripcion_cargo as cargo_cajero,
                                lb.importe_cheque,
                                pc.num_memo,
-                               mo.codigo as codigo_mone
+                               mo.codigo as codigo_mone,
+                               pxp.f_convertir_num_a_letra(lb.importe_cheque)::varchar as importe_literal,
+                                CASE
+                                 WHEN pe.genero::text = ANY (ARRAY[''varon''::character varying,''VARON''::character varying, ''Varon''::character varying]::text[]) THEN ''M''::text
+                                 WHEN pe.genero::text = ANY (ARRAY[''mujer''::character varying,''MUJER''::character varying, ''Mujer''::character varying]::text[]) THEN ''F''::text
+                                 ELSE ''''::text
+                                 END::character varying AS genero_solicitante
+
+
                         from tes.tproceso_caja pc
                         inner join tes.tcaja cj on cj.id_caja = pc.id_caja
                         inner join tes.tts_libro_bancos lb on lb.id_int_comprobante=pc.id_int_comprobante
@@ -566,13 +574,17 @@ v_consulta:='select lb.fecha,
                         inner join wf.testado_wf wfe on wfe.id_proceso_wf = ap.id_proceso_wf and  wfe.id_funcionario is not null
                         -- left join orga.vfuncionario_cargo apro on apro.id_funcionario = wfe.id_funcionario and ap.fecha >= apro.fecha_asignacion and
                         --       apro.fecha_finalizacion is null
-                        left join orga.vfuncionario_ultimo_cargo apro on apro.id_funcionario = wfe.id_funcionario and ap.fecha >= apro.fecha_asignacion
+                        left join orga.vfuncionario_cargo  apro on apro.id_funcionario = wfe.id_funcionario and ap.fecha between apro.fecha_asignacion and coalesce(apro.fecha_finalizacion, now())
                         inner join tes.tcajero cjr on cjr.id_caja = cj.id_caja and lb.fecha between
                                cjr.fecha_inicio and cjr.fecha_fin
-                        inner join orga.vfuncionario_cargo sol on sol.id_funcionario = cjr.id_funcionario and ap.fecha >= sol.fecha_asignacion and
-                               sol.fecha_finalizacion is null
+                        inner join orga.vfuncionario_cargo sol on sol.id_funcionario = cjr.id_funcionario and ap.fecha between sol.fecha_asignacion and
+                               coalesce(sol.fecha_finalizacion, now())
                         inner join tes.tcuenta_bancaria cue on cue.id_cuenta_bancaria = lb.id_cuenta_bancaria
-                        inner join param.tmoneda mo on mo.id_moneda = cue.id_moneda                                                               
+                        inner join param.tmoneda mo on mo.id_moneda = cue.id_moneda
+
+                        inner join orga.vfuncionario_persona f on f.id_funcionario = sol.id_funcionario
+                        inner join segu.vpersona2 pe on pe.id_persona = f.id_persona
+
                         where pc.id_proceso_wf= '||v_parametros.id_proceso_wf;
 
             --Devuelve la respuesta

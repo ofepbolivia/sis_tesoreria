@@ -233,6 +233,9 @@ header("content-type: text/javascript; charset=UTF-8");
             this.Cmp.monto_anticipo.on('change', this.calculaMontoPago, this);
             this.Cmp.monto_excento.on('change', this.calculaMontoPago, this);
 
+            this.Cmp.porc_monto_retgar.on('change', this.calculaMontoPago, this);
+            this.Cmp.porc_monto_retgar.on('select', this.calculaMontoPago, this);
+
             this.Cmp.id_plantilla.on('select', function (cmb, rec, i) {
                 this.getDecuentosPorAplicar(rec.data.id_plantilla);
                 this.Cmp.monto_excento.reset();
@@ -622,6 +625,9 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.getBoton('new').disable();
                 this.getBoton('SolPlanPago').enable();
                 this.getBoton('sig_estado').enable();
+
+                //08-05-2020 (may) Doc compra venta desde la cuota
+                this.getBoton('btnDocCmpVnt').enable();
             }
             else {
 
@@ -642,6 +648,9 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.getBoton('edit').disable();
                 this.getBoton('del').disable();
                 this.getBoton('SolPlanPago').enable();
+
+                //08-05-2020 (may) Doc compra venta desde la cuota
+                this.getBoton('btnDocCmpVnt').enable();
             }
 
             // if(data['sinc_presupuesto']=='si'&& (data['estado']== 'vbconta'||data['estado']== 'borrador')){
@@ -676,6 +685,9 @@ header("content-type: text/javascript; charset=UTF-8");
                 //this.getBoton('btnConformidad').disable();
                 this.getBoton('btnChequeoDocumentosWf').disable();
                 this.getBoton('btnPagoRel').disable();
+
+                //08-05-2020 (may) Doc compra venta desde la cuota
+                this.getBoton('btnDocCmpVnt').disable();
             }
             return tb
         },

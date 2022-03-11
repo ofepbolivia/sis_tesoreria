@@ -60,6 +60,7 @@ header("content-type: text/javascript; charset=UTF-8");
 	   				fieldLabel : 'Gestion',
 	   				allowBlank : false,
 	   				gdisplayField : 'gestion',//mapea al store del grid
+                    anchor:'50%',
 	   				gwidth : 100,
 		   			renderer : function (value, p, record){return String.format('{0}', record.data['gestion']);}
 	       	     },
@@ -81,6 +82,7 @@ header("content-type: text/javascript; charset=UTF-8");
 	   				allowBlank : true,
 	   				gdisplayField : 'periodo',//mapea al store del grid
 	   				gwidth : 100,
+                    anchor:'50%',
 	   				disabled:true,
 		   			renderer : function (value, p, record){return String.format('{0}', record.data['periodo']);}
 	       	     },
@@ -94,6 +96,27 @@ header("content-type: text/javascript; charset=UTF-8");
 	   			grid : true,
 	   			form : true
 	   	},
+        {
+            config:{
+                name:'id_proveedor',
+                hiddenName: 'id_proveedor',
+                origen:'PROVEEDOR',
+                fieldLabel:'Proveedor',
+                allowBlank:true,
+                tinit:false,
+                gwidth : 100,
+                anchor:'50%',
+                valueField: 'id_proveedor',
+                gdisplayField: 'desc_proveedor',
+                renderer:function(value, p, record){return String.format('{0}', record.data['desc_proveedor']);}
+            },
+            type:'ComboRec',//ComboRec
+            id_grupo:0,
+            filters:{pfiltro:'pro.desc_proveedor',type:'string'},
+            grid:true,
+            bottom_filter:true,
+            form:true
+        },
 		{
             config:{
                 name:'id_concepto_ingas',
@@ -147,7 +170,7 @@ header("content-type: text/javascript; charset=UTF-8");
 				currencyChar:' ',
 				fieldLabel: 'Monto Factura',
 				allowBlank: false,
-				anchor: '35%',
+                anchor:'50%',
 				gwidth: 100,
 				maxLength:1245184
 			},

@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION tes.f_lista_depto_conta_x_lb_wf_sel (
   p_id_usuario integer,
   p_id_tipo_estado integer,
@@ -74,6 +72,8 @@ DECLARE
     v_id_deptos_conta	varchar;
     v_registros_depto   record;
     g_registros 		record;
+    --08-09-2021 (may)
+    v_id_depto_op		integer;
 
 BEGIN
   v_nombre_funcion ='tes.f_lista_depto_conta_x_lb_wf_sel';
@@ -91,8 +91,14 @@ BEGIN
     inner join param.tdepto dep on dep.id_depto = pp.id_depto_lb
     where pp.id_estado_wf =  p_id_estado_wf;
     
+    --08-09-2021 (may) para buscar su id_depto OP
+    select  op.id_depto
+	into v_id_depto_op
+    from tes.tplan_pago pp
+    inner join tes.tobligacion_pago op on op.id_obligacion_pago = pp.id_obligacion_pago
+    where pp.id_estado_wf = p_id_estado_wf;
+
     v_id_deptos_conta = '0';
-    
    
     
     -- si tenemos libro de banco solo mostramos los depto de conta con el mismo lugar
@@ -114,7 +120,9 @@ BEGIN
        into
          v_id_deptos_conta
        from param.tdepto dep
-       inner join segu.tsubsistema sub on sub.id_subsistema = dep.id_subsistema and sub.codigo = 'CONTA';
+       inner join segu.tsubsistema sub on sub.id_subsistema = dep.id_subsistema and sub.codigo = 'CONTA'
+       left join param.tdepto_depto depd on depd.id_depto_destino = dep.id_depto
+       where depd.id_depto_origen = v_id_depto_op ;
     
     
     END IF;

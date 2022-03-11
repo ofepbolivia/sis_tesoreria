@@ -258,12 +258,12 @@ header("content-type: text/javascript; charset=UTF-8");
                     gwidth: 100,
                     maxLength: 50
                     /*renderer:function(value, p, record){
-                        if(record.data.presupuesto_aprobado=='sin_presupuesto_cc'){                        
+                        if(record.data.presupuesto_aprobado=='sin_presupuesto_cc'){
                             return '<tpl style="background-color:#FA5E5E; margin-top:0px; position:absolute; width:100px; float:left;">'+record.data['estado']+'</tpl>';
                         }else{
                             return String.format('{0}', value);
                         }
-                    }*/                  
+                    }*/
                 },
                 type: 'TextField',
                 filters: {pfiltro: 'obpg.estado', type: 'string'},
@@ -483,7 +483,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     hiddenName: 'id_contrato',
                     fieldLabel: 'Contrato',
                     typeAhead: false,
-                    forceSelection: false,
+                    forceSelection: true,
                     allowBlank: false,
                     disabled: true,
                     emptyText: 'Contratos...',
@@ -500,7 +500,9 @@ header("content-type: text/javascript; charset=UTF-8");
                         // turn on remote sorting
                         remoteSort: true,
                         baseParams: {
-                            par_filtro: 'con.nro_tramite#con.numero#con.tipo#con.monto#prov.desc_proveedor#con.objeto#con.monto',
+                            //02-06-2021 (may) modificacion para filtro, no hay con.nro_tramite
+                            //par_filtro: 'con.nro_tramite#con.numero#con.tipo#con.monto#prov.desc_proveedor#con.objeto#con.monto',
+                            par_filtro: 'con.numero#con.tipo#con.monto#prov.desc_proveedor#con.objeto#con.monto',
                             tipo_proceso: "CON",
                             tipo_estado: "finalizado"
                         }
@@ -635,6 +637,25 @@ header("content-type: text/javascript; charset=UTF-8");
                 grid: true,
                 form: true
             },
+
+            {
+                config: {
+                    name: 'nro_preventivo',
+                    fieldLabel: 'C31 Preventivo',
+                    allowBlank: true,
+                    anchor: '80%',
+                    gwidth: 100,
+                    maxLength: 131074,
+                    maxValue: 100
+                },
+                type: 'NumberField',
+                filters: {pfiltro: 'obpg.nro_preventivo', type: 'numeric'},
+                bottom_filter: true,
+                id_grupo: 1,
+                grid: true,
+                form: false
+            },
+
             {
                 config: {
                     name: 'tipo_cambio_conv',
@@ -873,6 +894,21 @@ header("content-type: text/javascript; charset=UTF-8");
             },
             {
                 config: {
+                    name: 'partida',
+                    fieldLabel: 'Partida',
+                    allowBlank: true,
+                    anchor: '80%',
+                    gwidth: 280,
+                    maxLength: 50
+                },
+                type: 'TextField',
+                filters: {pfiltro: 'par.codigo#par.nombre_partida', type: 'string'},
+                id_grupo: 1,
+                grid: true,
+                form: false
+            },
+            {
+                config: {
                     name: 'fecha_reg',
                     fieldLabel: 'Fecha creación',
                     allowBlank: true,
@@ -993,13 +1029,15 @@ header("content-type: text/javascript; charset=UTF-8");
             {name: 'fecha_fin', type: 'date', dateFormat: 'Y-m-d'},
             {name: 'observaciones', type: 'string'},
             {name: 'fecha_certificacion_pres', type: 'date', dateFormat: 'Y-m-d'},
-            {name: 'presupuesto_aprobado', type: 'string'}
+            {name: 'presupuesto_aprobado', type: 'string'},
+            {name: 'nro_preventivo', type: 'numeric'},
+            {name: 'partida', type: 'string'}
 
         ],
 
         arrayDefaultColumHidden: ['id_fecha_reg', 'id_fecha_mod', 'fecha_mod', 'usr_reg', 'estado_reg', 'fecha_reg', 'usr_mod',
             'numero', 'tipo_obligacion', 'id_depto', 'id_contrato', 'tipo_cambio_conv', 'tipo_anticipo', 'obs', 'total_nro_cuota', 'id_plantilla', 'fecha_pp_ini',
-            'rotacion', 'porc_anticipo', 'obs_presupuestos'],
+            'rotacion', 'porc_anticipo', 'obs_presupuestos', 'partida'],
 
 
         rowExpander: new Ext.ux.grid.RowExpander({
@@ -1944,7 +1982,7 @@ header("content-type: text/javascript; charset=UTF-8");
         onBtnCheckPresup: function () {
             var rec = this.sm.getSelected();
             //Se define el nombre de la columna de la llave primaria
-
+            console.log("aqui llega el dato",rec);
 
             Phx.CP.loadWindows('../../../sis_tesoreria/vista/presupuesto/CheckPresupuesto.php', 'Evolución presupuestaria <span style="color:green; font-size:15;">(' + rec.data.moneda + ')</span>', {
                 modal: true,
@@ -2116,8 +2154,8 @@ header("content-type: text/javascript; charset=UTF-8");
         },
         conexionFailPresupuesto:function(resp, data){
             Phx.CP.loadingHide();
-            var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));                                               
-            
+            var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+
             Ext.Msg.show({
                 title:'<h1 style="font-size:15px;">Aviso!</h1>',
                 msg: '<p style="font-weight:bold; font-size:12px;">'+reg.ROOT.detalle.mensaje+'</p>',
@@ -2126,14 +2164,14 @@ header("content-type: text/javascript; charset=UTF-8");
                 height:200,
                 icon: Ext.MessageBox.WARNING,
                 scope:this
-            });            
+            });
 
-            if (reg.ROOT.error){                
-                
+            if (reg.ROOT.error){
+
                 if (reg.ROOT.detalle.mensaje.search('centro de costo ->') >= 0 ){
-                        Ext.Ajax.request({                
+                        Ext.Ajax.request({
                         url:'../../sis_tesoreria/control/ObligacionPago/aprobarPresupuestoSolicitud',
-                        params: { id_obligacion_pago: data.params.id_obligacion_pago, aprobar:'no'},                
+                        params: { id_obligacion_pago: data.params.id_obligacion_pago, aprobar:'no'},
                         success: function(resp){
                             var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
                             !reg.ROOT.error && this.reload();
@@ -2143,7 +2181,7 @@ header("content-type: text/javascript; charset=UTF-8");
                         scope: this
                     });
                 }
-            }                        
+            }
         },
         successWizard: function (resp) {
             Phx.CP.loadingHide();
@@ -2186,6 +2224,100 @@ header("content-type: text/javascript; charset=UTF-8");
                     scope: this
                 });
             }
+        },
+        //franklin.espinoza 15/10/2020
+        onCargarDocumentoSigep:  function (){
+            var record = this.getSelectedData();
+            this.formDocumentoSigep();
+            this.formDocumento.getForm().findField('preventivo').setValue(record.nro_preventivo);
+            this.windowDocumento.show();
+        },
+        formDocumentoSigep: function () {
+
+            this.formDocumento = new Ext.form.FormPanel({
+                id: this.idContenedor + '_DOCSIGEP',
+                items: [
+                    new Ext.form.NumberField({
+                        fieldLabel: 'Nro. Preventivo',
+                        name: 'preventivo',
+                        //height: 150,
+                        allowBlank: true,
+                        width: '90%',
+                        msgTarget : 'side'
+                    })
+                ],
+                autoScroll: false,
+                //height: this.fheight,
+                autoDestroy: true,
+                autoScroll: true
+            });
+
+
+            // Definicion de la ventana que contiene al formulario
+            this.windowDocumento = new Ext.Window({
+                // id:this.idContenedor+'_W',
+                title: 'Datos Documento Sigep',
+                modal: true,
+                width: 300,
+                height: 200,
+                bodyStyle: 'padding:5px;',
+                layout: 'fit',
+                hidden: true,
+                autoScroll: false,
+                maximizable: true,
+                buttons: [{
+                    text: 'Guardar',
+                    arrowAlign: 'bottom',
+                    handler: this.onSubmitDocumento,
+                    argument: {
+                        'news': false
+                    },
+                    scope: this
+
+                },
+                    {
+                        text: 'Declinar',
+                        handler: this.onDeclinarDocumento,
+                        scope: this
+                    }],
+                items: this.formDocumento,
+                // autoShow:true,
+                autoDestroy: true,
+                closeAction: 'hide'
+            });
+        },
+
+        onSubmitDocumento: function () {
+            var record = this.getSelectedData();
+            Phx.CP.loadingShow();
+            Ext.Ajax.request({
+                url: '../../sis_tesoreria/control/ObligacionPago/guardarDocumentoSigep',
+                success: this.successDocumento,
+                failure: this.failureDocumento,
+                params: {
+                    'id_obligacion_pago' : record.id_obligacion_pago,
+                    'nro_preventivo' : this.formDocumento.getForm().findField('preventivo').getValue()
+                },
+                timeout: this.timeout,
+                scope: this
+            });
+
+        },
+
+        successDocumento: function (resp) {
+            this.windowDocumento.hide();
+            Phx.vista.ObligacionPago.superclass.successDel.call(this, resp);
+
+        },
+
+        failureDocumento: function (resp) {
+            Phx.CP.loadingHide();
+            Phx.vista.ObligacionPago.superclass.conexionFailure.call(this, resp);
+
+        },
+
+        onDeclinarDocumento: function () {
+            this.windowDocumento.hide();
         }
 
     })

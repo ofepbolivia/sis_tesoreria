@@ -339,6 +339,8 @@ header("content-type: text/javascript; charset=UTF-8");
         successSincGC: function (resp) {
             Phx.CP.loadingHide();
             this.wDEPTO.hide();
+            contadores = 0;
+            Ext.getCmp(this.wDEPTO.buttons[0].id).setDisabled(false);
             var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
             if (reg.ROOT.datos.resultado != 'falla') {
 
@@ -375,6 +377,9 @@ header("content-type: text/javascript; charset=UTF-8");
             this.Cmp.descuento_inter_serv.on('change', this.calculaMontoPago, this);
             this.Cmp.monto_anticipo.on('change', this.calculaMontoPago, this);
             this.Cmp.monto_excento.on('change', this.calculaMontoPago, this);
+
+            this.Cmp.porc_monto_retgar.on('change', this.calculaMontoPago, this);
+            this.Cmp.porc_monto_retgar.on('select', this.calculaMontoPago, this);
 
             this.Cmp.id_plantilla.on('select', function (cmb, rec, i) {
                 this.getDecuentosPorAplicar(rec.data.id_plantilla);

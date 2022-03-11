@@ -32,6 +32,7 @@ header("content-type: text/javascript; charset=UTF-8");
             bactGroups:  [0,1,2,3],
             btestGroups: [0],
             bexcelGroups: [0,1,2,3],
+            bganttGroups: [0,1,2,3],
 
             constructor:function(config){
                 this.maestro=config.maestro;
@@ -155,7 +156,8 @@ header("content-type: text/javascript; charset=UTF-8");
                     }
                 );
 
-                this.addButton('diagrama_gantt',
+                //03-11-2021 (may) se comenta boton Gantt bgantt:true
+                /*this.addButton('diagrama_gantt',
                     {
                         grupo:[0,1,2,3],
                         text:'Gant',
@@ -164,7 +166,7 @@ header("content-type: text/javascript; charset=UTF-8");
                         handler:this.diagramGantt,
                         tooltip: '<b>Diagrama Gantt de Solicitud de Efectivo</b>'
                     }
-                );
+                );*/
 
                 /*
                 this.addButton('btnSolicitud', {
@@ -740,14 +742,14 @@ header("content-type: text/javascript; charset=UTF-8");
                     this.getBoton('edit').enable();
                     this.getBoton('del').enable();
                     this.getBoton('btnRendicion').disable();
-                    this.getBoton('diagrama_gantt').enable();
+                    //this.getBoton('diagrama_gantt').enable();
                     //this.getBoton('btnReciboEntrega').disable();
                     //this.getBoton('btnRendicionEfectivo').disable();
                 }else if (data['estado'] == 'entregado'){
                     this.getBoton('fin_registro').enable();
                     this.getBoton('edit').disable();
                     this.getBoton('del').disable();
-                    this.getBoton('diagrama_gantt').enable();
+                    //this.getBoton('diagrama_gantt').enable();
                     this.getBoton('btnRendiciones').enable();
                     //this.getBoton('btnRendicionEfectivo').enable();
                     if(data.dias_no_rendido < 0)
@@ -762,13 +764,13 @@ header("content-type: text/javascript; charset=UTF-8");
                     this.getBoton('del').disable();
                     this.getBoton('btnRendicion').disable();
                     this.getBoton('btnRendiciones').enable();
-                    this.getBoton('diagrama_gantt').enable();
+                    //this.getBoton('diagrama_gantt').enable();
                 }else if(data['estado'] == 'vbjefe'){
                     this.getBoton('fin_registro').disable();
                     this.getBoton('edit').disable();
                     this.getBoton('del').disable();
                     this.getBoton('btnRendicion').disable();
-                    this.getBoton('diagrama_gantt').enable();
+                    //this.getBoton('diagrama_gantt').enable();
                     //this.getBoton('btnReciboEntrega').disable();
                     //this.getBoton('btnRendicionEfectivo').disable();
                 }else{
@@ -776,14 +778,14 @@ header("content-type: text/javascript; charset=UTF-8");
                     this.getBoton('edit').disable();
                     this.getBoton('del').disable();
                     this.getBoton('btnRendicion').disable();
-                    this.getBoton('diagrama_gantt').enable();
+                    //this.getBoton('diagrama_gantt').enable();
                     //this.getBoton('btnReciboEntrega').disable();
                     //this.getBoton('btnRendicionEfectivo').disable();
                 }
 
                 if(data['saldo'] == 0.00){
                     this.getBoton('btnDevol').disable();
-                    this.getBoton('btnRendicion').disable();
+                    this.getBoton('btnRendicion').enable();
                 }else{
                     this.getBoton('btnDevol').enable();
                     this.getBoton('btnRendicion').enable();
@@ -794,7 +796,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 var tb = Phx.vista.SolicitudEfectivoSinDet.superclass.liberaMenu.call(this);
                 if(tb) {
                     this.getBoton('btnChequeoDocumentosWf').disable();
-                    this.getBoton('diagrama_gantt').disable();
+                    //this.getBoton('diagrama_gantt').disable();
                     this.getBoton('fin_registro').disable();
                     this.getBoton('btnRendicion').disable();
                     this.getBoton('btnRendiciones').disable();
@@ -985,7 +987,7 @@ header("content-type: text/javascript; charset=UTF-8");
 
             },
 
-            diagramGantt : function (){
+            /*diagramGantt : function (){
                 var data=this.sm.getSelected().data.id_proceso_wf;
                 Phx.CP.loadingShow();
                 Ext.Ajax.request({
@@ -996,7 +998,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     timeout: this.timeout,
                     scope: this
                 });
-            },
+            },*/
 
             successEstadoSinc:function(resp){
                 Phx.CP.loadingHide();
@@ -1039,7 +1041,8 @@ header("content-type: text/javascript; charset=UTF-8");
             },
 
             bdel:true,
-            bsave:true
+            bsave:true,
+            bgantt:true
         }
     )
 </script>

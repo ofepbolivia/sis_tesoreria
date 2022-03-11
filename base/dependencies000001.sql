@@ -8,7 +8,7 @@ ALTER TABLE tes.tobligacion_pago
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
-    
+
 --tabla tes.obligacion_det
 
 ALTER TABLE tes.tobligacion_det
@@ -45,21 +45,21 @@ ALTER TABLE tes.tplan_pago
 
 /***********************************I-DEP-GSS-TES-121-24/04/2013****************************************/
 --tabla tes.tcuenta_bancaria
-    
+
 ALTER TABLE tes.tcuenta_bancaria
   ADD CONSTRAINT fk_tcuenta_bancaria__id_institucion FOREIGN KEY (id_institucion)
     REFERENCES param.tinstitucion(id_institucion)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
-  
+
 ALTER TABLE tes.tchequera
   ADD CONSTRAINT fk_tchequera__id_cuenta_bancaria FOREIGN KEY (id_cuenta_bancaria)
     REFERENCES tes.tcuenta_bancaria(id_cuenta_bancaria)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
-    
+
 
 /***********************************F-DEP-GSS-TES-121-24/04/2013****************************************/
 
@@ -74,7 +74,7 @@ ALTER TABLE tes.tobligacion_pago
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
-    
+
   --------------- SQL ---------------
 
 ALTER TABLE tes.tobligacion_pago
@@ -82,8 +82,8 @@ ALTER TABLE tes.tobligacion_pago
     REFERENCES param.tgestion(id_gestion)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
-    NOT DEFERRABLE;  
-    
+    NOT DEFERRABLE;
+
 --------------- SQL ---------------
 
 ALTER TABLE tes.tobligacion_pago
@@ -120,7 +120,7 @@ ALTER TABLE tes.tobligacion_pago
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
-    
+
 --------------- SQL ---------------
 
 ALTER TABLE tes.tobligacion_pago
@@ -129,7 +129,7 @@ ALTER TABLE tes.tobligacion_pago
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
-    
+
     --------------- SQL ---------------
 
 ALTER TABLE tes.tobligacion_pago
@@ -138,8 +138,8 @@ ALTER TABLE tes.tobligacion_pago
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
-    
-    
+
+
     --------------- SQL ---------------
 
 ALTER TABLE tes.tobligacion_pago
@@ -148,17 +148,17 @@ ALTER TABLE tes.tobligacion_pago
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
-    
+
     --------------- SQL ---------------
 
 CREATE INDEX tobligacion_pago_idx ON tes.tobligacion_pago
   USING btree (id_depto);
-  
+
   --------------- SQL ---------------
 
 CREATE INDEX tobligacion_pago_idx1 ON tes.tobligacion_pago
   USING btree (id_estado_wf);
-  
+
   --------------- SQL ---------------
 
 
@@ -169,9 +169,9 @@ CREATE INDEX tobligacion_pago_idx1 ON tes.tobligacion_pago
 
 
 
- 
- 
- 
+
+
+
 
 /***********************************I-DEP-RCM-TES-0-16/01/2014***************************************/
 ALTER TABLE tes.tcuenta_bancaria
@@ -210,7 +210,7 @@ ALTER TABLE tes.tplan_pago
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
-    
+
 --------------- SQL ---------------
 
 ALTER TABLE tes.tplan_pago
@@ -219,7 +219,7 @@ ALTER TABLE tes.tplan_pago
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
-    
+
 --------------- SQL ---------------
 
 ALTER TABLE tes.tplan_pago
@@ -228,9 +228,9 @@ ALTER TABLE tes.tplan_pago
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
-    
-    
-    
+
+
+
 --------------- SQL ---------------
 
 ALTER TABLE tes.tplan_pago
@@ -239,8 +239,8 @@ ALTER TABLE tes.tplan_pago
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
-    
-    
+
+
 --------------- SQL ---------------
 
 ALTER TABLE tes.tplan_pago
@@ -248,8 +248,8 @@ ALTER TABLE tes.tplan_pago
     REFERENCES tes.tcuenta_bancaria(id_cuenta_bancaria)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
-    NOT DEFERRABLE;    
-        
+    NOT DEFERRABLE;
+
 
 --------------- SQL ---------------
 
@@ -310,8 +310,8 @@ ALTER TABLE tes.tprorrateo
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
-    
-    
+
+
  --------------- SQL ---------------
 
 ALTER TABLE tes.tprorrateo
@@ -319,9 +319,9 @@ ALTER TABLE tes.tprorrateo
     REFERENCES tes.tplan_pago(id_plan_pago)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
-    NOT DEFERRABLE;   
-    
- 
+    NOT DEFERRABLE;
+
+
  --------------- SQL ---------------
 
 ALTER TABLE tes.tprorrateo
@@ -330,15 +330,15 @@ ALTER TABLE tes.tprorrateo
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
- 
- 
-    
+
+
+
 ALTER TABLE tes.tprorrateo
   ADD CONSTRAINT tprorrateo__id_int_transaccion FOREIGN KEY (id_int_transaccion)
     REFERENCES conta.tint_transaccion(id_int_transaccion)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
-    NOT DEFERRABLE;    
+    NOT DEFERRABLE;
 --------------- SQL ---------------
 
 ALTER TABLE tes.tprorrateo
@@ -354,7 +354,7 @@ ALTER TABLE tes.tprorrateo
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
-    
+
 --------------- SQL ---------------
 
 ALTER TABLE tes.tobligacion_det
@@ -362,9 +362,9 @@ ALTER TABLE tes.tobligacion_det
     REFERENCES tes.tobligacion_pago(id_obligacion_pago)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
-    NOT DEFERRABLE;    
- 
- 
+    NOT DEFERRABLE;
+
+
  --------------- SQL ---------------
 
 ALTER TABLE tes.tobligacion_det
@@ -373,8 +373,8 @@ ALTER TABLE tes.tobligacion_det
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
-    
-    
+
+
  --------------- SQL ---------------
 
 ALTER TABLE tes.tobligacion_det
@@ -382,8 +382,8 @@ ALTER TABLE tes.tobligacion_det
     REFERENCES param.tcentro_costo(id_centro_costo)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
-    NOT DEFERRABLE;   
-    
+    NOT DEFERRABLE;
+
 --------------- SQL ---------------
 
 ALTER TABLE tes.tobligacion_det
@@ -391,7 +391,7 @@ ALTER TABLE tes.tobligacion_det
     REFERENCES conta.tcuenta(id_cuenta)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
-    NOT DEFERRABLE; 
+    NOT DEFERRABLE;
 
 
 --------------- SQL ---------------
@@ -401,7 +401,7 @@ ALTER TABLE tes.tobligacion_det
     REFERENCES conta.tauxiliar(id_auxiliar)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
-    NOT DEFERRABLE;  
+    NOT DEFERRABLE;
 /***********************************F-DEP-RAC-TES-0-04/02/2014****************************************/
 
 
@@ -1301,8 +1301,8 @@ select pxp.f_insert_trol_procedimiento_gui ('OP - Cuenta Bancaria', 'TES_CHQ_ELI
 /***********************************I-DEP-RAC-TES-0-19/05/2014*****************************************/
 
 CREATE TRIGGER trig_actualiza_informacion_estado_pp
-  AFTER INSERT OR UPDATE OF estado, nro_cuota 
-  ON tes.tplan_pago FOR EACH ROW 
+  AFTER INSERT OR UPDATE OF estado, nro_cuota
+  ON tes.tplan_pago FOR EACH ROW
   EXECUTE PROCEDURE tes.f_trig_actualiza_informacion_estado_pp();
 
 /***********************************F-DEP-RAC-TES-0-19/05/2014*****************************************/
@@ -1811,13 +1811,13 @@ ALTER TABLE tes.tobligacion_pago
 
 /*
  --tabla tes.tusuario_cuenta_banc
-    
+
 ALTER TABLE	tes.tusuario_cuenta_banc
   ADD CONSTRAINT fk_tusuario_cuenta_banc__id_cuenta_bancaria FOREIGN KEY (id_cuenta_bancaria)
     REFERENCES tes.tcuenta_bancaria(id_cuenta_bancaria)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
-    NOT DEFERRABLE, 
+    NOT DEFERRABLE,
 
 ALTER TABLE	tes.tusuario_cuenta_banc
   ADD CONSTRAINT fk_tusuario_cuenta_banc__id_usuario FOREIGN KEY (id_usuario)
@@ -3232,15 +3232,15 @@ ALTER TABLE tes.tcajero
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
-    
+
 ALTER TABLE tes.tcajero
   ADD CONSTRAINT tcaja__id_funcionario FOREIGN KEY (id_funcionario)
     REFERENCES orga.tfuncionario(id_funcionario)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
-    
-/***********************************F-DEP-JRR-TES-10/08/2015****************************************/  
+
+/***********************************F-DEP-JRR-TES-10/08/2015****************************************/
 
 
 
@@ -3259,7 +3259,7 @@ ALTER TABLE tes.testacion_tipo_pago
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
-    
+
 ALTER TABLE tes.testacion_tipo_pago
   ADD CONSTRAINT testacion_tipo_pago__id_tipo_plan_pago FOREIGN KEY (id_tipo_plan_pago)
     REFERENCES tes.ttipo_plan_pago(id_tipo_plan_pago)
@@ -3268,7 +3268,7 @@ ALTER TABLE tes.testacion_tipo_pago
     NOT DEFERRABLE;
 
 
-/***********************************F-DEP-JRR-TES-0-25/08/2015****************************************/ 
+/***********************************F-DEP-JRR-TES-0-25/08/2015****************************************/
 
 
 
@@ -3276,21 +3276,21 @@ ALTER TABLE tes.testacion_tipo_pago
 
 
 
-/***********************************I-DEP-GSS-TES-0-20/01/2016****************************************/ 
+/***********************************I-DEP-GSS-TES-0-20/01/2016****************************************/
 ALTER TABLE tes.tsolicitud_rendicion_det
   ADD CONSTRAINT fk_tsolicitud_rendicion_det__id_proceso_caja FOREIGN KEY (id_proceso_caja)
     REFERENCES tes.tproceso_caja(id_proceso_caja)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
-    NOT DEFERRABLE; 
-	
+    NOT DEFERRABLE;
+
 ALTER TABLE tes.tsolicitud_rendicion_det
 	ADD CONSTRAINT fk_tsolicitud_rendicion_det__id_solicitud_efectivo FOREIGN KEY (id_solicitud_efectivo)
     REFERENCES tes.tsolicitud_efectivo(id_solicitud_efectivo)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
-	
+
 ALTER TABLE tes.tproceso_caja
   ADD CONSTRAINT tproceso_caja__id_caja FOREIGN KEY (id_caja)
     REFERENCES tes.tcaja(id_caja)
@@ -3304,9 +3304,9 @@ ALTER TABLE tes.tproceso_caja
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
-/***********************************F-DEP-GSS-TES-0-20/01/2016****************************************/ 
+/***********************************F-DEP-GSS-TES-0-20/01/2016****************************************/
 
-/***********************************I-DEP-GSS-TES-0-08/03/2016****************************************/ 
+/***********************************I-DEP-GSS-TES-0-08/03/2016****************************************/
 
 ALTER TABLE tes.tsolicitud_efectivo_det
   ADD CONSTRAINT fk_tsolicitud_efectivo_det__id_solicitud_efectivo FOREIGN KEY (id_solicitud_efectivo)
@@ -3370,7 +3370,7 @@ ALTER TABLE tes.tsolicitud_rendicion_det
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
-	
+
 /***********************************F-DEP-GSS-TES-0-08/03/2016****************************************/
 
 
@@ -3389,18 +3389,18 @@ CREATE INDEX tplan_pago_idx ON tes.tplan_pago
 
 CREATE INDEX tplan_pago_idx1 ON tes.tplan_pago
   USING btree (id_plantilla);
-  
-  
+
+
 --------------- SQL ---------------
 
 CREATE INDEX tplan_pago_id_obligacion_pago ON tes.tplan_pago
   USING btree (id_obligacion_pago);
-  
+
 --------------- SQL ---------------
 
 CREATE INDEX tplan_pago_id_int_comprobante ON tes.tplan_pago
   USING btree (id_int_comprobante);
-  
+
 --------------- SQL ---------------
 
 CREATE INDEX tobligacion_pago_id_contrato ON tes.tobligacion_pago
@@ -3411,13 +3411,13 @@ CREATE INDEX tobligacion_pago_id_contrato ON tes.tobligacion_pago
 
 CREATE INDEX tobligacion_pago_id_moneda ON tes.tobligacion_pago
   USING btree (id_moneda);
-  
+
 --------------- SQL ---------------
 
 CREATE INDEX tobligacion_pago_id_gestion ON tes.tobligacion_pago
   USING btree (id_gestion);
-  
-   
+
+
 
 /***********************************F-DEP-RAC-TES-0-23/03/2016****************************************/
 
@@ -3584,7 +3584,7 @@ AS
           character varying::text ])) AND
         (op.tipo_obligacion::text = ANY (ARRAY [ 'adquisiciones'::character
           varying::text, 'pago_directo'::character varying::text ])) AND
-        pp.estado_reg::text = 'activo'::text 
+        pp.estado_reg::text = 'activo'::text
   GROUP BY pp.id_plan_pago,
            pp.fecha_tentativa,
            pp.id_estado_wf,
@@ -3771,9 +3771,9 @@ AS
          COALESCE(cac.codigo, ''::character varying) AS codigo_categoria,
          COALESCE(cac.nombre, ''::character varying) AS nombre_categoria,
          pp.id_proceso_wf,
-         ((('<table border="1"><TR> 
-   <TH>Concepto</TH> 
-   <TH>Detalle</TH> 
+         ((('<table border="1"><TR>
+   <TH>Concepto</TH>
+   <TH>Detalle</TH>
    <TH>Importe ('::text || mon.codigo::text) || ')</TH>'::text) || pxp.html_rows
      (((((((((('<td>'::text || ci.desc_ingas::text) || '</td> <td>'::text) ||
      '<font hdden=true>'::text) || od.id_obligacion_det::character varying::text
@@ -3975,8 +3975,8 @@ FROM tes.tobligacion_pago op
 
 --------------- SQL ---------------
 
-CREATE VIEW tes.vplan_pago 
-AS 
+CREATE VIEW tes.vplan_pago
+AS
 SELECT   ppp.id_plan_pago,
          op.id_gestion,
          ges.gestion,
@@ -4029,7 +4029,7 @@ SELECT   ppp.id_plan_pago,
        LEFT JOIN leg.tcontrato con ON con.id_contrato = op.id_contrato
        JOIN orga.vfuncionario fun ON fun.id_funcionario = op.id_funcionario
 
-group by 
+group by
          ppp.id_plan_pago,
          op.id_gestion,
          ges.gestion,
@@ -4174,7 +4174,7 @@ AS
    JOIN tes.tcajero c ON c.id_caja = ca.id_caja AND c.tipo::text = 'responsable'::text
    JOIN orga.vfuncionario f ON f.id_funcionario = c.id_funcionario
   WHERE pc.fecha >= c.fecha_inicio AND pc.fecha <= c.fecha_fin OR pc.fecha >= c.fecha_inicio AND c.fecha_fin IS NULL;
-  
+
 
 -----
 
@@ -4350,7 +4350,7 @@ AS
        JOIN param.tplantilla plt ON plt.id_plantilla = ppp.id_plantilla
        LEFT JOIN leg.tcontrato con ON con.id_contrato = op.id_contrato AND
          con.id_gestion = ges.id_gestion
-       JOIN orga.vfuncionario fun ON fun.id_funcionario = op.id_funcionario;     
+       JOIN orga.vfuncionario fun ON fun.id_funcionario = op.id_funcionario;
 
 -----------
 
@@ -5681,3 +5681,583 @@ ALTER VIEW tes.v_pagos_libro_banco_exterior
   OWNER TO postgres;
 
 /***********************************F-DEP-MAY-TES-0-27/01/2020****************************************/
+
+/***********************************I-DEP-IRVA-TES-0-29/05/2020****************************************/
+DROP VIEW tes.v_pagos_libro_banco_exterior;
+CREATE OR REPLACE VIEW tes.v_pagos_libro_banco_exterior (
+    num_tramite,
+    fecha,
+    nro_cuenta,
+    nombre,
+    codigo,
+    nombre_estado,
+    obs,
+    desc_persona,
+    usuario_ai,
+    id_gestion,
+    id_obligacion_pago,
+    monto,
+    prioridad,
+    id_moneda,
+    estado_pp,
+    tipo_obligacion,
+    nombre_proveedor)
+AS
+SELECT op.num_tramite,
+    ef.fecha_reg AS fecha,
+    pl.nro_cuota AS nro_cuenta,
+    de.nombre,
+    te.codigo,
+    te.nombre_estado,
+    ef.obs,
+    us.desc_persona,
+    us2.desc_persona AS usuario_ai,
+    op.id_gestion,
+    op.id_obligacion_pago,
+    pl.monto,
+    de.prioridad,
+    op.id_moneda,
+    pl.estado AS estado_pp,
+    op.tipo_obligacion,
+    prove.rotulo_comercial AS nombre_proveedor
+FROM tes.tobligacion_pago op
+     JOIN param.tproveedor prove ON prove.id_proveedor = op.id_proveedor
+     JOIN tes.tplan_pago pl ON pl.id_obligacion_pago = op.id_obligacion_pago
+     JOIN param.tdepto de ON de.id_depto = pl.id_depto_lb
+     JOIN wf.tproceso_wf pf ON pf.id_proceso_wf = pl.id_proceso_wf
+     JOIN wf.testado_wf ef ON ef.id_proceso_wf = pf.id_proceso_wf
+     JOIN wf.ttipo_estado te ON te.id_tipo_estado = ef.id_tipo_estado AND
+         (te.codigo::text = 'supcostos'::text OR te.codigo::text = 'supconta'::text)
+     JOIN segu.vusuario us ON us.id_usuario = ef.id_usuario_reg
+     LEFT JOIN segu.vusuario us2 ON us2.id_usuario = ef.id_usuario_ai
+ORDER BY ef.fecha_reg;
+
+ALTER VIEW tes.v_pagos_libro_banco_exterior
+  OWNER TO postgres;
+/***********************************F-DEP-IRVA-TES-0-29/05/2020****************************************/
+
+/***********************************I-DEP-MAY-TES-0-24/09/2020****************************************/
+CREATE VIEW tes.v_pagos_libro_banco_exterior_2 (
+    num_tramite,
+    fecha,
+    nro_cuenta,
+    nombre,
+    codigo,
+    nombre_estado,
+    obs,
+    desc_persona,
+    usuario_ai,
+    id_gestion,
+    id_obligacion_pago,
+    monto,
+    prioridad,
+    id_moneda,
+    estado_pp,
+    tipo_obligacion,
+    nombre_proveedor,
+    id_plan_pago)
+AS
+SELECT op.num_tramite,
+    ef.fecha_reg AS fecha,
+    pl.nro_cuota AS nro_cuenta,
+    de.nombre,
+    te.codigo,
+    te.nombre_estado,
+    ef.obs,
+    us.desc_persona,
+    us2.desc_persona AS usuario_ai,
+    op.id_gestion,
+    op.id_obligacion_pago,
+    pl.monto,
+    de.prioridad,
+    op.id_moneda,
+    pl.estado AS estado_pp,
+    op.tipo_obligacion,
+    prove.rotulo_comercial AS nombre_proveedor,
+    pl.id_plan_pago
+FROM tes.tplan_pago pl
+     JOIN tes.tobligacion_pago op ON op.id_obligacion_pago = pl.id_obligacion_pago
+     JOIN param.tproveedor prove ON prove.id_proveedor = op.id_proveedor
+     JOIN param.tdepto de ON de.id_depto = pl.id_depto_lb
+     JOIN wf.tproceso_wf pf ON pf.id_proceso_wf = pl.id_proceso_wf
+     JOIN wf.testado_wf ef ON ef.id_proceso_wf = pf.id_proceso_wf
+     JOIN wf.ttipo_estado te ON te.id_tipo_estado = ef.id_tipo_estado
+     JOIN segu.vusuario us ON us.id_usuario = ef.id_usuario_reg
+     LEFT JOIN segu.vusuario us2 ON us2.id_usuario = ef.id_usuario_ai
+ORDER BY ef.fecha_reg;
+
+ALTER VIEW tes.v_pagos_libro_banco_exterior_2
+  OWNER TO "postgres";
+/***********************************F-DEP-MAY-TES-0-24/09/2020****************************************/
+
+/***********************************I-DEP-MAY-TES-0-26/02/2021****************************************/
+DROP VIEW tes.vcomp_devtesprov_plan_pago_2;
+
+CREATE VIEW tes.vcomp_devtesprov_plan_pago_2 (
+    id_plan_pago,
+    id_proveedor,
+    desc_proveedor,
+    id_moneda,
+    id_depto_conta,
+    numero,
+    fecha_actual,
+    estado,
+    monto_ejecutar_total_mb,
+    monto_ejecutar_total_mo,
+    monto,
+    monto_mb,
+    monto_retgar_mb,
+    monto_retgar_mo,
+    monto_no_pagado,
+    monto_no_pagado_mb,
+    otros_descuentos,
+    otros_descuentos_mb,
+    id_plantilla,
+    id_cuenta_bancaria,
+    id_cuenta_bancaria_mov,
+    nro_cheque,
+    nro_cuenta_bancaria,
+    num_tramite,
+    tipo,
+    id_gestion_cuentas,
+    id_int_comprobante,
+    liquido_pagable,
+    liquido_pagable_mb,
+    nombre_pago,
+    porc_monto_excento_var,
+    obs_pp,
+    descuento_anticipo,
+    descuento_inter_serv,
+    tipo_obligacion,
+    id_categoria_compra,
+    codigo_categoria,
+    nombre_categoria,
+    id_proceso_wf,
+    detalle,
+    codigo_moneda,
+    nro_cuota,
+    tipo_pago,
+    tipo_solicitud,
+    tipo_concepto_solicitud,
+    total_monto_op_mb,
+    total_monto_op_mo,
+    total_pago,
+    fecha_tentativa,
+    desc_funcionario,
+    email_empresa,
+    desc_usuario,
+    id_funcionario_gerente,
+    correo_usuario,
+    sw_conformidad,
+    ultima_cuota_pp,
+    ultima_cuota_dev,
+    tiene_form500,
+    prioridad_op,
+    prioridad_lb,
+    id_depto_lb,
+    codigo)
+AS
+SELECT pp.id_plan_pago,
+    op.id_proveedor,
+    COALESCE(p.desc_proveedor, ''::character varying) AS desc_proveedor,
+    op.id_moneda,
+    pp.id_depto_conta,
+    op.numero,
+    now() AS fecha_actual,
+    pp.estado,
+    pp.monto_ejecutar_total_mb,
+    pp.monto_ejecutar_total_mo,
+    pp.monto,
+    pp.monto_mb,
+    pp.monto_retgar_mb,
+    pp.monto_retgar_mo,
+    pp.monto_no_pagado,
+    pp.monto_no_pagado_mb,
+    pp.otros_descuentos,
+    pp.otros_descuentos_mb,
+    pp.id_plantilla,
+    pp.id_cuenta_bancaria,
+    pp.id_cuenta_bancaria_mov,
+    pp.nro_cheque,
+    pp.nro_cuenta_bancaria,
+    op.num_tramite,
+    pp.tipo,
+    op.id_gestion AS id_gestion_cuentas,
+    pp.id_int_comprobante,
+    pp.liquido_pagable,
+    pp.liquido_pagable_mb,
+    pp.nombre_pago,
+    pp.porc_monto_excento_var,
+    ((COALESCE(op.numero, ''::character varying)::text || ' '::text) ||
+        COALESCE(pp.obs_monto_no_pagado, ''::text))::character varying AS obs_pp,
+    pp.descuento_anticipo,
+    pp.descuento_inter_serv,
+    op.tipo_obligacion,
+    op.id_categoria_compra,
+    COALESCE(cac.codigo, ''::character varying) AS codigo_categoria,
+    COALESCE(cac.nombre, ''::character varying) AS nombre_categoria,
+    pp.id_proceso_wf,
+    ((('<table border="1"><TR>
+   <TH>Concepto</TH>
+   <TH>Detalle</TH>
+   <TH>Importe
+       ('::text || mon.codigo::text) || ')</TH>'::text) || pxp.html_rows(((((((((('<td>'::text || ci.desc_ingas::text) || '</td>
+       <td>'::text) || '<font
+           hdden=true>'::text) || od.id_obligacion_det::character varying::text) || '</font>'::text) || od.descripcion) || '</td> <td>'::text) || od.monto_pago_mo::text) || '</td>'::text)::character varying)::text) || '</table>'::text AS detalle,
+    mon.codigo AS codigo_moneda,
+    pp.nro_cuota,
+    pp.tipo_pago,
+    op.tipo_solicitud,
+    op.tipo_concepto_solicitud,
+    COALESCE(sum(od.monto_pago_mb), 0::numeric) AS total_monto_op_mb,
+    COALESCE(sum(od.monto_pago_mo), 0::numeric) AS total_monto_op_mo,
+    op.total_pago,
+    pp.fecha_tentativa,
+    fun.desc_funcionario1 AS desc_funcionario,
+    fun.email_empresa,
+    usu.desc_persona AS desc_usuario,
+    COALESCE(op.id_funcionario_gerente, 0) AS id_funcionario_gerente,
+    ususol.correo AS correo_usuario,
+        CASE
+            WHEN pp.fecha_conformidad IS NULL THEN 'no'::text
+            ELSE 'si'::text
+        END AS sw_conformidad,
+    op.ultima_cuota_pp,
+    op.ultima_cuota_dev,
+    pp.tiene_form500,
+    dep.prioridad AS prioridad_op,
+    COALESCE(deplb.prioridad, '-1'::integer) AS prioridad_lb,
+    pp.id_depto_lb,
+    deplb.codigo
+FROM tes.tplan_pago pp
+     JOIN tes.tobligacion_pago op ON pp.id_obligacion_pago = op.id_obligacion_pago
+     JOIN param.tmoneda mon ON mon.id_moneda = op.id_moneda
+     JOIN param.tdepto dep ON dep.id_depto = op.id_depto
+     LEFT JOIN param.vproveedor p ON p.id_proveedor = op.id_proveedor
+     LEFT JOIN adq.tcategoria_compra cac ON cac.id_categoria_compra =
+         op.id_categoria_compra
+     LEFT JOIN adq.tcotizacion cot ON op.id_obligacion_pago = cot.id_obligacion_pago
+     LEFT JOIN adq.tproceso_compra pro ON pro.id_proceso_compra = cot.id_proceso_compra
+     LEFT JOIN adq.tsolicitud sol ON sol.id_solicitud = pro.id_solicitud
+     LEFT JOIN segu.vusuario ususol ON ususol.id_usuario = sol.id_usuario_reg
+     LEFT JOIN param.tdepto deplb ON deplb.id_depto = pp.id_depto_lb
+     JOIN tes.tobligacion_det od ON od.id_obligacion_pago =
+         op.id_obligacion_pago AND od.estado_reg::text = 'activo'::text
+     JOIN param.tconcepto_ingas ci ON ci.id_concepto_ingas = od.id_concepto_ingas
+     JOIN orga.vfuncionario_cargo fun ON fun.id_funcionario = op.id_funcionario
+         AND fun.estado_reg_asi::text = 'activo'::text
+     JOIN segu.vusuario usu ON usu.id_usuario = op.id_usuario_reg
+GROUP BY pp.id_plan_pago, op.id_proveedor, p.desc_proveedor, op.id_moneda,
+    op.id_depto_conta, op.numero, pp.estado, pp.monto_ejecutar_total_mb, pp.monto_ejecutar_total_mo, pp.monto, pp.monto_mb, pp.monto_retgar_mb, pp.monto_retgar_mo, pp.monto_no_pagado, pp.monto_no_pagado_mb, pp.otros_descuentos, pp.otros_descuentos_mb, pp.id_plantilla, pp.id_cuenta_bancaria, pp.id_cuenta_bancaria_mov, pp.nro_cheque, pp.nro_cuenta_bancaria, op.num_tramite, pp.tipo, op.id_gestion, pp.id_int_comprobante, pp.liquido_pagable, pp.liquido_pagable_mb, pp.nombre_pago, pp.porc_monto_excento_var, pp.obs_monto_no_pagado, pp.descuento_anticipo, pp.descuento_inter_serv, op.tipo_obligacion, op.id_categoria_compra, cac.codigo, cac.nombre, pp.id_proceso_wf, mon.codigo, pp.nro_cuota, pp.tipo_pago, op.total_pago, op.tipo_solicitud, op.tipo_concepto_solicitud, pp.fecha_tentativa, fun.desc_funcionario1, fun.email_empresa, usu.desc_persona, op.id_funcionario_gerente, ususol.correo, op.ultima_cuota_pp, op.ultima_cuota_dev, pp.tiene_form500, dep.prioridad, deplb.prioridad, deplb.codigo;
+
+ALTER VIEW tes.vcomp_devtesprov_plan_pago_2
+  OWNER TO postgres;
+/***********************************F-DEP-MAY-TES-0-26/02/2021****************************************/
+
+/***********************************I-DEP-FEA-TES-0-09/02/2022****************************************/
+CREATE VIEW tes.vrefrigerio_viatico_plan_pago (
+    id_plan_pago,
+    id_proveedor,
+    desc_proveedor,
+    id_moneda,
+    id_depto_conta,
+    numero,
+    fecha_actual,
+    estado,
+    monto_ejecutar_total_mb,
+    monto_ejecutar_total_mo,
+    monto,
+    monto_mb,
+    monto_retgar_mb,
+    monto_retgar_mo,
+    monto_no_pagado,
+    monto_no_pagado_mb,
+    otros_descuentos,
+    otros_descuentos_mb,
+    id_plantilla,
+    id_cuenta_bancaria,
+    id_cuenta_bancaria_mov,
+    nro_cheque,
+    nro_cuenta_bancaria,
+    num_tramite,
+    tipo,
+    id_gestion_cuentas,
+    id_int_comprobante,
+    liquido_pagable,
+    liquido_pagable_mb,
+    nombre_pago,
+    porc_monto_excento_var,
+    obs_pp,
+    descuento_anticipo,
+    descuento_inter_serv,
+    tipo_obligacion,
+    id_categoria_compra,
+    id_proceso_wf,
+    forma_pago,
+    monto_ajuste_ag,
+    monto_ajuste_siguiente_pago,
+    monto_anticipo,
+    tipo_cambio_conv,
+    id_depto_libro,
+    fecha_costo_ini,
+    fecha_costo_fin,
+    id_obligacion_pago,
+    fecha_tentativa,
+    id_int_comprobante_rel,
+    fecha,
+    id_depto,
+    id_centro_costo_depto)
+AS
+SELECT pp.id_plan_pago,
+    op.id_proveedor,
+    COALESCE(p.desc_proveedor, ''::character varying) AS desc_proveedor,
+    op.id_moneda,
+    op.id_depto_conta,
+    op.numero,
+    now() AS fecha_actual,
+    pp.estado,
+    pp.monto_ejecutar_total_mb,
+    pp.monto_ejecutar_total_mo,
+    pp.monto,
+    pp.monto_mb,
+    pp.monto_retgar_mb,
+    pp.monto_retgar_mo,
+    pp.monto_no_pagado,
+    pp.monto_no_pagado_mb,
+    pp.otros_descuentos,
+    pp.otros_descuentos_mb,
+    pp.id_plantilla,
+    pp.id_cuenta_bancaria,
+    pp.id_cuenta_bancaria_mov,
+    pp.nro_cheque,
+    pp.nro_cuenta_bancaria,
+    op.num_tramite,
+    pp.tipo,
+    op.id_gestion AS id_gestion_cuentas,
+    pp.id_int_comprobante,
+    pp.liquido_pagable,
+    pp.liquido_pagable_mb,
+    pp.nombre_pago,
+    pp.porc_monto_excento_var,
+    ((COALESCE(op.numero, ''::character varying)::text || ' '::text) || COALESCE(pp.obs_monto_no_pagado, ''::text))::character varying AS obs_pp,
+    pp.descuento_anticipo,
+    pp.descuento_inter_serv,
+    op.tipo_obligacion,
+    op.id_categoria_compra,
+    pp.id_proceso_wf,
+    pp.forma_pago,
+    pp.monto_ajuste_ag,
+    pp.monto_ajuste_siguiente_pago,
+    pp.monto_anticipo,
+    pp.tipo_cambio AS tipo_cambio_conv,
+    pp.id_depto_lb AS id_depto_libro,
+        CASE
+            WHEN pp.fecha_costo_ini IS NULL THEN now()::date
+            WHEN pp.fecha_costo_ini > now() THEN now()::date
+            ELSE pp.fecha_costo_ini
+        END AS fecha_costo_ini,
+    COALESCE(pp.fecha_costo_fin, now()::date) AS fecha_costo_fin,
+    op.id_obligacion_pago,
+    pp.fecha_tentativa,
+    pr.id_int_comprobante AS id_int_comprobante_rel,
+    op.fecha,
+    4 AS id_depto,
+    (
+    SELECT f_get_config_relacion_contable.ps_id_centro_costo
+    FROM conta.f_get_config_relacion_contable('CCDEPCON'::character varying, (
+        SELECT f_get_periodo_gestion.po_id_gestion
+        FROM param.f_get_periodo_gestion(op.fecha) f_get_periodo_gestion(po_id_periodo, po_id_gestion, po_id_periodo_subsistema)
+        ), 4, NULL::integer, 'No existe presupuesto administrativo relacionado al departamento de RRHH'::character varying)
+            f_get_config_relacion_contable(ps_id_cuenta, ps_id_auxiliar, ps_id_partida, ps_id_centro_costo, ps_nombre_tipo_relacion)
+    ) AS id_centro_costo_depto
+FROM tes.tplan_pago pp
+     JOIN tes.tobligacion_pago op ON pp.id_obligacion_pago = op.id_obligacion_pago AND op.tipo_obligacion::text = 'pago_pvr'::text
+     JOIN param.tdepto d ON d.codigo::text = 'CON'::text
+     LEFT JOIN param.vproveedor p ON p.id_proveedor = op.id_proveedor
+     LEFT JOIN tes.tplan_pago pr ON pr.id_plan_pago = pp.id_plan_pago_fk;
+
+ALTER VIEW tes.vrefrigerio_viatico_plan_pago
+  OWNER TO postgres;
+
+
+
+  CREATE VIEW tes.vrefrigerio_viatico_plan_pago_detalle (
+    id_concepto_ingas,
+    id_partida,
+    id_partida_ejecucion_com,
+    monto_pago_mo,
+    monto_pago_mb,
+    id_centro_costo,
+    descripcion,
+    id_plan_pago,
+    id_prorrateo,
+    id_int_transaccion,
+    id_orden_trabajo,
+    id_auxiliar,
+    id_cuenta)
+AS
+SELECT od.id_concepto_ingas,
+    od.id_partida,
+    od.id_partida_ejecucion_com,
+    pro.monto_ejecutar_mo AS monto_pago_mo,
+    pro.monto_ejecutar_mb AS monto_pago_mb,
+    od.id_centro_costo,
+    od.descripcion,
+    pro.id_plan_pago,
+    pro.id_prorrateo,
+    pro.id_int_transaccion,
+    od.id_orden_trabajo,
+    od.id_auxiliar,
+    od.id_cuenta
+FROM tes.tprorrateo pro
+     JOIN tes.tobligacion_det od ON od.id_obligacion_det = pro.id_obligacion_det
+     JOIN tes.tobligacion_pago op ON op.id_obligacion_pago = od.id_obligacion_pago AND op.tipo_obligacion::text = 'pago_pvr'::text;
+
+ALTER VIEW tes.vrefrigerio_viatico_plan_pago_detalle
+  OWNER TO postgres;
+
+  /***********************************F-DEP-FEA-TES-0-09/02/2022****************************************/
+
+/***********************************F-DEP-MAY-TES-0-14/02/2022****************************************/
+CREATE VIEW tes.vobligacion_pago_pga (
+    id_usuario_reg,
+    id_usuario_mod,
+    fecha_reg,
+    fecha_mod,
+    estado_reg,
+    id_usuario_ai,
+    usuario_ai,
+    id_obligacion_pago,
+    id_proveedor,
+    id_funcionario,
+    id_subsistema,
+    id_moneda,
+    id_depto,
+    id_estado_wf,
+    id_proceso_wf,
+    id_gestion,
+    fecha,
+    numero,
+    estado,
+    obs,
+    porc_anticipo,
+    porc_retgar,
+    tipo_cambio_conv,
+    num_tramite,
+    tipo_obligacion,
+    comprometido,
+    pago_variable,
+    nro_cuota_vigente,
+    total_pago,
+    id_depto_conta,
+    total_nro_cuota,
+    id_plantilla,
+    fecha_pp_ini,
+    rotacion,
+    ultima_cuota_pp,
+    ultimo_estado_pp,
+    tipo_anticipo,
+    id_categoria_compra,
+    tipo_solicitud,
+    tipo_concepto_solicitud,
+    id_funcionario_gerente,
+    ajuste_anticipo,
+    ajuste_aplicado,
+    id_obligacion_pago_extendida,
+    monto_estimado_sg,
+    monto_ajuste_ret_garantia_ga,
+    monto_ajuste_ret_anticipo_par_ga,
+    id_contrato,
+    obs_presupuestos,
+    ultima_cuota_dev,
+    codigo_poa,
+    obs_poa,
+    uo_ex,
+    detalle,
+    sw_movimiento)
+AS
+SELECT op.id_usuario_reg,
+    op.id_usuario_mod,
+    op.fecha_reg,
+    op.fecha_mod,
+    op.estado_reg,
+    op.id_usuario_ai,
+    op.usuario_ai,
+    op.id_obligacion_pago,
+    op.id_proveedor,
+    op.id_funcionario,
+    op.id_subsistema,
+    op.id_moneda,
+    op.id_depto,
+    op.id_estado_wf,
+    op.id_proceso_wf,
+    op.id_gestion,
+    op.fecha,
+    op.numero,
+    op.estado,
+    op.obs,
+    op.porc_anticipo,
+    op.porc_retgar,
+    op.tipo_cambio_conv,
+    op.num_tramite,
+    op.tipo_obligacion,
+    op.comprometido,
+    op.pago_variable,
+    op.nro_cuota_vigente,
+    op.total_pago,
+    op.id_depto_conta,
+    op.total_nro_cuota,
+    op.id_plantilla,
+    op.fecha_pp_ini,
+    op.rotacion,
+    op.ultima_cuota_pp,
+    op.ultimo_estado_pp,
+    op.tipo_anticipo,
+    op.id_categoria_compra,
+    op.tipo_solicitud,
+    op.tipo_concepto_solicitud,
+    op.id_funcionario_gerente,
+    op.ajuste_anticipo,
+    op.ajuste_aplicado,
+    op.id_obligacion_pago_extendida,
+    op.monto_estimado_sg,
+    op.monto_ajuste_ret_garantia_ga,
+    op.monto_ajuste_ret_anticipo_par_ga,
+    op.id_contrato,
+    op.obs_presupuestos,
+    op.ultima_cuota_dev,
+    op.codigo_poa,
+    op.obs_poa,
+    op.uo_ex,
+    ((('<table border="1"><TR>
+   <TH>Concepto</TH>
+   <TH>Detalle</TH>
+   <TH>Importe
+       ('::text || mon.codigo::text) || ')</TH>'::text) || pxp.html_rows(((((((((('<td>'::text || ci.desc_ingas::text) || '</td>
+       <td>'::text) || '<font
+           hdden=true>'::text) || od.id_obligacion_det::character varying::text) || '</font>'::text) || od.descripcion) || '</td>
+               <td>'::text) || od.monto_pago_mo::text) || '</td>'::text)::character varying)::text) || '</table>'::text AS detalle,
+    par.sw_movimiento
+FROM tes.tobligacion_pago op
+     JOIN param.tmoneda mon ON mon.id_moneda = op.id_moneda
+     JOIN param.tdepto dep ON dep.id_depto = op.id_depto
+     LEFT JOIN param.vproveedor p ON p.id_proveedor = op.id_proveedor
+     LEFT JOIN adq.tcategoria_compra cac ON cac.id_categoria_compra =
+         op.id_categoria_compra
+     LEFT JOIN adq.tcotizacion cot ON op.id_obligacion_pago = cot.id_obligacion_pago
+     LEFT JOIN adq.tproceso_compra pro ON pro.id_proceso_compra = cot.id_proceso_compra
+     LEFT JOIN adq.tsolicitud sol ON sol.id_solicitud = pro.id_solicitud
+     LEFT JOIN segu.vusuario ususol ON ususol.id_usuario = sol.id_usuario_reg
+     JOIN tes.tobligacion_det od ON od.id_obligacion_pago =
+         op.id_obligacion_pago AND od.estado_reg::text = 'activo'::text
+     JOIN param.tconcepto_ingas ci ON ci.id_concepto_ingas = od.id_concepto_ingas
+     JOIN orga.vfuncionario_cargo fun ON fun.id_funcionario = op.id_funcionario
+         AND fun.estado_reg_asi::text = 'activo'::text
+     JOIN segu.vusuario usu ON usu.id_usuario = op.id_usuario_reg
+     JOIN pre.tpartida par ON par.id_partida = od.id_partida
+GROUP BY op.id_usuario_reg, op.id_usuario_mod, op.fecha_reg, op.fecha_mod,
+    op.estado_reg, op.id_usuario_ai, op.usuario_ai, op.id_obligacion_pago, op.id_proveedor, op.id_funcionario, op.id_subsistema, op.id_moneda, op.id_depto, op.id_estado_wf, op.id_proceso_wf, op.id_gestion, op.fecha, op.numero, op.estado, op.obs, op.porc_anticipo, op.porc_retgar, op.tipo_cambio_conv, op.num_tramite, op.tipo_obligacion, op.comprometido, op.pago_variable, op.nro_cuota_vigente, op.total_pago, op.id_depto_conta, op.total_nro_cuota, op.id_plantilla, op.fecha_pp_ini, op.rotacion, op.ultima_cuota_pp, op.ultimo_estado_pp, op.tipo_anticipo, op.id_categoria_compra, op.tipo_solicitud, op.tipo_concepto_solicitud, op.id_funcionario_gerente, op.ajuste_anticipo, op.ajuste_aplicado, op.id_obligacion_pago_extendida, op.monto_estimado_sg, op.monto_ajuste_ret_garantia_ga, op.monto_ajuste_ret_anticipo_par_ga, op.id_contrato, op.obs_presupuestos, op.ultima_cuota_dev, op.codigo_poa, op.obs_poa, op.uo_ex, mon.codigo, par.sw_movimiento;
+
+ALTER VIEW tes.vobligacion_pago_pga
+  OWNER TO postgres;
+/***********************************F-DEP-MAY-TES-0-14/02/2022****************************************/

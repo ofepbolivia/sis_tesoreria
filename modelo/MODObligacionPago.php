@@ -94,6 +94,9 @@ class MODObligacionPago extends MODbase
         $this->captura('observaciones', 'varchar');
         $this->captura('fecha_certificacion_pres', 'date');
         $this->captura('presupuesto_aprobado', 'varchar');
+        $this->captura('nro_preventivo', 'integer');
+
+        $this->captura('partida', 'varchar');
 
         //Ejecuta la instruccion
         $this->armarConsulta();
@@ -618,7 +621,7 @@ class MODObligacionPago extends MODbase
         $this->captura('pagado', 'numeric');
         $this->captura('revertible', 'numeric');
         $this->captura('revertir', 'numeric');
-        $this->captura('moneda', 'varchar');          
+        $this->captura('moneda', 'varchar');
         $this->captura('desc_orden', 'varchar');
 
         //Ejecuta la instruccion
@@ -1020,7 +1023,7 @@ class MODObligacionPago extends MODbase
 		$this->procedimiento='tes.ft_obligacion_pago_sel';
 		$this->transaccion='TES_LIBAN_EXT_SEL';
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
-        
+
         $this->setParametro('id_gestion','id_gestion','int4');
 		$this->captura('id_obligacion_pago','int4');
         $this->captura('num_tramite','varchar');
@@ -1036,13 +1039,16 @@ class MODObligacionPago extends MODbase
         $this->captura('moneda','varchar');
         $this->captura('cod_moneda','varchar');
         $this->captura('estado_pp','varchar');
-		
+        $this->captura('nombre_proveedor','varchar');
+
+        $this->captura('id_plan_pago','int4');
+
 		//Ejecuta la instruccion
-        $this->armarConsulta();        
-        $this->ejecutarConsulta();        
-		
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
 		//Devuelve la respuesta
-		return $this->respuesta;        
+		return $this->respuesta;
     }
     function listarEvoluPresup()
     {
@@ -1054,14 +1060,17 @@ class MODObligacionPago extends MODbase
 
         $this->setParametro('id_partida_ejecucion_com', 'id_partida_ejecucion_com', 'int4');
         $this->setParametro('tipo_interfaz', 'tipo_interfaz', 'varchar');
-        
+
         //Definicion de la lista del resultado del query
         $this->captura('id_partida_ejecucion', 'int4');
         $this->captura('id_partida_ejecucion_fk', 'int4');
         $this->captura('moneda', 'varchar');
         $this->captura('comprometido', 'numeric');
+        $this->captura('comprometido_mb', 'numeric');
         $this->captura('ejecutado', 'numeric');
-        $this->captura('pagado', 'numeric');        
+        $this->captura('ejecutado_mb', 'numeric');
+        $this->captura('pagado', 'numeric');
+        $this->captura('pagado_mb', 'numeric');
         $this->captura('nro_tramite', 'varchar');
         $this->captura('tipo_movimiento', 'varchar');
         $this->captura('nombre_partida', 'varchar');
@@ -1072,9 +1081,9 @@ class MODObligacionPago extends MODbase
         $this->captura('usr_reg', 'varchar');
         $this->captura('usr_mod', 'varchar');
         $this->captura('fecha_reg', 'timestamp');
-        $this->captura('fecha_mod', 'timestamp');    
+        $this->captura('fecha_mod', 'timestamp');
         $this->captura('estado_reg', 'varchar');
-       
+
         //Ejecuta la instruccion
         $this->armarConsulta();
         //echo($this->consulta);exit;
@@ -1114,7 +1123,282 @@ class MODObligacionPago extends MODbase
 
         //Devuelve la respuesta
         return $this->respuesta;
-    }    
+    }
+    function reporteSolicitud()
+    {
+        //Definicion de variables para ejecucion del procedimientp
+        $this->procedimiento = 'tes.ft_obligacion_pago_sel';
+        $this->transaccion = 'TES_SOLREPOBP_SEL';
+        $this->tipo_procedimiento = 'SEL';//tipo de transaccion
+        $this->setCount(false);
+
+        $this->setParametro('id_obligacion_pago', 'id_obligacion_pago', 'int4');
+        $this->setParametro('id_proceso_wf', 'id_proceso_wf', 'int4');
+
+        //Definicion de la lista del resultado del query
+        $this->captura('id_obligacion_pago', 'int4');
+        $this->captura('estado', 'varchar');
+        $this->captura('numero', 'varchar');
+        $this->captura('num_tramite', 'varchar');
+        $this->captura('fecha_apro', 'date');
+        $this->captura('desc_moneda', 'varchar');
+        $this->captura('tipo', 'varchar');
+        $this->captura('desc_gestion', 'integer');
+        $this->captura('fecha_soli', 'date');
+        $this->captura('fecha_soli_gant', 'date');
+        $this->captura('desc_funcionario', 'text');
+        $this->captura('desc_uo', 'text');
+        $this->captura('desc_depto', 'varchar');
+        $this->captura('desc_funcionario_apro', 'text');
+        $this->captura('cargo_desc_funcionario', 'varchar');
+        $this->captura('cargo_desc_funcionario_apro', 'varchar');
+        $this->captura('fecha_reg', 'timestamp');
+        $this->captura('codigo_poa', 'varchar');
+        $this->captura('nombre_usuario_ai', 'varchar');
+        $this->captura('codigo_uo', 'varchar');
+        $this->captura('prioridad', 'integer');
+        $this->captura('id_moneda', 'integer');
+        $this->captura('obs', 'varchar');
+
+        $this->armarConsulta();
+        //echo($this->consulta);exit;
+        $this->ejecutarConsulta();
+
+        return $this->respuesta;
+    }
+
+    //{develop: franklin.espinoza date: 12/10/2020, description: Guarda Preventivo para procesos con Preventivo}
+    function guardarDocumentoSigep(){
+        //swEditable de variables para ejecucion del procedimiento
+        $this->procedimiento='tes.ft_obligacion_pago_ime';
+        $this->transaccion='TES_DOCSIGEP_IME';
+        $this->tipo_procedimiento='IME';
+
+        //Define los parametros para la funcion
+        $this->setParametro('id_obligacion_pago','id_obligacion_pago','integer');
+        $this->setParametro('nro_preventivo','nro_preventivo','integer');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+
+    //02-12-2020 (may) para insertar la relacion de un proceso
+    function insertarRelacionProceso(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento='tes.ft_obligacion_pago_ime';
+        $this->transaccion='TES_RELACOB_IME';
+        $this->tipo_procedimiento='IME';
+
+        //Define los parametros para la funcion
+        $this->setParametro('observaciones','observaciones','varchar');
+        $this->setParametro('id_obligacion_pago','id_obligacion_pago','int4');
+
+        $this->setParametro('id_proceso_wf','id_proceso_wf','int4');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+    //02-12-2020 (may) para modificar la relacion de un proceso
+    function modificarRelacionProceso(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento='tes.ft_obligacion_pago_ime';
+        $this->transaccion='TES_RELACOB_MOD';
+        $this->tipo_procedimiento='IME';
+
+        //Define los parametros para la funcion
+        $this->setParametro('id_relacion_proceso_pago','id_relacion_proceso_pago','int4');
+        $this->setParametro('observaciones','observaciones','varchar');
+        $this->setParametro('id_obligacion_pago','id_obligacion_pago','int4');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+
+     //02-12-2020 (may) para eliminar la relacion de un proceso
+    function eliminarRelacionProceso(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento='tes.ft_obligacion_pago_ime';
+        $this->transaccion='TES_RELACOB_ELI';
+        $this->tipo_procedimiento='IME';
+
+        //Define los parametros para la funcion
+        $this->setParametro('id_relacion_proceso_pago','id_relacion_proceso_pago','int4');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+
+    //02-12-2020 (may) para listar la relacion de un proceso
+    function listarRelacionProceso(){
+        //Definicion de variables para ejecucion del procedimientp
+        $this->procedimiento='tes.ft_obligacion_pago_sel';
+        $this->transaccion='TES_RELACOB_SEL';
+        $this->tipo_procedimiento='SEL';//tipo de transaccion
+
+        $this->setParametro('id_proceso_wf','id_proceso_wf','integer');
+        //$this->setParametro('id_estado_wf','id_estado_wf','integer');
+        //$this->setParametro('num_tramite','num_tramite','varchar');
+        //$this->setParametro('todos','todos','integer');
+
+        //Definicion de la lista del resultado del query
+        $this->captura('id_relacion_proceso_pago','int4');
+        $this->captura('observaciones','varchar');
+        $this->captura('id_obligacion_pago','int4');
+        $this->captura('num_tramite','varchar');
+
+        $this->captura('estado_reg','varchar');
+        $this->captura('fecha_reg','timestamp');
+        $this->captura('id_usuario_reg','int4');
+        $this->captura('id_usuario_mod','int4');
+        $this->captura('fecha_mod','timestamp');
+        $this->captura('usr_reg','varchar');
+        $this->captura('usr_mod','varchar');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+
+    //02-12-2020 (may) para listar compo de nros de tramite
+    function listarObligacioPagoCombos(){
+        //Definicion de variables para ejecucion del procedimientp
+        $this->procedimiento='tes.ft_obligacion_pago_sel';
+        $this->transaccion='TES_COMBOP_SEL';
+        $this->tipo_procedimiento='SEL';//tipo de transaccion
+
+        //Definicion de la lista del resultado del query
+        //$this->setParametro('id_obligacion_pago','id_obligacion_pago','int4');
+        $this->captura('id_obligacion_pago','int4');
+        $this->captura('num_tramite','varchar');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        //echo $this->consulta; exit;
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+
+    //25-02-2021 (may) Pago de Gestion Anterior Exterior
+    function extenderPGAE()
+    {
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento = 'tes.ft_obligacion_pago_ime';
+        $this->transaccion = 'TES_EXTPGAE_IME';
+        $this->tipo_procedimiento = 'IME';
+
+        //Define los parametros para la funcion
+        $this->setParametro('id_obligacion_pago', 'id_obligacion_pago', 'int4');
+        $this->setParametro('id_administrador', 'id_administrador', 'int4');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+
+    /********************************* BEGIN {developer: franklin.espinoza, date: 11/10/2021} GENERAR PLAN PAGOS PVR *********************************/
+    function generarPlanPagoPVR(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento = 'tes.ft_obligacion_pago_ime';
+        $this->transaccion = 'TES_GEN_PP_PVR_IME';
+        $this->tipo_procedimiento = 'IME';
+
+        //Define los parametros para la funcion
+        $this->setParametro('id_obligacion_pago', 'id_obligacion_pago', 'int4');
+        $this->setParametro('operacion', 'operacion', 'varchar');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+    /********************************* END {developer: franklin.espinoza, date: 11/10/2021} GENERAR PLAN PAGOS PVR *********************************/
+
+    /********************************* BEGIN {developer: franklin.espinoza, date: 11/10/2021} PAGOS PVR *********************************/
+    function generarPagoPVR()
+    {
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento = 'tes.ft_obligacion_pago_ime';
+        $this->transaccion = 'TES_GENERAR_PVR_IME';
+        $this->tipo_procedimiento = 'IME';
+
+        //Define los parametros para la funcion
+
+        $this->setParametro('nombre_origen', 'nombre_origen', 'varchar');
+        $this->setParametro('json_beneficiarios', 'json_beneficiarios', 'jsonb');
+        $this->setParametro('fecha_pago', 'fecha_pago', 'date');
+        $this->setParametro('glosa_pago', 'glosa_pago', 'varchar');
+        $this->setParametro('id_funcionario_responsable', 'id_funcionario_responsable', 'integer');
+
+        $this->setParametro('fecha_ini', 'fecha_ini', 'date');
+        $this->setParametro('fecha_fin', 'fecha_fin', 'date');
+
+        $this->captura('personal_sin_presupuesto','json');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();//echo $this->consulta; exit;
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+    /********************************* END {developer: franklin.espinoza, date: 11/10/2021} PAGOS PVR *********************************/
+
+    /********************************* BEGIN {developer: franklin.espinoza, date: 11/11/2021} PAGOS PVR ADMINISTRATIVO *********************************/
+    function generarPagoAdministrativoPVR(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento = 'tes.ft_obligacion_pago_ime';
+        $this->transaccion = 'TES_GENERAR_PVR_ADM';
+        $this->tipo_procedimiento = 'IME';
+
+        //Define los parametros para la funcion
+
+        $this->setParametro('nombre_origen', 'nombre_origen', 'varchar');
+        $this->setParametro('json_beneficiarios', 'json_beneficiarios', 'jsonb');
+        $this->setParametro('fecha_pago', 'fecha_pago', 'date');
+        $this->setParametro('glosa_pago', 'glosa_pago', 'varchar');
+        $this->setParametro('id_funcionario_responsable', 'id_funcionario_responsable', 'integer');
+
+        $this->setParametro('fecha_ini', 'fecha_ini', 'date');
+        $this->setParametro('fecha_fin', 'fecha_fin', 'date');
+        $this->setParametro('codigo_tipo_pago', 'codigo_tipo_pago', 'varchar');
+
+        $this->captura('personal_sin_presupuesto','json');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();//echo $this->consulta; exit;
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+    /********************************* END {developer: franklin.espinoza, date: 11/10/2021} PAGOS PVR ADMINISTRATIVO *********************************/
+
 }
 
 ?>

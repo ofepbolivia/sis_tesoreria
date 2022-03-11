@@ -16,6 +16,7 @@ Phx.vista.ObligacionPagoConsulta = {
     bnew:false,
     bsave:false,
     bdel:false,
+    bgantt: true,
 	require:'../../../sis_tesoreria/vista/obligacion_pago/ObligacionPago.php',
 	requireclase:'Phx.vista.ObligacionPago',
 	title:'Obligacion de Pago (Consulta)',
@@ -47,6 +48,16 @@ Phx.vista.ObligacionPagoConsulta = {
         });
 
 	    Phx.vista.ObligacionPagoConsulta.superclass.constructor.call(this,config);
+
+        this.addButtonIndex(4,'docCargaSigep',{
+            text:'Cert. SIGEP',
+            grupo:[0,1,2],
+            iconCls: 'brenew',
+            disabled: true,
+            handler: this.onCargarDocumentoSigep,
+            tooltip: '<b>Registro Preventivo SIGEP</b><br/>Información para los comprobantes que ya tienen Preventivo en el SIGEP.'
+        });
+
         this.getBoton('ini_estado').setVisible(false);
         this.getBoton('ant_estado').setVisible(false);
         this.getBoton('fin_registro').setVisible(false);
@@ -126,11 +137,9 @@ Phx.vista.ObligacionPagoConsulta = {
               	//Inhabilita el reporte de disponibilidad
               	this.getBoton('btnVerifPresup').disable();
               }
-
-
-
-
             }
+        //franklin.espinoza 15/10/2020
+        this.getBoton('docCargaSigep').enable();
           
      },
      
@@ -155,7 +164,8 @@ Phx.vista.ObligacionPagoConsulta = {
        
        //RCM: menú de reportes de adquisiciones
        this.menuAdq.disable();
-        
+         //franklin.espinoza 15/10/2020
+         this.getBoton('docCargaSigep').disable();
        return tb
     }, 
     

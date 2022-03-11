@@ -443,6 +443,7 @@ Phx.vista.RendicionEfectivo=Ext.extend(Phx.gridInterfaz,{
 	bedit:false,
 	bsave:false,
 	bnew:false,
+    bgantt:true,
 	
 	onButtonNew: function(){    	
     	Phx.vista.RendicionEfectivo.superclass.onButtonNew.call(this);		

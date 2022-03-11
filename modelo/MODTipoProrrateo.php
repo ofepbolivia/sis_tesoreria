@@ -118,7 +118,9 @@ class MODTipoProrrateo extends MODbase{
 		/*Parametros opcionales de la interfaz que llama*/
 		$this->setParametro('nombre_funcion_ejecutar','nombre_funcion_ejecutar','varchar');		
 		$this->setParametro('nombre_monto_mb','nombre_monto_mb','varchar');
-		$this->setParametro('tipo_cambio','tipo_cambio','numeric');		
+		$this->setParametro('tipo_cambio','tipo_cambio','numeric');
+
+        $this->setParametro('id_proveedor','id_proveedor','int4');
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();

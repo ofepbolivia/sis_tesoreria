@@ -12,12 +12,12 @@ header("content-type: text/javascript; charset=UTF-8");
 Phx.vista.FormRelacionarCheque=Ext.extend(Phx.frmInterfaz,{
     layout:'fit',
     maxCount:0,
-    constructor:function(config){   
+    constructor:function(config){
         Phx.vista.FormRelacionarCheque.superclass.constructor.call(this,config);
-        this.init(); 
+        this.init();
 		Ext.apply(this.Cmp.id_cuenta_bancaria_mov.store.baseParams,{id_cuenta_bancaria: this.data.id_cuenta_bancaria, mycls:"RelacionarCheque"});
     },
-   
+
     Atributos:[
         {
             //configuracion del componente
@@ -27,7 +27,7 @@ Phx.vista.FormRelacionarCheque=Ext.extend(Phx.frmInterfaz,{
                     name: 'id_libro_bancos'
             },
             type:'Field',
-            form:true 
+            form:true
         },
 		{
             config:{
@@ -46,7 +46,7 @@ Phx.vista.FormRelacionarCheque=Ext.extend(Phx.frmInterfaz,{
                     totalProperty: 'total',
                     fields: ['id_libro_bancos','id_cuenta_bancaria','fecha','detalle','observaciones','nro_comprobante','importe_cheque','comprobante_sigma','nro_cheque'],
                     remoteSort: true,
-                    baseParams:{par_filtro:'detalle#nro_comprobante#importe_cheque#nro_cheque'}
+                    baseParams:{par_filtro:'detalle#nro_comprobante#importe_cheque#lban.nro_cheque'}
                }),
                valueField: 'id_libro_bancos',
                displayField: 'detalle',
@@ -67,31 +67,31 @@ Phx.vista.FormRelacionarCheque=Ext.extend(Phx.frmInterfaz,{
                renderer:function(value, p, record){return String.format('{0}', record.data['desc_deposito']);}
             },
             type:'ComboBox',
-            filters:{pfiltro:'cbanmo.detalle#cbanmo.nro_doc_tipo',type:'string'},
+            filters:{pfiltro:'cbanmo.detalle#cbanmo.nro_doc_tipo#lban.nro_cheque',type:'string'},
             id_grupo:1,
             grid:true,
             form:true
         }
     ],
-    
+
     title:'Cambio Cheque',
-    	
+
     onSubmit:function(){
-       //TODO passar los datos obtenidos del wizard y pasar  el evento save 
+       //TODO passar los datos obtenidos del wizard y pasar  el evento save
        if (this.form.getForm().isValid()) {
 		   this.fireEvent('beforesave',this,this.getValues());
 		   this.getValues();
        }
     },
-    	
+
     getValues:function(){
 		var me = this;
-		
+
         var resp = {
-				   id_libro_bancos:this.Cmp.id_cuenta_bancaria_mov.getValue()		   
-            }   
-         return resp;   
-     }    
-    
-})    
+				   id_libro_bancos:this.Cmp.id_cuenta_bancaria_mov.getValue()
+            }
+         return resp;
+     }
+
+})
 </script>

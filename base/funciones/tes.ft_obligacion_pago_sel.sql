@@ -61,7 +61,13 @@ DECLARE
     v_moneda					varchar;
 
     v_id_uo						integer;
+	v_filtro					varchar;
 
+    -- bvp
+    v_proces_wf					integer;
+    v_nro_tramite				varchar;
+	v_id_estado_wf				integer;
+    v_fecha_sol					date;
 
 BEGIN
 
@@ -83,6 +89,7 @@ BEGIN
           v_inner='';
           v_strg_sol = 'obpg.id_obligacion_pago';
 
+
           IF  pxp.f_existe_parametro(p_tabla,'historico') THEN
              v_historico =  v_parametros.historico;
           ELSE
@@ -90,7 +97,8 @@ BEGIN
           END IF;
 
 
-         IF   v_parametros.tipo_interfaz in ('obligacionPagoTes','obligacionPagoUnico', 'PGA', 'PPM', 'PCE', 'PBR') THEN
+         -- 25-02-2021 (may) se aumenta PGAE para pagos de gestion anterior del exterior
+         IF   v_parametros.tipo_interfaz in ('obligacionPagoTes','obligacionPagoUnico', 'PGA', 'PPM', 'PCE', 'PBR', 'PGAE','PVR') THEN
 
                  IF   p_administrador != 1 THEN
 
@@ -157,6 +165,11 @@ BEGIN
                 	v_filadd=v_filadd ||' obpg.tipo_obligacion = ''pce'' and';
          		ELSIF v_parametros.tipo_interfaz  = 'PBR' THEN
                 	v_filadd=v_filadd ||' obpg.tipo_obligacion = ''pbr'' and';
+                -- 25-02-2021 (may) se aumenta PGAE para pagos de gestion anterior del exterior
+                ELSIF v_parametros.tipo_interfaz  = 'PGAE' THEN
+                	v_filadd=v_filadd ||' obpg.tipo_obligacion = ''pgaext'' and';
+                ELSIF v_parametros.tipo_interfaz  = 'PVR' THEN
+                	v_filadd=v_filadd ||' obpg.tipo_obligacion = ''pago_pvr'' and';
                 ELSE
                    v_filadd=v_filadd ||' obpg.tipo_obligacion in (''pago_directo'',''rrhh'') and';
                 END IF;
@@ -219,7 +232,7 @@ BEGIN
          --05-02-2020 (MAY) filtro para interfaz para procesos de gestion materiales en obligaciones de pago
          ELSIF v_parametros.tipo_interfaz =  'ObligacionPagoGestionMat' THEN
 
-           		v_filadd= ' obpg.tipo_obligacion = ''adquisiciones'' and  obpg.tipo_solicitud = ''Boa'' and ';
+           		v_filadd= ' obpg.tipo_obligacion = ''gestion_mat'' and  obpg.tipo_solicitud = ''Boa'' and ';
          --
 
          ELSE
@@ -256,7 +269,7 @@ BEGIN
         END IF;
 
 
-
+--raise exception 'ññeja %',v_filadd;
                   --Sentencia de la consulta
                   v_consulta:='select
                               '||v_strg_sol||',
@@ -322,7 +335,10 @@ BEGIN
                               conf.fecha_fin::date,
                               conf.observaciones,
                               obpg.fecha_certificacion_pres,
-                              obpg.presupuesto_aprobado
+                              obpg.presupuesto_aprobado,
+                              obpg.nro_preventivo,
+
+      						 (list(distinct (par.codigo::varchar||''-''||par.nombre_partida::varchar)) )::VARCHAR as partida
 
                               from tes.tobligacion_pago obpg
                               inner join segu.tusuario usu1 on usu1.id_usuario = obpg.id_usuario_reg
@@ -340,10 +356,80 @@ BEGIN
 
                               left join tes.tconformidad conf on conf.id_obligacion_pago = obpg.id_obligacion_pago
 
+                              left join tes.tobligacion_det od ON od.id_obligacion_pago = obpg.id_obligacion_pago
+      						  left join pre.tpartida par ON par.id_partida = od.id_partida
+
                               where  '||v_filadd;
 
                   --Definicion de la respuesta
                   v_consulta:=v_consulta||v_parametros.filtro;
+                  v_consulta:=  v_consulta ||
+					' GROUP BY obpg.id_obligacion_pago,
+                                obpg.id_proveedor,
+                                pv.desc_proveedor,
+                                obpg.estado,
+                                obpg.tipo_obligacion,
+                                obpg.id_moneda,
+                                mn.moneda,
+                                obpg.obs,
+                                obpg.porc_retgar,
+                                obpg.id_subsistema,
+                                ss.nombre,
+                                obpg.id_funcionario,
+                                fun.desc_funcionario1,
+                                obpg.estado_reg,
+                                obpg.porc_anticipo,
+                                obpg.id_estado_wf,
+                                obpg.id_depto,
+                                dep.nombre,
+                                obpg.num_tramite,
+                                obpg.id_proceso_wf,
+                                obpg.fecha_reg,
+                                obpg.id_usuario_reg,
+                                obpg.fecha_mod,
+                                obpg.id_usuario_mod,
+                                usu1.cuenta,
+                                usu2.cuenta,
+                                obpg.fecha,
+                                obpg.numero,
+                                obpg.tipo_cambio_conv,
+                                obpg.id_gestion,
+                                obpg.comprometido,
+                                obpg.nro_cuota_vigente,
+                                mn.tipo_moneda,
+                                obpg.total_pago,
+                                obpg.pago_variable,
+                                obpg.id_depto_conta,
+                                obpg.total_nro_cuota,
+                                obpg.fecha_pp_ini,
+                                obpg.rotacion,
+                                obpg.id_plantilla,
+                                pla.desc_plantilla,
+                                obpg.ultima_cuota_pp,
+                                obpg.ultimo_estado_pp,
+                                obpg.tipo_anticipo,
+                                obpg.ajuste_anticipo,
+                                obpg.ajuste_aplicado,
+                                obpg.monto_estimado_sg,
+                                obpg.id_obligacion_pago_extendida,
+                                con.tipo,
+                                con.numero ,
+                                con.id_contrato,
+                                obpg.obs_presupuestos,
+                                obpg.codigo_poa,
+                                obpg.obs_poa,
+                                obpg.uo_ex,
+                                obpg.id_funcionario_responsable,
+                                fresp.desc_funcionario1,
+                                conf.id_conformidad,
+                                conf.conformidad_final,
+                                conf.fecha_conformidad_final,
+                                conf.fecha_inicio,
+                                conf.fecha_fin,
+                                conf.observaciones,
+                                obpg.fecha_certificacion_pres,
+                                obpg.presupuesto_aprobado,
+                                obpg.nro_preventivo ';
                   v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
 
 
@@ -375,8 +461,8 @@ BEGIN
                 v_historico = 'no';
               END IF;
 
-
-             IF   v_parametros.tipo_interfaz in ('obligacionPagoTes','obligacionPagoUnico', 'PGA', 'PPM', 'PCE', 'PBR') THEN
+             -- 25-02-2021 (may) se aumenta PGAE para pagos de gestion anterior del exterior
+             IF   v_parametros.tipo_interfaz in ('obligacionPagoTes','obligacionPagoUnico', 'PGA', 'PPM', 'PCE', 'PBR', 'PGAE','PVR') THEN
 
                      IF   p_administrador != 1 THEN
 
@@ -436,6 +522,11 @@ BEGIN
                 	   v_filadd=v_filadd ||' obpg.tipo_obligacion = ''pce'' and';
                     ELSIF v_parametros.tipo_interfaz  = 'PBR' THEN
                 	   v_filadd=v_filadd ||' obpg.tipo_obligacion = ''pbr'' and';
+                    -- 25-02-2021 (may) se aumenta PGAE para pagos de gestion anterior del exterior
+                    ELSIF v_parametros.tipo_interfaz  = 'PGAE' THEN
+                        v_filadd=v_filadd ||' obpg.tipo_obligacion = ''pgaext'' and';
+                    ELSIF v_parametros.tipo_interfaz  = 'PVR' THEN
+                		v_filadd=v_filadd ||' obpg.tipo_obligacion = ''pago_pvr'' and';
                     ELSE
                        v_filadd=v_filadd ||' obpg.tipo_obligacion in (''pago_directo'',''rrhh'') and';
                     END IF;
@@ -470,6 +561,8 @@ BEGIN
                   END IF;
 
              ELSIF v_parametros.tipo_interfaz =  'ObligacionPagoConsulta' THEN
+                --04-08-2021(may) para ell filtro de paginas no salgan en blanco
+             	v_strg_sol = 'DISTINCT(obpg.id_obligacion_pago)';
                 --no hay limitaciones ...
              ELSIF v_parametros.tipo_interfaz =  'ObligacionPagoApropiacion' THEN
                 --no hay limitaciones ...
@@ -478,6 +571,8 @@ BEGIN
 
             --(28-01-2020) MAY nuevo filtro consulta obligaciones de pago para cada gerencia
          ELSIF  v_parametros.tipo_interfaz =  'ObligacionPagoConsultaGerencia' THEN
+                --04-08-2021(may) para ell filtro de paginas no salgan en blanco
+         		  v_strg_sol = 'DISTINCT(obpg.id_obligacion_pago)';
 
           		--busca id_uo del usuario
                   SELECT uo.id_uo
@@ -499,29 +594,43 @@ BEGIN
              --05-02-2020 (MAY) filtro para interfaz para procesos de gestion materiales en obligaciones de pago
              ELSIF v_parametros.tipo_interfaz =  'ObligacionPagoGestionMat' THEN
 
-                    v_filadd= ' obpg.tipo_obligacion = ''adquisiciones'' and  obpg.tipo_solicitud = ''Boa'' and ';
+                    v_filadd= ' obpg.tipo_obligacion = ''gestion_mat'' and  obpg.tipo_solicitud = ''Boa'' and ';
              --
 
              ELSE
 
                   -- SI LA NTERFACE VIENE DE ADQUISIONES
 
+                  --04-08-2021(may) para ell filtro de paginas no salgan en blanco
+					v_strg_sol = 'DISTINCT(obpg.id_obligacion_pago)';
+
                   IF   p_administrador != 1 THEN
-                       select
-                             pxp.aggarray(depu.id_depto)
-                          into
-                             va_id_depto
-                         from param.tdepto_usuario depu
-                         where depu.id_usuario =  p_id_usuario and depu.cargo = 'responsable';
+                     select
+                         pxp.aggarray(depu.id_depto)
+                      into
+                         va_id_depto
+                     from param.tdepto_usuario depu
+                     where depu.id_usuario =  p_id_usuario and depu.cargo in  ('responsable', 'auxiliar');
+
+                   --(may)
+
+                            SELECT tf.id_funcionario
+                            INTO v_id_funcionario
+                            FROM segu.tusuario tu
+                            INNER JOIN orga.tfuncionario tf on tf.id_persona = tu.id_persona
+                            WHERE tu.id_usuario = p_id_usuario ;
 
 
-                         v_filadd='( (pc.id_depto  in ('|| COALESCE(array_to_string(va_id_depto,','),'0')||'))   or   pc.id_usuario_auxiliar = '||p_id_usuario::varchar ||' ) and ';
+                            v_filadd = ' (pc.id_depto  in ('|| COALESCE(array_to_string(va_id_depto,','),'0')||')  or obpg.id_funcionario = '||v_id_funcionario||' or obpg.id_usuario_reg = '||p_id_usuario||' or sol.id_usuario_reg = '||p_id_usuario||') and ';
+
+                    --
                   END IF;
 
 
                   v_inner = '
                                 inner join adq.tcotizacion cot on cot.id_obligacion_pago = obpg.id_obligacion_pago
-                                inner join adq.tproceso_compra pc on pc.id_proceso_compra = cot.id_proceso_compra  ';
+                                inner join adq.tproceso_compra pc on pc.id_proceso_compra = cot.id_proceso_compra
+                                inner join adq.tsolicitud sol on sol.id_solicitud = pc.id_solicitud ';
             END IF;
 
 
@@ -540,6 +649,12 @@ BEGIN
                         '|| v_inner ||'
                         left join orga.vfuncionario fun on fun.id_funcionario=obpg.id_funcionario
                         left join orga.vfuncionario fresp ON fresp.id_funcionario = obpg.id_funcionario_responsable
+
+             			left join tes.tconformidad conf on conf.id_obligacion_pago = obpg.id_obligacion_pago
+
+						left join tes.tobligacion_det od ON od.id_obligacion_pago = obpg.id_obligacion_pago
+      					left join pre.tpartida par ON par.id_partida = od.id_partida
+
                         where  '||v_filadd;
 
 			--Definicion de la respuesta
@@ -569,9 +684,15 @@ BEGIN
 
           IF  v_parametros.tipo_interfaz !=  'ObligacionPagoConta' THEN
             --no hay limitaciones ...
-            IF   p_administrador != 1 THEN
+           IF   p_administrador != 1 THEN
+            	--(maylee.perez) para internacionales la vista de los procesos que van desde la estacion central
+                IF   v_parametros.tipo_interfaz  = 'obligacionPagoInterS' THEN
+                       v_filadd='';
+                ELSE
+
                    v_filadd = '(obpg.id_funcionario='||v_parametros.id_funcionario_usu::varchar||'  or obpg.id_usuario_reg='||p_id_usuario||' ) and ';
-            END IF;
+           		END IF;
+           END IF;
           END IF;
 
          IF  v_parametros.tipo_interfaz in ('obligacionPagoSol', 'obligacionPagoUnico','obligacionPagoEspecial', 'solicitudSinImputacionPresupuestaria') THEN
@@ -1087,7 +1208,7 @@ BEGIN
                   IF(v_record.codigo = 'vbpoa' OR v_record.codigo = 'suppresu' OR v_record.codigo = 'vbpresupuestos' OR v_record.codigo = 'registrado')THEN
                     	SELECT vf.desc_funcionario1, vf.nombre_cargo, vf.oficina_nombre
                         INTO v_record_funcionario
-                        FROM orga.vfuncionario_cargo_lugar vf
+                        FROM orga.vfuncionario_cargo_lugar_todos vf
                         WHERE vf.id_funcionario = v_record.id_funcionario;
                         v_firmas[v_index] = v_record.codigo::VARCHAR||','||v_record.fecha_reg::VARCHAR||','||v_record_funcionario.desc_funcionario1::VARCHAR||','||v_record_funcionario.nombre_cargo::VARCHAR||','||v_record_funcionario.oficina_nombre;
                         v_index = v_index + 1;
@@ -1112,6 +1233,11 @@ BEGIN
             ---
 
 			--Sentencia de la consulta de conteo de registros
+			--26-04-2021(may) modificacion parte FROM current_date
+            --inner JOIN orga.tuo_funcionario uof ON uof.id_funcionario = ts.id_funcionario and uof.tipo = ''oficial'' and uof.estado_reg = ''activo'' and (current_date <= uof.fecha_finalizacion or  uof.fecha_finalizacion is null)
+            --30-04-2021(may) se aumento parte FROM uof.fecha_asignacion <= ts.fecha and
+            --inner JOIN orga.tuo_funcionario uof ON uof.id_funcionario = ts.id_funcionario and uof.tipo = 'oficial' and uof.estado_reg = 'activo' and (ts.fecha <= uof.fecha_finalizacion or  uof.fecha_finalizacion is null)
+
 			v_consulta:='
             SELECT
             	vcp.id_categoria_programatica AS id_cp, ttc.codigo AS centro_costo,
@@ -1162,13 +1288,15 @@ BEGIN
 
             inner join orga.vfuncionario fun on fun.id_funcionario = ts.id_funcionario
 
-            inner JOIN orga.tuo_funcionario uof ON uof.id_funcionario = ts.id_funcionario and uof.tipo = ''oficial'' and uof.estado_reg = ''activo'' and (current_date <= uof.fecha_finalizacion or  uof.fecha_finalizacion is null)
+            inner JOIN orga.tuo_funcionario uof ON uof.id_funcionario = ts.id_funcionario and uof.tipo = ''oficial''  and (uof.fecha_asignacion <= ts.fecha and (ts.fecha <= uof.fecha_finalizacion or  uof.fecha_finalizacion is null))
 			inner JOIN orga.tuo tuo on tuo.id_uo = orga.f_get_uo_gerencia(uof.id_uo,uof.id_funcionario,current_date)
 
             left JOIN pre.tpresupuesto_partida_entidad tppe ON tppe.id_partida = tpar.id_partida AND tppe.id_presupuesto = tp.id_presupuesto
             left JOIN pre.tentidad_transferencia tet ON tet.id_entidad_transferencia = tppe.id_entidad_transferencia
 
-            WHERE tsd.estado_reg = ''activo'' AND ts.id_proceso_wf = '||v_parametros.id_proceso_wf;
+            WHERE tsd.estado_reg = ''activo''
+            AND uof.estado_reg = ''activo''
+            AND ts.id_proceso_wf = '||v_parametros.id_proceso_wf;
 
 			v_consulta =  v_consulta ||
             ' GROUP BY vcp.id_categoria_programatica, tpar.codigo, ttc.codigo, vcp.codigo_programa,
@@ -1373,8 +1501,11 @@ BEGIN
                         plbex.monto,
                         mone.moneda,
                         mone.codigo as cod_moneda,
-                        plbex.estado_pp
-                    from tes.v_pagos_libro_banco_exterior plbex
+                        plbex.estado_pp,
+                        plbex.nombre_proveedor,
+                        plbex.id_plan_pago
+
+                    from tes.v_pagos_libro_banco_exterior_2 plbex
                     inner join param.tmoneda mone on mone.id_moneda = plbex.id_moneda
 					where plbex.fecha between '''||v_fecha_ini||''' and '''||v_fecha_fin||'''
                     and ' ;
@@ -1383,6 +1514,7 @@ BEGIN
             v_consulta:=v_consulta||v_parametros.filtro;
             v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
 			raise notice '%',v_consulta;
+
 			--Devuelve la respuesta
 			return v_consulta;
 
@@ -1408,7 +1540,7 @@ BEGIN
 
 			--Sentencia de la consulta de conteo de registros
 			v_consulta:='select count(plbex.id_obligacion_pago)
-						from tes.v_pagos_libro_banco_exterior plbex
+						from tes.v_pagos_libro_banco_exterior_2 plbex
                         inner join param.tmoneda mone on mone.id_moneda = plbex.id_moneda
                         where plbex.fecha between '''||v_fecha_ini||''' and '''||v_fecha_fin||'''
                         and ';
@@ -1437,8 +1569,11 @@ BEGIN
               id_partida_ejecucion_fk   integer,
               moneda					varchar,
               comprometido				numeric,
+              comprometido_mb			numeric,
               ejecutado					numeric,
+              ejecutado_mb				numeric,
               pagado					numeric,
+              pagado_mb					numeric,
               nro_tramite				varchar,
               tipo_movimiento			varchar,
               nombre_partida			varchar,
@@ -1499,7 +1634,7 @@ BEGIN
                 inner join path_rec  pr on pe2.id_partida_ejecucion_fk = pr.id_partida_ejecucion
             )
             insert into ttemp_eval_det (id_partida_ejecucion, id_partida_ejecucion_fk,
-                          comprometido, ejecutado, pagado, moneda, nro_tramite, tipo_movimiento,
+                          comprometido, ejecutado, pagado, comprometido_mb, ejecutado_mb, pagado_mb, moneda, nro_tramite, tipo_movimiento,
                           nombre_partida, codigo, codigo_categoria, fecha, codigo_cc,
                           usr_reg, usr_mod, fecha_reg, fecha_mod, estado_reg)
              SELECT
@@ -1517,6 +1652,18 @@ BEGIN
                 p.monto
              else
              0.00 end,
+             case when p.tipo_movimiento = 'comprometido'then
+                round(p.monto_mb, 2)
+             else
+             0.00 end,
+             case when p.tipo_movimiento = 'ejecutado'then
+                round(p.monto_mb, 2)
+             else
+             0.00 end,
+             case when p.tipo_movimiento = 'pagado'then
+                round(p.monto_mb, 2)
+             else
+             0.00 end,             
               mo.moneda,
               pej.nro_tramite,
               p.tipo_movimiento,
@@ -1562,6 +1709,248 @@ BEGIN
           return v_consulta;
       end;
 
+ /*********************************
+ 	#TRANSACCION:  'TES_SOLREPOBP_SEL'
+ 	#DESCRIPCION:	Consulta de datos para reporte solicitud
+ 	#AUTOR:		Breydi vasquez
+ 	#FECHA:		22/02/2020
+	***********************************/
+
+	elsif(p_transaccion='TES_SOLREPOBP_SEL')then
+
+    begin
+
+            IF  pxp.f_existe_parametro(p_tabla,'id_obligacion_pago') THEN
+
+                  v_filtro = 'obpg.id_obligacion_pago = '||v_parametros.id_obligacion_pago||' and ';
+
+                    select
+                    obp.id_proceso_wf
+                    into v_proces_wf
+                    from tes.tobligacion_pago obp
+                    where obp.id_obligacion_pago = v_parametros.id_obligacion_pago;
+
+               		select obp.num_tramite
+                     into v_nro_tramite
+                    from tes.tobligacion_pago obp
+                    where obp.id_obligacion_pago = v_parametros.id_obligacion_pago;
+
+            ELSE
+                  v_filtro = 'obpg.id_proceso_wf = '||v_parametros.id_proceso_wf||' and ';
+
+                  v_proces_wf = v_parametros.id_proceso_wf;
+
+               		select obp.num_tramite
+                     into v_nro_tramite
+                    from tes.tobligacion_pago obp
+                    where obp.id_proceso_wf = v_parametros.id_proceso_wf;
+
+            END IF;
+
+
+              select es.id_estado_wf
+                  into v_id_estado_wf
+              from wf.testado_wf es
+              where es.fecha_reg = (
+                      select
+                           max(ewf.fecha_reg)
+                         FROM  wf.testado_wf ewf
+                         INNER JOIN  wf.ttipo_estado te on ewf.id_tipo_estado = te.id_tipo_estado
+                         LEFT JOIN   segu.tusuario usu on usu.id_usuario = ewf.id_usuario_reg
+                         LEFT JOIN  orga.vfuncionario fun on fun.id_funcionario = ewf.id_funcionario
+                         LEFT JOIN  param.tdepto depto on depto.id_depto = ewf.id_depto
+                         WHERE
+                          ewf.id_proceso_wf = v_proces_wf
+                          and te.codigo = 'borrador'
+                          and te.etapa = 'Solicitante');
+
+              select
+                     ew.fecha_reg::date
+                     into v_fecha_sol
+                   FROM  wf.testado_wf ew
+                   where ew.id_estado_anterior = v_id_estado_wf;
+
+
+            --Sentencia de la consulta
+			v_consulta:='select
+                                obpg.id_obligacion_pago,
+                                obpg.estado,
+                                obpg.numero,
+                                obpg.num_tramite,
+                                obpg.fecha_conclusion_pago as fecha_apro,
+                                mon.codigo as desc_moneda,
+                                obpg.tipo_solicitud as tipo,
+                                ges.gestion as desc_gestion,
+                                obpg.fecha as fecha_soli,
+                                '''||coalesce(v_fecha_sol, now())||'''::date as fecha_soli_gant,
+                                fun.desc_funcionario1 as desc_funcionario,
+                                uo.codigo||''-''||uo.nombre_unidad as desc_uo,
+                                dep.codigo as desc_depto,
+                                funa.desc_funcionario1 as desc_funcionario_apro,
+                                fca.descripcion_cargo::varchar as cargo_desc_funcionario,
+                                fcag.descripcion_cargo::varchar as cargo_desc_funcionario_apro,
+                                obpg.fecha_reg,
+                                obpg.codigo_poa,
+                                COALESCE(obpg.usuario_ai,'''')::varchar as nombre_usuario_ai,
+                                uo.codigo as codigo_uo,
+                                dep.prioridad as dep_prioridad,
+                                obpg.id_moneda,
+                                obpg.obs
+                        from tes.tobligacion_pago obpg
+                        inner join segu.tusuario usu1 on usu1.id_usuario = obpg.id_usuario_reg
+                        inner join orga.vfuncionario fun on fun.id_funcionario = obpg.id_funcionario
+                        inner join orga.tuo uo on uo.id_uo = orga.f_get_uo_gerencia_ope(NULL, obpg.id_funcionario,obpg.fecha)
+                        inner join param.tmoneda mon on mon.id_moneda = obpg.id_moneda
+                        inner join param.tgestion ges on ges.id_gestion = obpg.id_gestion
+                        inner join param.tdepto dep on dep.id_depto = obpg.id_depto
+                        left join orga.vfuncionario funa on funa.id_funcionario = obpg.id_funcionario_gerente
+                        left join segu.tusuario usu2 on usu2.id_usuario = obpg.id_usuario_mod
+                        inner join wf.testado_wf ew on ew.id_estado_wf = obpg.id_estado_wf
+                        inner join orga.vfuncionario_ultimo_cargo fca on fca.id_funcionario = fun.id_funcionario
+                        left join orga.vfuncionario_ultimo_cargo fcag on fcag.id_funcionario = obpg.id_funcionario_gerente
+                        where '||v_filtro;
+
+			--Definicion de la respuesta
+			v_consulta:=v_consulta||v_parametros.filtro;
+			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+
+            raise notice '%', v_consulta;
+
+			--Devuelve la respuesta
+			return v_consulta;
+    end;
+
+    /*********************************
+ 	#TRANSACCION:  'TES_RELACOB_SEL'
+ 	#DESCRIPCION:	Consulta de datos
+ 	#AUTOR:		maylee.perez
+    #FECHA:		02/11/2020 10:28:30
+	***********************************/
+
+	elsif(p_transaccion='TES_RELACOB_SEL')then
+
+    	begin
+
+            --Sentencia de la consulta
+			v_consulta:='select
+                            rp.id_relacion_proceso_pago,
+                            rp.observaciones,
+                            rp.id_obligacion_pago,
+                            op.num_tramite::varchar,
+
+                            rp.estado_reg,
+                            rp.fecha_reg,
+                            rp.id_usuario_reg,
+                            rp.id_usuario_mod,
+                            rp.fecha_mod,
+                            usu1.cuenta as usr_reg,
+                            usu2.cuenta as usr_mod
+
+                      from tes.trelacion_proceso_pago rp
+                         inner join segu.tusuario usu1 on usu1.id_usuario = rp.id_usuario_reg
+                         left join segu.tusuario usu2 on usu2.id_usuario = rp.id_usuario_mod
+
+                         join tes.tobligacion_pago op on op.id_obligacion_pago = rp.id_obligacion_pago
+
+                      where  rp.estado_reg = ''activo'' and ';
+
+
+			--Definicion de la respuesta
+			v_consulta:=v_consulta||v_parametros.filtro;
+			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+            raise notice '... %', v_consulta;
+			--Devuelve la respuesta
+			return v_consulta;
+
+		end;
+
+	/*********************************
+ 	#TRANSACCION:  'TES_RELACOB_CONT'
+ 	#DESCRIPCION:	Conteo de registros
+ 	#AUTOR:		maylee.perez
+    #FECHA:		02/11/2020 10:28:30
+	***********************************/
+
+	elsif(p_transaccion='TES_RELACOB_CONT')then
+
+		begin
+			--Sentencia de la consulta de conteo de registros
+			v_consulta:='select count(rp.id_relacion_proceso_pago)
+					     from tes.trelacion_proceso_pago rp
+                         inner join segu.tusuario usu1 on usu1.id_usuario = rp.id_usuario_reg
+                         left join segu.tusuario usu2 on usu2.id_usuario = rp.id_usuario_mod
+
+                         join tes.tobligacion_pago op on op.id_obligacion_pago = rp.id_obligacion_pago
+
+                      where  rp.estado_reg = ''activo'' and ';
+
+			--Definicion de la respuesta
+			v_consulta:=v_consulta||v_parametros.filtro;
+
+			--Devuelve la respuesta
+			return v_consulta;
+
+		end;
+
+        /*********************************
+        #TRANSACCION:  'TES_COMBOP_SEL'
+        #DESCRIPCION: Consulta de datos de combo obligaciones de pago
+        #AUTOR:		maylee.perez
+    	#FECHA:		02/11/2020 10:28:30
+        ***********************************/
+
+
+        elseif(p_transaccion='TES_COMBOP_SEL')then
+
+            begin
+
+
+              --Sentencia de la consulta
+               v_consulta:=' Select opa.id_obligacion_pago,
+               						opa.num_tramite
+
+				  from tes.tobligacion_pago opa
+                  where opa.id_gestion = 19
+     			  and opa.tipo_obligacion in (''pago_especial'', ''pago_directo'')
+                  and  ';
+
+      --raise exception 'llega %',v_parametros.filtro;
+            --Definicion de la respuesta
+            v_consulta:=v_consulta||v_parametros.filtro;
+            v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+
+            --Devuelve la respuesta
+            return v_consulta;
+
+          end;
+
+        /*********************************
+        #TRANSACCION:  'TES_COMBOP_CONT'
+        #DESCRIPCION: Conteo de registros de combo obligaciones de pago
+        #AUTOR:		maylee.perez
+    	#FECHA:		02/11/2020 10:28:30
+        ***********************************/
+
+        elsif(p_transaccion='TES_COMBOP_CONT')then
+
+          begin
+            --Sentencia de la consulta de conteo de registros
+            v_consulta:='select count(opa.id_obligacion_pago)
+                    from tes.tobligacion_pago opa
+                    where opa.id_gestion = 19
+                    and opa.tipo_obligacion in (''pago_especial'', ''pago_directo'')
+                    and  ';
+
+
+
+            --Definicion de la respuesta
+            v_consulta:=v_consulta||v_parametros.filtro;
+
+            --Devuelve la respuesta
+            return v_consulta;
+
+          end;
+
    else
 
 		raise exception 'Transaccion inexistente';
@@ -1583,3 +1972,6 @@ VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
 COST 100;
+
+ALTER FUNCTION tes.ft_obligacion_pago_sel (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
+  OWNER TO postgres;

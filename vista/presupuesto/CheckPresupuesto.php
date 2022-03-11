@@ -56,6 +56,18 @@ header("content-type: text/javascript; charset=UTF-8");
 			type:'Field',
 			form:true 
 		 },
+
+         {
+            config:{
+                name: 'id_obligacion_det',
+                fieldLabel: 'ID Obligacion Detalle',
+                gwidth: 50,
+            },
+            type:'Field',
+            grid:true,
+            form:false
+         },
+
 		 {
 			config : {
 				name : 'nombre_partida',
@@ -270,6 +282,9 @@ header("content-type: text/javascript; charset=UTF-8");
                     'moneda',                    
                     'desc_orden'
 		],
+
+        arrayDefaultColumHidden: ['id_obligacion_det'],
+        
 		sortInfo : {
 			field : 'nombre_partida',
 			direction : 'ASC'

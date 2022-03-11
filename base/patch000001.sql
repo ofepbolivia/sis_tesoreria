@@ -1906,7 +1906,7 @@ CREATE TABLE tes.tdetalle_conciliacion_bancaria (
   CONSTRAINT tdetalle_conciliacion_bancaria_pkey PRIMARY KEY(id_detalle_conciliacion_bancaria)
 ) INHERITS (pxp.tbase)
 
-WITH (oids = false);  
+WITH (oids = false);
 /*****************************F-SCP-BVP-TES-0-15/03/2019*************/
 
 /*****************************I-SCP-MAY-TES-0-20/03/2019*************/
@@ -2026,3 +2026,218 @@ ALTER TABLE tes.tobligacion_pago
 COMMENT ON COLUMN tes.tobligacion_pago.presupuesto_aprobado
 IS 'Usado para control de presupuesto.';
 /*****************************F-SCP-BVP-TES-0-31/01/2020*************/
+
+/*****************************I-SCP-IRVA-TES-0-14/08/2020*************/
+CREATE OR REPLACE VIEW tes.vobligacion_pp_prorrateo (
+    desc_proveedor,
+    ult_est_pp,
+    num_tramite,
+    nro_cuota,
+    estado_pp,
+    tipo_cuota,
+    nro_cbte,
+    c31,
+    monto_ejecutar_mo,
+    ret_garantia,
+    liq_pagable,
+    desc_ingas,
+    codigo_cc,
+    partida,
+    codigo_categoria,
+    fecha)
+AS
+SELECT pv.desc_proveedor,
+    op.ultimo_estado_pp AS ult_est_pp,
+    op.num_tramite,
+    pp.nro_cuota,
+    pp.estado AS estado_pp,
+    pp.tipo AS tipo_cuota,
+    tcon.nro_cbte,
+    tcon.c31,
+    pro.monto_ejecutar_mo,
+    pro.monto_ejecutar_mo * 0.07 AS ret_garantia,
+    pro.monto_ejecutar_mo * 0.93 AS liq_pagable,
+    cig.desc_ingas,
+    cc.codigo_cc,
+    (par.codigo::text || '-'::text) || par.nombre_partida::text AS partida,
+    vcp.codigo_categoria,
+    op.fecha
+FROM tes.tobligacion_pago op
+     LEFT JOIN tes.tobligacion_det obd ON obd.id_obligacion_pago = op.id_obligacion_pago
+     JOIN tes.tplan_pago pp ON pp.id_obligacion_pago = op.id_obligacion_pago
+     JOIN tes.tprorrateo pro ON pro.id_plan_pago = pp.id_plan_pago AND
+         pro.id_obligacion_det = obd.id_obligacion_det
+     JOIN conta.tint_comprobante tcon ON tcon.id_int_comprobante = pp.id_int_comprobante
+     JOIN param.tconcepto_ingas cig ON cig.id_concepto_ingas = obd.id_concepto_ingas
+     JOIN param.vcentro_costo cc ON cc.id_centro_costo = obd.id_centro_costo
+     JOIN pre.tpartida par ON par.id_partida = obd.id_partida
+     JOIN param.vproveedor pv ON pv.id_proveedor = op.id_proveedor
+     JOIN pre.tpresupuesto pre ON pre.id_centro_costo = cc.id_centro_costo
+     JOIN pre.vcategoria_programatica vcp ON vcp.id_categoria_programatica =
+         pre.id_categoria_prog
+WHERE pp.estado::text = 'pagado'::text OR pp.estado::text = 'devengado'::text
+ORDER BY cc.codigo_cc, pv.desc_proveedor;
+/*****************************F-SCP-IRVA-TES-0-14/08/2020*************/
+
+
+
+/*****************************I-SCP-FEA-TES-0-15/10/2020*************/
+ALTER TABLE tes.tobligacion_pago
+  ADD COLUMN nro_preventivo INTEGER;
+
+COMMENT ON COLUMN tes.tobligacion_pago.nro_preventivo
+IS 'dato sigep para procesos con preventivo, mandatorio para CIP.';
+/*****************************F-SCP-FEA-TES-0-15/10/2020*************/
+
+
+/*****************************I-SCP-MAY-TES-0-03/12/2020*************/
+CREATE TABLE tes.trelacion_proceso_pago (
+  id_relacion_proceso_pago SERIAL,
+  id_obligacion_pago INTEGER,
+  observaciones VARCHAR(500),
+  id_obligacion_pago_ini INTEGER,
+  CONSTRAINT trelacion_proceso_pago_pkey PRIMARY KEY(id_relacion_proceso_pago)
+) INHERITS (pxp.tbase)
+WITH (oids = false);
+
+COMMENT ON COLUMN tes.trelacion_proceso_pago.id_relacion_proceso_pago
+IS 'identificador';
+
+COMMENT ON COLUMN tes.trelacion_proceso_pago.id_obligacion_pago
+IS 'identificador tabla tes.tobligacion_pago';
+
+COMMENT ON COLUMN tes.trelacion_proceso_pago.observaciones
+IS 'observaciones de la relacion de un pago';
+
+COMMENT ON COLUMN tes.trelacion_proceso_pago.id_obligacion_pago_ini
+IS 'ientificador tes.tobligacion_pago de los nuevos prfocesos al que se registrara';
+
+ALTER TABLE tes.trelacion_proceso_pago
+  OWNER TO postgres;
+
+
+ALTER TABLE tes.tobligacion_det
+ADD COLUMN id_obligacion_pago_relacion INTEGER;
+
+COMMENT ON COLUMN tes.tobligacion_det.id_obligacion_pago_relacion
+IS 'identificador de la tabla tes.tobligacion_pago de donde sale la relacion';
+/*****************************F-SCP-MAY-TES-0-03/12/2020*************/
+
+/*****************************I-SCP-MAY-TES-0-04/12/2020*************/
+ALTER TABLE tes.tconformidad
+  ALTER COLUMN observaciones TYPE VARCHAR(5000);
+/*****************************F-SCP-MAY-TES-0-04/12/2020*************/
+
+/***********************************I-SCP-MAY-TES-0-01/09/2021***************************************/
+ALTER TABLE tes.tobligacion_pago
+  ALTER COLUMN id_matriz_modalidad INTEGER;
+
+COMMENT ON COLUMN tes.tobligacion_pago.id_matriz_modalidad
+IS 'identificador de la tabla matriz';
+/***********************************F-SCP-MAY-TES-0-01/09/2021***************************************/
+
+/***********************************I-SCP-IRVA-TES-0-05/01/2022***************************************/
+ALTER TABLE tes.tplan_pago
+  ADD COLUMN convertido VARCHAR(5) DEFAULT 'no' NOT NULL;
+
+COMMENT ON COLUMN tes.tplan_pago.convertido
+IS 'Campo para diferenciar cuales han sido convertidos para la siguiente getion';
+/***********************************F-SCP-IRVA-TES-0-05/01/2022***************************************/
+
+
+/***********************************I-SCP-FEA-TES-0-09/02/2022***************************************/
+CREATE TABLE tes.tplanilla_pvr_con_pago (
+  id_planilla_pvr_con_pago SERIAL,
+  ids_funcionario JSONB,
+  nombre_origen VARCHAR(30),
+  fecha_pago DATE,
+  detalle_con_pago JSONB,
+  glosa_pago TEXT,
+  CONSTRAINT tplanilla_pvr_con_pago_pkey PRIMARY KEY(id_planilla_pvr_con_pago)
+) INHERITS (pxp.tbase)
+WITH (oids = false);
+
+ALTER TABLE tes.tplanilla_pvr_con_pago
+  ALTER COLUMN id_planilla_pvr_con_pago SET STATISTICS 0;
+
+ALTER TABLE tes.tplanilla_pvr_con_pago
+  ALTER COLUMN ids_funcionario SET STATISTICS 0;
+
+ALTER TABLE tes.tplanilla_pvr_con_pago
+  ALTER COLUMN nombre_origen SET STATISTICS 0;
+
+ALTER TABLE tes.tplanilla_pvr_con_pago
+  ALTER COLUMN fecha_pago SET STATISTICS 0;
+
+ALTER TABLE tes.tplanilla_pvr_con_pago
+  ALTER COLUMN detalle_con_pago SET STATISTICS 0;
+
+ALTER TABLE tes.tplanilla_pvr_con_pago
+  ALTER COLUMN glosa_pago SET STATISTICS 0;
+
+ALTER TABLE tes.tplanilla_pvr_con_pago
+  OWNER TO postgres;
+
+
+CREATE TABLE tes.tplanilla_pvr_sin_pago (
+  id_planilla_pvr_sin_pago SERIAL,
+  ids_funcionario JSONB,
+  nombre_origen VARCHAR(30),
+  fecha_pago DATE,
+  detalle_sin_pago JSONB,
+  glosa_pago TEXT,
+  CONSTRAINT tplanilla_pvr_sin_pago_pkey PRIMARY KEY(id_planilla_pvr_sin_pago)
+) INHERITS (pxp.tbase)
+WITH (oids = false);
+
+ALTER TABLE tes.tplanilla_pvr_sin_pago
+  ALTER COLUMN id_planilla_pvr_sin_pago SET STATISTICS 0;
+
+ALTER TABLE tes.tplanilla_pvr_sin_pago
+  ALTER COLUMN ids_funcionario SET STATISTICS 0;
+
+ALTER TABLE tes.tplanilla_pvr_sin_pago
+  ALTER COLUMN nombre_origen SET STATISTICS 0;
+
+ALTER TABLE tes.tplanilla_pvr_sin_pago
+  ALTER COLUMN fecha_pago SET STATISTICS 0;
+
+ALTER TABLE tes.tplanilla_pvr_sin_pago
+  ALTER COLUMN detalle_sin_pago SET STATISTICS 0;
+
+ALTER TABLE tes.tplanilla_pvr_sin_pago
+  ALTER COLUMN glosa_pago SET STATISTICS 0;
+
+ALTER TABLE tes.tplanilla_pvr_sin_pago
+  OWNER TO postgres;
+
+
+CREATE TABLE tes.tt_sin_presupuesto (
+  id_funcionario INTEGER,
+  codigo_cc VARCHAR,
+  centro_costo VARCHAR,
+  partida VARCHAR,
+  fecha_pago DATE,
+  orden_viaje JSONB,
+  motivo TEXT
+) INHERITS (pxp.tbase)
+WITH (oids = false);
+
+ALTER TABLE tes.tt_sin_presupuesto
+  OWNER TO postgres;
+
+
+ALTER TABLE tes.tobligacion_det
+  ADD COLUMN id_proveedor INTEGER;
+
+COMMENT ON COLUMN tes.tobligacion_det.id_proveedor
+IS 'Campo que  representa el identificador de un proveedor.';
+
+ALTER TABLE tes.tobligacion_det
+  ADD COLUMN registro_viatico_refrigerio TEXT;
+
+COMMENT ON COLUMN tes.tobligacion_det.registro_viatico_refrigerio
+IS 'Campo que describre el tipo y al funcionario que se le hace el pago.';
+
+
+/***********************************F-SCP-FEA-TES-0-09/02/2022***************************************/

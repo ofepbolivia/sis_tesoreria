@@ -349,6 +349,8 @@ header("content-type: text/javascript; charset=UTF-8");
         successSincGC: function (resp) {
             Phx.CP.loadingHide();
             this.wDEPTO.hide();
+            contadores = 0;
+            Ext.getCmp(this.wDEPTO.buttons[0].id).setDisabled(false);
             var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
             if (reg.ROOT.datos.resultado != 'falla') {
 

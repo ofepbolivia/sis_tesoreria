@@ -9,6 +9,10 @@
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
+
+var contadores = 0;
+
+
     Phx.vista.PlanPago = Ext.extend(Phx.gridInterfaz, {
         fheight: '90%',
         fwidth: '85%',
@@ -171,6 +175,15 @@ header("content-type: text/javascript; charset=UTF-8");
                 }
             );
 
+            //08-05-2020 (may) Doc compra venta desde la cuota
+            this.addButton('btnDocCmpVnt', {
+                text: 'Doc. Cmp/Vnt',
+                iconCls: 'brenew',
+                disabled: true,
+                handler: this.loadDocCmpVnt,
+                tooltip: '<b>Documentos de Compra/Venta</b><br/>Muestra los documentos relacionados'
+            });
+
             this.addButton('btnPagoRel',
                 {
                     text: 'Pagos Rel.',
@@ -223,14 +236,18 @@ header("content-type: text/javascript; charset=UTF-8");
 
             'INICIAL': [
                 ['devengado_pagado', 'Devengar y pagar (2 comprobantes)'],
-                ['devengado_pagado_1c', 'Devengar y pagar (1 comprobante)'],
                 ['devengado', 'Devengar'],
                 //['devengado_rrhh','Devengar RH'],
                 ['dev_garantia', 'Devolucion de Garantia'], //es similr a un devengar y pagar pero no genera prorrateo directamente
                 ['dev_garantia_con', 'Devolucion de Garantia Gestion Actual'],
                 ['dev_garantia_con_ant', 'Devolucion de Garantia Gestion Anterior'],
                 ['anticipo', 'Anticipo Fact/Rec (No ejecuta presupuesto, necesita Documento)'],
-                ['ant_parcial', 'Anticipo Parcial(No ejecuta presupuesto, Con retenciones parciales en cada pago)']
+                ['ant_parcial', 'Anticipo Parcial(No ejecuta presupuesto, Con retenciones parciales en cada pago)'],
+                //17-06-2020 (may) se cambia nombre opcion para un cbte, para combustible usan un comprobante
+                //['devengado_pagado_1c', 'Devengar y pagar (1 comprobante)'],
+                ['devengado_pagado_1c', 'Aplicación de Anticipo (Combustible)'],
+                //03-12-2020 (may) se aumenta opcion Pagar para que se registre sin necesidad de relacionar su cuota
+                ['pagado', 'Pagar']
             ],
 
             'ANT_PARCIAL': [
@@ -259,6 +276,17 @@ header("content-type: text/javascript; charset=UTF-8");
                 },
                 type: 'Field',
                 form: true
+            },
+            {
+                //configuracion del componente
+                config: {
+                    labelSeparator: '',
+                    inputType: 'hidden',
+                    name: 'id_int_comprobante'
+                },
+                type: 'Field',
+                form: true,
+                grid: false
             },
             {
                 //configuracion del componente
@@ -355,7 +383,13 @@ header("content-type: text/javascript; charset=UTF-8");
                             return String.format('<b><font color="orange">{0}</font></b>', value);
                         }
                         else {
-                            return value;
+                            //15-01-2021 (may)
+                            if (record.data.id_obligacion_pago_extendida > 0) {
+                                return String.format('<b><font color="orange">{0}</font></b>', value);
+                            }else{
+                                return value;
+                            }
+
                         }
 
                     }
@@ -483,7 +517,7 @@ header("content-type: text/javascript; charset=UTF-8");
                         dato = (dato == '' && value == 'devengado') ? 'Devengar' : dato;
                         dato = (dato == '' && value == 'devengado_rrhh') ? 'Devengar' : dato;
                         dato = (dato == '' && value == 'devengado_pagado') ? 'Devengar y pagar (2 cbte)' : dato;
-                        dato = (dato == '' && value == 'devengado_pagado_1c') ? 'Devengar y pagar (1 cbte)' : dato;
+
                         dato = (dato == '' && value == 'pagado') ? 'Pagar' : dato;
                         dato = (dato == '' && value == 'pagado_rrhh') ? 'Pagar' : dato;
                         dato = (dato == '' && value == 'anticipo') ? 'Anticipo Fact/Rec' : dato;
@@ -496,6 +530,9 @@ header("content-type: text/javascript; charset=UTF-8");
                         dato = (dato == '' && value == 'rendicion') ? 'Rendicion Ant.' : dato;
                         dato = (dato == '' && value == 'ret_rendicion') ? 'Detalle de Rendicion' : dato;
                         dato = (dato == '' && value == 'especial') ? 'Pago simple (s/p)' : dato;
+                        //17-06-2020 (may) se cambia nombre opcion para un cbte, para combustible usan un comprobante
+                        //dato = (dato == '' && value == 'devengado_pagado_1c') ? 'Devengar y pagar (1 cbte)' : dato;
+                        dato = (dato == '' && value == 'devengado_pagado_1c') ? 'Aplicación de Anticipo (Combustible)' : dato;
                         return String.format('{0}', dato);
                     },
 
@@ -1038,7 +1075,47 @@ header("content-type: text/javascript; charset=UTF-8");
                 grid: true,
                 form: true
             },
-
+            {
+                config : {
+                    name:'porc_monto_retgar',
+                    fieldLabel: 'Porcentaje Ret. Garantia',
+                    currencyChar: ' ',
+                    resizable:true,
+                    allowBlank:true,
+                    gwidth: 100,
+                    emptyText:'Seleccione ...',
+                    store: new Ext.data.JsonStore({
+                        url: '../../sis_parametros/control/Catalogo/listarCatalogoCombo',
+                        id: 'id_catalogo',
+                        root: 'datos',
+                        sortInfo:{
+                            field: 'orden',
+                            direction: 'ASC'
+                        },
+                        totalProperty: 'total',
+                        fields: ['id_catalogo','codigo','descripcion'],
+                        // turn on remote sorting
+                        remoteSort: true,
+                        baseParams: {par_filtro:'descripcion',cod_subsistema:'TES',catalogo_tipo:'tplan_pago_retencion'}
+                    }),
+                    enableMultiSelect:true,
+                    valueField: 'codigo',
+                    displayField: 'descripcion',
+                    gdisplayField: 'porc_monto_retgar',
+                    forceSelection:true,
+                    typeAhead: false,
+                    triggerAction: 'all',
+                    lazyRender:true,
+                    mode:'remote',
+                    pageSize:10,
+                    listWidth: 350,
+                    queryDelay:1000
+                },
+                type : 'ComboBox',
+                id_grupo: 1,
+                form : true,
+                grid: true,
+            },
             {
                 config: {
                     name: 'monto_retgar_mo',
@@ -1233,7 +1310,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     // anchor: '80%',
                     width: 280,
                     gwidth: 300,
-                    maxLength: 300
+                    maxLength: 500
                 },
                 type: 'TextArea',
                 filters: {pfiltro: 'plapa.obs_monto_no_pagado', type: 'string'},
@@ -1612,6 +1689,7 @@ header("content-type: text/javascript; charset=UTF-8");
         id_store: 'id_plan_pago',
         fields: [
             {name: 'id_plan_pago', type: 'numeric'},
+            {name: 'id_int_comprobante', type: 'numeric'},
             'id_obligacion_pago',
             {name: 'estado_reg', type: 'string'},
             {name: 'nro_cuota', type: 'numeric'},
@@ -1671,7 +1749,9 @@ header("content-type: text/javascript; charset=UTF-8");
             'id_moneda', 'tipo_moneda', 'desc_moneda',
             'num_tramite', 'monto_excento',
             'proc_monto_excento_var', 'obs_wf', 'descuento_inter_serv',
-            'obs_descuento_inter_serv', 'porc_monto_retgar', 'desc_funcionario1', 'revisado_asistente',
+            'obs_descuento_inter_serv',
+            {name: 'porc_monto_retgar', type: 'numeric'},
+            'desc_funcionario1', 'revisado_asistente',
             {name: 'fecha_conformidad', type: 'date', dateFormat: 'Y-m-d'},
             'conformidad',
             'tipo_obligacion',
@@ -1693,7 +1773,8 @@ header("content-type: text/javascript; charset=UTF-8");
             {name: 'nit', type: 'string'},
             'id_proveedor_cta_bancaria',
             'id_multa',
-            'desc_multa'
+            'desc_multa',
+            'id_obligacion_pago_extendida'
         ],
 
         arrayDefaultColumHidden: ['id_fecha_reg', 'id_fecha_mod',
@@ -1701,7 +1782,7 @@ header("content-type: text/javascript; charset=UTF-8");
             'descuento_anticipo', 'monto_retgar_mo', 'monto_no_pagado', 'otros_descuentos', 'descuento_inter_serv', 'descuento_ley', 'id_depto_lb',
             'id_depto_lb', 'id_cuenta_bancaria', 'obs_wf', 'fecha_dev', 'fecha_pag', 'obs_descuentos_anticipo', 'obs_monto_no_pagado',
             'obs_otros_descuentos', 'obs_descuentos_ley', 'obs_descuento_inter_serv', 'monto_ajuste_ag', 'monto_ajuste_siguiente_pag', 'fecha_costo_ini',
-            'fecha_costo_fin', 'funcionario_wf', 'monto_anticipo', 'monto', 'monto_ejecutar_total_mo', 'monto_establecido','nit'],
+            'fecha_costo_fin', 'funcionario_wf', 'monto_anticipo', 'monto', 'monto_ejecutar_total_mo', 'monto_establecido','nit','porc_monto_retgar'],
 
 
         rowExpander: new Ext.ux.grid.RowExpander({
@@ -2051,11 +2132,15 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.Cmp.monto_retgar_mo.setValue(this.porc_ret_gar * this.Cmp.monto.getValue());
             }
 
-            monto_ret_gar = this.Cmp.monto_retgar_mo.getValue();
-
+            //24-06-2021 (may)para calcular Retenciones de garantia con porcentaje de retenciones de garantia
+            //monto_ret_gar = this.Cmp.monto_retgar_mo.getValue();
+            monto_ret_gar =  this.Cmp.monto.getValue() * this.Cmp.porc_monto_retgar.getValue();
+            this.Cmp.monto_retgar_mo.setValue(monto_ret_gar);
 
             var liquido = this.Cmp.monto.getValue() - this.Cmp.monto_no_pagado.getValue() - this.Cmp.otros_descuentos.getValue() - monto_ret_gar - this.Cmp.descuento_ley.getValue() - this.Cmp.descuento_inter_serv.getValue() - this.Cmp.descuento_anticipo.getValue();
             //this.Cmp.liquido_pagable.setValue(liquido > 0 ? liquido : 0);
+
+
             this.Cmp.liquido_pagable.setValue(liquido);
             var eje = this.Cmp.monto.getValue() - this.Cmp.monto_no_pagado.getValue() - this.Cmp.monto_anticipo.getValue();
             this.Cmp.monto_ejecutar_total_mo.setValue(eje > 0 ? eje : 0);
@@ -2068,11 +2153,12 @@ header("content-type: text/javascript; charset=UTF-8");
             //deshabilita el cambio del tipo de pago
             //may 08-01-2020 solo para visto bueno conta puede modificar el tipo de cuota
             console.log('llegamay', data.estado);
-            if (data.estado == 'vbconta') {
+            //15-12-2021 (may) a solicitud de Grover desde la fecha se puede modificar el tipo de cuota
+            //if (data.estado == 'vbconta') {
                 this.Cmp.tipo.enable();
-            }else{
+            /*}else{
                 this.Cmp.tipo.disable();
-            }
+            }*/
 
             this.Cmp.fecha_tentativa.enable();
             //08-01-2020 (may) modificacion para que pueda listar lo mismo que un new
@@ -2089,7 +2175,7 @@ header("content-type: text/javascript; charset=UTF-8");
             this.tmp_porc_monto_excento_var = undefined;
 
 
-          //may
+            //may
 
             if (data.estado == 'vbsolicitante') {
 
@@ -2295,6 +2381,20 @@ header("content-type: text/javascript; charset=UTF-8");
             );
         },
 
+        //08-05-2020 (may) Doc compra venta desde la cuota
+        loadDocCmpVnt: function () {
+            var rec = this.sm.getSelected();
+            console.log('rec', rec);
+            rec.data.disparador = 'obligacion';
+            console.log('despues', rec);
+            Phx.CP.loadWindows('../../../sis_contabilidad/vista/doc_compra_venta/DocCompraVentaCbte.php', 'Documentos del Cbte', {
+
+                width: '70%',
+                height: '80%'
+            }, rec.data, this.idContenedor, 'DocCompraVentaCbte');
+        },
+
+
         loadPagosRelacionados: function () {
             var rec = this.sm.getSelected();
             rec.data.nombreVista = this.nombreVista;
@@ -2456,6 +2556,8 @@ header("content-type: text/javascript; charset=UTF-8");
             this.Cmp.monto_ajuste_siguiente_pag.setValue(0);
             this.Cmp.monto_anticipo.setValue(0);
 
+            this.Cmp.porc_monto_retgar.setValue(0);
+
         },
 
         ocultarFP: function (me, pFormaPago) {
@@ -2602,6 +2704,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 me.mostrarComponente(me.Cmp.descuento_ley);
                 me.mostrarComponente(me.Cmp.monto_anticipo);
                 me.mostrarComponente(me.Cmp.obs_descuentos_ley);
+                me.mostrarComponente(me.Cmp.porc_monto_retgar);
                 me.deshabilitarDescuentos(me);
                 me.ocultarComponentesPago(me);
                 me.Cmp.monto_retgar_mo.setReadOnly(false);
@@ -2649,6 +2752,8 @@ header("content-type: text/javascript; charset=UTF-8");
                 me.mostrarComponente(me.Cmp.descuento_ley);
                 me.mostrarComponente(me.Cmp.monto_anticipo);
 
+                me.mostrarComponente(me.Cmp.porc_monto_retgar);
+
                 me.habilitarDescuentos(me);
                 me.mostrarComponentesPago(me);
                 me.Cmp.monto_retgar_mo.setReadOnly(false);
@@ -2694,6 +2799,8 @@ header("content-type: text/javascript; charset=UTF-8");
                 me.ocultarComponente(me.Cmp.monto_no_pagado);
                 me.ocultarComponente(me.Cmp.monto_retgar_mo);
                 me.ocultarComponente(me.Cmp.monto_anticipo);
+
+                me.ocultarComponente(me.Cmp.porc_monto_retgar);
                 me.ocultarGrupo(2); //ocultar el grupo de ajustes
                 me.ocultarGrupo(3); //ocultar el grupo de periodo del costo
 
@@ -2712,6 +2819,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 me.ocultarComponente(me.Cmp.monto_no_pagado);
                 me.ocultarComponente(me.Cmp.monto_retgar_mo);
                 me.ocultarComponente(me.Cmp.monto_anticipo);
+                me.ocultarComponente(me.Cmp.porc_monto_retgar);
                 me.ocultarGrupo(2); //ocultar el grupo de ajustes
                 me.ocultarGrupo(3); //ocultar el grupo de periodo del costo
 
@@ -2730,6 +2838,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 me.ocultarComponente(me.Cmp.monto_no_pagado);
                 me.ocultarComponente(me.Cmp.monto_retgar_mo);
                 me.ocultarComponente(me.Cmp.monto_anticipo);
+                me.ocultarComponente(me.Cmp.porc_monto_retgar);
                 me.ocultarGrupo(2); //ocultar el grupo de ajustes
                 me.ocultarGrupo(3); //ocultar el grupo de periodo del costo
 
@@ -2747,6 +2856,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 me.ocultarComponente(me.Cmp.monto_no_pagado);
                 me.ocultarComponente(me.Cmp.monto_retgar_mo);
                 me.ocultarComponente(me.Cmp.monto_anticipo);
+                me.ocultarComponente(me.Cmp.porc_monto_retgar);
                 me.ocultarGrupo(2); //ocultar el grupo de ajustes
                 me.ocultarGrupo(3); //ocultar el grupo de periodo del costo
 
@@ -2754,7 +2864,10 @@ header("content-type: text/javascript; charset=UTF-8");
             },
 
             'pagado': function (me) {
-                me.Cmp.id_plantilla.disable();
+                //03/122020 (may) que sea enable porque no solo se utilizara cuando se relacione una cuota
+                //me.Cmp.id_plantilla.disable();
+                me.Cmp.id_plantilla.enable();
+
                 me.habilitarDescuentos(me);
                 me.mostrarComponentesPago(me);
                 me.mostrarComponente(me.Cmp.liquido_pagable);
@@ -2797,6 +2910,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 me.ocultarComponente(me.Cmp.obs_descuentos_ley);
                 me.mostrarComponente(me.Cmp.liquido_pagable);
                 me.ocultarComponente(me.Cmp.monto_anticipo);
+                me.ocultarComponente(me.Cmp.porc_monto_retgar);
                 me.ocultarGrupo(2); //ocultar el grupo de ajustes
                 me.ocultarGrupo(3); //ocultar el grupo de periodo del costo
 
@@ -2822,6 +2936,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 me.mostrarComponente(me.Cmp.liquido_pagable);
                 me.mostrarComponente(me.Cmp.descuento_ley);
                 me.mostrarComponente(me.Cmp.obs_descuentos_ley);
+                me.ocultarComponente(me.Cmp.porc_monto_retgar);
                 me.ocultarGrupo(2); //ocultar el grupo de ajustes
                 me.mostrarGrupo(3); //ocultar el grupo de periodo del costo
 
@@ -2836,6 +2951,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 me.ocultarComponente(me.Cmp.monto_no_pagado);
                 me.ocultarComponente(me.Cmp.monto_anticipo);
                 me.ocultarComponente(me.Cmp.liquido_pagable);
+                me.ocultarComponente(me.Cmp.porc_monto_retgar);
                 me.deshabilitarDescuentos(me);
 
                 me.ocultarComponentesPago(me);
@@ -3020,12 +3136,22 @@ header("content-type: text/javascript; charset=UTF-8");
                 closeAction: 'hide',
                 buttons: [{
                     text: 'Guardar',
+                    listeners : {
+      			         click : function(n){
+      								 contadores ++;
+      									if(contadores >= 1){
+      										Ext.getCmp(this.id).setDisabled(true);
+      									}
+      			         }
+      						 },
                     handler: this.onSubmitDepto,
                     scope: this
 
                 }, {
                     text: 'Cancelar',
                     handler: function () {
+                        contadores = 0;
+      									Ext.getCmp(this.wDEPTO.buttons[0].id).setDisabled(false);
                         this.wDEPTO.hide()
                     },
                     scope: this

@@ -13,7 +13,7 @@ DECLARE
     v_id_uo					integer;
     v_gerencia			varchar;
     v_id_uo_hijo		integer;
-    v_nivel				integer;
+    v_nivel				numeric;
 BEGIN
   	v_nombre_funcion = 'tes.f_get_uo_gerencia_proceso';
     if (par_id_uo is not null) then

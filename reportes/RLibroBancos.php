@@ -192,8 +192,8 @@ Class RLibroBancos extends Report {
 							'nro_comprobante' => $row['nro_comprobante'],
 							'comprobante_sigma' => $row['comprobante_sigma'],
 							'nro_cheque' => ($row['tipo'] == 'Gasto')?$row['nro_cheque']:$row['nro_deposito'],
-							'importe_deposito' => $row['importe_deposito'],
-							'importe_cheque' => $row['importe_cheque']
+							'importe_deposito' => trim($row['importe_deposito']),
+							'importe_cheque' => trim($row['importe_cheque'])
 						);
 			}else{                                
 				$RowArray = array(
@@ -204,9 +204,9 @@ Class RLibroBancos extends Report {
 							'nro_comprobante' => $row['nro_comprobante'],
 							'comprobante_sigma' => $row['comprobante_sigma'],
 							'nro_cheque' => ($row['tipo'] == 'Gasto')?$row['nro_cheque']:$row['nro_deposito'],
-							'importe_deposito' => $row['importe_deposito'],
-							'importe_cheque' => $row['importe_cheque'],
-							'saldo' => $row['saldo']
+							'importe_deposito' => trim($row['importe_deposito']),
+							'importe_cheque' => trim($row['importe_cheque']),
+							'saldo' => trim($row['saldo'])
 						);
 			}
                          

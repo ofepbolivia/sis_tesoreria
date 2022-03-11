@@ -457,5 +457,36 @@ class MODSolicitudEfectivo extends MODbase{
 	    
 	    return $this->respuesta;
 	}
+
+    //13-08-2021 (may) memorandum caja chica PD
+    function imprimirMemoCajaChicaPdf(){
+        //Definicion de variables para ejecucion del procedimientp
+        $this->procedimiento='tes.ft_solicitud_efectivo_sel';
+        $this->transaccion='TES_MEMOCJ_SEL';
+        $this->tipo_procedimiento='SEL';//tipo de transaccion
+        $this->setCount(false);
+
+        $this->setParametro('id_proceso_wf','id_proceso_wf','int4');
+
+        //Definicion de la lista del resultado del query
+        $this->captura('fecha','date');
+        $this->captura('nro_cheque','varchar');
+        $this->captura('codigo','varchar');
+        $this->captura('aprobador','text');
+        $this->captura('cargo_aprobador','varchar');
+        $this->captura('cajero','text');
+        $this->captura('cargo_cajero','varchar');
+        $this->captura('importe_cheque','numeric');
+        $this->captura('num_memo','varchar');
+        $this->captura('codigo_mone','varchar');
+        $this->captura('importe_literal','varchar');
+        $this->captura('genero_solicitante','varchar');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
 }
 ?>

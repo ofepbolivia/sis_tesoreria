@@ -13,6 +13,7 @@ require_once(dirname(__FILE__).'/../../pxp/pxpReport/DataSource.php');
 require_once(dirname(__FILE__).'/../reportes/RConformidad.php');
 require_once(dirname(__FILE__).'/../reportes/RProcesoConRetencionXLS.php');
 require_once(dirname(__FILE__).'/../reportes/RProcesoConRetencionXLSPro.php');
+require_once(dirname(__FILE__).'/../reportes/RProcesoResumenXContratoXLS.php');
 
 require_once(dirname(__FILE__) . '/../reportes/RConformidadTotal.php');
 
@@ -69,6 +70,13 @@ class ACTPlanPago extends ACTbase{
     }
 
     function insertarPlanPago(){
+
+        /*Aumentando para identificar que son comprobantes para la siguiente gestion
+        (Ismael Valdivia 3/12/2021)*/
+        if($this->objParam->getParametro('tipo_interfaz') != ''){
+          $this->objParam->addParametro('tipo_interfaz',$this->objParam->getParametro('tipo_interfaz'));
+        }
+
         $this->objFunc=$this->create('MODPlanPago');
         if($this->objParam->insertar('id_plan_pago')){
             $this->res=$this->objFunc->insertarPlanPago($this->objParam);
@@ -215,6 +223,10 @@ class ACTPlanPago extends ACTbase{
     function generarConformidad(){
         $this->objFunc=$this->create('MODPlanPago');
         $this->res=$this->objFunc->generarConformidad($this->objParam);
+        // {dev: breydi.vasquez, date: 20/10/2021, desc: ejecutar action firma documentos}
+        if ($this->res->getTipo() == 'EXITO') {
+            include("../../../sis_workflow/control/ActionFirmaDocumentos.php");
+        }
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
 
@@ -424,6 +436,8 @@ class ACTPlanPago extends ACTbase{
             $this->res = $this->objFunc->listarProcesoConRetencion($this->objParam);
         }elseif ($this->objParam->getParametro('tipo_reporte')=='reporte_pro'){
             $this->res = $this->objFunc->listarProcesoConRetencionAProrrateo($this->objParam);
+        }elseif ($this->objParam->getParametro('tipo_reporte')=='reporte_resu') {
+            $this->res = $this->objFunc->listarProcesoResumenXContrato($this->objParam);
         }
 
         //obtener titulo de reporte
@@ -440,6 +454,8 @@ class ACTPlanPago extends ACTbase{
             $this->objReporteFormato = new RProcesoConRetencionXLS($this->objParam);
         }elseif ($this->objParam->getParametro('tipo_reporte')=='reporte_pro'){
             $this->objReporteFormato = new RProcesoConRetencionXLSPro($this->objParam);
+        }elseif ($this->objParam->getParametro('tipo_reporte')=='reporte_resu') {
+            $this->objReporteFormato = new RProcesoResumenXContratoXLS($this->objParam);
         }
 
         $this->objReporteFormato->generarDatos();

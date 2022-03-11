@@ -82,6 +82,16 @@ header("content-type: text/javascript; charset=UTF-8");
                 },
                 {
                     config:{
+                        name: 'id_obligacion_det',
+                        fieldLabel: 'ID Obligacion Detalle',
+                        gwidth: 50,
+                    },
+                    type:'Field',
+                    grid:true,
+                    form:false
+                },
+                {
+                    config:{
                         name:'id_centro_costo',
                         origen:'CENTROCOSTO',
                         // baseParams:{filtrar:'grupo_ep'},
@@ -486,6 +496,9 @@ header("content-type: text/javascript; charset=UTF-8");
                 {name:'usr_mod', type: 'string'},'desc_ingas','nombre_ingas','descripcion',
                 'id_orden_trabajo','desc_orden'
             ],
+
+            arrayDefaultColumHidden: ['id_obligacion_det'],
+
             onButtonEdit:function(){
 
                 Phx.vista.ObligacionDet.superclass.onButtonEdit.call(this);
@@ -622,6 +635,11 @@ header("content-type: text/javascript; charset=UTF-8");
                     this.getBoton('btnProrrateo').disable();
 
 
+                }
+
+                //21-12-2020 (may) para vbpresu se habilita la modificacion del detalle para el solicitante
+                if(this.maestro.estado ==  'vbpresupuestos'){
+                    this.getBoton('edit').enable();
                 }
 
                 if(this.maestro&&(this.maestro.estado ==  'borrador' && this.maestro.tipo_obligacion=='adquisiciones' )){

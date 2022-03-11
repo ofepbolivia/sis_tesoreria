@@ -466,7 +466,7 @@ BEGIN
                          v_monto_ant_descontado
                         from tes.tplan_pago pp
                         where  pp.estado_reg='activo'
-                              and pp.tipo in('dev_garantia')
+                              and pp.tipo in('dev_garantia', 'dev_garantia_con','dev_garantia_con_ant')
                               and pp.id_obligacion_pago = p_id_obligacion_pago;
 
 

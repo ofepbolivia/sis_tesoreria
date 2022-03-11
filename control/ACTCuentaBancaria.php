@@ -58,6 +58,10 @@ class ACTCuentaBancaria extends ACTbase{
         if($this->objParam->getParametro('centro')=='otro'){
             $this->objParam->addFiltro("ctaban.centro = ''otro''");
         }
+
+        if($this->objParam->getParametro('centro')=='exterior'){
+            $this->objParam->addFiltro("ctaban.centro in (''otro'',''si'',''esp'',''no'')");
+        }
 		/*
 		if($this->objParam->getParametro('tipo_interfaz')!=''){
 			$this->objParam->addFiltro("''".$this->objParam->getParametro('tipo_interfaz')."''=ANY(fin.sw_tipo_interfaz)");

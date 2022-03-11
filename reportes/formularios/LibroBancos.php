@@ -10,7 +10,7 @@ header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
 	Phx.vista.ReporteLibroBancos = Ext.extend(Phx.frmInterfaz, {
-		
+
 		Atributos : [
 		{
             config:{
@@ -30,7 +30,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     fields: ['id_cuenta_bancaria','nro_cuenta','denominacion','centro', 'nombre_institucion'],
                     // turn on remote sorting
                     remoteSort: true,
-                    baseParams:{par_filtro:'nro_cuenta#denominacion#centro', permiso:'libro_bancos'}
+                    baseParams:{par_filtro:'ctaban.nro_cuenta#ctaban.denominacion#ctaban.centro', permiso:'libro_bancos'}
                     }),
                 valueField: 'id_cuenta_bancaria',
                 displayField: 'nro_cuenta',
@@ -46,12 +46,12 @@ header("content-type: text/javascript; charset=UTF-8");
                 listWidth:600,
                 resizable:true,
                 anchor:'100%'
-                
+
             },
             type:'ComboBox',
             id_grupo:0,
-            filters:{   
-                        pfiltro:'nro_cuenta#denominacion',
+            filters:{
+                        pfiltro:'ctaban.nro_cuenta#ctaban.denominacion',
                         type:'string'
                     },
             grid:true,
@@ -63,7 +63,7 @@ header("content-type: text/javascript; charset=UTF-8");
 				fieldLabel: 'Cuenta Bancaria',
 				allowBlank: false,
 				anchor: '80%',
-				gwidth: 100, 
+				gwidth: 100,
 				renderer:function (value,p,record){return value}
 			},
 			type:'Field',
@@ -78,7 +78,7 @@ header("content-type: text/javascript; charset=UTF-8");
 					name: 'nombre_banco'
 			},
 			type:'Field',
-			form:true 
+			form:true
 		},
 		{
 			config:{
@@ -87,7 +87,7 @@ header("content-type: text/javascript; charset=UTF-8");
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
-						format: 'd/m/Y', 
+						format: 'd/m/Y',
 						renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
 			},
 			type:'DateField',
@@ -103,7 +103,7 @@ header("content-type: text/javascript; charset=UTF-8");
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
-						format: 'd/m/Y', 
+						format: 'd/m/Y',
 						renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
 			},
 			type:'DateField',
@@ -118,12 +118,12 @@ header("content-type: text/javascript; charset=UTF-8");
 				fieldLabel:'Tipo',
 				allowBlank:false,
 				emptyText:'Tipo...',
-				typeAhead: true,								
-				mode: 'local',				
-				gwidth: 100,                
-                hiddenName: 'id_forma_pago',                
+				typeAhead: true,
+				mode: 'local',
+				gwidth: 100,
+                hiddenName: 'id_forma_pago',
                 store: new Ext.data.JsonStore({
-                         url: '../../sis_tesoreria/control/TsLibroBancos/consultaFormaPagoRepo',                         
+                         url: '../../sis_tesoreria/control/TsLibroBancos/consultaFormaPagoRepo',
                          id: 'id_forma_pago',
                          root: 'datos',
                          sortInfo:{
@@ -134,10 +134,10 @@ header("content-type: text/javascript; charset=UTF-8");
                     fields: ['id_forma_pago','variable','desc_forma_pago'],
                     // turn on remote sorting
                     remoteSort: true,
-                    baseParams:{par_filtro:'fpa.desc_forma_pago'}                    
+                    baseParams:{par_filtro:'fpa.desc_forma_pago'}
                     }),
                 valueField: 'variable',
-                displayField: 'desc_forma_pago', 
+                displayField: 'desc_forma_pago',
                 forceSelection:true,
                 typeAhead: false,
                 triggerAction: 'all',
@@ -150,14 +150,14 @@ header("content-type: text/javascript; charset=UTF-8");
                 anchor:'80%'
 			},
 			type:'ComboBox',
-			id_grupo:1,		
-            filters:{   
+			id_grupo:1,
+            filters:{
                         pfiltro:'variable',
                         type:'string'
-                    },            
+                    },
 			grid:true,
 			form:true
-		},        
+		},
         /*
 		{
 			config:{
@@ -171,17 +171,17 @@ header("content-type: text/javascript; charset=UTF-8");
 				mode:'local',
 				store:new Ext.data.ArrayStore({
 	        	fields: ['ID', 'valor'],
-	        	data :	[['Todos','Todos'],	
+	        	data :	[['Todos','Todos'],
 						['cheque','Cheque'],
 						['deposito','Depósito'],
 						['debito_automatico','Débito Automático'],
 	        			['transferencia_carta','Transferencia con carta'],
-						['transferencia_interna','Transferencias internas']]	        				
+						['transferencia_interna','Transferencias internas']]
 	    		}),
 				valueField:'ID',
 				displayField:'valor',
-				width:250,			
-				
+				width:250,
+
 			},
 			type:'ComboBox',
 			id_grupo:1,
@@ -199,7 +199,7 @@ header("content-type: text/javascript; charset=UTF-8");
 				mode:'local',
 				store:new Ext.data.ArrayStore({
 	        	fields: ['ID', 'valor'],
-	        	data :	[['Todos','Todos'],	
+	        	data :	[['Todos','Todos'],
 						['impreso y entregado','En transito'],
 						['borrador','Borrador'],
 						['pendiente','Pendiente'],
@@ -210,12 +210,12 @@ header("content-type: text/javascript; charset=UTF-8");
 						['anulado','Anulado'],
 						['reingresado','Reingresado'],
 						['depositado','Depositado'],
-						['transferido','Transferido']]	        				
+						['transferido','Transferido']]
 	    		}),
 				valueField:'ID',
 				displayField:'valor',
-				width:250,			
-				
+				width:250,
+
 			},
 			type:'ComboBox',
 			id_grupo:1,
@@ -255,11 +255,11 @@ header("content-type: text/javascript; charset=UTF-8");
                 listWidth:600,
                 resizable:true,
                 anchor:'100%'
-                
+
             },
             type:'ComboBox',
             id_grupo:0,
-            filters:{   
+            filters:{
                         pfiltro:'nombre_finalidad',
                         type:'string'
                     },
@@ -272,7 +272,7 @@ header("content-type: text/javascript; charset=UTF-8");
 				fieldLabel: 'Finalidad',
 				allowBlank: false,
 				anchor: '80%',
-				gwidth: 100, 
+				gwidth: 100,
 				renderer:function (value,p,record){return value}
 			},
 			type:'Field',
@@ -292,35 +292,35 @@ header("content-type: text/javascript; charset=UTF-8");
 				mode:'local',
 				store:new Ext.data.ArrayStore({
 	        	fields: ['ID', 'valor'],
-	        	data :	[['1','PDF'],	
-						['2','Excel']]	        				
+	        	data :	[['1','PDF'],
+						['2','Excel']]
 	    		}),
 				valueField:'ID',
 				displayField:'valor',
-				width:250,			
-				
+				width:250,
+
 			},
 			type:'ComboBox',
 			id_grupo:1,
 			form:true
 		}],
-		title : 'Reporte Libro Bancos',		
+		title : 'Reporte Libro Bancos',
 		ActSave : '../../sis_tesoreria/control/TsLibroBancos/reporteLibroBancos',
 		timeout : 1500000,
-		
+
 		topBar : true,
 		botones : false,
 		labelSubmit : 'Imprimir',
 		tooltipSubmit : '<b>Generar Reporte Libro Bancos</b>',
-		
+
 		constructor : function(config) {
 			Phx.vista.ReporteLibroBancos.superclass.constructor.call(this, config);
-			this.init();			
+			this.init();
 			this.iniciarEventos();
             this.pais;
 		},
-		
-		iniciarEventos:function(){        
+
+		iniciarEventos:function(){
 			this.cmpFormatoReporte = this.getComponente('formato_reporte');
 			this.cmpFechaIni = this.getComponente('fecha_ini');
 			this.cmpFechaFin = this.getComponente('fecha_fin');
@@ -330,13 +330,13 @@ header("content-type: text/javascript; charset=UTF-8");
 			this.cmpNombreBanco = this.getComponente('nombre_banco');
 			this.cmpNroCuenta = this.getComponente('nro_cuenta');
             this.cmpFinalidad = this.getComponente('id_finalidad');
-			
+
 			this.getComponente('finalidad').hide(true);
 			this.cmpNroCuenta.hide(true);
 			this.getComponente('id_finalidad').on('change',function(c,r,n){
 				this.getComponente('finalidad').setValue(c.lastSelectionText);
 			},this);
-			
+
 			this.cmpIdCuentaBancaria.on('select',function(c,r,n){
                 console.log('cc=> ',c);
 				this.cmpNombreBanco.setValue(r.data.nombre_institucion);
@@ -345,7 +345,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.getComponente('id_forma_pago').store.baseParams={vista: 'reporte'};
                 this.getComponente('id_forma_pago').modificado=true;
 				this.getComponente('id_finalidad').reset();
-				this.getComponente('id_finalidad').store.baseParams={id_cuenta_bancaria:c.value, vista: 'reporte'};				
+				this.getComponente('id_finalidad').store.baseParams={id_cuenta_bancaria:c.value, vista: 'reporte'};
 				this.getComponente('id_finalidad').modificado=true;
 			},this);
 
@@ -356,14 +356,14 @@ header("content-type: text/javascript; charset=UTF-8");
 					failure: this.conexionFailure,
 					timeout:this.timeout,
 					scope:this
-				});            
+				});
 		},
         setPais: function (resp){
-            var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));                        
-            this.pais = reg.datos[0].codigo;            
-        },        
+            var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+            this.pais = reg.datos[0].codigo;
+        },
 		onSubmit:function(o){
-			if(this.cmpFormatoReporte.getValue()==2){    
+			if(this.cmpFormatoReporte.getValue()==2){
                 console.log('Country =>',this.pais);
 
 				var data = 'FechaIni=' + this.cmpFechaIni.getValue().format('d-m-Y');
@@ -373,20 +373,20 @@ header("content-type: text/javascript; charset=UTF-8");
 				data = data + '&Tipo=' + this.cmpTipo.getValue();
 				data = data + '&NombreBanco=' + this.cmpNombreBanco.getValue();
 				data = data + '&NumeroCuenta=' + this.cmpNroCuenta.getValue();
-                data = data + '&FINALIDAD=' + this.cmpFinalidad.getValue();                 
+                data = data + '&FINALIDAD=' + this.cmpFinalidad.getValue();
                 data = data + '&FILTRO=' + this.pais;
-				
+
 				console.log(data);
 				window.open('http://sms.obairlines.bo/ErpReports/Reporte/VerLibroBancos?'+data);
-				//window.open('http://localhost:2309/Home/VerLibroBancos?'+data);				
+				//window.open('http://localhost:2309/Home/VerLibroBancos?'+data);
 			}else{
-				Phx.vista.ReporteLibroBancos.superclass.onSubmit.call(this,o);				
+				Phx.vista.ReporteLibroBancos.superclass.onSubmit.call(this,o);
 			}
 		},
-		
+
 		tipo : 'reporte',
 		clsSubmit : 'bprint',
-		
+
 		Grupos : [{
 			layout : 'column',
 			items : [{

@@ -8,17 +8,17 @@
 */
 
 class MODUsuarioCuentaBanc extends MODbase{
-	
+
 	function __construct(CTParametro $pParam){
 		parent::__construct($pParam);
 	}
-			
+
 	function listarUsuarioCuentaBanc(){
 		//Definicion de variables para ejecucion del procedimientp
 		$this->procedimiento='tes.ft_usuario_cuenta_banc_sel';
 		$this->transaccion='TES_UCU_SEL';
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
-				
+
 		//Definicion de la lista del resultado del query
 		$this->captura('id_usuario_cuenta_banc','int4');
 		$this->captura('id_usuario','int4');
@@ -34,22 +34,22 @@ class MODUsuarioCuentaBanc extends MODbase{
 		$this->captura('usr_reg','varchar');
 		$this->captura('usr_mod','varchar');
 		$this->captura('desc_persona','text');
-		
-		
+		$this->captura('nombre_completo1', 'text');
+
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
-		
+
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
-			
+
 	function insertarUsuarioCuentaBanc(){
 		//Definicion de variables para ejecucion del procedimiento
 		$this->procedimiento='tes.ft_usuario_cuenta_banc_ime';
 		$this->transaccion='TES_UCU_INS';
 		$this->tipo_procedimiento='IME';
-				
+
 		//Define los parametros para la funcion
 		$this->setParametro('id_usuario','id_usuario','int4');
 		$this->setParametro('estado_reg','estado_reg','varchar');
@@ -63,13 +63,13 @@ class MODUsuarioCuentaBanc extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
-			
+
 	function modificarUsuarioCuentaBanc(){
 		//Definicion de variables para ejecucion del procedimiento
 		$this->procedimiento='tes.ft_usuario_cuenta_banc_ime';
 		$this->transaccion='TES_UCU_MOD';
 		$this->tipo_procedimiento='IME';
-				
+
 		//Define los parametros para la funcion
 		$this->setParametro('id_usuario_cuenta_banc','id_usuario_cuenta_banc','int4');
 		$this->setParametro('id_usuario','id_usuario','int4');
@@ -84,13 +84,13 @@ class MODUsuarioCuentaBanc extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
-			
+
 	function eliminarUsuarioCuentaBanc(){
 		//Definicion de variables para ejecucion del procedimiento
 		$this->procedimiento='tes.ft_usuario_cuenta_banc_ime';
 		$this->transaccion='TES_UCU_ELI';
 		$this->tipo_procedimiento='IME';
-				
+
 		//Define los parametros para la funcion
 		$this->setParametro('id_usuario_cuenta_banc','id_usuario_cuenta_banc','int4');
 
@@ -101,6 +101,6 @@ class MODUsuarioCuentaBanc extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
-			
+
 }
 ?>

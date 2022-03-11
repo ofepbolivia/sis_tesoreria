@@ -21,8 +21,21 @@ Phx.vista.FormRendicion = {
 		
 	constructor: function(config) {		
 	   Phx.vista.FormRendicion.superclass.constructor.call(this,config);
-	   this.addEvents('aftersave');
+	   //this.addEvents('aftersave');
     },
+
+    extraAtributos:[
+        {
+            //configuracion del componente
+            config:{
+                labelSeparator:'',
+                inputType:'hidden',
+                name: 'id_solicitud_efectivo'
+            },
+            type:'Field',
+            form:true
+        }
+    ],
     
 	onNew: function(){    	
     	Phx.vista.FormRendicion.superclass.onNew.call(this);

@@ -1,0 +1,747 @@
+<?php
+/**
+ * @package pXP
+ * @file gen-PlanPagoPOCRegIni.php
+ * @author  Maylee Perez Pastor
+ * @date 02-12-2020 10:22:05
+ * @description Archivo con la interfaz de usuario que permite
+ *dar el visto a solicitudes de compra
+ *
+ */
+header("content-type: text/javascript; charset=UTF-8");
+?>
+<script>
+    Phx.vista.PlanPagoPOCRegIni = {
+
+        bdel: true,
+        bedit: true,
+        bsave: false,
+
+        require: '../../../sis_tesoreria/vista/plan_pago/PlanPagoPOC.php',
+        requireclase: 'Phx.vista.PlanPagoPOC',
+        title: 'Registro de Planes de Pago',
+        nombreVista: 'PlanPagoPOCRegIni',
+
+        constructor: function (config) {
+
+
+            this.maestro = config.maestro;
+
+
+            this.Atributos.splice(12, 0,
+                {
+                    config: {
+                        name: 'es_ultima_cuota',
+                        fieldLabel: 'Última Cuota',
+                        allowBlank: true,
+                        anchor: '70%',
+                        gwidth: 85,
+
+                        renderer: function (value, p, record, rowIndex, colIndex) {
+                            if (value == true) {
+                                var checked = 'checked';
+                            }
+                            return String.format('<div style="vertical-align:middle;text-align:center;"><input style="height:30px;width:30px;"  type="checkbox"  {0}></div>', checked);
+                        }
+                    },
+                    type: 'Checkbox',
+                    id_grupo: 0,
+                    grid: true,
+                    form: true
+                }
+            );
+            this.Atributos.splice(14, 0,
+                {
+                    config: {
+                        name: 'nro_cbte',
+                        fieldLabel: 'Nro. Comprobante',
+                        allowBlank: true,
+                        anchor: '80%',
+                        gwidth: 120,
+                        maxLength: 255,
+
+                        renderer: function (vale, p, record) {
+                            if (record.data.nro_cbte == null)
+                                return String.format('{0}', '');
+                            else
+                                return String.format('{0}', "<div style='color: green'><b>" + record.data.nro_cbte + "</b></div>");
+                        }
+
+                    },
+                    type: 'TextField',
+                    filters: {pfiltro: 'tcon.nro_cbte', type: 'string'},
+                    id_grupo: 1,
+                    grid: true,
+                    form: false,
+                    bottom_filter: true
+                }
+            );
+            this.Atributos.splice(15, 0,
+                {
+                    config: {
+                        name: 'c31',
+                        fieldLabel: 'C31',
+                        allowBlank: true,
+                        anchor: '80%',
+                        gwidth: 90,
+                        maxLength: 255,
+
+                        renderer: function (vale, p, record) {
+                            if (record.data.c31 == null)
+                                return String.format('{0}', '');
+                            else
+                                return String.format('{0}', "<div style='color: green'><b>" + record.data.c31 + "</b></div>");
+                        }
+                    },
+                    type: 'TextField',
+                    filters: {pfiltro: 'tcon.c31', type: 'string'},
+                    id_grupo: 1,
+                    grid: true,
+                    form: false,
+                    bottom_filter: true
+                }
+            );
+            Phx.vista.PlanPagoPOCRegIni.superclass.constructor.call(this, config);
+            //this.creaFormularioConformidad();
+            ////formulario de departamentos
+            //this.crearFormularioEstados();
+            //si la interface es pestanha este código es para iniciar
+            var dataPadre = Phx.CP.getPagina(this.idContenedorPadre).getSelectedData()
+            if (dataPadre) {
+                this.onEnablePanel(this, dataPadre);
+            }
+            else {
+                this.bloquearMenus();
+            }
+
+            this.addButton('btnConformidad', {
+                text: 'Conformidad',
+                iconCls: 'bok',
+                disabled: false,
+                handler: this.onButtonConformidad,
+                tooltip: 'Generar conformidad para el pago (Firma acta de conformidad)'
+            });
+
+            this.addButton('clonarPP', {
+                text: 'Clonar Plan de Pago',
+                iconCls: 'blist',
+                disabled: false,
+                handler: this.clonarPP,
+                tooltip: 'Clonar el registro de una Cuota'
+            });
+
+
+            /*this.addButton('btnVerifPresup', {
+                  text : 'Disponibilidad',
+                  iconCls : 'bassign',
+
+                  disabled : true,
+                  handler : this.onBtnVerifPresup,
+                  tooltip : '<b>Verificación de la disponibilidad presupuestaria</b>'
+              });*/
+
+
+            this.creaFormularioConformidad();
+            this.iniciarEventos();
+            //esconde boton para mandar a borrador
+            this.getBoton('ini_estado').hide();
+
+            this.getConfigPago();
+            this.grid.addListener('cellclick', this.marcar_ultima_cuota, this);
+
+        },
+
+        marcar_ultima_cuota: function (grid, rowIndex, columnIndex, e) {
+            var record = this.store.getAt(rowIndex).data,
+                fieldName = grid.getColumnModel().getDataIndex(columnIndex);
+
+            if (fieldName == 'es_ultima_cuota') {
+
+                Ext.Ajax.request({
+                    url: '../../sis_tesoreria/control/PlanPago/setUltimaCuota',
+                    params: {
+                        id_obligacion_pago: record.id_obligacion_pago,
+                        id_plan_pago: record.id_plan_pago,
+                        es_ultima_cuota: record.es_ultima_cuota,
+                        accion: 'grid'
+                    },
+                    success: function (resp) {
+                        this.reload();
+                    },
+                    failure: this.conexionFailure,
+                    timeout: this.timeout,
+                    scope: this
+                });
+            }
+        },
+
+        getConfigPago: function (id_plantilla) {
+            var data = this.getSelectedData();
+            Phx.CP.loadingShow();
+
+            Ext.Ajax.request({
+
+                url: '../../sis_tesoreria/control/PlanPago/getConfigPago',
+                params: {test: 'test'},
+                success: function (resp) {
+                    Phx.CP.loadingHide();
+                    var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+                    if (!reg.ROOT.error) {
+
+                        console.log('----llega...', reg);
+
+                        var tipHab = reg.ROOT.datos.tes_tipo_pago_deshabilitado.split(",");
+                        console.log('tipHab', tipHab)
+                        for (var ele = 0; ele < tipHab.length; ele++) {
+                            for (var k = 0; k < this.arrayStore['DEVENGAR'].length; k++) {
+                                console.log(tipHab[ele], this.arrayStore['DEVENGAR'][k][0])
+                                if (this.arrayStore['DEVENGAR'][k][0] == tipHab[ele]) {
+                                    this.arrayStore['DEVENGAR'].splice(k, 1);
+                                }
+                            }
+                        }
+                    }
+                    else {
+                        alert(reg.ROOT.mensaje);
+                    }
+                },
+                failure: this.conexionFailure,
+                timeout: this.timeout,
+                scope: this
+            });
+        },
+
+
+        iniciarEventos: function () {
+            //(f.e.a)
+            /*this.Cmp.fecha_tentativa.on('select', function(value, date){
+            var anio = this.maestro.num_tramite.substring(13,18);//date.getFullYear();
+
+            var fecha_inicio = new Date(anio+'/01/1');
+            var fecha_fin = new Date(anio+'/12/31');
+            //control de fechas de inicio y fin de costos
+            this.Cmp.fecha_costo_ini.setMinValue(fecha_inicio);
+            this.Cmp.fecha_costo_fin.setMaxValue(fecha_fin);
+        }, this);*/
+            this.Cmp.monto.on('change', this.calculaMontoPago, this);
+            this.Cmp.descuento_anticipo.on('change', this.calculaMontoPago, this);
+            this.Cmp.monto_no_pagado.on('change', this.calculaMontoPago, this);
+            this.Cmp.otros_descuentos.on('change', this.calculaMontoPago, this);
+            this.Cmp.monto_retgar_mo.on('change', this.calculaMontoPago, this);
+            this.Cmp.descuento_ley.on('change', this.calculaMontoPago, this);
+            this.Cmp.descuento_inter_serv.on('change', this.calculaMontoPago, this);
+            this.Cmp.monto_anticipo.on('change', this.calculaMontoPago, this);
+            this.Cmp.monto_excento.on('change', this.calculaMontoPago, this);
+
+            this.Cmp.id_plantilla.on('select', function (cmb, rec, i) {
+                this.getDecuentosPorAplicar(rec.data.id_plantilla);
+                this.Cmp.monto_excento.reset();
+                if (rec.data.sw_monto_excento == 'si') {
+                    this.Cmp.monto_excento.enable();
+                    this.Cmp.tipo_excento.setValue(rec.data.tipo_excento);
+                    this.Cmp.valor_excento.setValue(rec.data.valor_excento);
+                }
+                else {
+                    this.Cmp.monto_excento.disable();
+                    this.Cmp.tipo_excento.setValue('variable');
+                    this.Cmp.monto_excento.setValue(0);
+                    this.Cmp.valor_excento.setValue(0);
+                }
+            }, this);
+
+
+            //evento para definir los tipos de pago
+            this.Cmp.tipo.on('select', function (cmb, rec, i) {
+                var data = this.getSelectedData();
+                //segun el tipo define los campo visibles y no visibles
+                this.setTipoPago[rec.data.variable](this, data);
+                this.unblockGroup(1);
+                this.window.doLayout();
+
+                //(f.e.a)control de fechas de inicio y fin de costos
+                //var fecha = this.Cmp.fecha_tentativa.getValue();
+                //var anio = fecha.getFullYear();
+                /*var anio = this.maestro.num_tramite.substring(13,18);
+                    var fecha_inicio = new Date(anio+'/01/1');
+                    var fecha_fin = new Date(anio+'/12/31');
+                    this.Cmp.fecha_costo_ini.setMinValue(fecha_inicio);
+                    this.Cmp.fecha_costo_fin.setMaxValue(fecha_fin);*/
+
+                if (this.accionFormulario == 'NEW') {
+
+                    if (rec.data.variable == 'devengado' ||
+                        rec.data.variable == 'devengado_pagado' ||
+                        rec.data.variable == 'devengado_pagado_1c' ||
+                        rec.data.variable == 'rendicion' ||
+                        rec.data.variable == 'anticipo') {
+                        this.obtenerFaltante('registrado,ant_parcial_descontado');
+                    }
+
+
+                    if (rec.data.variable == 'ant_parcial') {
+                        this.obtenerFaltante('ant_parcial');
+                    }
+
+                    if (rec.data.variable == 'dev_garantia') {
+                        this.obtenerFaltante('dev_garantia');
+                    }
+
+                    if (rec.data.variable == 'dev_garantia_con') {
+                        this.obtenerFaltante('dev_garantia_con');
+                    }
+
+                    if (rec.data.variable == 'dev_garantia_con_ant') {
+                        this.obtenerFaltante('dev_garantia_con_ant');
+                    }
+
+                    if (rec.data.variable == 'especial') {
+                        this.obtenerFaltante('especial');
+                    }
+                }
+                if (this.accionFormulario == 'NEW_PAGO' || this.accionFormulario == 'NEW' || this.accionFormulario == 'NEW_ANT_APLI') {
+                    if (rec.data.variable == 'pagado') {
+                        this.iniciaPagoDelDevengado(data);
+                    }
+
+                    if (rec.data.variable == 'ant_aplicado') {
+                        this.iniciaAplicacion(data);
+                    }
+                }
+            }, this);
+
+
+            this.Cmp.monto_ajuste_ag.on('change', function (cmp, newValue, oldValue) {
+
+                if (newValue > this.Cmp.monto_ejecutar_total_mo.getValue()) {
+                    cmp.setValue(oldValue);
+                }
+
+            }, this);
+
+
+            //eventos de fechas de costo
+            this.Cmp.fecha_costo_ini.on('change', function (o, newValue, oldValue) {
+                this.Cmp.fecha_costo_fin.setMinValue(newValue);
+                this.Cmp.fecha_costo_fin.reset();
+
+            }, this)
+
+            //eventos de fechas de costo
+            this.Cmp.fecha_costo_fin.on('change', function (o, newValue, oldValue) {
+                this.Cmp.fecha_costo_ini.setMaxValue(newValue);
+            }, this)
+
+
+        },
+
+        onBtnSolPlanPago: function () {
+            var rec = this.sm.getSelected();
+            Ext.Ajax.request({
+                url: '../../sis_tesoreria/control/PlanPago/solicitudPlanPago',
+                params: {'id_plan_pago': rec.data.id_plan_pago, id_obligacion_pago: this.maestro.id_obligacion_pago},
+                success: this.successExport,
+                failure: function () {
+                    //console.log("fail");
+                },
+                timeout: function () {
+                    //console.log("timeout");
+                },
+                scope: this
+            });
+        },
+
+        setTipoPagoNormal: function () {
+
+            this.mostrarComponente(this.Cmp.monto_ejecutar_total_mo)
+            this.habilitarDescuentos();
+
+        },
+
+
+        enableDisable: function (val) {
+            //devengado
+
+            this.Cmp.nombre_pago.disable();
+            this.ocultarComponente(this.Cmp.nombre_pago);
+
+            //pago
+
+            this.deshabilitarDescuentos()
+            this.Cmp.nombre_pago.enable();
+            this.mostrarComponente(this.Cmp.nombre_pago);
+            this.habilitarDescuentos();
+
+
+            this.Cmp.monto_no_pagado.setValue(0);
+            this.Cmp.otros_descuentos.setValue(0);
+            this.Cmp.liquido_pagable.setValue(0);
+            this.Cmp.monto_ejecutar_total_mo.setValue(0);
+            this.Cmp.monto_retgar_mo.setValue(0);
+            this.Cmp.descuento_ley.setValue(0)
+            this.calculaMontoPago()
+
+        },
+
+        iniciaAplicacion: function (data) {
+            //carga la plantilla con el mismo documento que el devengado
+            var me = this;
+            this.Cmp.id_plantilla.store.load({
+                params: {start: 0, limit: 1, id_plantilla: data.id_plantilla},
+                callback: function () {
+                    me.Cmp.id_plantilla.setValue(data.id_plantilla);
+                    me.Cmp.id_plantilla.modificado = true;
+                    me.getDecuentosPorAplicar(data.id_plantilla);
+                }
+            });
+
+
+            this.inicioValores();
+            this.tmp_porc_monto_excento_var = data.porc_monto_excento_var;
+            //obtiene el monto de apgo que falta registrar
+            //y el monto de anticpo parcial que falta por descontar
+            if (data.pago_variable == 'si') {
+                this.obtenerFaltante('ant_aplicado_descontado_op_variable', data.id_plan_pago);
+            }
+            else {
+                this.obtenerFaltante('ant_aplicado_descontado', data.id_plan_pago);
+            }
+        },
+        iniciaPagoDelDevengado: function (data) {
+            //carga la plantilla con el mismo documento que el devengado
+            var me = this;
+            this.Cmp.id_plantilla.store.load({
+                params: {start: 0, limit: 1, id_plantilla: data.id_plantilla},
+                callback: function () {
+                    me.Cmp.id_plantilla.setValue(data.id_plantilla);
+                    me.Cmp.id_plantilla.modificado = true;
+                    me.getDecuentosPorAplicar(data.id_plantilla);
+                }
+            });
+
+
+            this.inicioValores();
+
+            //calcula el porcentaje de retencio de garantia si en el
+            //devengado es mayor a cero, se utiliza en la funcion calculaMontoPago
+            this.Cmp.porc_monto_retgar.setValue(data.porc_monto_retgar);
+            this.porc_ret_gar = data.porc_monto_retgar;
+            this.tmp_porc_monto_excento_var = data.porc_monto_excento_var;
+
+            //obtiene el monto de apgo que falta registrar
+            //y el monto de anticpo parcial que falta por descontar
+            this.obtenerFaltante('registrado_pagado,ant_parcial_descontado', data.id_plan_pago);
+        },
+
+        onButtonNew: function () {
+            // var anio = this.maestro.fecha;
+            // anio = anio.getFullYear();
+            // var fecha_inicio = new Date(anio+'/01/1');
+            //
+            // var fecha_fin = new Date(anio+'/12/31');
+            // this.Cmp.fecha_costo_ini.setMinValue(fecha_inicio);
+            // this.Cmp.fecha_costo_ini.setMaxValue(fecha_fin);
+            // this.Cmp.fecha_costo_fin.setMinValue(fecha_inicio);
+            // this.Cmp.fecha_costo_fin.setMaxValue(fecha_fin);
+            this.porc_ret_gar = 0; //resetea valor por defecto de retencion de garantia
+            var data = this.getSelectedData();
+            this.ocultarGrupo(2); //ocultar el grupo de ajustes
+
+            //variables temporales
+            this.tmp_porc_monto_excento_var = undefined;
+            if (data) {
+
+                // para habilitar registros de cuotas de pago
+                //sobre los devengados
+                Phx.vista.PlanPagoPOCRegIni.superclass.onButtonNew.call(this);
+                this.Cmp.tipo.enable();
+                this.blockGroup(1)//bloqueaos el grupo , detalle de pago
+                this.Cmp.id_obligacion_pago.setValue(this.maestro.id_obligacion_pago);
+                this.Cmp.id_plan_pago_fk.setValue(data.id_plan_pago);
+
+                if (data.tipo == 'devengado' || data.tipo == 'devengado_pagado') {
+                    //
+                    this.accionFormulario = 'NEW_PAGO';  //esta bandera modifica el ,  obtenerFaltante
+                    if (data.estado == 'devengado') {
+                        if (data.monto * 1 > data.total_pagado * 1) {
+
+                            this.Cmp.tipo.store.loadData(this.arrayStore.DEVENGAR);
+
+
+                        } else {
+                            alert('No queda nada por pagar');
+                        }
+                    }
+                    else {
+                        alert('El devengado no fue completado');
+                    }
+
+                }
+                else {
+                    if (data.tipo == 'anticipo') {
+                        this.accionFormulario = 'NEW_ANT_APLI';
+
+                        if (data.monto * 1 > data.total_pagado * 1 && data.estado == 'anticipado') {
+
+                            this.Cmp.tipo.store.loadData(this.arrayStore.ANTICIPO);
+
+
+                        }
+                    }
+                }
+            }
+            else {
+                this.accionFormulario = 'NEW';
+                //para habilitar registros de cuota de devengado
+                Phx.vista.PlanPagoPOCRegIni.superclass.onButtonNew.call(this);
+                this.Cmp.tipo.enable();
+                this.Cmp.id_obligacion_pago.setValue(this.maestro.id_obligacion_pago);
+                this.blockGroup(1)//bloqueaos el grupo , detalle de pago
+                //tipo pago (OPERACION)
+
+                if (this.maestro.tipo_obligacion === 'pago_especial') {
+                    //prepara pagos de enticipo
+                    this.Cmp.tipo.store.loadData(this.arrayStore.ESPECIAL)
+                }
+                else {
+                    if (this.maestro.nro_cuota_vigente == 0 && this.maestro.tipo_anticipo == 'si') {
+                        //prepara pagos de enticipo
+                        this.Cmp.tipo.store.loadData(this.arrayStore.ANT_PARCIAL)
+
+                    }
+                    else {
+
+                        //prepara pagos iniciales
+                        this.Cmp.tipo.store.loadData(this.arrayStore.DEVENGAR)
+
+                    }
+                }
+
+
+                this.inicioValores()
+            }
+
+        },
+
+        onButtonEdit: function () {
+            Phx.vista.PlanPagoPOCRegIni.superclass.onButtonEdit.call(this);
+
+
+        },
+
+        obtenerFaltante: function (_filtro, _id_plan_pago) {
+
+            Phx.CP.loadingShow();
+            Ext.Ajax.request({
+                // form:this.form.getForm().getEl(),
+                url: '../../sis_tesoreria/control/ObligacionPago/obtenerFaltante',
+                params: {
+                    ope_filtro: _filtro,
+                    id_obligacion_pago: this.maestro.id_obligacion_pago,
+                    id_plan_pago: _id_plan_pago
+                },
+                success: this.successOF,
+                failure: this.conexionFailure,
+                timeout: this.timeout,
+                scope: this
+            });
+        },
+
+        successOF: function (resp) {
+            Phx.CP.loadingHide();
+            var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+            if (!reg.ROOT.error) {
+                if (reg.ROOT.datos.monto_total_faltante > 0) {
+                    this.Cmp.monto.setValue(reg.ROOT.datos.monto_total_faltante);
+
+
+                    //si se trata de un nuevo pago
+                    if (this.accionFormulario == 'NEW_PAGO') {
+                        this.Cmp.monto_retgar_mo.setValue(this.porc_ret_gar * reg.ROOT.datos.monto_total_faltante);
+
+                    }
+
+                    if (this.tmp_porc_monto_excento_var > 0) {
+                        this.Cmp.monto_excento.setValue(reg.ROOT.datos.monto_total_faltante * this.tmp_porc_monto_excento_var);
+                    }
+
+
+                    if (this.Cmp.tipo.getValue() == 'devengado_pagado' || this.Cmp.tipo.getValue() == 'devengado_pagado_1c' || this.Cmp.tipo.getValue() == 'pagado') {
+                        //si es un pago calculamos el descuento de anticipo
+                        this.Cmp.descuento_anticipo.setValue(reg.ROOT.datos.ant_parcial_descontado);
+                        this.Cmp.descuento_anticipo.maxValue = reg.ROOT.datos.ant_parcial_descontado;
+                    }
+                }
+                else {
+                    this.Cmp.monto.setValue(0);
+                }
+                this.calculaMontoPago();
+            } else {
+
+                alert('error al obtener saldo por registrar')
+            }
+        },
+
+
+        onReloadPage: function (m) {
+            this.maestro = m;
+            this.store.baseParams = {
+                id_obligacion_pago: this.maestro.id_obligacion_pago,
+                tipo_interfaz: this.nombreVista
+            };
+            this.load({params: {start: 0, limit: this.tam_pag}})
+
+        },
+
+        successSave: function (resp) {
+            Phx.CP.getPagina(this.idContenedorPadre).reload();
+            Phx.vista.PlanPagoPOCRegIni.superclass.successSave.call(this, resp);
+
+        },
+        successDel: function (resp) {
+            Phx.CP.getPagina(this.idContenedorPadre).reload();
+            Phx.vista.PlanPagoPOCRegIni.superclass.successDel.call(this, resp);
+        },
+
+        preparaMenu: function (n) {
+
+
+            var data = this.getSelectedData();
+            var tb = this.tbar;
+            this.getBoton('ant_estado').disable();
+            this.getBoton('sig_estado').disable();
+            Phx.vista.PlanPagoPOCRegIni.superclass.preparaMenu.call(this, n);
+
+            //alert('pasa el constructor ....')
+
+            //alert(data['estado'])
+
+            if (data['estado'] == 'borrador') {
+                this.getBoton('edit').enable();
+
+                this.getBoton('del').enable();
+                this.getBoton('new').disable();
+                this.getBoton('SolPlanPago').enable();
+                this.getBoton('sig_estado').enable();
+
+                //08-05-2020 (may) Doc compra venta desde la cuota
+                this.getBoton('btnDocCmpVnt').enable();
+            }
+            else {
+
+                //alert('lega ......')
+
+
+                if ((data['tipo'] == 'devengado' || data['tipo'] == 'devengado_pagado') && data['estado'] == 'devengado' && (data.monto * 1) > (data.total_pagado * 1)) {
+                    this.getBoton('new').enable();
+                }
+                else {
+                    this.getBoton('new').disable();
+                }
+
+                if (data['estado'] == 'anticipado' && data['tipo'] == 'anticipo' && (data.monto * 1) > (data.total_pagado * 1)) {
+                    this.getBoton('new').enable();
+                }
+
+                this.getBoton('edit').disable();
+                this.getBoton('del').disable();
+                this.getBoton('SolPlanPago').enable();
+
+                //08-05-2020 (may) Doc compra venta desde la cuota
+                this.getBoton('btnDocCmpVnt').enable();
+            }
+
+            // if(data['sinc_presupuesto']=='si'&& (data['estado']== 'vbconta'||data['estado']== 'borrador')){
+            //     this.getBoton('SincPresu').enable();
+            // }
+            // else{
+            //     this.getBoton('SincPresu').disable();
+            // }
+
+
+            /*if (data.tipo=='devengado'  || data.tipo=='devengado_pagado' || data.tipo=='devengado_pagado_1c') {
+              this.getBoton('btnConformidad').enable();
+           } else {
+              this.getBoton('btnConformidad').disable();
+           }*/
+
+            // this.getBoton('btnVerifPresup').enable();
+            this.getBoton('btnChequeoDocumentosWf').enable();
+            this.getBoton('btnPagoRel').enable();
+        },
+
+        liberaMenu: function () {
+            var tb = Phx.vista.PlanPagoPOCRegIni.superclass.liberaMenu.call(this);
+            if (tb) {
+                // this.getBoton('SincPresu').disable();
+                this.getBoton('SolPlanPago').disable();
+                //this.getBoton('btnVerifPresup').disable();
+                this.getBoton('ant_estado').disable();
+                this.getBoton('sig_estado').disable();
+
+
+                //this.getBoton('btnConformidad').disable();
+                this.getBoton('btnChequeoDocumentosWf').disable();
+                this.getBoton('btnPagoRel').disable();
+
+                //08-05-2020 (may) Doc compra venta desde la cuota
+                this.getBoton('btnDocCmpVnt').disable();
+            }
+            return tb
+        },
+
+
+        getDecuentosPorAplicar: function (id_plantilla) {
+            var data = this.getSelectedData();
+            Phx.CP.loadingShow();
+
+            Ext.Ajax.request({
+                // form:this.form.getForm().getEl(),
+                url: '../../sis_contabilidad/control/PlantillaCalculo/recuperarDescuentosPlantillaCalculo',
+                params: {id_plantilla: id_plantilla},
+                success: this.successAplicarDesc,
+                failure: this.conexionFailure,
+                timeout: this.timeout,
+                scope: this
+            });
+        },
+
+
+        onBtnVerifPresup: function () {
+            var rec = this.sm.getSelected();
+            //Se define el nombre de la columna de la llave primaria
+            rec.tabla_id = this.tabla_id;
+            rec.tabla = this.tabla;
+
+            Phx.CP.loadWindows('../../../sis_presupuestos/vista/verificacion_presup/VerificacionPresup.php', 'Disponibilidad Presupuestaria', {
+                modal: true,
+                width: '80%',
+                height: '50%',
+            }, rec.data, this.idContenedor, 'VerificacionPresup');
+        },
+        clonarPP:function(){
+            if(confirm('¿Está seguro de clonar? ')){
+                var rec = this.sm.getSelected();
+                Phx.CP.loadingShow();
+                Ext.Ajax.request({
+                    url: '../../sis_tesoreria/control/PlanPago/clonarPP',
+                    params: {
+                        id_plan_pago: rec.data.id_plan_pago
+                    },
+                    success: this.successSinc,
+                    failure: this.conexionFailure,
+                    timeout: this.timeout,
+                    scope: this
+                });
+            }
+        },
+
+        east: {
+            url: '../../../sis_tesoreria/vista/prorrateo/Prorrateo.php',
+            title: 'Prorrateo',
+            width: 400,
+            cls: 'Prorrateo'
+        },
+        tabla_id: 'id_plan_pago',
+        tabla: 'tes.tplan_pago'
+    };
+</script>

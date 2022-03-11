@@ -108,6 +108,15 @@ header("content-type: text/javascript; charset=UTF-8");
 
             this.cmbGestion.on('select', this.capturarEventos, this);
 
+            /*this.addButtonIndex(6,'docCargaSigep',{
+                text:'Doc. SIGEP',
+                grupo:[0,1,2],
+                iconCls: 'brenew',
+                disabled: true,
+                handler: this.onCargarDocumentoSigep,
+                tooltip: '<b>Cargar Documento SIGEP</b><br/>Información para los comprobantes que ya tienen Preventivo en el SIGEP.'
+            });*/
+
             this.addButton('obs_presu', {
                 grupo: [0, 1, 2],
                 text: 'Obs. Presupuestos',
@@ -335,6 +344,8 @@ header("content-type: text/javascript; charset=UTF-8");
             } else {
                 this.desBotoneshistorico()
             }
+            //franklin.espinoza 15/10/2020
+            //this.getBoton('docCargaSigep').enable();
 
         },
         liberaMenu: function () {
@@ -343,6 +354,8 @@ header("content-type: text/javascript; charset=UTF-8");
             if (tb) {
                 this.getBoton('obs_presu').disable();
             }
+            //franklin.espinoza 15/10/2020
+            //this.getBoton('docCargaSigep').disable();
             return tb
         },
         desBotoneshistorico: function () {

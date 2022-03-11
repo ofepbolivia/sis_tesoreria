@@ -1,6 +1,8 @@
 <?php
 require_once dirname(__FILE__).'/../../pxp/lib/lib_reporte/ReportePDFFormulario.php';
 // Extend the TCPDF class to create custom MultiRow
+set_time_limit(0);//avoid timeout
+ini_set('memory_limit','-1');
 class RConformidad extends  ReportePDFFormulario {
 	var $datos_titulo;
 	var $datos_detalle;
@@ -29,7 +31,7 @@ class RConformidad extends  ReportePDFFormulario {
 	}
 
 	function generarActa($maestro) {
-
+		// ini_set('memory_limit', '500M');
 		$nombre_solicitante = $maestro[0]['nombre_solicitante'];
 		$proveedor = $maestro[0]['proveedor'];
 		$fecha_conformidad = $maestro[0]['fecha_conformidad'];

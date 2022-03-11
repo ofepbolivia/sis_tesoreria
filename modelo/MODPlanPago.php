@@ -129,6 +129,8 @@ class MODPlanPago extends MODbase{
         $this->captura('id_multa','integer');
         $this->captura('desc_multa','varchar');
 
+        $this->captura('id_obligacion_pago_extendida','int4');
+
         //Ejecuta la instruccion
         $this->armarConsulta();
         $this->ejecutarConsulta();
@@ -278,7 +280,9 @@ class MODPlanPago extends MODbase{
         $this->setParametro('monto_establecido','monto_establecido','numeric');
         $this->setParametro('id_proveedor_cta_bancaria','id_proveedor_cta_bancaria','int4');
         $this->setParametro('id_multa','id_multa','int4');
-
+        /*Aumentando para diferenciar los comprobantes a la sigGestion (Ismael Valdivia 3/12/2021)*/
+        $this->setParametro('tipo_interfaz','tipo_interfaz','varchar');
+        /******************************************************************************************/
 
 
 
@@ -695,6 +699,8 @@ class MODPlanPago extends MODbase{
 
 
         $this->setParametro('id_concepto','id_concepto','int4');
+        $this->setParametro('id_partida','id_partida','int4');
+        $this->setParametro('tipo_reporte','tipo_reporte','varchar');
         $this->capturaCount('total_monto_ot','numeric');
 
 
@@ -717,10 +723,15 @@ class MODPlanPago extends MODbase{
         $this->captura('justificacion','varchar');
         /**************************************************************************************/
 
+        $this->captura('desc_funcionario1','text');
+        $this->captura('id_partida','int4');
+        $this->captura('nombre_partida','varchar');
+        $this->captura('codigo_partida','varchar');
+        $this->captura('nombre_ingas','text');
 
         //Ejecuta la instruccion
         $this->armarConsulta();
-        echo $this->thisconsulta;
+        // echo $this->consulta;exit;
         $this->ejecutarConsulta();
 
         //Devuelve la respuesta
@@ -963,6 +974,8 @@ class MODPlanPago extends MODbase{
         $this->captura('c31', 'varchar');
         $this->captura('numero', 'varchar');
 
+        $this->captura('porc_monto_retgar', 'NUMERIC');
+
         //Ejecuta la instruccion
         $this->armarConsulta();
         $this->ejecutarConsulta();
@@ -1167,6 +1180,31 @@ class MODPlanPago extends MODbase{
 
 
     }
+
+    function listarProcesoResumenXContrato() {
+  			//Definicion de variables para ejecucion del procedimientp
+  			$this->procedimiento='tes.f_plan_pago_sel';
+  			$this->transaccion='TES_REXCONT_SEL';
+  			$this->tipo_procedimiento='SEL';//tipo de transaccion
+
+  			//Definicion de la lista del resultado del query
+        $this->setParametro('fecha_ini','fecha_ini','date');
+        $this->setParametro('fecha_fin','fecha_fin','date');
+        $this->setParametro('id_proveedor','id_proveedor','integer');
+        $this->setParametro('id_contrato','id_contrato','integer');
+  			$this->setCount(false);
+
+  			$this->captura('jsonData','text');
+
+  			//Ejecuta la instruccion
+  			$this->armarConsulta();
+  			 // echo $this->consulta;exit;
+  			$this->ejecutarConsulta();
+
+  			//Devuelve la respuesta
+  			return $this->respuesta;
+
+  	}
 
 }
 ?>
