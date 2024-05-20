@@ -151,7 +151,8 @@ Phx.vista.FormObligacion=Ext.extend(Phx.frmInterfaz,{
 						                allowBlank: false,
 						                allowDecimals: true,
 						                allowNegative:false,
-						                decimalPrecision:2
+						                decimalPrecision:2,
+                                        style: 'text-align:right;max-width:55px;' //fRnk: a solicitud
 						            })
 					
 			  }

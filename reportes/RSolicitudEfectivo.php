@@ -42,7 +42,7 @@ Class RSolicitudEfectivo extends CustomReport {
 	function __construct(CTParametro $objParam) {
 		$this->objParam = $objParam;
 	}
-    function write() {
+    function write1() {//18-04-2022 ANPM se cambia el nombre de la función write por conflicto con función de la librería
     	
         $pdf = new CustomReport($this->objParam);
         $pdf->setDataSource($this->getDataSource());

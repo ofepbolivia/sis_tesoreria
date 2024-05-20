@@ -212,7 +212,7 @@ class ACTSolicitudEfectivo extends ACTbase{
 
 		$reporte->setDataSource($dataSource);
 
-		$reporte->write();
+		$reporte->write1();//18-04-2022 ANPM se cambia el nombre de la función write por conflicto con función de la librería
 
 			if(!$create_file){
 						$mensajeExito = new Mensaje();
@@ -290,7 +290,7 @@ class ACTSolicitudEfectivo extends ACTbase{
 
 		$reporte->setDataSource($dataSource);
 
-		$reporte->write();
+		$reporte->write1();//18-04-2022 ANPM se cambia el nombre de la función write por conflicto con función de la librería
 
 			if(!$create_file){
 						$mensajeExito = new Mensaje();
@@ -387,7 +387,7 @@ class ACTSolicitudEfectivo extends ACTbase{
 
 		$reporte->setDataSource($dataSource);
 
-		$reporte->write();
+		$reporte->write1();//18-04-2022 ANPM se cambia el nombre de la función write por conflicto con función de la librería
 
 			if(!$create_file){
 						$mensajeExito = new Mensaje();

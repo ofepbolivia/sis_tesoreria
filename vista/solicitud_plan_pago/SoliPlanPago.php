@@ -2200,7 +2200,8 @@ header("content-type: text/javascript; charset=UTF-8");
             } else {
                 this.tmp_porc_monto_excento_var = undefined;
             }
-
+            this.Cmp.id_proveedor_cta_bancaria.enable();
+            /*fRnk: se comento temporalmente para realizar pruebas
             if (data.estado == 'vbconta') {
                 this.Cmp.obs_monto_no_pagado.allowBlank = false;
 
@@ -2211,7 +2212,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     this.Cmp.id_proveedor_cta_bancaria.disable();
                     this.Cmp.id_proveedor_cta_bancaria.allowBlank = true;
                 }
-            }
+            }*/
            /* console.log('forma pago: ',data);
             if (data.estado == 'borrador') {
                 this.Cmp.obs_monto_no_pagado.allowBlank = false;
@@ -2557,6 +2558,7 @@ header("content-type: text/javascript; charset=UTF-8");
 
         ocultarCheCue: function (me, pFormaPago) {
             console.log('llega2m', pFormaPago);
+          /*fRnk: se comento temporalmente para realizar pruebas
             if (pFormaPago == 'transferencia' || pFormaPago =='debito_automatico') {
                 me.Cmp.id_proveedor_cta_bancaria.allowBlank = false;
                 me.Cmp.id_proveedor_cta_bancaria.enable()
@@ -2565,7 +2567,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 me.Cmp.id_proveedor_cta_bancaria.setValue('');
                 me.Cmp.id_proveedor_cta_bancaria.disable();
             }
-
+*/
         },
 
 
