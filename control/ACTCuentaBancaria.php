@@ -66,9 +66,14 @@ class ACTCuentaBancaria extends ACTbase{
 		if($this->objParam->getParametro('tipo_interfaz')!=''){
 			$this->objParam->addFiltro("''".$this->objParam->getParametro('tipo_interfaz')."''=ANY(fin.sw_tipo_interfaz)");
 		}
-		*/	
-		$this->objFunc=$this->create('MODCuentaBancaria');			
-		$this->res=$this->objFunc->listarCuentaBancariaUsuario($this->objParam);
+		*/
+        if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){ //fRnk: adicionado a solicitud c) HR01765-2024
+            $this->objReporte = new Reporte($this->objParam,$this);
+            $this->res = $this->objReporte->generarReporteListado('MODCuentaBancaria','listarCuentaBancariaUsuario');
+        } else {
+            $this->objFunc = $this->create('MODCuentaBancaria');
+            $this->res = $this->objFunc->listarCuentaBancariaUsuario($this->objParam);
+        }
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
 				

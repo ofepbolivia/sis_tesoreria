@@ -12,7 +12,8 @@ header("content-type: text/javascript; charset=UTF-8");
 Phx.vista.PeriodoTes = {
 	require:'../../../sis_parametros/vista/periodo_subsistema/PeriodoSubsistema.php',
 	requireclase:'Phx.vista.PeriodoSubsistema',
-	title:'Períodos',
+	title:'Estado de Periodos de TesorerÃ­a', //fRnk: a) HR01765-2024
+    title2:'',
 	codSist: 'TES',
 	bdel: false,
 	bedit: false,
@@ -24,7 +25,6 @@ Phx.vista.PeriodoTes = {
 		Ext.apply(this.store.baseParams,{codSist: this.codSist});
 		this.load({params:{start:0, limit:50}});
 	},
-	
     codReporte:'S/C',
 	codSist:'TES',
 	pdfOrientacion:'L'

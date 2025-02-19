@@ -482,7 +482,7 @@ Phx.vista.CuentaBancaria=Ext.extend(Phx.gridInterfaz,{
         }
 	],
 	
-	title:'Cuenta Bancaria',
+	title:'Detalle de Cuentas Fiscales', //fRnk: modificado c) HR01765-2024
 	ActSave:'../../sis_tesoreria/control/CuentaBancaria/insertarCuentaBancaria',
 	ActDel:'../../sis_tesoreria/control/CuentaBancaria/eliminarCuentaBancaria',
 	ActList:'../../sis_tesoreria/control/CuentaBancaria/listarCuentaBancariaUsuario',
