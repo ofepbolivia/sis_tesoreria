@@ -17,19 +17,19 @@ Phx.vista.CuentaBancariaPeriodo=Ext.extend(Phx.gridInterfaz,{
     	//llama al constructor de la clase padre
 		Phx.vista.CuentaBancariaPeriodo.superclass.constructor.call(this,config);
 		this.init();
-		
+
 		this.addButton('btnAbrirCerrarPeriodo',
 			{
 				text: 'Cerrar/Abrir',
 				iconCls: 'block',
-				disabled: false,
+				disabled: true,
 				handler: this.abrirCerrarPeriodo,
 				tooltip: '<b>Cerrar/Abrir</b><br/>Cerrar/Abrir el periodo de una cuenta bancaria'
 			}
 		);
 		//this.load({params:{start:0, limit:this.tam_pag}})
 	},
-			
+
 	Atributos:[
 		{
 			//configuracion del componente
@@ -39,30 +39,30 @@ Phx.vista.CuentaBancariaPeriodo=Ext.extend(Phx.gridInterfaz,{
 					name: 'id_cuenta_bancaria_periodo'
 			},
 			type:'Field',
-			form:true 
+			form:true
 		},
 		{
 			config: {
 				name: 'id_cuenta_bancaria',
-				fieldLabel: 'id_cuenta_bancaria',
-				allowBlank: true,
+				fieldLabel: 'Cuenta bancaria',
+				allowBlank: false,
 				emptyText: 'Elija una opción...',
 				store: new Ext.data.JsonStore({
 					url: '../../sis_tesoreria/control/CuentaBancaria/listarCuentaBancaria',
-					id: 'id_',
+					//id: 'id_',
 					root: 'datos',
 					sortInfo: {
-						field: 'nombre',
+						field: 'inst.nombre', //fRnk
 						direction: 'ASC'
 					},
 					totalProperty: 'total',
-					fields: ['id_', 'nombre', 'codigo'],
+					fields: ['id_cuenta_bancaria', 'nro_cuenta', 'nombre_institucion'],
 					remoteSort: true,
 					baseParams: {par_filtro: 'movtip.nombre#movtip.codigo'}
 				}),
-				valueField: 'id_',
-				displayField: 'nombre',
-				gdisplayField: 'desc_',
+				valueField: 'id_cuenta_bancaria',
+				displayField: 'nro_cuenta',
+				gdisplayField: 'nro_cuenta',
 				hiddenName: 'id_cuenta_bancaria',
 				forceSelection: true,
 				typeAhead: false,
@@ -74,9 +74,11 @@ Phx.vista.CuentaBancariaPeriodo=Ext.extend(Phx.gridInterfaz,{
 				anchor: '100%',
 				gwidth: 150,
 				minChars: 2,
-				renderer : function(value, p, record) {
+				/*renderer : function(value, p, record) {
 					return String.format('{0}', record.data['desc_']);
-				}
+				}*/
+                tpl: '<tpl for="."><div class="x-combo-list-item"><p>{nro_cuenta}</p></div></tpl>',
+                renderer:function(value, p, record){return String.format('{0}', record.data['nro_cuenta']);},
 			},
 			type: 'ComboBox',
 			id_grupo: 0,
@@ -87,18 +89,18 @@ Phx.vista.CuentaBancariaPeriodo=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'gestion',
-				fieldLabel: 'Gestion',
-				allowBlank: true,
+				fieldLabel: 'Gestión',
+				allowBlank: false,
 				anchor: '80%',
 				gwidth: 100,
-				maxLength:-5
+				maxLength:4
 			},
 				type:'TextField',
 				filters:{pfiltro:'perctab.gestion',type:'string'},
 				id_grupo:1,
 				grid:true,
-				form:true
-		},		
+				form:false
+		},
 		{
 			config:{
 				name: 'nombre_periodo',
@@ -106,36 +108,34 @@ Phx.vista.CuentaBancariaPeriodo=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
-				maxLength:-5
+				maxLength:10
 			},
 				type:'TextField',
 				filters:{pfiltro:'perctab.estado',type:'string'},
 				id_grupo:1,
 				grid:true,
-				form:true
+				form:false
 		},
 		{
 			config: {
 				name: 'id_periodo',
 				fieldLabel: 'Periodo',
-				allowBlank: true,
+				allowBlank: false,
 				emptyText: 'Elija una opción...',
-				store: new Ext.data.JsonStore({
-					url: '../../sis_tesoreria/control/CuentaBancariaPeriodo/listarCuentaBancariaPeriodo',//Correcion en la direccion la obtencion de id_periodo
-					id: 'id_',
+				store: new Ext.data.JsonStore({ //HR01765-2024
+					//url: '../../sis_tesoreria/control/CuentaBancariaPeriodo/listarCuentaBancariaPeriodo',//Correcion en la direccion la obtencion de id_periodo
+					url: '../../sis_parametros/control/PeriodoSubsistema/listarPeriodoSubsistema',
+					//id: 'id_',
 					root: 'datos',
-					sortInfo: {
-						field: 'nombre',
-						direction: 'ASC'
-					},
+					sortInfo: {field: 'gestion,periodo',direction: 'DESC'},
 					totalProperty: 'total',
-					fields: ['id_', 'nombre', 'codigo'],
+					fields: ['id_periodo_subsistema', 'periodo', 'id_periodo', 'gestion'],
 					remoteSort: true,
-					baseParams: {par_filtro: 'movtip.nombre#movtip.codigo'}
+					baseParams: {codSist: 'TES'}
 				}),
-				valueField: 'id_',
-				displayField: 'nombre',
-				gdisplayField: 'desc_',
+				valueField: 'id_periodo',
+				displayField: 'periodo',
+				gdisplayField: 'periodo',
 				hiddenName: 'id_periodo',
 				forceSelection: true,
 				typeAhead: false,
@@ -147,9 +147,8 @@ Phx.vista.CuentaBancariaPeriodo=Ext.extend(Phx.gridInterfaz,{
 				anchor: '100%',
 				gwidth: 80,
 				minChars: 2,
-				renderer : function(value, p, record) {
-					return String.format('{0}', record.data['periodo']);
-				}
+                tpl: '<tpl for="."><div class="x-combo-list-item"><p>{gestion} - {periodo}</p></div></tpl>',
+
 			},
 			type: 'ComboBox',
 			id_grupo: 0,
@@ -160,18 +159,18 @@ Phx.vista.CuentaBancariaPeriodo=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'estado',
-				fieldLabel: 'estado',
+				fieldLabel: 'Estado',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
-				maxLength:-5
+				maxLength:15,
 			},
 				type:'TextField',
 				filters:{pfiltro:'perctab.estado',type:'string'},
 				id_grupo:1,
 				grid:true,
 				form:true
-		},		
+		},
 		{
 			config:{
 				name: 'estado_reg',
@@ -209,7 +208,7 @@ Phx.vista.CuentaBancariaPeriodo=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
-							format: 'd/m/Y', 
+							format: 'd/m/Y',
 							renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
 			},
 				type:'DateField',
@@ -270,7 +269,7 @@ Phx.vista.CuentaBancariaPeriodo=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
-							format: 'd/m/Y', 
+							format: 'd/m/Y',
 							renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
 			},
 				type:'DateField',
@@ -280,7 +279,7 @@ Phx.vista.CuentaBancariaPeriodo=Ext.extend(Phx.gridInterfaz,{
 				form:false
 		}
 	],
-	tam_pag:50,	
+	tam_pag:50,
 	title:'Periodos por Cuenta Bancaria',
 	ActSave:'../../sis_tesoreria/control/CuentaBancariaPeriodo/insertarCuentaBancariaPeriodo',
 	ActDel:'../../sis_tesoreria/control/CuentaBancariaPeriodo/eliminarCuentaBancariaPeriodo',
@@ -303,42 +302,47 @@ Phx.vista.CuentaBancariaPeriodo=Ext.extend(Phx.gridInterfaz,{
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'usr_reg', type: 'string'},
 		{name:'usr_mod', type: 'string'},
-		
+
 	],
-	
+
 	preparaMenu:function(tb){
         Phx.vista.CuentaBancariaPeriodo.superclass.preparaMenu.call(this,tb)
-        
+
 		var data = this.getSelectedData();
 		if(data['estado']== 'cerrado'){
 			this.getBoton('btnAbrirCerrarPeriodo').setIconClass('bunlock');
 		}
 		else{
 			this.getBoton('btnAbrirCerrarPeriodo').setIconClass('block');
-		}        
+		}
     },
-	
+
 	onReloadPage:function(m)
 	{
-		this.maestro=m;						
+		this.maestro=m;
 		this.store.baseParams={id_cuenta_bancaria:this.maestro.id_cuenta_bancaria};
-		this.load({params:{start:0, limit:50}});			
+		this.load({params:{start:0, limit:50}});
+        this.getBoton('btnAbrirCerrarPeriodo').enable();
 	},
-	
+
 	abrirCerrarPeriodo:function(){
-	    Phx.CP.loadingShow();
-	    var d = this.sm.getSelected().data;
-        Ext.Ajax.request({
-            url:'../../sis_tesoreria/control/CuentaBancariaPeriodo/abrirCerrarCuentaBancariaPeriodo',
-            params:{id_cuenta_bancaria_periodo:d.id_cuenta_bancaria_periodo, estado:d.estado},
-            success:this.successAbrirCerrarPeriodo,
-            failure: this.conexionFailure,
-            timeout:this.timeout,
-            scope:this
-        }); 
-	    
+        var d = this.sm.getSelected();
+        if(d){//fRnk
+            d = d.data;
+            Phx.CP.loadingShow();
+            Ext.Ajax.request({
+                url:'../../sis_tesoreria/control/CuentaBancariaPeriodo/abrirCerrarCuentaBancariaPeriodo',
+                params:{id_cuenta_bancaria_periodo:d.id_cuenta_bancaria_periodo, estado:d.estado},
+                success:this.successAbrirCerrarPeriodo,
+                failure: this.conexionFailure,
+                timeout:this.timeout,
+                scope:this
+            });
+        }else{
+            alert('Debe seleccionar un periodo para abrir o cerrar.');
+        }
 	},
-	
+
 	successAbrirCerrarPeriodo:function(resp){
        Phx.CP.loadingHide();
        var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
@@ -346,14 +350,14 @@ Phx.vista.CuentaBancariaPeriodo=Ext.extend(Phx.gridInterfaz,{
          this.reload();
        }
     },
-	
+
 	sortInfo:{
 		field: 'per.id_gestion DESC, per.periodo',
 		direction: 'DESC'
 	},
 	bdel:false,
 	bsave:false,
-	bnew:false,
+	bnew:true,
 	bedit:false
 	}
 )
