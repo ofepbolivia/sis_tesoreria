@@ -1,138 +1,150 @@
 <?php
 /**
- *@package pXP
- *@file gen-ACTTsLibroBancos.php
- *@author  (admin)
- *@date 01-12-2013 09:10:17
- *@description Clase que recibe los parametros enviados por la vista para mandar a la capa de Modelo
+ * @package pXP
+ * @file gen-ACTTsLibroBancos.php
+ * @author  (admin)
+ * @date 01-12-2013 09:10:17
+ * @description Clase que recibe los parametros enviados por la vista para mandar a la capa de Modelo
  */
-include_once(dirname(__FILE__).'/../../lib/lib_general/funciones.inc.php');
-require_once(dirname(__FILE__).'/../../pxp/pxpReport/ReportWriter.php');
-require_once(dirname(__FILE__).'/../../sis_tesoreria/reportes/RLibroBancos.php');
-require_once(dirname(__FILE__).'/../reportes/RMemoCajaChica.php');
-require_once(dirname(__FILE__).'/../../pxp/pxpReport/DataSource.php');
-include_once(dirname(__FILE__).'/../../lib/PHPMailer/class.phpmailer.php');
-include_once(dirname(__FILE__).'/../../lib/PHPMailer/class.smtp.php');
-include_once(dirname(__FILE__).'/../../lib/lib_general/cls_correo_externo.php');
+include_once(dirname(__FILE__) . '/../../lib/lib_general/funciones.inc.php');
+require_once(dirname(__FILE__) . '/../../pxp/pxpReport/ReportWriter.php');
+require_once(dirname(__FILE__) . '/../../sis_tesoreria/reportes/RLibroBancos.php');
+require_once(dirname(__FILE__) . '/../reportes/RMemoCajaChica.php');
+require_once(dirname(__FILE__) . '/../../pxp/pxpReport/DataSource.php');
+include_once(dirname(__FILE__) . '/../../lib/PHPMailer/class.phpmailer.php');
+include_once(dirname(__FILE__) . '/../../lib/PHPMailer/class.smtp.php');
+include_once(dirname(__FILE__) . '/../../lib/lib_general/cls_correo_externo.php');
 
-include_once(dirname(__FILE__).'/../../lib/lib_general/ExcelInput.php');
+include_once(dirname(__FILE__) . '/../../lib/lib_general/ExcelInput.php');
 
 
-class ACTTsLibroBancosExtracto extends ACTbase{
+class ACTTsLibroBancosExtracto extends ACTbase
+{
 
-    function listarTsLibroBancosExtracto(){
-        $this->objParam->defecto('ordenacion','id_libro_bancos');
-        $this->objParam->defecto('dir_ordenacion','asc');
+    function listarTsLibroBancosExtracto()
+    {
+        $this->objParam->defecto('ordenacion', 'id_libro_bancos');
+        $this->objParam->defecto('dir_ordenacion', 'asc');
 
-        if($this->objParam->getParametro('id_cuenta_bancaria')!=''){
-            $this->objParam->addFiltro("id_cuenta_bancaria = ".$this->objParam->getParametro('id_cuenta_bancaria'));
+        if ($this->objParam->getParametro('id_cuenta_bancaria') != '') {
+            $this->objParam->addFiltro("id_cuenta_bancaria = " . $this->objParam->getParametro('id_cuenta_bancaria'));
         }
 
-        if($this->objParam->getParametro('mycls')=='TsLibroBancosDeposito'){
+        if ($this->objParam->getParametro('mycls') == 'TsLibroBancosDeposito') {
             $this->objParam->addFiltro("id_libro_bancos_fk is null");
             $this->objParam->addFiltro("tipo=''deposito''");
         }
-        if($this->objParam->getParametro('mycls')=='TsLibroBancosCheque'){
-            $this->objParam->addFiltro("id_libro_bancos_fk = ".$this->objParam->getParametro('id_libro_bancos'));
+        if ($this->objParam->getParametro('mycls') == 'TsLibroBancosCheque') {
+            $this->objParam->addFiltro("id_libro_bancos_fk = " . $this->objParam->getParametro('id_libro_bancos'));
             $this->objParam->addFiltro("tipo in (''cheque'',''debito_automatico'',''transferencia_carta'',''transf_interna_debe'')");
         }
-        if($this->objParam->getParametro('mycls')=='TsLibroBancosDepositoExtra'){
-            $this->objParam->addFiltro("id_libro_bancos_fk = ".$this->objParam->getParametro('id_libro_bancos'));
+        if ($this->objParam->getParametro('mycls') == 'TsLibroBancosDepositoExtra') {
+            $this->objParam->addFiltro("id_libro_bancos_fk = " . $this->objParam->getParametro('id_libro_bancos'));
             $this->objParam->addFiltro("tipo in (''deposito'',''transf_interna_haber'')");
         }
 
-        if($this->objParam->getParametro('mycls')=='TsLibroBancos'){
+        if ($this->objParam->getParametro('mycls') == 'TsLibroBancos') {
             //$this->objParam->addFiltro("id_libro_bancos_fk is null");
         }
 
-        if($this->objParam->getParametro('mycls')=='RelacionDeposito'){
+        if ($this->objParam->getParametro('mycls') == 'RelacionDeposito') {
             $this->objParam->addFiltro("columna_pk is null");
             $this->objParam->addFiltro("tipo=''deposito''");
         }
 
-        if($this->objParam->getParametro('mycls')=='RelacionarCheque'){
+        if ($this->objParam->getParametro('mycls') == 'RelacionarCheque') {
             $this->objParam->addFiltro("id_int_comprobante is null");
             $this->objParam->addFiltro("tipo=''cheque''");
         }
 
-        if($this->objParam->getParametro('m_nro_cheque')!=''){
+        if ($this->objParam->getParametro('m_nro_cheque') != '') {
             $this->objParam->addFiltro("nro_cheque= (Select max (lb.nro_cheque)
 													From tes.tts_libro_bancos lb 
-													Where lb.id_cuenta_bancaria=".$this->objParam->getParametro('m_id_cuenta_bancaria').") ");
+													Where lb.id_cuenta_bancaria=" . $this->objParam->getParametro('m_id_cuenta_bancaria') . ") ");
         }
 
-        if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
-            $this->objReporte = new Reporte($this->objParam,$this);
-            $this->res = $this->objReporte->generarReporteListado('MODTsLibroBancos','listarTsLibroBancos');
-        } else{
-            $this->objFunc=$this->create('MODTsLibroBancosExtracto');
+        if ($this->objParam->getParametro('tipoReporte') == 'excel_grid' || $this->objParam->getParametro('tipoReporte') == 'pdf_grid') {
+            $this->objReporte = new Reporte($this->objParam, $this);
+            $this->res = $this->objReporte->generarReporteListado('MODTsLibroBancos', 'listarTsLibroBancos');
+        } else {
+            $this->objFunc = $this->create('MODTsLibroBancosExtracto');
 
-            $this->res=$this->objFunc->listarTsLibroBancosExtracto($this->objParam);
-        }
-        $this->res->imprimirRespuesta($this->res->generarJson());
-    }
-
-    function listarTsLibroBancosDepositosConSaldo(){
-        $this->objParam->defecto('ordenacion','fecha');
-        $this->objParam->defecto('dir_ordenacion','desc');
-        $this->objFunc=$this->create('MODTsLibroBancos');
-        $this->res=$this->objFunc->listarTsLibroBancosDepositosConSaldo($this->objParam);
-        $this->res->imprimirRespuesta($this->res->generarJson());
-    }
-
-    function insertarTsLibroBancosExtracto(){
-        $this->objFunc=$this->create('MODTsLibroBancosExtracto');
-        if($this->objParam->insertar('id_libro_bancos')){
-            $this->res=$this->objFunc->insertarTsLibroBancosExtracto($this->objParam);
-        } else{
-            $this->res=$this->objFunc->modificarTsLibroBancos($this->objParam);
+            $this->res = $this->objFunc->listarTsLibroBancosExtracto($this->objParam);
         }
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
 
-    function anteriorEstadoLibroBancosExtracto(){
-        $this->objFunc=$this->create('MODTsLibroBancos');
-        $this->res=$this->objFunc->anteriorEstadoLibroBancos($this->objParam);
+    function listarTsLibroBancosDepositosConSaldo()
+    {
+        $this->objParam->defecto('ordenacion', 'fecha');
+        $this->objParam->defecto('dir_ordenacion', 'desc');
+        $this->objFunc = $this->create('MODTsLibroBancos');
+        $this->res = $this->objFunc->listarTsLibroBancosDepositosConSaldo($this->objParam);
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
 
-    function siguienteEstadoLibroBancosExtracto(){
-        $this->objFunc=$this->create('MODTsLibroBancos');
-        $this->res=$this->objFunc->siguienteEstadoLibroBancos($this->objParam);
+    function insertarTsLibroBancosExtracto()
+    {
+        $this->objFunc = $this->create('MODTsLibroBancosExtracto');
+        if ($this->objParam->insertar('id_libro_bancos')) {
+            $this->res = $this->objFunc->insertarTsLibroBancosExtracto($this->objParam);
+        } else {
+            $this->res = $this->objFunc->modificarTsLibroBancos($this->objParam);
+        }
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
 
-    function fondoDevolucionRetencion(){
-        $this->objFunc=$this->create('MODTsLibroBancos');
-        $this->res=$this->objFunc->fondoDevolucionRetencion($this->objParam);
+    function anteriorEstadoLibroBancosExtracto()
+    {
+        $this->objFunc = $this->create('MODTsLibroBancos');
+        $this->res = $this->objFunc->anteriorEstadoLibroBancos($this->objParam);
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
 
-    function transferirDeposito(){
-        $this->objFunc=$this->create('MODTsLibroBancos');
-        $this->res=$this->objFunc->transferirDeposito($this->objParam);
+    function siguienteEstadoLibroBancosExtracto()
+    {
+        $this->objFunc = $this->create('MODTsLibroBancos');
+        $this->res = $this->objFunc->siguienteEstadoLibroBancos($this->objParam);
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
 
-    function relacionarCheque(){
-        $this->objFunc=$this->create('MODTsLibroBancos');
-        $this->res=$this->objFunc->relacionarCheque($this->objParam);
+    function fondoDevolucionRetencion()
+    {
+        $this->objFunc = $this->create('MODTsLibroBancos');
+        $this->res = $this->objFunc->fondoDevolucionRetencion($this->objParam);
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
 
-    function transferirCuenta(){
-        $this->objFunc=$this->create('MODTsLibroBancos');
-        $this->res=$this->objFunc->transferirCuenta($this->objParam);
+    function transferirDeposito()
+    {
+        $this->objFunc = $this->create('MODTsLibroBancos');
+        $this->res = $this->objFunc->transferirDeposito($this->objParam);
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
 
-    function eliminarTsLibroBancosExtracto(){
-        $this->objFunc=$this->create('MODTsLibroBancos');
-        $this->res=$this->objFunc->eliminarTsLibroBancos($this->objParam);
+    function relacionarCheque()
+    {
+        $this->objFunc = $this->create('MODTsLibroBancos');
+        $this->res = $this->objFunc->relacionarCheque($this->objParam);
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
 
-    function cargarExtractoCsv(){
+    function transferirCuenta()
+    {
+        $this->objFunc = $this->create('MODTsLibroBancos');
+        $this->res = $this->objFunc->transferirCuenta($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+
+    function eliminarTsLibroBancosExtracto()
+    {
+        $this->objFunc = $this->create('MODTsLibroBancos');
+        $this->res = $this->objFunc->eliminarTsLibroBancos($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+
+    function cargarExtractoCsv()
+    {
         //validar extnsion del archivo
         $id_cuenta_bancaria = $this->objParam->getParametro('id_cuenta_bancaria');
         $codigoArchivo = $this->objParam->getParametro('codigo');
@@ -144,97 +156,104 @@ class ACTTsLibroBancosExtracto extends ACTbase{
         $error = 'no';
         $mensaje_completo = '';
         //validar errores unicos del archivo: existencia, copia y extension
-        if(isset($arregloFiles['archivo']) && is_uploaded_file($arregloFiles['archivo']['tmp_name'])){
-/*
-            if (!in_array($extension, array('xls','xlsx','XLS','XLSX'))){
-                $mensaje_completo = "La extensión del archivo debe ser XLS o XLSX";
+        if (isset($arregloFiles['archivo']) && is_uploaded_file($arregloFiles['archivo']['tmp_name'])) {
+            /*
+                        if (!in_array($extension, array('xls','xlsx','XLS','XLSX'))){
+                            $mensaje_completo = "La extensión del archivo debe ser XLS o XLSX";
+                            $error = 'error_fatal';
+                        }else {*/
+            //procesa Archivo
+            $archivoExcel = new ExcelInput($arregloFiles['archivo']['tmp_name'], $codigoArchivo);
+            $archivoExcel->recuperarColumnasExcel();
+
+            $arrayArchivo = $archivoExcel->leerColumnasArchivoExcel();
+            //var_dump($arrayArchivo); exit;
+            foreach ($arrayArchivo as $fila) {
+                $this->objParam->addParametro('id_cuenta_bancaria', $id_cuenta_bancaria);
+                //$this->objParam->addParametro('id_tipo_movimiento', '');
+                $this->objParam->addParametro('id_tipo_movimiento', $fila['id_tipo_movimiento'] == NULL ? '' : $fila['id_tipo_movimiento']);
+                $this->objParam->addParametro('saldo', $fila['saldo'] == NULL ? '' : $fila['saldo']);
+                $this->objParam->addParametro('cod_operacion', $fila['cod_operacion'] == NULL ? '' : $fila['cod_operacion']);
+                $this->objParam->addParametro('fecha', $fila['fecha'] == NULL ? '' : $fila['fecha']);
+                if (floatval($fila['credito']) < 0) {
+                    $this->objParam->addParametro('debito', abs($fila['credito']));
+                    $this->objParam->addParametro('credito', '0.00');
+                } else {
+                    $this->objParam->addParametro('credito', $fila['credito'] == NULL ? '' : $fila['credito']);
+                    $this->objParam->addParametro('debito', $fila['debito'] == NULL ? '' : $fila['debito']);
+                }
+                $this->objParam->addParametro('nro_cbte', $fila['nro_cbte'] == NULL ? '' : $fila['nro_cbte']);
+                $this->objParam->addParametro('estado_conciliacion', $fila['estado_conciliacion'] == NULL ? '' : $fila['estado_conciliacion']);
+                $this->objParam->addParametro('importe_conciliar', $fila['importe_conciliar'] == NULL ? '' : $fila['importe_conciliar']);
+                $this->objParam->addParametro('nro_documento', $fila['nro_documento'] == NULL ? '' : $fila['nro_documento']);
+                $this->objParam->addParametro('cuenta_transf', $fila['cuenta_transf'] == NULL ? '' : $fila['cuenta_transf']);
+                $this->objParam->addParametro('secuencial', $fila['secuencial'] == NULL ? '' : $fila['secuencial']);
+                $this->objParam->addParametro('glosa', $fila['glosa'] == NULL ? '' : $fila['glosa']);
+                $this->objParam->addParametro('fecha_c', $fila['fecha_c'] == NULL ? '' : $fila['fecha_c']);
+                $this->objParam->addParametro('pnr', $fila['pnr'] == NULL ? '' : $fila['pnr']);
+                $this->objParam->addParametro('nombre', $fila['nombre'] == NULL ? '' : $fila['nombre']);
+                $this->objParam->addParametro('monto', $fila['monto'] == NULL ? '' : $fila['monto']);
+                $this->objParam->addParametro('moneda', $fila['moneda'] == NULL ? '' : $fila['moneda']);
+
+                $this->objFunc = $this->create('sis_tesoreria/MODExtracto');
+                $this->res = $this->objFunc->insertarExtractoNew($this->objParam);
+                if ($this->res->getTipo() == 'ERROR') {
+                    $error = 'error';
+                    $mensaje_completo = "Error al guardar el fila en tabla " . $this->res->getMensajeTec();
+                    //echo $mensaje_completo;
+                    //exit;
+                }
+            }
+
+            //upload directory
+            $upload_dir = "/tmp/";
+            //create file name
+            $file_path = $upload_dir . $arregloFiles['archivo']['name'];
+
+            //move uploaded file to upload dir
+            if (!move_uploaded_file($arregloFiles['archivo']['tmp_name'], $file_path)) {
+                //error moving upload file
+                $mensaje_completo = "Error al guardar el archivo csv en disco";
                 $error = 'error_fatal';
-            }else {*/
-                //procesa Archivo
-                $archivoExcel = new ExcelInput($arregloFiles['archivo']['tmp_name'], $codigoArchivo);
-                $archivoExcel->recuperarColumnasExcel();
-
-                $arrayArchivo = $archivoExcel->leerColumnasArchivoExcel();
-                //var_dump($arrayArchivo); exit;
-                foreach ($arrayArchivo as $fila) {
-                    $this->objParam->addParametro('id_cuenta_bancaria', $id_cuenta_bancaria);
-                    $this->objParam->addParametro('id_tipo_movimiento', '');
-                    $this->objParam->addParametro('saldo', $fila['saldo'] == NULL ? '' : $fila['saldo']);
-                    $this->objParam->addParametro('cod_operacion', $fila['cod_operacion'] == NULL ? '' : $fila['cod_operacion']);
-                    $this->objParam->addParametro('fecha', $fila['fecha'] == NULL ? '' : $fila['fecha']);
-                    if(floatval($fila['credito']) < 0){
-                        $this->objParam->addParametro('debito', abs($fila['credito']));
-                        $this->objParam->addParametro('credito', '0.00');
-                    }else{
-                        $this->objParam->addParametro('credito', $fila['credito'] == NULL ? '' : $fila['credito']);
-                        $this->objParam->addParametro('debito', $fila['debito'] == NULL ? '' : $fila['debito']);
-                    }
-                    $this->objParam->addParametro('nro_cbte', $fila['nro_cbte'] == NULL ? '' : $fila['nro_cbte']);
-                    $this->objParam->addParametro('importe_conciliar', $fila['importe_conciliar'] == NULL ? '' : $fila['importe_conciliar']);
-                    $this->objParam->addParametro('nro_documento', $fila['nro_documento'] == NULL ? '' : $fila['nro_documento']);
-                    $this->objParam->addParametro('secuencial', $fila['secuencial'] == NULL ? '' : $fila['secuencial']);
-                    $this->objParam->addParametro('glosa', $fila['glosa'] == NULL ? '' : $fila['glosa']);
-                    $this->objParam->addParametro('estado_conciliacion', $fila['estado_conciliacion'] == NULL ? '' : $fila['estado_conciliacion']);
-                    $this->objParam->addParametro('cuenta_transf', $fila['cuenta_transf'] == NULL ? '' : $fila['cuenta_transf']);
-                    $this->objFunc = $this->create('sis_bancos/MODExtracto');
-                    $this->res = $this->objFunc->insertarExtracto($this->objParam);
-                    if($this->res->getTipo()=='ERROR'){
-                        $error = 'error';
-                        $mensaje_completo = "Error al guardar el fila en tabla ". $this->res->getMensajeTec();
-                    }
-                }
-
-                //upload directory
-                $upload_dir = "/tmp/";
-                //create file name
-                $file_path = $upload_dir . $arregloFiles['archivo']['name'];
-
-                //move uploaded file to upload dir
-                if (!move_uploaded_file($arregloFiles['archivo']['tmp_name'], $file_path)) {
-                    //error moving upload file
-                    $mensaje_completo = "Error al guardar el archivo csv en disco";
-                    $error = 'error_fatal';
-                }
-           // }
+            }
+            // }
         } else {
             $mensaje_completo = "No se subio el archivo";
             $error = 'error_fatal';
         }
         //armar respuesta en error fatal
         if ($error == 'error_fatal') {
-
-            $this->mensajeRes=new Mensaje();
-            $this->mensajeRes->setMensaje('ERROR','ACTColumnaCalor.php',$mensaje_completo,
-                $mensaje_completo,'control');
+            $this->mensajeRes = new Mensaje();
+            $this->mensajeRes->setMensaje('ERROR', 'ACTColumnaCalor.php', $mensaje_completo, $mensaje_completo, 'control');
             //si no es error fatal proceso el archivo
         } else {
             $lines = file($file_path);
-/*
-            foreach ($lines as $line_num => $line) {
-                $arr_temp = explode('|', $line);
+            /*
+                        foreach ($lines as $line_num => $line) {
+                            $arr_temp = explode('|', $line);
 
-                if (count($arr_temp) != 2) {
-                    $error = 'error';
-                    $mensaje_completo .= "No se proceso la linea: $line_num, por un error en el formato \n";
+                            if (count($arr_temp) != 2) {
+                                $error = 'error';
+                                $mensaje_completo .= "No se proceso la linea: $line_num, por un error en el formato \n";
 
-                } else {
-                    $this->objParam->addParametro('numero',$arr_temp[0]);
-                    $this->objParam->addParametro('monto',$arr_temp[1]);
-                    $this->objFunc=$this->create('MODConsumo');
-                    $this->res=$this->objFunc->modificarConsumoCsv($this->objParam);
+                            } else {
+                                $this->objParam->addParametro('numero',$arr_temp[0]);
+                                $this->objParam->addParametro('monto',$arr_temp[1]);
+                                $this->objFunc=$this->create('MODConsumo');
+                                $this->res=$this->objFunc->modificarConsumoCsv($this->objParam);
 
-                    if ($this->res->getTipo() == 'ERROR') {
-                        $error = 'error';
-                        $mensaje_completo .= $this->res->getMensaje() . " \n";
-                    }
-                }
-            }*/
+                                if ($this->res->getTipo() == 'ERROR') {
+                                    $error = 'error';
+                                    $mensaje_completo .= $this->res->getMensaje() . " \n";
+                                }
+                            }
+                        }*/
         }
         //armar respuesta en caso de exito o error en algunas tuplas
         if ($error == 'error') {
-            $this->mensajeRes=new Mensaje();
-            $this->mensajeRes->setMensaje('ERROR','ACTConsumo.php','Ocurrieron los siguientes errores : ' . $mensaje_completo,
-                $mensaje_completo,'control');
+            $this->mensajeRes = new Mensaje();
+            $this->mensajeRes->setMensaje('ERROR', 'ACTConsumo.php', 'Ocurrieron los siguientes errores : ' . $mensaje_completo,
+                $mensaje_completo, 'control');
             /*
             $this->mensajeRes=new Mensaje();
             $this->mensajeRes->setMensaje($this->res);
@@ -243,9 +262,9 @@ class ACTTsLibroBancosExtracto extends ACTbase{
             $this->res->imprimirRespuesta($this->respuesta->generarJson());
             */
         } else if ($error == 'no') {
-            $this->mensajeRes=new Mensaje();
-            $this->mensajeRes->setMensaje('EXITO','ACTConsumo.php','El archivo fue ejecutado con éxito',
-                'El archivo fue ejecutado con éxito','control');
+            $this->mensajeRes = new Mensaje();
+            $this->mensajeRes->setMensaje('EXITO', 'ACTConsumo.php', 'El archivo fue ejecutado con éxito',
+                'El archivo fue ejecutado con éxito', 'control');
         }
 
         //devolver respuesta
@@ -253,208 +272,213 @@ class ACTTsLibroBancosExtracto extends ACTbase{
         //return $this->respuesta;
     }
 
-    function imprimirCheque(){
+    function imprimirCheque()
+    {
 
         $fecha_cheque_literal = $this->objParam->getParametro('fecha_cheque_literal');
-        $importe_cheque =$this->objParam->getParametro('importe_cheque');;
+        $importe_cheque = $this->objParam->getParametro('importe_cheque');
         $a_favor = $this->objParam->getParametro('a_favor');
         $nombre_lugar = $this->objParam->getParametro('nombre_regional');
 
-        $fichero= 'HTMLReporteCheque.php';
-        $fichero_salida = dirname(__FILE__).'/../../reportes_generados/'.$fichero;
+        $fichero = 'HTMLReporteCheque.php';
+        $fichero_salida = dirname(__FILE__) . '/../../reportes_generados/' . $fichero;
 
-        $fp=fopen($fichero_salida,w);
+        $fp = fopen($fichero_salida, w);
 
         $funciones = new funciones();
 
         $contenido = "<body onLoad='window.print();'>";
-        $contenido = $contenido. "<table border=0 style='line-height: 10px;'>";
-        $contenido = $contenido. "<td colspan='10'; style='text-align: left; width:35px; font-size:8pt'></td>";
-        $contenido = $contenido. "<td colspan='26'; style='text-align: left; width:25px; font-size:8pt'>".$nombre_lugar.", ".$fecha_cheque_literal."</td><tr>";
-        $contenido = $contenido. "<td colspan='28'; style='text-align: left; width:35px; font-size:8pt'></td>";
-        $contenido = $contenido. "<td colspan='3'; style='text-align: left; width:35px; font-size:8pt'>".number_format($importe_cheque,2)."</td><tr>";
-        $contenido = $contenido. "<td colspan='33'; style='text-align: left; width:35px; font-size:8pt'></td><tr>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td>";
-        $contenido = $contenido. "<td colspan='31'; style='text-align: left; width:35px; font-size:8pt'>".$a_favor."</td><tr>";
-        $contenido = $contenido. "<td colspan='33'; style='text-align: left; width:35px; font-size:8pt'></td><tr>";
-        $contenido = $contenido. "<td colspan='33'; style='text-align: left; width:35px; font-size:8pt'></td><tr>";
-        $contenido = $contenido. "<td colspan='33'; style='text-align: left; width:35px; font-size:8pt'></td><tr>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td>";
-        $contenido = $contenido. "<td colspan='31'; style='text-align: left; width:35px; font-size:8pt'>".$funciones->num2letrasCheque($importe_cheque).'-----'."</td><tr>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td><tr>";
-        $contenido = $contenido. '</body>';
+        $contenido = $contenido . "<table border=0 style='line-height: 10px;'>";
+        $contenido = $contenido . "<td colspan='10'; style='text-align: left; width:35px; font-size:8pt'></td>";
+        $contenido = $contenido . "<td colspan='26'; style='text-align: left; width:25px; font-size:8pt'>" . $nombre_lugar . ", " . $fecha_cheque_literal . "</td><tr>";
+        $contenido = $contenido . "<td colspan='28'; style='text-align: left; width:35px; font-size:8pt'></td>";
+        $contenido = $contenido . "<td colspan='3'; style='text-align: left; width:35px; font-size:8pt'>" . number_format($importe_cheque, 2) . "</td><tr>";
+        $contenido = $contenido . "<td colspan='33'; style='text-align: left; width:35px; font-size:8pt'></td><tr>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td>";
+        $contenido = $contenido . "<td colspan='31'; style='text-align: left; width:35px; font-size:8pt'>" . $a_favor . "</td><tr>";
+        $contenido = $contenido . "<td colspan='33'; style='text-align: left; width:35px; font-size:8pt'></td><tr>";
+        $contenido = $contenido . "<td colspan='33'; style='text-align: left; width:35px; font-size:8pt'></td><tr>";
+        $contenido = $contenido . "<td colspan='33'; style='text-align: left; width:35px; font-size:8pt'></td><tr>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td>";
+        $contenido = $contenido . "<td colspan='31'; style='text-align: left; width:35px; font-size:8pt'>" . $funciones->num2letrasCheque($importe_cheque) . '-----' . "</td><tr>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td><tr>";
+        $contenido = $contenido . '</body>';
 
         fwrite($fp, $contenido);
         fclose($fp);
 
         $mensajeExito = new Mensaje();
-        $mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado',
-            'Se generó con éxito el reporte: '.$fichero,'control');
+        $mensajeExito->setMensaje('EXITO', 'Reporte.php', 'Reporte generado',
+            'Se generó con éxito el reporte: ' . $fichero, 'control');
         $mensajeExito->setArchivoGenerado($fichero);
         $this->res = $mensajeExito;
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
 
-    function imprimirCheque2(){
+    function imprimirCheque2()
+    {
 
         $fecha_cheque_literal = $this->objParam->getParametro('fecha_cheque_literal');
-        $importe_cheque =$this->objParam->getParametro('importe_cheque');;
+        $importe_cheque = $this->objParam->getParametro('importe_cheque');
         $a_favor = $this->objParam->getParametro('a_favor');
         $nombre_lugar = $this->objParam->getParametro('nombre_regional');
 
-        $fichero= 'HTMLReporteCheque2.php';
-        $fichero_salida = dirname(__FILE__).'/../../reportes_generados/'.$fichero;
+        $fichero = 'HTMLReporteCheque2.php';
+        $fichero_salida = dirname(__FILE__) . '/../../reportes_generados/' . $fichero;
 
-        $fp=fopen($fichero_salida,w);
+        $fp = fopen($fichero_salida, w);
 
         $funciones = new funciones();
 
         $contenido = "<body onLoad='window.print();'>";
-        $contenido = $contenido. "<table border=0 style='line-height: 10px;'>";
-        $contenido = $contenido. "<td colspan='7'; style='text-align: left; width:35px; font-size:8pt'></td>";
-        $contenido = $contenido. "<td colspan='26'; style='text-align: left; width:25px; font-size:8pt'>".$nombre_lugar.", ".$fecha_cheque_literal."</td><tr>";
-        $contenido = $contenido. "<td colspan='25'; style='text-align: left; width:35px; font-size:8pt'></td>";
-        $contenido = $contenido. "<td colspan='3'; style='text-align: left; width:35px; font-size:8pt'>".number_format($importe_cheque,2)."</td><tr>";
-        $contenido = $contenido. "<td colspan='33'; style='text-align: left; width:35px; font-size:8pt'></td><tr>";
+        $contenido = $contenido . "<table border=0 style='line-height: 10px;'>";
+        $contenido = $contenido . "<td colspan='7'; style='text-align: left; width:35px; font-size:8pt'></td>";
+        $contenido = $contenido . "<td colspan='26'; style='text-align: left; width:25px; font-size:8pt'>" . $nombre_lugar . ", " . $fecha_cheque_literal . "</td><tr>";
+        $contenido = $contenido . "<td colspan='25'; style='text-align: left; width:35px; font-size:8pt'></td>";
+        $contenido = $contenido . "<td colspan='3'; style='text-align: left; width:35px; font-size:8pt'>" . number_format($importe_cheque, 2) . "</td><tr>";
+        $contenido = $contenido . "<td colspan='33'; style='text-align: left; width:35px; font-size:8pt'></td><tr>";
         /*$contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td>";
         $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td>";
         $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td>"; */
-        $contenido = $contenido. "<td colspan='31'; style='text-align: left; width:35px; font-size:8pt'>".$a_favor."</td><tr>";
-        $contenido = $contenido. "<td colspan='33'; style='text-align: left; width:35px; font-size:8pt'></td><tr>";
-        $contenido = $contenido. "<td colspan='33'; style='text-align: left; width:35px; font-size:8pt'></td><tr>";
-        $contenido = $contenido. "<td colspan='33'; style='text-align: left; width:35px; font-size:8pt'></td><tr>";
+        $contenido = $contenido . "<td colspan='31'; style='text-align: left; width:35px; font-size:8pt'>" . $a_favor . "</td><tr>";
+        $contenido = $contenido . "<td colspan='33'; style='text-align: left; width:35px; font-size:8pt'></td><tr>";
+        $contenido = $contenido . "<td colspan='33'; style='text-align: left; width:35px; font-size:8pt'></td><tr>";
+        $contenido = $contenido . "<td colspan='33'; style='text-align: left; width:35px; font-size:8pt'></td><tr>";
         /*$contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td>";
         $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td>";
         $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td>";*/
-        $contenido = $contenido. "<td colspan='31'; style='text-align: left; width:35px; font-size:8pt'>".$funciones->num2letrasCheque($importe_cheque).'-----'."</td><tr>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td><tr>";
-        $contenido = $contenido. '</body>';
+        $contenido = $contenido . "<td colspan='31'; style='text-align: left; width:35px; font-size:8pt'>" . $funciones->num2letrasCheque($importe_cheque) . '-----' . "</td><tr>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td><tr>";
+        $contenido = $contenido . '</body>';
 
         fwrite($fp, $contenido);
         fclose($fp);
 
         $mensajeExito = new Mensaje();
-        $mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado',
-            'Se generó con éxito el reporte: '.$fichero,'control');
+        $mensajeExito->setMensaje('EXITO', 'Reporte.php', 'Reporte generado',
+            'Se generó con éxito el reporte: ' . $fichero, 'control');
         $mensajeExito->setArchivoGenerado($fichero);
         $this->res = $mensajeExito;
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
 
-    function vistaPrevia(){
+    function vistaPrevia()
+    {
 
         $fecha_cheque_literal = $this->objParam->getParametro('fecha_cheque_literal');
-        $importe_cheque =$this->objParam->getParametro('importe_cheque');;
+        $importe_cheque = $this->objParam->getParametro('importe_cheque');
         $a_favor = $this->objParam->getParametro('a_favor');
         $nombre_lugar = $this->objParam->getParametro('nombre_regional');
 
-        $fichero= 'HTMLReporteCheque.php';
-        $fichero_salida = dirname(__FILE__).'/../../reportes_generados/'.$fichero;
+        $fichero = 'HTMLReporteCheque.php';
+        $fichero_salida = dirname(__FILE__) . '/../../reportes_generados/' . $fichero;
 
-        $fp=fopen($fichero_salida,w);
+        $fp = fopen($fichero_salida, w);
 
         $funciones = new funciones();
 
         $contenido = "<body onLoad='window.print();'>";
-        $contenido = $contenido. "<table border=0 style='line-height: 10px;'>";
-        $contenido = $contenido. "<td colspan='10'; style='text-align: left; width:35px; font-size:8pt'></td>";
-        $contenido = $contenido. "<td colspan='26'; style='text-align: left; width:25px; font-size:8pt'>".$nombre_lugar.", ".$fecha_cheque_literal."</td><tr>";
-        $contenido = $contenido. "<td colspan='28'; style='text-align: left; width:35px; font-size:8pt'></td>";
-        $contenido = $contenido. "<td colspan='3'; style='text-align: left; width:35px; font-size:8pt'>".number_format($importe_cheque,2)."</td><tr>";
-        $contenido = $contenido. "<td colspan='33'; style='text-align: left; width:35px; font-size:8pt'></td><tr>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td>";
-        $contenido = $contenido. "<td colspan='31'; style='text-align: left; width:35px; font-size:8pt'>".$a_favor."</td><tr>";
-        $contenido = $contenido. "<td colspan='33'; style='text-align: left; width:35px; font-size:8pt'></td><tr>";
-        $contenido = $contenido. "<td colspan='33'; style='text-align: left; width:35px; font-size:8pt'></td><tr>";
-        $contenido = $contenido. "<td colspan='33'; style='text-align: left; width:35px; font-size:8pt'></td><tr>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td>";
-        $contenido = $contenido. "<td colspan='31'; style='text-align: left; width:35px; font-size:8pt'>".$funciones->num2letrasCheque($importe_cheque).'-----'."</td><tr>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'>VISTA PREVIA SIN VALOR</td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'>VISTA PREVIA SIN VALOR</td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'>VISTA PREVIA SIN VALOR</td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'>VISTA PREVIA SIN VALOR</td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'>VISTA PREVIA SIN VALOR</td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'>VISTA PREVIA SIN VALOR</td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'>VISTA PREVIA SIN VALOR</td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'>VISTA PREVIA SIN VALOR</td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'>VISTA PREVIA SIN VALOR</td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'>VISTA PREVIA SIN VALOR</td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'>VISTA PREVIA SIN VALOR</td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'>VISTA PREVIA SIN VALOR</td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'>VISTA PREVIA SIN VALOR</td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
-        $contenido = $contenido. "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td><tr>";
-        $contenido = $contenido. '</body>';
+        $contenido = $contenido . "<table border=0 style='line-height: 10px;'>";
+        $contenido = $contenido . "<td colspan='10'; style='text-align: left; width:35px; font-size:8pt'></td>";
+        $contenido = $contenido . "<td colspan='26'; style='text-align: left; width:25px; font-size:8pt'>" . $nombre_lugar . ", " . $fecha_cheque_literal . "</td><tr>";
+        $contenido = $contenido . "<td colspan='28'; style='text-align: left; width:35px; font-size:8pt'></td>";
+        $contenido = $contenido . "<td colspan='3'; style='text-align: left; width:35px; font-size:8pt'>" . number_format($importe_cheque, 2) . "</td><tr>";
+        $contenido = $contenido . "<td colspan='33'; style='text-align: left; width:35px; font-size:8pt'></td><tr>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td>";
+        $contenido = $contenido . "<td colspan='31'; style='text-align: left; width:35px; font-size:8pt'>" . $a_favor . "</td><tr>";
+        $contenido = $contenido . "<td colspan='33'; style='text-align: left; width:35px; font-size:8pt'></td><tr>";
+        $contenido = $contenido . "<td colspan='33'; style='text-align: left; width:35px; font-size:8pt'></td><tr>";
+        $contenido = $contenido . "<td colspan='33'; style='text-align: left; width:35px; font-size:8pt'></td><tr>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td>";
+        $contenido = $contenido . "<td colspan='31'; style='text-align: left; width:35px; font-size:8pt'>" . $funciones->num2letrasCheque($importe_cheque) . '-----' . "</td><tr>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'>VISTA PREVIA SIN VALOR</td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'>VISTA PREVIA SIN VALOR</td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'>VISTA PREVIA SIN VALOR</td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'>VISTA PREVIA SIN VALOR</td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'>VISTA PREVIA SIN VALOR</td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'>VISTA PREVIA SIN VALOR</td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'>VISTA PREVIA SIN VALOR</td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'>VISTA PREVIA SIN VALOR</td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'>VISTA PREVIA SIN VALOR</td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'>VISTA PREVIA SIN VALOR</td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'>VISTA PREVIA SIN VALOR</td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'>VISTA PREVIA SIN VALOR</td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'>VISTA PREVIA SIN VALOR</td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td>";
+        $contenido = $contenido . "<td style='text-align: left; width:35px; font-size:8pt'></td><td style='text-align: left; width:35px; font-size:8pt'></td><tr>";
+        $contenido = $contenido . '</body>';
 
         fwrite($fp, $contenido);
         fclose($fp);
 
         $mensajeExito = new Mensaje();
-        $mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado',
-            'Se generó con éxito el reporte: '.$fichero,'control');
+        $mensajeExito->setMensaje('EXITO', 'Reporte.php', 'Reporte generado',
+            'Se generó con éxito el reporte: ' . $fichero, 'control');
         $mensajeExito->setArchivoGenerado($fichero);
         $this->res = $mensajeExito;
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
 
-    function listarDepositosENDESIS(){
-        $this->objParam->defecto('ordenacion','id_libro_bancos');
-        $this->objParam->defecto('dir_ordenacion','asc');
+    function listarDepositosENDESIS()
+    {
+        $this->objParam->defecto('ordenacion', 'id_libro_bancos');
+        $this->objParam->defecto('dir_ordenacion', 'asc');
 
-        if($this->objParam->getParametro('id_cuenta_bancaria')!=''){
-            $this->objParam->addFiltro("id_cuenta_bancaria = ".$this->objParam->getParametro('id_cuenta_bancaria'));
+        if ($this->objParam->getParametro('id_cuenta_bancaria') != '') {
+            $this->objParam->addFiltro("id_cuenta_bancaria = " . $this->objParam->getParametro('id_cuenta_bancaria'));
         }
 
-        if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
-            $this->objReporte = new Reporte($this->objParam,$this);
-            $this->res = $this->objReporte->generarReporteListado('MODTsLibroBancos','listarDepositosENDESIS');
-        } else{
-            $this->objFunc=$this->create('MODTsLibroBancos');
-            $this->res=$this->objFunc->listarDepositosENDESIS($this->objParam);
+        if ($this->objParam->getParametro('tipoReporte') == 'excel_grid' || $this->objParam->getParametro('tipoReporte') == 'pdf_grid') {
+            $this->objReporte = new Reporte($this->objParam, $this);
+            $this->res = $this->objReporte->generarReporteListado('MODTsLibroBancos', 'listarDepositosENDESIS');
+        } else {
+            $this->objFunc = $this->create('MODTsLibroBancos');
+            $this->res = $this->objFunc->listarDepositosENDESIS($this->objParam);
         }
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
 
-    function reporteLibroBancosExtracto(){
+    function reporteLibroBancosExtracto()
+    {
         $dataSource = new DataSource();
 
         $nro_cuenta = $this->objParam->getParametro('nro_cuenta');
@@ -464,10 +488,10 @@ class ACTTsLibroBancosExtracto extends ACTbase{
         $estado = $this->objParam->getParametro('estado');
         $finalidad = $this->objParam->getParametro('finalidad');
 
-        $this->objParam->addParametroConsulta('ordenacion','id_libro_bancos');
-        $this->objParam->addParametroConsulta('dir_ordenacion','ASC');
-        $this->objParam->addParametroConsulta('cantidad',1000);
-        $this->objParam->addParametroConsulta('puntero',0);
+        $this->objParam->addParametroConsulta('ordenacion', 'id_libro_bancos');
+        $this->objParam->addParametroConsulta('dir_ordenacion', 'ASC');
+        $this->objParam->addParametroConsulta('cantidad', 1000);
+        $this->objParam->addParametroConsulta('puntero', 0);
 
         $dataSource->putParameter('nro_cuenta', $nro_cuenta);
         $dataSource->putParameter('fecha_ini', $fecha_ini);
@@ -476,10 +500,10 @@ class ACTTsLibroBancosExtracto extends ACTbase{
         $dataSource->putParameter('estado', $estado);
         $dataSource->putParameter('finalidad', $finalidad);
 
-        $this->objFunc=$this->create('MODTsLibroBancos');
+        $this->objFunc = $this->create('MODTsLibroBancos');
         $resultLibroBancos = $this->objFunc->reporteLibroBancos($this->objParam);
 
-        if($resultLibroBancos->getTipo()=='EXITO'){
+        if ($resultLibroBancos->getTipo() == 'EXITO') {
 
             $datosLibroBancos = $resultLibroBancos->getDatos();
 
@@ -489,36 +513,36 @@ class ACTTsLibroBancosExtracto extends ACTbase{
             $reporte = new RLibroBancos();
 
             $reporte->setDataSource($dataSource);
-            $reportWriter = new ReportWriter($reporte, dirname(__FILE__).'/../../reportes_generados/'.$nombreArchivo);
+            $reportWriter = new ReportWriter($reporte, dirname(__FILE__) . '/../../reportes_generados/' . $nombreArchivo);
             $reportWriter->writeReport(ReportWriter::PDF);
 
             $mensajeExito = new Mensaje();
-            $mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado',
-                'Se generó con éxito el reporte: '.$nombreArchivo,'control');
+            $mensajeExito->setMensaje('EXITO', 'Reporte.php', 'Reporte generado',
+                'Se generó con éxito el reporte: ' . $nombreArchivo, 'control');
             $mensajeExito->setArchivoGenerado($nombreArchivo);
             $this->res = $mensajeExito;
             $this->res->imprimirRespuesta($this->res->generarJson());
-        }
-        else{
+        } else {
             $resultLibroBancos->imprimirRespuesta($resultLibroBancos->generarJson());
         }
     }
 
-    function imprimirMemoCajaChica( $create_file = false){
+    function imprimirMemoCajaChica($create_file = false)
+    {
 
         $dataSource = new DataSource();
         //$idSolicitud = $this->objParam->getParametro('id_solicitud');
         //$id_proceso_wf= $this->objParam->getParametro('id_proceso_wf');
-        $this->objParam->addParametroConsulta('ordenacion','id_cotizacion');
-        $this->objParam->addParametroConsulta('dir_ordenacion','ASC');
-        $this->objParam->addParametroConsulta('cantidad',1000);
-        $this->objParam->addParametroConsulta('puntero',0);
+        $this->objParam->addParametroConsulta('ordenacion', 'id_cotizacion');
+        $this->objParam->addParametroConsulta('dir_ordenacion', 'ASC');
+        $this->objParam->addParametroConsulta('cantidad', 1000);
+        $this->objParam->addParametroConsulta('puntero', 0);
         $this->objFunc = $this->create('MODSolicitudEfectivo');
         $resultMemoCajaChica = $this->objFunc->memoCajaChica();
 
         $funciones = new funciones();
 
-        if($resultMemoCajaChica->getTipo()=='EXITO'){
+        if ($resultMemoCajaChica->getTipo() == 'EXITO') {
 
             $datosMemoCajaChica = $resultMemoCajaChica->getDatos();
 
@@ -541,16 +565,15 @@ class ACTTsLibroBancosExtracto extends ACTbase{
             $reporte->setDataSource($dataSource);
             $nombreArchivo = 'memoCajaChica.docx';
 
-            $reporte->write(dirname(__FILE__).'/../../reportes_generados/'.$nombreArchivo);
+            $reporte->write(dirname(__FILE__) . '/../../reportes_generados/' . $nombreArchivo);
 
             $mensajeExito = new Mensaje();
-            $mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado',
-                'Se generó con éxito el reporte: '.$nombreArchivo,'control');
+            $mensajeExito->setMensaje('EXITO', 'Reporte.php', 'Reporte generado',
+                'Se generó con éxito el reporte: ' . $nombreArchivo, 'control');
             $mensajeExito->setArchivoGenerado($nombreArchivo);
             $this->res = $mensajeExito;
             $this->res->imprimirRespuesta($this->res->generarJson());
-        }
-        else{
+        } else {
 
             $resultMemoCajaChica->imprimirRespuesta($resultMemoCajaChica->generarJson());
         }
@@ -562,15 +585,16 @@ class ACTTsLibroBancosExtracto extends ACTbase{
     * DESC:   Envia email de notificacion al solicitante
     * DATE:   03/02/2015
     * */
-    function enviarNotificacion(){
+    function enviarNotificacion()
+    {
 
         //obtiene direcciones de envio
-        $this->objFunSeguridad=$this->create('MODTsLibroBancos');
-        $this->res=$this->objFunSeguridad->obtenerDatosSolicitanteFondoAvance($this->objParam);
+        $this->objFunSeguridad = $this->create('MODTsLibroBancos');
+        $this->res = $this->objFunSeguridad->obtenerDatosSolicitanteFondoAvance($this->objParam);
 
         $array = $this->res->getDatos();
 
-        if($array[0]['email']==''){
+        if ($array[0]['email'] == '') {
             echo "{\"ROOT\":{\"error\":true,\"detalle\":{\"mensaje\":\" Error al enviar correo no existe destinatario\"}}}";
         }
         ////////////////////////////////////////
@@ -578,22 +602,22 @@ class ACTTsLibroBancosExtracto extends ACTbase{
         ///////////////////////////////////////
         $data_mail = '';
 
-        $data_mail.= 'Estimad@ '.$array[0]['nombre_completo'].'<br><br>'.
+        $data_mail .= 'Estimad@ ' . $array[0]['nombre_completo'] . '<br><br>' .
 
-            'En cumplimiento a políticas de la empresa, le informamos que su solicitud ha sido atendida de acuerdo al siguiente detalle:<br><br>'.
-            '&nbsp;&nbsp;&nbsp;&nbsp;<B>Número Cheque:</B> '.$this->objParam->getParametro('nro_cheque').'<br>'.
-            '&nbsp;&nbsp;&nbsp;&nbsp;<B>A favor:</B> '.$this->objParam->getParametro('a_favor').'<br>'.
-            '&nbsp;&nbsp;&nbsp;&nbsp;<B>Detalle:</B> '.$this->objParam->getParametro('detalle').'<br>'.
-            '&nbsp;&nbsp;&nbsp;&nbsp;<B>Importe:</B> '.$this->objParam->getParametro('importe_cheque').' Bs.<br><br>'.
-            'Favor pasar a recoger el cheque de la Unidad de Tesorería.<br><br>'.
-            '-------------------------------------<br>'.
+            'En cumplimiento a políticas de la empresa, le informamos que su solicitud ha sido atendida de acuerdo al siguiente detalle:<br><br>' .
+            '&nbsp;&nbsp;&nbsp;&nbsp;<B>Número Cheque:</B> ' . $this->objParam->getParametro('nro_cheque') . '<br>' .
+            '&nbsp;&nbsp;&nbsp;&nbsp;<B>A favor:</B> ' . $this->objParam->getParametro('a_favor') . '<br>' .
+            '&nbsp;&nbsp;&nbsp;&nbsp;<B>Detalle:</B> ' . $this->objParam->getParametro('detalle') . '<br>' .
+            '&nbsp;&nbsp;&nbsp;&nbsp;<B>Importe:</B> ' . $this->objParam->getParametro('importe_cheque') . ' Bs.<br><br>' .
+            'Favor pasar a recoger el cheque de la Unidad de Tesorería.<br><br>' .
+            '-------------------------------------<br>' .
             '* Sistema ERP BOA<br>';
 
         ///////////////////////////////////////////////////
         //manda el correo electronicos al solicitante
         ///////////////////////////////////////////////////
 
-        $correo=new CorreoExterno();
+        $correo = new CorreoExterno();
         $correo->addDestinatario($_SESSION['_MAIL_NITIFICACIONES_3']); //  este mail esta destinado al area de tesoreria
         $correo->addDestinatario($array[0]['email']);
 
@@ -604,17 +628,16 @@ class ACTTsLibroBancosExtracto extends ACTbase{
         $correo->setTitulo('Solicitud atendida');
 
         $correo->setDefaultPlantilla();
-        $resp=$correo->enviarCorreo();
+        $resp = $correo->enviarCorreo();
 
-        if($resp=='OK'){
+        if ($resp == 'OK') {
             $mensajeExito = new Mensaje();
-            $mensajeExito->setMensaje('EXITO','Solicitud.php','Correo enviado',
-                'Se mando el correo con exito: OK','control' );
+            $mensajeExito->setMensaje('EXITO', 'Solicitud.php', 'Correo enviado',
+                'Se mando el correo con exito: OK', 'control');
             $this->res = $mensajeExito;
             $this->res->imprimirRespuesta($this->res->generarJson());
 
-        }
-        else{
+        } else {
             //echo $resp;
             echo "{\"ROOT\":{\"error\":true,\"detalle\":{\"mensaje\":\" Error al enviar correo\"}}}";
 
