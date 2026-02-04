@@ -15,7 +15,7 @@ include_once(dirname(__FILE__) . '/../../lib/PHPMailer/class.phpmailer.php');
 include_once(dirname(__FILE__) . '/../../lib/PHPMailer/class.smtp.php');
 include_once(dirname(__FILE__) . '/../../lib/lib_general/cls_correo_externo.php');
 
-include_once(dirname(__FILE__) . '/../../lib/lib_general/ExcelInput.php');
+include_once(dirname(__FILE__) . '/../../lib/lib_general/ExcelInput2.php');
 
 
 class ACTTsLibroBancosExtracto extends ACTbase
